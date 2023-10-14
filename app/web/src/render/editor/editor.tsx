@@ -79,7 +79,7 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
   useEffect(() => {
     if (p.status !== "init" && w.prasiApi) {
       for (const [k, v] of Object.entries(deepClone(EditorGlobal))) {
-        if (k === "session" || k === "site") continue;
+        if (k === "session" || k === "site" || "status") continue;
         (p as any)[k] = v;
       }
 
@@ -99,6 +99,7 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
   }
 
   if (p.status === "init") {
+    (window as any).mok = ((window as any).mok || 0) + 1;
     p.ui.loading = <Loading note="load-page" />;
     p.ui.preload = <Loading note="preload-root" backdrop={false} />;
     p.ui.notfound = (
@@ -109,6 +110,7 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
         PREVIEW ERROR
       </div>
     );
+    p.status = "loading";
     initEditor(p, site_id);
   }
 

@@ -83,9 +83,8 @@ export const liveWS = async (p: PG) => {
 
                   console.clear();
                   console.log(
-                    `🔥 Page updated: ${
-                      p.page?.url
-                    } ${new Date().toLocaleString()}`
+                    `🔥 Page updated: ${p.page
+                      ?.url} ${new Date().toLocaleString()}`
                   );
                 }
               })
@@ -177,49 +176,6 @@ export const liveWS = async (p: PG) => {
                 delete p.comps.pending[msg.comp_id];
                 delete p.comps.resolve[msg.comp_id];
               }
-            }
-            break;
-          case "sitejs_reload":
-            if (msg.js) {
-              p.site.js = msg.js;
-
-              const exec = (fn: string, scopes: any) => {
-                if (p) {
-                  if (!p.script.api) p.script.api = createAPI(p.site.api_url);
-                  if (!p.script.db) p.script.db = createDB(p.site.api_url);
-
-                  scopes["db"] = p.script.db;
-                  scopes["api"] = p.script.api;
-                  const f = new Function(...Object.keys(scopes), fn);
-                  const res = f(...Object.values(scopes));
-                  return res;
-                }
-                return null;
-              };
-              const w = window as any;
-              const scope = {
-                types: {},
-                exports: w.exports,
-                load: importModule,
-                render: p.render,
-                module: {
-                  exports: {} as any,
-                },
-              };
-
-              p.status = "init";
-              console.log(
-                `🔥 Site JS Reloaded: ${new Date().toLocaleString()}`
-              );
-              exec(p.site.js, scope);
-
-              if (scope.module.exports) {
-                for (const [k, v] of Object.entries(scope.module.exports)) {
-                  w.exports[k] = v;
-                }
-              }
-
-              p.render();
             }
             break;
           case "undo":
