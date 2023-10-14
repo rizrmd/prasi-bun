@@ -94,7 +94,6 @@ const getApiTypes = async () => {
 declare module "gen/srv/api/entry" {
     export * as srv from "gen/srv/api/srv";
 }
-  
 ` +
     ((await readAsync(dir("app/srv/exports.d.ts"))) || "")
       .replace(/\"app\/srv\/api/gi, '"srv/api')
