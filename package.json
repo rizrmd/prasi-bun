@@ -1,0 +1,22 @@
+{
+  "name": "prasi-deploy",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --silent --watch ./pkgs/core/index.ts dev",
+    "prod": "bun run --silent ./pkgs/core/index.ts",
+    "pull": "cd app/db && bun prisma db pull && bun prisma generate",
+    "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts"
+  },
+  "workspaces": [
+    "app/*",
+    "pkgs/*"
+  ],
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,37 @@
+{
+  "exclude": [
+    ".git",
+    "node_modules",
+    "app/static"
+  ],
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "composite": true,
+    "strict": true,
+    "downlevelIteration": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "paths": {
+      "service-srv": [
+        "./pkgs/core/server/api-ctx.ts"
+      ],
+      "utils/*": [
+        "./pkgs/core/utils/*"
+      ]
+    },
+    "types": [
+      "bun-types" // add Bun global
+    ],
+  },
+}

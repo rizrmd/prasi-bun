@@ -1,0 +1,19 @@
+{
+  "name": "core",
+  "dependencies": {
+    "@surfy/multipart-parser": "^1.0.2",
+    "@swc/core": "^1.3.91",
+    "@types/mime": "^3.0.2",
+    "@types/unzipper": "^0.10.7",
+    "execa": "^8.0.1",
+    "fs-jetpack": "^5.1.0",
+    "lmdb": "^2.8.5",
+    "mime": "^3.0.0",
+    "pino": "^8.15.3",
+    "pino-pretty": "^10.2.0",
+    "radash": "^11.0.0",
+    "radix3": "^1.1.0",
+    "typescript": "^5.2.2",
+    "unzipper": "^0.10.14"
+  }
+}
