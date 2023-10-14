@@ -85,6 +85,9 @@ export const createCache = <T>() => ({
 });
 
 export const session = createCache();
+if (session.lmdb === null) {
+  session.init({ cookieKey: "prasi-sid" });
+}
 
 const self = (me: Session) => me;
 type Session = typeof session;
