@@ -6,6 +6,11 @@ export const defineWindow = async (awaitServerUrl = true) => {
 
   if (awaitServerUrl) await waitUntil(() => w.__SRV_URL__);
 
+  w.prasiContext = {
+    global: {},
+    render() {},
+  }; 
+
   const location = window["location"];
 
   const host =
@@ -70,11 +75,10 @@ export const defineWindow = async (awaitServerUrl = true) => {
     }
 
     history.pushState({}, "", _href);
-    if (w.rootRes) w.rootRes.pathname = href;
     w.pathname = href;
 
-    if (w.rootRender) {
-      w.rootRender();
+    if (w.prasiContext && w.prasiContext.render) {
+      w.prasiContext.render();
     }
   };
 

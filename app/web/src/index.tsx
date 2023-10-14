@@ -1,6 +1,8 @@
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import { defineReact, defineWindow } from "web-utils";
 import { Root } from "./base/root";
+import "./index.css";
+import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
@@ -21,6 +23,18 @@ const registerServiceWorker = async () => {
 registerServiceWorker();
 
 const el = document.getElementById("root");
+
 if (el) {
-  createRoot(el).render(<Root />);
+  (async () => {
+    defineReact();
+    await defineWindow(false);
+    const w = window as any;
+    const base = `${location.protocol}//${location.host}`;
+
+    await reloadDBAPI(base);
+    w.api = createAPI(base);
+    w.db = createDB(base);
+
+    createRoot(el).render(<Root />);
+  })();
 }

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-
 export const useLocal = <T extends object>(
   data: T,
   effect?: (arg: {
