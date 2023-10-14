@@ -12,7 +12,6 @@ export const loadPage = async (page_id: string) => {
         id_site: true,
         url: true,
         js_compiled: true,
-        updated_at: true,
         content_tree: true,
       },
     })) as unknown as null | Page;

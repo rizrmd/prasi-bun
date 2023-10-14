@@ -81,7 +81,7 @@ export const _ = {
 export const getApiEntry = () => {
   const res: any = {};
   for (const [k, v] of Object.entries(g.api)) {
-    const name = k.substring(0, k.length - 3);
+    const name = k.substring(0, k.length - 3).replace(/\W/gi, "_");
     res[name] = { ...v, name, path: `app/srv/api/${v.path}` };
   }
 
@@ -108,7 +108,8 @@ const getPrisma = async (path: string) => {
   if (path === "prisma")
     return JSON.stringify(
       (
-        (await readAsync(dir.path("node_modules/.prisma/client/index.d.ts"))) || ""
+        (await readAsync(dir.path("node_modules/.prisma/client/index.d.ts"))) ||
+        ""
       ).replace(`@prisma/client/runtime/library`, `./runtime/library`)
     );
 
@@ -121,7 +122,9 @@ const getPrisma = async (path: string) => {
 
   if (path === "library")
     return JSON.stringify(
-      await readAsync(dir.path("node_modules/@prisma/client/runtime/library.d.ts"))
+      await readAsync(
+        dir.path("node_modules/@prisma/client/runtime/library.d.ts")
+      )
     );
 
   return JSON.stringify({});

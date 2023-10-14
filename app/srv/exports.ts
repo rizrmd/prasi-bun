@@ -19,6 +19,13 @@ export const npm = {
   args: ["mode","id"],
   handler: import("./api/npm")
 }
+export const site_dts = {
+  name: "site_dts",
+  url: "/site-dts/:site_id",
+  path: "app/srv/api/site-dts.ts",
+  args: ["site_id"],
+  handler: import("./api/site-dts")
+}
 export const _upload = {
   name: "_upload",
   url: "/_upload",

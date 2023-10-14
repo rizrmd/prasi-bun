@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { createRouter } from "web-utils";
+import { createRouter } from "radix3";
 import { CompDoc } from "../../../base/global/content-editor";
 import { IContent, MContent, MPage } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
@@ -55,7 +55,10 @@ export type LSite = {
   config?: any;
 };
 export type Loader = {
-  site: (p: PG, where: { domain: string } | { id: string }) => Promise<LSite>;
+  site: (
+    p: PG,
+    where: { domain: string } | { id: string }
+  ) => Promise<LSite | null>;
   page: (p: PG, id: string) => Promise<LPage | null>;
   pages: (p: PG, site_id: string) => Promise<LPage[]>;
   npm: (p: PG, type: "site" | "page", id: string) => string;
