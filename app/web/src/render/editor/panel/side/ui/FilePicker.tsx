@@ -1,5 +1,5 @@
 import { FC, useTransition } from "react";
-import { fetchSendApi } from "web-init/src/web/iframe-cors";
+import { fetchSendApi } from "web-utils/src/web/iframe-cors";
 import { useLocal } from "web-utils";
 import { Button } from "./Button";
 export const FilePicker: FC<{

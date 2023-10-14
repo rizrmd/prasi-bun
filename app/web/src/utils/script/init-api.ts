@@ -1,7 +1,7 @@
 import { createStore, get, set } from "idb-keyval";
 import trim from "lodash.trim";
-import { apiClient, dbClient } from "web-init";
-import { createFrameCors } from "web-init/src/web/iframe-cors";
+import { apiClient, dbClient } from "web-utils";
+import { createFrameCors } from "web-utils/src/web/iframe-cors";
 export const w = window as unknown as {
   prasiApi: Record<string, any>;
   apiHeaders: any;

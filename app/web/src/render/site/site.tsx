@@ -1,8 +1,6 @@
 import { FC, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { defineReact } from "web-init/src/web/define-react";
-import { defineWindow } from "web-init/src/web/define-window";
-import { GlobalContext } from "web-utils";
+import { GlobalContext, defineReact, defineWindow } from "web-utils";
 import { SiteLoader } from "./site-loader";
 
 const w = window as unknown as {
@@ -22,15 +20,16 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
   };
   w.rootRender = w.prasiContext.render;
 
+  const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
   return (
-    <GlobalContext.Provider value={w.prasiContext}>
+    <Provider value={w.prasiContext}>
       <Live
         domain={url.host}
         pathname={location.pathname}
         loader={SiteLoader}
         mode="prod"
       />
-    </GlobalContext.Provider>
+    </Provider>
   );
 };
 

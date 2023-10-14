@@ -1,4 +1,4 @@
-import { page } from "web-init";
+import { page } from "web-utils";
 
 export default page({
   url: "*",

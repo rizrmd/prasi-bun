@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import "../../web-init/src/types";
 
 export const useLocal = <T extends object>(
   data: T,

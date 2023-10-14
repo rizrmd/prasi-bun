@@ -1,4 +1,4 @@
-import { Server } from "bun";
+import { Server, Subprocess } from "bun";
 import { Logger } from "pino";
 import { RadixRouter } from "radix3";
 import { PrismaClient } from "../../../app/db/db";
@@ -24,4 +24,5 @@ export const g = global as unknown as {
     js: string;
     etag: string;
   };
+  parcel: Subprocess;
 };

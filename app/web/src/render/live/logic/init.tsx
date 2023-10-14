@@ -1,5 +1,5 @@
 import { validate } from "uuid";
-import { createRouter, type apiClient } from "web-init";
+import { createRouter, type apiClient } from "web-utils";
 import {
   createAPI,
   createDB,

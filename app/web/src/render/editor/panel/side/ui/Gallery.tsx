@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import get from "lodash.get";
 import { FC, useTransition } from "react";
-import { fetchSendApi } from "web-init/src/web/iframe-cors";
+import { fetchSendApi } from "web-utils/src/web/iframe-cors";
 import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
 import { EditorGlobal } from "../../../logic/global";

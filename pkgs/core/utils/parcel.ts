@@ -14,13 +14,13 @@ export const parcelBuild = async () => {
     "--dist-dir",
     dir(`app/static`),
   ];
-
-  await removeAsync(dir("app/static"));
-
   g.log.info(`Building web with parcel`);
   if (g.mode !== "dev") {
+    await removeAsync(dir("app/static"));
+    await removeAsync(dir("app/web/.parcel-cache"));
+
     const parcel = spawn({
-      cmd: args,
+      cmd: args, 
       cwd: dir("app/web"),
       stdio: ["ignore", "inherit", "inherit"],
     });
@@ -31,6 +31,8 @@ export const parcelBuild = async () => {
       cwd: dir("app/web"),
       stdio: ["ignore", "pipe", "pipe"],
     });
+
+    g.parcel = parcel;
 
     let output = true;
     (async () => {
