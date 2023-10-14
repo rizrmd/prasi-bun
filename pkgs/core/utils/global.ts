@@ -11,6 +11,7 @@ type SingleRoute = {
 };
 
 export const g = global as unknown as {
+  status: "init" | "ready";
   db: PrismaClient;
   dburl: string;
   mode: "dev" | "prod";
