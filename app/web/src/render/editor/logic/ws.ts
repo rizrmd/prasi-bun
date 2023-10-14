@@ -25,7 +25,6 @@ const timeout = {
 };
 export const editorWS = async (p: PG) => {
   if (p.ws && p.ws.readyState === p.ws.OPEN) {
-    console.log("Cancelling reconnect, ws still open");
     return;
   }
   const render = () => {
