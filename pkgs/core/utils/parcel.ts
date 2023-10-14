@@ -1,4 +1,4 @@
-import { dirAsync } from "fs-jetpack";
+import { dirAsync, removeAsync } from "fs-jetpack";
 import { dir } from "./dir";
 import { g } from "./global";
 import { spawn } from "bun";
@@ -14,6 +14,8 @@ export const parcelBuild = async () => {
     "--dist-dir",
     dir(`app/static`),
   ];
+
+  await removeAsync(dir("app/static"));
 
   g.log.info(`Building web with parcel`);
   if (g.mode !== "dev") {

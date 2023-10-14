@@ -4,7 +4,7 @@ const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
       await navigator.serviceWorker.register(
-        new URL("./sw.js", import.meta.url),
+        new URL("./sworker.js", import.meta.url),
         {
           type: "module",
           scope: "/",
@@ -15,3 +15,5 @@ const registerServiceWorker = async () => {
     }
   }
 };
+
+registerServiceWorker();
