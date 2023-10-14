@@ -7,12 +7,15 @@ import { WebSocketHandler } from "bun";
 
 const cache = { static: {} as Record<string, any> };
 
+export type WSData = { url: URL };
+
 export const createServer = async () => {
   g.api = {};
   g.router = createRouter({ strictTrailingSlash: true });
   g.server = Bun.serve({
     port: g.port,
     websocket: {
+      maxPayloadLength: 99999999,
       close(ws, code, reason) {
         const pathname = ws.data.url.pathname;
         if (wsHandler[pathname]) {
@@ -40,7 +43,7 @@ export const createServer = async () => {
           }
         }
       },
-    } as WebSocketHandler<{ url: URL }>,
+    } as WebSocketHandler<WSData>,
     async fetch(req, server) {
       if (g.status === "init") return new Response("initializing...");
       const url = new URL(req.url);
