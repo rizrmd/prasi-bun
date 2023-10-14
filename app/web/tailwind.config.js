@@ -2,7 +2,6 @@
 const color = require("tailwindcss/colors");
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
-
   safelist: [
     "lg:items-end",
     "lg:items-start",

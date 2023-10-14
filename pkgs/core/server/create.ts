@@ -3,7 +3,6 @@ import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { scanApi } from "./api-scan";
 import { serveAPI } from "./serve-api";
-import "bun-types";
 
 export const createServer = async () => {
   g.router = createRouter({ strictTrailingSlash: true });
@@ -17,8 +16,11 @@ export const createServer = async () => {
       if (req.method === "GET") {
         try {
           const file = Bun.file(dir(`app/static${url.pathname}`));
-          return new Response(file);
+          if (file.type !== "application/octet-stream") {
+            return new Response(file as any);
+          }
         } catch (e) {}
+        return new Response(Bun.file(dir(`app/static/index.html`)) as any);
       } else {
         const api = await serveAPI(url, req);
         if (api) {
