@@ -1,10 +1,31 @@
+declare module "api/auth/login" {
+    export const _: {
+        url: string;
+        api(username: string, password: string): Promise<{
+            status: string;
+            session: any;
+            reason?: undefined;
+        } | {
+            status: string;
+            reason: string;
+            session?: undefined;
+        }>;
+    };
+}
 declare module "api/session" {
     export const _: {
         url: string;
-        api(): Promise<string>;
+        api(): Promise<any>;
     };
 }
 declare module "exports" {
+    export const login: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("api/auth/login")>;
+    };
     export const session: {
         name: string;
         url: string;

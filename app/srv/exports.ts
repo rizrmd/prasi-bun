@@ -1,6 +1,13 @@
+export const login = {
+  name: "login",
+  url: "/_login",
+  path: "app/srv/api/auth/login.ts",
+  args: ["username","password"],
+  handler: import("./api/auth/login")
+}
 export const session = {
   name: "session",
-  url: "/session)}",
+  url: "/session",
   path: "app/srv/api/session.ts",
   args: [],
   handler: import("./api/session")
