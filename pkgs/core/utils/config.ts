@@ -5,11 +5,11 @@ const _internal = { config: {} as any, writeTimeout: null as any };
 
 export const config = {
   init: async () => {
-    await dirAsync(dir("../data/config"));
-    await dirAsync(dir("../data/files"));
+    await dirAsync(dir.path("../data/config"));
+    await dirAsync(dir.path("../data/files"));
 
     _internal.config =
-      (await readAsync(dir("../data/config/conf.json"), "json")) || {};
+      (await readAsync(dir.path("../data/config/conf.json"), "json")) || {};
   },
   get all() {
     return _internal.config;
@@ -27,7 +27,7 @@ export const config = {
     _internal.config[key] = value;
     clearTimeout(_internal.writeTimeout);
     _internal.writeTimeout = setTimeout(() => {
-      Bun.write(dir("../data/config/conf.json"), _internal.config);
+      Bun.write(dir.path("../data/config/conf.json"), _internal.config);
     }, 100);
   },
 };

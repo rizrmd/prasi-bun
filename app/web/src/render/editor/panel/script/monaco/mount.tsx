@@ -56,7 +56,7 @@ export const jsMount = async (p: PG, editor: MonacoEditor, monaco: Monaco) => {
       }
       if (!w.importCache.prettier_parser)
         w.importCache.prettier_parser = await import(
-          "prettier/parser-typescript"
+          "prettier/plugins/typescript"
         );
 
       if (!w.importCache.prettier)

@@ -4,9 +4,9 @@ import { dir } from "./dir";
 import { dirAsync } from "fs-jetpack";
 
 export const startDevWatcher = async () => {
-  await dirAsync(dir(`app/srv/api`));
-  watch(dir(`app/srv/api`), async (event, filename) => {
-    const s = file(dir(`app/srv/api/${filename}`));
+  await dirAsync(dir.path(`app/srv/api`));
+  watch(dir.path(`app/srv/api`), async (event, filename) => {
+    const s = file(dir.path(`app/srv/api/${filename}`));
     if (s.size === 0) {
       await Bun.write(
         `app/srv/api/${filename}`,

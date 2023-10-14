@@ -22,7 +22,7 @@ export const prepareApiRoutes = async () => {
               path: importPath.substring((root || path).length + 1),
             };
             g.api[filename] = route;
-            g.router.insert(route.url, g.api[filename]);
+            g.router.insert(route.url.replace(/\*/gi, "**"), g.api[filename]);
           } catch (e) {
             g.log.warn(
               `Failed to import app/srv/api${importPath.substring(
@@ -46,6 +46,6 @@ export const prepareApiRoutes = async () => {
       }
     }
   };
-  await scan(dir(`app/srv/api`));
-  await scan(dir(`pkgs/core/api`));
+  await scan(dir.path(`app/srv/api`));
+  await scan(dir.path(`pkgs/core/api`));
 };

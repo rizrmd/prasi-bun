@@ -3,14 +3,14 @@ import { defineReact, defineWindow } from "web-utils";
 import { Root } from "./base/root";
 import "./index.css";
 import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
+import { w } from "./utils/types/general";
 
 const start = async () => {
   registerServiceWorker();
   defineReact();
   await defineWindow(false);
-  const w = window as any;
   const base = `${location.protocol}//${location.host}`;
-
+  w.serverurl = base;
   await reloadDBAPI(base);
   w.api = createAPI(base);
   w.db = createDB(base);

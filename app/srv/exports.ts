@@ -12,12 +12,12 @@ export const session = {
   args: [],
   handler: import("./api/session")
 }
-export const _web = {
-  name: "_web",
-  url: "/_web/:id/**",
-  path: "app/srv/api/_web.ts",
-  args: ["id","_"],
-  handler: import("./api/_web")
+export const npm = {
+  name: "npm",
+  url: "/npm/:mode/:id/*",
+  path: "app/srv/api/npm.ts",
+  args: ["mode","id"],
+  handler: import("./api/npm")
 }
 export const _upload = {
   name: "_upload",
@@ -28,14 +28,14 @@ export const _upload = {
 }
 export const _prasi = {
   name: "_prasi",
-  url: "/_prasi/**",
+  url: "/_prasi/*",
   path: "app/srv/api/_prasi.ts",
   args: [],
   handler: import("./api/_prasi")
 }
 export const _file = {
   name: "_file",
-  url: "/_file/**",
+  url: "/_file/*",
   path: "app/srv/api/_file.ts",
   args: [],
   handler: import("./api/_file")

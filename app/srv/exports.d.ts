@@ -1,3 +1,4 @@
+/// <reference types="node" />
 declare module "api/auth/login" {
     export const _: {
         url: string;
@@ -18,6 +19,38 @@ declare module "api/session" {
         api(): Promise<any>;
     };
 }
+declare module "global" {
+    import { site, user } from "dbgen";
+    import { ExecaChildProcess } from "execa";
+    export const glb: {
+        lastUpdate: Record<string, number>;
+        prasiSrv: {
+            status: Record<string, "unavailable" | "installing" | "starting" | "started" | "stopped" | "destroying">;
+            running: Record<string, ExecaChildProcess>;
+        };
+        npm: {
+            page: Record<string, null | {
+                file: Buffer;
+                etag: string;
+            }>;
+            site: Record<string, null | {
+                file: Buffer;
+                etag: string;
+            }>;
+        };
+    };
+    export type Session = {
+        user: user & {
+            site: site[];
+        };
+    };
+}
+declare module "api/npm" {
+    export const _: {
+        url: string;
+        api(mode: "site" | "page", id: string): Promise<void>;
+    };
+}
 declare module "exports" {
     export const login: {
         name: string;
@@ -33,12 +66,12 @@ declare module "exports" {
         args: any[];
         handler: Promise<typeof import("api/session")>;
     };
-    export const _web: {
+    export const npm: {
         name: string;
         url: string;
         path: string;
         args: string[];
-        handler: Promise<any>;
+        handler: Promise<typeof import("api/npm")>;
     };
     export const _upload: {
         name: string;

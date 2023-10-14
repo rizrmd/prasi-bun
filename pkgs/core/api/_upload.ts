@@ -21,7 +21,7 @@ export const _ = {
         .toLowerCase()}`; 
 
       url = `/_file/${path}`;
-      await writeAsync(dir(`../data/upload/${path}`), part.buffer);
+      await writeAsync(dir.path(`../data/upload/${path}`), part.buffer);
     }
 
     return url;

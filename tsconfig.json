@@ -23,6 +23,9 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "paths": {
+      "dir": [
+        "./pkgs/core/utils/dir.ts"
+      ],
       "dbgen": [
         "./node_modules/.prisma/client/index.d.ts"
       ],

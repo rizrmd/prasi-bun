@@ -19,5 +19,5 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": { "@node-rs/argon2": "^1.5.2" }
+  "dependencies": { "@node-rs/argon2": "^1.5.2", "@types/mime-types": "^2.1.2", "mime-types": "^2.1.35" }
 }

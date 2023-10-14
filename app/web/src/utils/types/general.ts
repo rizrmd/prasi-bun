@@ -1,6 +1,5 @@
 import { page as dbpage } from "dbgen";
 import { TypedDoc, TypedMap } from "yjs-types";
-import { loadSite } from "../../../../srv/edit/tools/load-site";
 import { IItem, MItem } from "./item";
 import { IRoot, MRoot } from "./root";
 import { ISection, MSection } from "./section";
@@ -31,6 +30,9 @@ export const w = window as unknown as {
   params: any;
   editorGlbDefault: string;
   ts: number;
+  serverurl: string;
+  api: any;
+  db: any;
 };
 
 export type Page = {
@@ -47,7 +49,6 @@ export type MPage = TypedDoc<{
     }
   >;
 }>;
-export type Site = Exclude<Awaited<ReturnType<typeof loadSite>>, null>;
 
 export type IContent = ISection | IItem | IText;
 export type MContent = MSection | MItem | MText;

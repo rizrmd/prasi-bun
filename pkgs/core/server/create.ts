@@ -3,6 +3,7 @@ import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
 
+const cache = { static: {} as Record<string, any> };
 export const createServer = async () => {
   g.api = {};
   g.router = createRouter({ strictTrailingSlash: true });
@@ -22,15 +23,21 @@ export const createServer = async () => {
       }
 
       try {
-        const file = Bun.file(dir(`app/static${url.pathname}`));
-        if (file.type !== "application/octet-stream") {
+        if (cache.static[url.pathname]) {
+          return new Response(cache.static[url.pathname]);
+        }
+
+        const file = Bun.file(dir.path(`app/static${url.pathname}`));
+        if ((await file.exists()) && file.type !== "application/octet-stream") {
+          cache.static[url.pathname] = file;
           return new Response(file as any);
         }
       } catch (e) {
         g.log.error(e);
       }
+
       try {
-        return new Response(Bun.file(dir(`app/static/index.html`)) as any);
+        return new Response(Bun.file(dir.path(`app/static/index.html`)) as any);
       } catch (e) {
         g.log.error(e);
         return new Response("Loading...");

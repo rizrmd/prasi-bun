@@ -16,20 +16,20 @@ export const ${name} = {
   handler: import("./api/${v.path.substring(0, v.path.length - 3)}")
 }`);
   }
-  await Bun.write(dir(`app/srv/exports.ts`), out.join(`\n`));
+  await Bun.write(dir.path(`app/srv/exports.ts`), out.join(`\n`));
 
-  const targetFile = dir("app/srv/exports.d.ts");
+  const targetFile = dir.path("app/srv/exports.d.ts");
   const tsc = spawn(
     [
-      dir("node_modules/.bin/tsc"),
-      dir("app/srv/exports.ts"),
+      dir.path("node_modules/.bin/tsc"),
+      dir.path("app/srv/exports.ts"),
       "--declaration",
       "--emitDeclarationOnly",
       "--outFile",
       targetFile,
     ],
     {
-      cwd: dir(`node_modules/.bin`),
+      cwd: dir.path(`node_modules/.bin`),
     }
   );
 
