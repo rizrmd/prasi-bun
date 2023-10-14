@@ -1,4 +1,4 @@
-import { page } from "web-init";
+import { page } from "web-utils";
 import { useLocal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { Suspense, lazy, useEffect } from "react";

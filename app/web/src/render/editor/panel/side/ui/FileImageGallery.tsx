@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { fetchSendApi } from "web-init/src/web/iframe-cors";
+import { fetchSendApi } from "web-utils/src/web/iframe-cors";
 import { useGlobal, useLocal } from "web-utils";
 import { Gallery } from "./Gallery";
 import { Loading } from "../../../../../utils/ui/loading";

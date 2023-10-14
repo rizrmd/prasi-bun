@@ -1,4 +1,6 @@
+import { createRoot } from "react-dom/client";
 import "./index.css";
+import { Root } from "./base/root";
 
 const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
@@ -17,3 +19,8 @@ const registerServiceWorker = async () => {
 };
 
 registerServiceWorker();
+
+const el = document.getElementById("root");
+if (el) {
+  createRoot(el).render(<Root />);
+}

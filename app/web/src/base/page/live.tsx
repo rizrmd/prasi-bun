@@ -1,5 +1,5 @@
 import { validate } from "uuid";
-import { page } from "web-init";
+import { page } from "web-utils";
 import { Live } from "../../render/live/live";
 import { defaultLoader } from "../../render/live/logic/default-loader";
 
