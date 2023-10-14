@@ -1,17 +1,62 @@
 import { createRouter } from "radix3";
+import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
+import { WebSocketHandler } from "bun";
 
 const cache = { static: {} as Record<string, any> };
+
 export const createServer = async () => {
   g.api = {};
   g.router = createRouter({ strictTrailingSlash: true });
   g.server = Bun.serve({
     port: g.port,
-    async fetch(req) {
+    websocket: {
+      close(ws, code, reason) {
+        const pathname = ws.data.url.pathname;
+        if (wsHandler[pathname]) {
+          const close = wsHandler[pathname].close;
+          if (close) {
+            close(ws, code, reason);
+          }
+        }
+      },
+      message(ws, message) {
+        const pathname = ws.data.url.pathname;
+        if (wsHandler[pathname]) {
+          const msg = wsHandler[pathname].message;
+          if (msg) {
+            msg(ws, message);
+          }
+        }
+      },
+      open(ws) {
+        const pathname = ws.data.url.pathname;
+        if (wsHandler[pathname]) {
+          const open = wsHandler[pathname].open;
+          if (open) {
+            open(ws);
+          }
+        }
+      },
+    } as WebSocketHandler<{ url: URL }>,
+    async fetch(req, server) {
       if (g.status === "init") return new Response("initializing...");
       const url = new URL(req.url);
+
+      if (wsHandler[url.pathname]) {
+        if (
+          server.upgrade(req, {
+            data: {
+              url: new URL(req.url),
+            },
+          })
+        ) {
+          return;
+        }
+        return new Response("Upgrade failed :(", { status: 500 });
+      }
 
       try {
         const api = await serveAPI(url, req);
