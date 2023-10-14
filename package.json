@@ -19,5 +19,5 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": { "@node-rs/argon2": "^1.5.2" }
 }

@@ -165,34 +165,25 @@ export const createFrameCors = async (url: string, win?: any) => {
 };
 
 export const fetchSendApi = async (
-  _url: string,
+  rawUrl: string,
   params: any,
   parentWindow?: any
 ) => {
   let w: any = typeof window === "object" ? window : globalThis;
 
   const win = parentWindow || w;
-  let url = _url;
+  const url = new URL(rawUrl);
   let frm: Awaited<ReturnType<typeof createFrameCors>>;
+
+  const base = `${url.protocol}//${url.host}`;
+
   if (!win.frmapi) {
     win.frmapi = {};
-
-    win.frmapi[w.serverurl] = await createFrameCors(w.serverurl, win);
+    win.frmapi[base] = await createFrameCors(base, win);
   }
 
-  frm = win.frmapi[w.serverurl];
+  frm = win.frmapi[base];
 
-  if (url.startsWith("http")) {
-    const purl = new URL(url);
-    if (!win.frmapi[purl.host]) {
-      win.frmapi[purl.host] = await createFrameCors(
-        `${purl.protocol}//${purl.host}`
-      );
-    }
-
-    frm = win.frmapi[purl.host];
-    url = url.substring(`${purl.protocol}//${purl.host}`.length);
-  }
   if (!win.apiHeaders) {
     win.apiHeaders = {};
   }
@@ -204,5 +195,5 @@ export const fetchSendApi = async (
     });
   }
 
-  return await frm.send(url, params, win.apiHeaders);
+  return await frm.send(url.pathname, params, win.apiHeaders);
 };
