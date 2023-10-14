@@ -1,7 +1,6 @@
-import { page } from "web-utils";
-import { useLocal } from "web-utils";
-import { Loading } from "../../utils/ui/loading";
 import { Suspense, lazy, useEffect } from "react";
+import { page, useLocal } from "web-utils";
+import { Loading } from "../../utils/ui/loading";
 
 const Editor = lazy(async () => ({
   default: (await import("../../render/editor/editor")).Editor,
@@ -35,7 +34,8 @@ export default page({
               let e = await api.session();
               if (!e) {
                 (window as any).redirectTo = location.pathname;
-                navigate("/login");
+                console.log("session not found");
+                // navigate("/login");
                 localStorage.removeItem("prasi-session");
               } else {
                 localStorage.setItem("prasi-session", JSON.stringify(e));

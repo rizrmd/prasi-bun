@@ -2,22 +2,25 @@ import { createRouter } from "radix3";
 import { FC, Suspense, lazy } from "react";
 import { GlobalContext, useLocal } from "web-utils";
 import { Loading } from "../utils/ui/loading";
+import { w } from "../utils/types/general";
 
 export const Root: FC<{}> = ({}) => {
   const local = useLocal(
     {
-      router: createRouter<any>({ strictTrailingSlash: true }),
+      router: createRouter<{ url: string; Page: FC<any> }>({
+        strictTrailingSlash: true,
+      }),
       Page: null as any,
     },
     async () => {
       const pages = await import("./pages");
       for (const [_, v] of Object.entries(pages)) {
-        local.router.insert(
-          v.url,
-          lazy(async () => {
+        local.router.insert(v.url, {
+          url: v.url,
+          Page: lazy(async () => {
             return { default: (await v.page()).default.component as any };
-          })
-        );
+          }),
+        });
       }
       local.render();
     }
@@ -28,7 +31,8 @@ export const Root: FC<{}> = ({}) => {
 
   const found = local.router.lookup(location.pathname);
   if (found) {
-    local.Page = found;
+    w.params = found.params;
+    local.Page = found.Page;
   }
 
   if (!local.Page) {

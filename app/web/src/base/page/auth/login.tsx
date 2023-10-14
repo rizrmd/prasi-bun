@@ -21,7 +21,9 @@ export default page({
           if (rto) {
             navigate(rto);
           } else {
-            navigate("/editor");
+            console.log("navigate to");
+            localStorage.setItem("prasi-session", JSON.stringify(s));
+            navigate("/editor/_/_");
           }
         } else {
           form.init = true;
@@ -50,7 +52,7 @@ export default page({
               if (rto) {
                 navigate(rto);
               } else {
-                navigate("/editor");
+                navigate("/editor/_/_");
               }
             }
           }}

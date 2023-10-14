@@ -9,7 +9,7 @@ const cache = {
 };
 
 export const _ = {
-  url: "/_prasi/**",
+  url: "/_prasi/*",
   async api() {
     const { req, res } = apiContext(this);
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -95,7 +95,7 @@ declare module "gen/srv/api/entry" {
     export * as srv from "gen/srv/api/srv";
 }
 ` +
-    ((await readAsync(dir("app/srv/exports.d.ts"))) || "")
+    ((await readAsync(dir.path("app/srv/exports.d.ts"))) || "")
       .replace(/\"app\/srv\/api/gi, '"srv/api')
       .replace(
         'declare module "app/srv/exports"',
@@ -108,20 +108,20 @@ const getPrisma = async (path: string) => {
   if (path === "prisma")
     return JSON.stringify(
       (
-        (await readAsync(dir("node_modules/.prisma/client/index.d.ts"))) || ""
+        (await readAsync(dir.path("node_modules/.prisma/client/index.d.ts"))) || ""
       ).replace(`@prisma/client/runtime/library`, `./runtime/library`)
     );
 
   if (path === "runtime")
     return JSON.stringify(
       await readAsync(
-        dir("node_modules/@prisma/client/runtime/index-browser.d.ts")
+        dir.path("node_modules/@prisma/client/runtime/index-browser.d.ts")
       )
     );
 
   if (path === "library")
     return JSON.stringify(
-      await readAsync(dir("node_modules/@prisma/client/runtime/library.d.ts"))
+      await readAsync(dir.path("node_modules/@prisma/client/runtime/library.d.ts"))
     );
 
   return JSON.stringify({});

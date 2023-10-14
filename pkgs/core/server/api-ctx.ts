@@ -1,3 +1,4 @@
+import { g } from "utils/global";
 
 const parseQueryParams = (ctx: any) => {
   const pageHref = ctx.req.url;
@@ -15,6 +16,7 @@ export const apiContext = (ctx: any) => {
   ctx.req.params = ctx.params;
   ctx.req.query_parameters = parseQueryParams(ctx);
   return {
+    mode: g.mode,
     req: ctx.req as Request & { params: any; query_parameters: any },
     res: {
       ...ctx.res,

@@ -4,9 +4,9 @@ import { $ } from "execa";
 import { g } from "./global";
 
 export const preparePrisma = async () => {
-  if (await existsAsync(dir("app/db/.env"))) {
-    if (!(await existsAsync(dir("node_modules/.prisma")))) {
-      await $({ cwd: dir(`app/db`) })`bun prisma generate`;
+  if (await existsAsync(dir.path("app/db/.env"))) {
+    if (!(await existsAsync(dir.path("node_modules/.prisma")))) {
+      await $({ cwd: dir.path(`app/db`) })`bun prisma generate`;
     }
     const { PrismaClient } = await import("../../../app/db/db");
     g.db = new PrismaClient();

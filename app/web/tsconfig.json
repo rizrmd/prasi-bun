@@ -20,5 +20,10 @@
     "isolatedModules": true,
     // "noEmit": true,
     "jsx": "react-jsx",
+    "paths": {
+      "dbgen": [
+        "../../node_modules/.prisma/client/index.d.ts"
+      ],
+    }
   },
 }

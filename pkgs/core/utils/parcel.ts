@@ -7,28 +7,28 @@ export const parcelBuild = async () => {
   await dirAsync("app/static");
   const args = [
     "node",
-    dir("node_modules/.bin/parcel"),
+    dir.path("node_modules/.bin/parcel"),
     g.mode === "dev" ? "watch" : "build",
     "./src/index.tsx",
     g.mode === "dev" ? "--no-hmr" : "--no-optimize",
     "--dist-dir",
-    dir(`app/static`),
+    dir.path(`app/static`),
   ];
   g.log.info(`Building web with parcel`);
   if (g.mode !== "dev") {
-    await removeAsync(dir("app/static"));
-    await removeAsync(dir("app/web/.parcel-cache"));
+    await removeAsync(dir.path("app/static"));
+    await removeAsync(dir.path("app/web/.parcel-cache"));
 
     const parcel = spawn({
       cmd: args, 
-      cwd: dir("app/web"),
+      cwd: dir.path("app/web"),
       stdio: ["ignore", "inherit", "inherit"],
     });
     await parcel.exited;
   } else {
     const parcel = spawn({
       cmd: args,
-      cwd: dir("app/web"),
+      cwd: dir.path("app/web"),
       stdio: ["ignore", "pipe", "pipe"],
     });
 
