@@ -3,6 +3,7 @@ import { dir } from "./dir";
 import { g } from "./global";
 import { spawn } from "bun";
 
+const decoder = new TextDecoder();
 export const parcelBuild = async () => {
   await dirAsync("app/static");
   const args = [
@@ -20,53 +21,60 @@ export const parcelBuild = async () => {
     await removeAsync(dir.path("app/web/.parcel-cache"));
 
     const parcel = spawn({
-      cmd: args, 
+      cmd: args,
       cwd: dir.path("app/web"),
       stdio: ["ignore", "inherit", "inherit"],
     });
     await parcel.exited;
   } else {
-    const parcel = spawn({
-      cmd: args,
-      cwd: dir.path("app/web"),
-      stdio: ["ignore", "pipe", "pipe"],
-    });
+    await new Promise<void>((resolve) => {
+      const parcel = spawn({
+        cmd: args,
+        cwd: dir.path("app/web"),
+        stdio: ["ignore", "pipe", "pipe"],
+      });
 
-    g.parcel = parcel;
+      g.parcel = parcel;
 
-    let output = true;
-    (async () => {
-      if (parcel.stdout) {
-        for await (const chunk of parcel.stdout) {
-          if (output) process.stdout.write(chunk);
+      let output = true;
+      let decoded = false;
+      (async () => {
+        if (parcel.stdout) {
+          for await (const chunk of parcel.stdout) {
+            if (!decoded && decoder.decode(chunk).includes("✨")) {
+              resolve();
+              decoded = true;
+            }
+            if (output) process.stdout.write(chunk);
+          }
         }
-      }
-    })();
+      })();
 
-    (async () => {
-      if (parcel.stderr) {
-        for await (const chunk of parcel.stderr) {
-          if (output) process.stderr.write(chunk);
+      (async () => {
+        if (parcel.stderr) {
+          for await (const chunk of parcel.stderr) {
+            if (output) process.stderr.write(chunk);
+          }
         }
-      }
-    })();
+      })();
 
-    const cleanup = async () => {
-      output = false;
-    };
+      const cleanup = async () => {
+        output = false;
+      };
 
-    process.on("SIGINT", async () => {
-      await cleanup();
-      process.exit();
-    });
+      process.on("SIGINT", async () => {
+        await cleanup();
+        process.exit();
+      });
 
-    process.on("SIGTERM", async () => {
-      await cleanup();
-      process.exit();
-    });
+      process.on("SIGTERM", async () => {
+        await cleanup();
+        process.exit();
+      });
 
-    process.on("beforeExit", async () => {
-      await cleanup();
+      process.on("beforeExit", async () => {
+        await cleanup();
+      });
     });
   }
 };

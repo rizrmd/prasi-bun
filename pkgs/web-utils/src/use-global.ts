@@ -39,7 +39,6 @@ export const useGlobal = <T extends object>(
   if (!_id) {
     _id = "GLOBAL_DEFAULT";
   }
-
   const ctx = useContext(GlobalContext);
   const { global, render } = ctx;
 

@@ -18,6 +18,10 @@ export const defaultLoader: Loader = {
       },
     })) as unknown as LSite;
 
+    if (!site) {
+      return null;
+    }
+
     const cgroups = await db.site_use_comp.findMany({
       where: { id_site: site.id },
       select: { use_id_site: true },

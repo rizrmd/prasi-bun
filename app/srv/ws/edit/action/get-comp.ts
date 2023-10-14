@@ -1,21 +1,34 @@
-import { Websocket } from "hyper-express";
+import { ServerWebSocket } from "bun";
 import { compress } from "lz-string";
 import { syncronize } from "y-pojo";
 import * as Y from "yjs";
+import { WSData } from "../../../../../pkgs/core/server/create";
+import { SingleComp, eg } from "../edit-global";
 import {
   WS_MSG_GET_COMP,
   WS_MSG_SET_COMP,
   WS_MSG_SV_LOCAL,
-} from "../../../web/src/utils/types/ws";
-import { SingleComp, eg } from "../edit-global";
+} from "../../../../web/src/utils/types/ws";
 
-export const getComp = async (ws: Websocket, msg: WS_MSG_GET_COMP) => {
+export const getComp = async (
+  ws: ServerWebSocket<WSData>,
+  msg: WS_MSG_GET_COMP
+) => {
   const comp_id = msg.comp_id;
 
   if (!eg.edit.comp[comp_id]) {
     const rawComp = await db.component.findFirst({
       where: {
         id: comp_id,
+      },
+      select: {
+        component_group: true,
+        content_tree: true,
+        id: true,
+        id_component_group: true,
+        name: true,
+        props: true,
+        type: true,
       },
     });
 
@@ -34,7 +47,7 @@ export const getComp = async (ws: Websocket, msg: WS_MSG_GET_COMP) => {
       const map = ydoc.getMap("map");
       syncronize(map as any, rawComp);
 
-      const ws = new Set<Websocket>();
+      const ws = new Set<ServerWebSocket<WSData>>();
       const um = new Y.UndoManager(map, { ignoreRemoteMapChanges: true });
       const broadcast = () => {
         const sv_local = compress(Y.encodeStateVector(ydoc as any).toString());

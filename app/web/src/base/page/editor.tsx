@@ -1,19 +1,19 @@
-import { Suspense, lazy, useEffect } from "react";
-import { page, useLocal } from "web-utils";
+import { FC, useEffect } from "react";
+import { page, useGlobal, useLocal } from "web-utils";
+import { EditorGlobal } from "../../render/editor/logic/global";
 import { Loading } from "../../utils/ui/loading";
-
-const Editor = lazy(async () => ({
-  default: (await import("../../render/editor/editor")).Editor,
-}));
 
 export default page({
   url: "/editor/:site_id/:page_id",
   component: ({}) => {
+    const p = useGlobal(EditorGlobal, "EDITOR");
+
     const local = useLocal({
       loading: true,
       session: null as any,
       notfound: false,
       init: false,
+      Editor: null as null | FC<any>,
     });
     const site_id = params.site_id === "_" ? "" : params.site_id;
     const page_id = params.page_id === "_" ? "" : params.page_id;
@@ -21,6 +21,10 @@ export default page({
     useEffect(() => {
       if (!local.init) {
         (async () => {
+          if (!local.Editor) {
+            local.Editor = (await import("../../render/editor/editor")).Editor;
+          }
+
           let ses: any = null;
           try {
             ses = JSON.parse(localStorage.getItem("prasi-session") || "");
@@ -129,12 +133,11 @@ export default page({
       }
     }, [local.init]);
 
-    if (local.loading) return <Loading note="base-page" />;
+    const Editor = local.Editor;
+    if (local.loading || !Editor) return <Loading note="base-page" />;
 
     return (
-      <Suspense fallback={<Loading note="editor-init" />}>
-        <Editor session={local.session} site_id={site_id} page_id={page_id} />
-      </Suspense>
+      <Editor session={local.session} site_id={site_id} page_id={page_id} />
     );
   },
 });
