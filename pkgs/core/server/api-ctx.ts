@@ -1,4 +1,3 @@
-import { g } from "../utils/global";
 
 const parseQueryParams = (ctx: any) => {
   const pageHref = ctx.req.url;
