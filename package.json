@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --silent --watch ./pkgs/core/index.ts dev",
+    "dev": "bun clean && bun run --silent --watch ./pkgs/core/index.ts dev",
     "clean": "rm -rf app/static && rm -rf app/web/.parcel-cache",
     "prod": "bun run --silent ./pkgs/core/index.ts",
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",

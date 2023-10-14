@@ -48,5 +48,5 @@ export const scanApi = async () => {
     }
   };
   await scan(dir(`app/srv/api`));
-  await scan(dir(`pkgs/api`));
+  await scan(dir(`pkgs/core/api`));
 };

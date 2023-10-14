@@ -13,6 +13,7 @@ export default page({
 
     return (
       <Live
+        mode={"dev"}
         domain={params.domain}
         pathname={`/${params._ === "_" ? "" : params._}`}
         loader={defaultLoader}

@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import { page } from "web-utils";
 
 export default page({
-  url: "*",
+  url: "**",
   component: ({}) => {
-    navigate("/login");
+    useEffect(() => {
+      navigate("/login");
+    }, []);
     return <div>Loading...</div>;
   },
 });

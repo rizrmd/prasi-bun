@@ -13,25 +13,18 @@ export const createServer = async () => {
     async fetch(req) {
       const url = new URL(req.url);
 
-      if (req.method === "GET") {
-        try {
-          const file = Bun.file(dir(`app/static${url.pathname}`));
-          if (file.type !== "application/octet-stream") {
-            return new Response(file as any);
-          }
-        } catch (e) {}
-        return new Response(Bun.file(dir(`app/static/index.html`)) as any);
-      } else {
-        const api = await serveAPI(url, req);
-        if (api) {
-          return api;
-        }
+      const api = await serveAPI(url, req);
+      if (api) {
+        return api;
       }
 
-      return new Response(`404 Not Found`, {
-        status: 404,
-        statusText: "Not Found",
-      });
+      try {
+        const file = Bun.file(dir(`app/static${url.pathname}`));
+        if (file.type !== "application/octet-stream") {
+          return new Response(file as any);
+        }
+      } catch (e) {}
+      return new Response(Bun.file(dir(`app/static/index.html`)) as any);
     },
   });
 
