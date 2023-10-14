@@ -8,6 +8,9 @@ import { config } from "./utils/config";
 import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { parcelBuild } from "utils/parcel";
+import { prepareApiRoutes } from "./server/api-scan";
+
+g.status = "init";
 
 await createLogger();
 g.port = parseInt(process.env.PORT || "4550");
@@ -30,4 +33,6 @@ if (g.db) {
 await createServer();
 await parcelBuild();
 await generateAPIFrm();
+await prepareApiRoutes();
 await prepareAPITypes();
+g.status = "ready";

@@ -5,8 +5,7 @@ import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { parseArgs } from "./parse-args";
 
-export const scanApi = async () => {
-  g.api = {};
+export const prepareApiRoutes = async () => {
   const scan = async (path: string, root?: string) => {
     const apis = await listAsync(path);
     if (apis) {

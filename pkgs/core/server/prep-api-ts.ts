@@ -1,4 +1,4 @@
-import { spawnSync } from "bun";
+import { spawn, spawnSync } from "bun";
 import { readAsync } from "fs-jetpack";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
@@ -19,7 +19,7 @@ export const ${name} = {
   await Bun.write(dir(`app/srv/exports.ts`), out.join(`\n`));
 
   const targetFile = dir("app/srv/exports.d.ts");
-  spawnSync(
+  const tsc = spawn(
     [
       dir("node_modules/.bin/tsc"),
       dir("app/srv/exports.ts"),
@@ -32,6 +32,8 @@ export const ${name} = {
       cwd: dir(`node_modules/.bin`),
     }
   );
+
+  await tsc.exited;
 
   let res = await readAsync(targetFile);
   if (res) {
