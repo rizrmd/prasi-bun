@@ -1,3 +1,10 @@
+export const session = {
+  name: "session",
+  url: "/session)}",
+  path: "app/srv/api/session.ts",
+  args: [],
+  handler: import("./api/session")
+}
 export const _web = {
   name: "_web",
   url: "/_web/:id/**",

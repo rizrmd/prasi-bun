@@ -13,6 +13,7 @@ import { prepareApiRoutes } from "./server/api-scan";
 g.status = "init";
 
 await createLogger();
+g.datadir = g.mode === "dev" ? ".data" : "../data";
 g.port = parseInt(process.env.PORT || "4550");
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
 g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");

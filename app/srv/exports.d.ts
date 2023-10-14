@@ -1,4 +1,17 @@
+declare module "api/session" {
+    export const _: {
+        url: string;
+        api(): Promise<string>;
+    };
+}
 declare module "exports" {
+    export const session: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
+        handler: Promise<typeof import("api/session")>;
+    };
     export const _web: {
         name: string;
         url: string;
