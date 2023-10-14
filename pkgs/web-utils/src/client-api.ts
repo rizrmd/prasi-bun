@@ -20,9 +20,9 @@ export const apiClient = (
                 if (!api || !api[actionName]) {
                   resolve(null);
                   console.error(
-                    `API ${actionName.toString()} not found, existing API: ${Object.keys(
+                    `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
                       api
-                    )}`
+                    ).join("\n   - ")}`
                   );
                   return;
                 }

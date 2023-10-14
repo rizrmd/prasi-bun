@@ -20,11 +20,12 @@ export const defaultLoader: Loader = {
 
     const cgroups = await db.site_use_comp.findMany({
       where: { id_site: site.id },
+      select: { use_id_site: true },
     });
 
     if (cgroups) {
       site.cgroup_ids = [];
-      for (const id of cgroups.map((c) => c.use_id_site)) {
+      for (const id of cgroups.map((c: any) => c.use_id_site)) {
         site.cgroup_ids.push(id);
       }
     }

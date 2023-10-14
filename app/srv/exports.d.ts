@@ -51,6 +51,12 @@ declare module "api/npm" {
         api(mode: "site" | "page", id: string): Promise<void>;
     };
 }
+declare module "api/site-dts" {
+    export const _: {
+        url: string;
+        api(site_id: string): Promise<string>;
+    };
+}
 declare module "exports" {
     export const login: {
         name: string;
@@ -72,6 +78,13 @@ declare module "exports" {
         path: string;
         args: string[];
         handler: Promise<typeof import("api/npm")>;
+    };
+    export const site_dts: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("api/site-dts")>;
     };
     export const _upload: {
         name: string;

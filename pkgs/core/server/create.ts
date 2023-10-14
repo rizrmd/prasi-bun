@@ -15,7 +15,7 @@ export const createServer = async () => {
   g.server = Bun.serve({
     port: g.port,
     websocket: {
-      maxPayloadLength: 99999999,
+      maxPayloadLength: 9999999,
       close(ws, code, reason) {
         const pathname = ws.data.url.pathname;
         if (wsHandler[pathname]) {
