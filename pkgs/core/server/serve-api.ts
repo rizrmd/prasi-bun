@@ -74,6 +74,20 @@ export const serveAPI = async (url: URL, req: Request) => {
     if (finalResponse) {
       return createResponse(current.res, finalResponse);
     }
+    if (
+      (current.res as any)._status &&
+      (current.res as any)._status !== current.res.status
+    ) {
+      const res = new Response(current.res.body, {
+        status: (current.res as any)._status,
+      });
+
+      current.res.headers.forEach((v, k) => {
+        res.headers.set(k, v);
+      });
+
+      return res;
+    }
 
     return current.res;
   }

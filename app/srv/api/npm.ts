@@ -4,14 +4,13 @@ import { readAsync } from "fs-jetpack";
 import mime from "mime-types";
 import { apiContext } from "service-srv";
 import { glb } from "../global";
+import { g } from "utils/global";
 
 export const _ = {
   url: "/npm/:mode/:id/*",
   async api(mode: "site" | "page", id: string) {
     const { req, res, mode: _mode } = apiContext(this);
-    let path = dir.path(`../npm/${mode}/${id}/${req.params._}`);
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    let path = dir.path(`${g.datadir}/npm/${mode}/${id}/${req.params._}`);
 
     if (!glb.npm) {
       glb.npm = { page: {}, site: {} };

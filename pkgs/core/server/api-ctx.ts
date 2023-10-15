@@ -51,8 +51,15 @@ export const createResponse = (existingRes: any, body: any) => {
   const status =
     typeof existingRes._status === "number" ? existingRes._status : undefined;
 
+  let finalBody = body;
+  if (body instanceof Buffer) {
+  } else {
+    finalBody =
+      typeof body === "string" ? body : JSON.stringify(body, replacer);
+  }
+
   let res = new Response(
-    typeof body === "string" ? body : JSON.stringify(body, replacer),
+    finalBody,
     status
       ? {
           status,
@@ -61,12 +68,14 @@ export const createResponse = (existingRes: any, body: any) => {
   );
 
   if (typeof body === "object") {
-    res.headers.append("content-type", "application/json");
+    if (!res.headers.get("content-type")) {
+      res.headers.set("content-type", "application/json");
+    }
   }
 
   const cur = existingRes as Response;
   for (const [key, value] of cur.headers.entries()) {
-    res.headers.append(key, value);
+    res.headers.set(key, value);
   }
 
   return res;
