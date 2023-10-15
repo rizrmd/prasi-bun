@@ -8,17 +8,17 @@ export type ElProp = ReturnType<typeof createElProp>;
 export const createElProp = (item: IContent, p: PG) => {
   return {
     onPointerEnter: (e: React.PointerEvent<HTMLDivElement>) => {
-      e.stopPropagation();
+      // e.stopPropagation();
 
-      if (p.item.sideHover) {
-        p.item.sideHover = false;
-        p.softRender.all();
-      }
+      // if (p.item.sideHover) {
+      //   p.item.sideHover = false;
+      //   p.softRender.all();
+      // }
 
-      if (p.item.hover !== item.id) {
-        p.item.hover = item.id;
-        p.softRender.all();
-      }
+      // if (p.item.hover !== item.id) {
+      //   p.item.hover = item.id;
+      //   p.softRender.all();
+      // }
     },
     onClick: (e: React.PointerEvent<HTMLDivElement>) => {
       e.stopPropagation();
