@@ -3,11 +3,11 @@ import { page } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 
 export default page({
-  url: "**",
+  url: "*",
   component: ({}) => {
     useEffect(() => {
       if (localStorage.getItem("prasi-session")) {
-        navigate("/editor/_/_");
+        navigate("/editor");
       } else {
         navigate("/login");
       }

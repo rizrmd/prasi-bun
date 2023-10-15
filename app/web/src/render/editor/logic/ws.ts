@@ -27,6 +27,7 @@ export const editorWS = async (p: PG) => {
   if (p.ws && p.ws.readyState === p.ws.OPEN) {
     return;
   }
+  
   const render = () => {
     if (!p.focused && !p.script.active) {
       p.render();

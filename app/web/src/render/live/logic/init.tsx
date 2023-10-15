@@ -1,5 +1,6 @@
+import { createRouter } from "radix3";
 import { validate } from "uuid";
-import { createRouter, type apiClient } from "web-utils";
+import { type apiClient } from "web-utils";
 import {
   createAPI,
   createDB,
@@ -9,7 +10,6 @@ import {
 import importModule from "../../editor/tools/dynamic-import";
 import { LSite, PG } from "./global";
 import { validateLayout } from "./layout";
-import { preload } from "./route";
 
 export const w = window as unknown as {
   basepath: string;
@@ -195,7 +195,7 @@ export const initLive = async (p: PG, domain: string) => {
       }
 
       /** create router */
-      p.route = createRouter({ strictTrailingSlash: true });
+      p.route = createRouter({ strictTrailingSlash: false });
       if (pages && pages.length > 0) {
         for (const page of pages) {
           p.route.insert(page.url, page);
