@@ -11,7 +11,7 @@ export type WSData = { url: URL };
 
 export const createServer = async () => {
   g.api = {};
-  g.router = createRouter({ strictTrailingSlash: true });
+  g.router = createRouter({ strictTrailingSlash: false });
   g.server = Bun.serve({
     port: g.port,
     websocket: {
