@@ -136,6 +136,11 @@ export default page({
     const Editor = local.Editor;
     if (local.loading || !Editor) return <Loading note="base-page" />;
 
+    navigator.serviceWorker.controller?.postMessage({
+      type: "add-cache",
+      url: location.href,
+    });
+
     return (
       <Editor session={local.session} site_id={site_id} page_id={page_id} />
     );
