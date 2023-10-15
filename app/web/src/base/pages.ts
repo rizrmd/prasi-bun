@@ -11,11 +11,11 @@ export const auth_register = {
   page: () => import("./page/auth/register"),
 };
 export const all = {
-  url:  "*",
+  url:  "**",
   page: () => import("./page/all"),
 };
 export const ed = {
-  url:  "/ed/:site_id/:page_id",
+  url:  "/editor/**",
   page: () => import("./page/ed"),
 };
 export const editor = {

@@ -17,6 +17,7 @@ const w = window as unknown as {
   importCache: {
     prettier: any;
     prettier_parser: any;
+    prettier_estree: any;
   };
 };
 
@@ -52,22 +53,34 @@ export const jsMount = async (p: PG, editor: MonacoEditor, monaco: Monaco) => {
   monaco.languages.registerDocumentFormattingEditProvider("typescript", {
     async provideDocumentFormattingEdits(model, options, token) {
       if (!w.importCache) {
-        w.importCache = { prettier_parser: "", prettier: "" };
+        w.importCache = {
+          prettier_parser: "",
+          prettier: "",
+          prettier_estree: "",
+        };
       }
-      if (!w.importCache.prettier_parser)
-        w.importCache.prettier_parser = await import(
-          "prettier/plugins/typescript"
-        );
 
       if (!w.importCache.prettier)
-        w.importCache.prettier = await import("prettier/standalone");
+        w.importCache.prettier = (await import("prettier/standalone")).default;
+
+      if (!w.importCache.prettier_parser)
+        (w.importCache.prettier_parser = await import(
+          "prettier/plugins/typescript"
+        )).default;
+
+      if (!w.importCache.prettier_estree)
+        w.importCache.prettier_estree = (
+          await import("prettier/plugins/estree")
+        ).default;
 
       const prettier = w.importCache.prettier;
       const prettier_parser = w.importCache.prettier_parser;
+      const prettier_estree = w.importCache.prettier_estree;
+
       const text = trim(
-        prettier.format(model.getValue(), {
+        await prettier.format(model.getValue(), {
           parser: "typescript",
-          plugins: [prettier_parser],
+          plugins: [prettier_parser, prettier_estree],
         }),
         "; \n"
       );
