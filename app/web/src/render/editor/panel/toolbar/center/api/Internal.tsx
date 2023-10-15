@@ -23,7 +23,7 @@ export const InternalAPI: FC<{
   const reloadStatus = () => {
     if (p.site) {
       const s = api.srvapi_check.bind({ apiUrl: "https://api.prasi.app" });
-      s(p.site.id).then((e) => {
+      s(p.site.id).then((e: any) => {
         local.status = e;
         checkApi(e === "started");
         local.render();

@@ -22,7 +22,6 @@ export const prepareApiRoutes = async () => {
               path: importPath.substring((root || path).length + 1),
             };
             g.api[filename] = route;
-            g.router.insert(route.url.replace(/\*/gi, "**"), g.api[filename]);
           } catch (e) {
             g.log.warn(
               `Failed to import app/srv/api${importPath.substring(
