@@ -11,6 +11,11 @@ export default page({
       params.page_id = params._;
     }
 
+    navigator.serviceWorker.controller?.postMessage({
+      type: "add-cache",
+      url: location.href,
+    });
+
     return (
       <Live
         mode={"dev"}
