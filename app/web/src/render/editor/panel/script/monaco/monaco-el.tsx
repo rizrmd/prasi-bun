@@ -38,6 +38,7 @@ const w = window as unknown as {
   importCache: {
     prettier: any;
     prettier_parser: any;
+    prettier_estree: any;
   };
 };
 
@@ -87,18 +88,28 @@ export const ScriptMonacoElement: FC<{
   const doEdit = async (newval: string, all?: boolean) => {
     if (local.editor) {
       if (!w.importCache) {
-        w.importCache = { prettier_parser: "", prettier: "" };
+        w.importCache = {
+          prettier_parser: "",
+          prettier: "",
+          prettier_estree: "",
+        };
       }
+
+      if (!w.importCache.prettier)
+        w.importCache.prettier = (await import("prettier/standalone")).default;
+
       if (!w.importCache.prettier_parser)
         w.importCache.prettier_parser = await import(
           "prettier/plugins/typescript"
         );
 
-      if (!w.importCache.prettier)
-        w.importCache.prettier = await import("prettier/standalone");
+      if (!w.importCache.prettier_estree)
+        w.importCache.prettier_estree = await import("prettier/plugins/estree");
 
       const prettier = w.importCache.prettier;
       const prettier_parser = w.importCache.prettier_parser;
+      const prettier_estree = w.importCache.prettier_estree;
+
       const text = trim(
         prettier.format(
           all
@@ -106,7 +117,7 @@ export const ScriptMonacoElement: FC<{
             : local.editor?.getValue().replace(/\{\s*children\s*\}/gi, newval),
           {
             parser: "typescript",
-            plugins: [prettier_parser],
+            plugins: [prettier_parser, prettier_estree],
           }
         ),
         "; \n"

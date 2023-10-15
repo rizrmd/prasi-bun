@@ -190,9 +190,13 @@ export const fetchSendApi = async (
 
   if (!frm) {
     await waitUntil(() => {
-      frm = win.frmapi[w.serverurl];
+      frm = win.frmapi[base];
       return frm;
     });
+  }
+
+  if (url.pathname.startsWith("//")) {
+    url.pathname = url.pathname.substring(1);
   }
 
   return await frm.send(url.pathname, params, win.apiHeaders);

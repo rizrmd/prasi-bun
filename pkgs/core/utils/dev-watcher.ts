@@ -30,17 +30,7 @@ export const _ = {
   await genPages();
   watch(pagedir, async (event, filename) => {
     const s = file(dir.path(`${pagedir}/${filename}`));
-    if (s.size > 0) {
-      //       await Bun.write(
-      //         `app/srv/api/${filename}`,
-      //         `\
-      // export const all = {
-      //   url: "*",
-      //   page: () => import("./page/all"),
-      // };
-      //         `
-      //       );
-    }
+    genPages();
   });
 };
 
@@ -55,7 +45,7 @@ const genPages = async () => {
       const src = await readAsync(`${pagedir}/${pathname}.tsx`);
       if (src) {
         const url = src.split("url:")[1].split(",").shift();
-        if (url) { 
+        if (url) {
           res.push(
             `\
 export const ${pathname.replace(/\W/gi, "_")} = {

@@ -8,7 +8,7 @@ export const Root: FC<{}> = ({}) => {
   const local = useLocal(
     {
       router: createRouter<{ url: string; Page: FC<any> }>({
-        strictTrailingSlash: false,
+        strictTrailingSlash: true,
       }),
       Page: null as any,
     },
@@ -31,13 +31,12 @@ export const Root: FC<{}> = ({}) => {
   const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
 
   const found = local.router.lookup(location.pathname);
-  console.log(found)
 
   if (found) {
     w.params = found.params;
     local.Page = found.Page;
   }
-
+ 
   if (!local.Page) {
     return <Loading />;
   }

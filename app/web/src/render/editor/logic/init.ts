@@ -32,7 +32,6 @@ export const w = window as unknown as {
 };
 
 export const initEditor = async (p: PG, site_id: string) => {
-
   w.isEditor = true;
   if (typeof w.isLayout === "undefined") {
     w.isLayout = false;
@@ -77,6 +76,7 @@ export const initEditor = async (p: PG, site_id: string) => {
     return site;
   };
   const processSite = async (site: LSite) => {
+    if (!site || (site && !site.id)) return;
     if (!w.exports) {
       w.exports = {};
     }
@@ -149,7 +149,7 @@ export const initEditor = async (p: PG, site_id: string) => {
 };
 
 export const execSiteJS = (p: PG) => {
-  if (p) {
+  if (p && p.site.api_url) {
     p.script.siteTypes = {};
     const scope: any = {
       types: p.script.siteTypes,

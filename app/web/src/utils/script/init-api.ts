@@ -19,7 +19,9 @@ export const createAPI = (url: string) => {
   if (!w.prasiApi) {
     w.prasiApi = {};
   }
-
+  if (!url) {
+    throw new Error("s")
+  }
   return w.apiClient(w.prasiApi[url]?.apiEntry, url);
 };
 
