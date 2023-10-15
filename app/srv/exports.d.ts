@@ -57,6 +57,12 @@ declare module "app/srv/api/npm" {
         api(mode: "site" | "page", id: string): Promise<void>;
     };
 }
+declare module "app/srv/api/local-ip" {
+    export const _: {
+        url: string;
+        api(): Promise<string[]>;
+    };
+}
 declare module "app/web/src/utils/types/ws" {
     export type WS_MSG = WS_MSG_GET_COMP | WS_MSG_SET_COMP | WS_MSG_GET_PAGE | WS_MSG_SET_PAGE | WS_MSG_SV_LOCAL | WS_MSG_SVDIFF_REMOTE | WS_MSG_DIFF_LOCAL | WS_MSG_UNDO | WS_MSG_REDO | WS_MSG_NEW_COMP | WS_SITE_JS | {
         type: "ping";
@@ -633,6 +639,13 @@ declare module "app/srv/exports" {
         path: string;
         args: string[];
         handler: Promise<typeof import("app/srv/api/npm")>;
+    };
+    export const local_ip: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
+        handler: Promise<typeof import("app/srv/api/local-ip")>;
     };
     export const npm_bundle: {
         name: string;
