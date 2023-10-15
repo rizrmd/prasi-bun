@@ -82,7 +82,7 @@ export const createServer = async () => {
 
       try {
         const found = cache.static[url.pathname];
-        if (found || g.mode === "prod") {
+        if (found && g.mode === "prod") {
           const res = new Response(found.content);
           res.headers.set("Content-Type", found.type);
         }
