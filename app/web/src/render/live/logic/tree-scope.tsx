@@ -51,6 +51,7 @@ export const treeScopeEval = (
         }
       }
     }
+
     const output = { jsx: null as any };
     args = {
       ...w.exports,
@@ -86,7 +87,9 @@ export const treeScopeEval = (
           console.warn(`Available var:`, args, `\n\n`);
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
 
     return output.jsx;
   } catch (e) {

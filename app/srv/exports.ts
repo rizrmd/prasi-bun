@@ -1,3 +1,10 @@
+export const npm_size = {
+  name: "npm_size",
+  url: "/npm-size/:mode/:id",
+  path: "app/srv/api/npm-size.ts",
+  args: ["mode","id"],
+  handler: import("./api/npm-size")
+}
 export const login = {
   name: "login",
   url: "/_login",
@@ -18,6 +25,13 @@ export const npm = {
   path: "app/srv/api/npm.ts",
   args: ["mode","id"],
   handler: import("./api/npm")
+}
+export const npm_bundle = {
+  name: "npm_bundle",
+  url: "/npm-bundle/:mode/:id",
+  path: "app/srv/api/npm-bundle.ts",
+  args: ["mode","id"],
+  handler: import("./api/npm-bundle")
 }
 export const site_dts = {
   name: "site_dts",

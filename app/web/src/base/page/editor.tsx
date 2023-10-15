@@ -38,8 +38,7 @@ export default page({
               let e = await api.session();
               if (!e) {
                 (window as any).redirectTo = location.pathname;
-                console.log("session not found");
-                // navigate("/login");
+                navigate("/login");
                 localStorage.removeItem("prasi-session");
               } else {
                 localStorage.setItem("prasi-session", JSON.stringify(e));

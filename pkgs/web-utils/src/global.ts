@@ -4,7 +4,7 @@ declare global {
   const navigate: (path: string) => void;
   const params: any;
   const css: typeof goober.css;
-  const cx: (...arg: string[]) => string;
+  const cx: (...arg: any[]) => string;
   const api: any;
   const db: PrismaClient;
   const prasiContext: any;

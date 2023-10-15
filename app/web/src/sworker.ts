@@ -2,6 +2,8 @@ import { manifest, version } from "@parcel/service-worker";
 
 const g = {
   cache: null as null | Cache,
+  dev: false,
+  baseUrl: "",
 };
 
 async function install() {
@@ -22,27 +24,34 @@ addEventListener("activate", (e) =>
 addEventListener("fetch", async (evt) => {
   const e = evt as FetchEvent;
 
+  if (g.baseUrl) {
+    const url = e.request.url;
+    if (url.startsWith(g.baseUrl)) {
+      return;
+    }
+  }
+
   e.respondWith(
     (async () => {
       if (!g.cache) {
         g.cache = await caches.open(version);
       }
+
+      if (!g.baseUrl) {
+        const keys = await g.cache.keys();
+        const url = new URL(keys[0].url);
+        url.pathname = "";
+        g.baseUrl = url.toString();
+      }
+
       const cache = g.cache;
+
       const r = await cache.match(e.request);
       if (r) {
+        cache.add(e.request);
         return r;
       }
-      const url = new URL(e.request.url);
-
-      const res = await fetch(e.request);
-      if (
-        url.pathname.includes("_api_frm") ||
-        url.pathname.startsWith("/_prasi")
-      ) {
-        await cache.put(e.request, res);
-      }
-
-      return res;
+      return await fetch(e.request.url);
     })()
   );
 });
