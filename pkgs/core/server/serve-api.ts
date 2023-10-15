@@ -1,6 +1,13 @@
 import { createResponse } from "./api-ctx";
 import { g } from "../utils/global";
 
+const replacer = (key: string, value: string) => {
+  if (typeof value === "string" && value.startsWith("BigInt::")) {
+    return BigInt(value.substring(8));
+  }
+  return value;
+};
+
 export const serveAPI = async (url: URL, req: Request) => {
   let found = g.router.lookup(url.pathname);
   if (!found?.url) {
@@ -23,7 +30,9 @@ export const serveAPI = async (url: URL, req: Request) => {
     if (req.method !== "GET") {
       if (!req.headers.get("content-type")?.startsWith("multipart/form-data")) {
         try {
-          const json: any = await req.json();
+          const text = await req.text();
+          const json = JSON.parse(text, replacer);
+
           if (typeof json === "object") {
             if (Array.isArray(json)) {
               args = json;

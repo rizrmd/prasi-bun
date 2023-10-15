@@ -32,12 +32,17 @@ addEventListener("fetch", async (evt) => {
       if (r) {
         return r;
       }
-      const url = e.request.url;
-      if (url.includes("_api_frm")) {
-        cache.add(e.request);
+      const url = new URL(e.request.url);
+
+      const res = await fetch(e.request);
+      if (
+        url.pathname.includes("_api_frm") ||
+        url.pathname.startsWith("/_prasi")
+      ) {
+        await cache.put(e.request, res);
       }
 
-      return await fetch(e.request);
+      return res;
     })()
   );
 });
