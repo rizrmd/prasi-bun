@@ -17,6 +17,7 @@ const start = async () => {
   w.db = createDB(base);
 
   navigator.serviceWorker.addEventListener("message", (e) => {
+    console.log("[SW]", e.data);
     if (e.data.type === "activated") {
       if (e.data.shouldRefresh && sw) {
         sw.unregister().then(() => {

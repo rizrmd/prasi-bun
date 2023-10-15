@@ -26,6 +26,13 @@ export const npm = {
   args: ["mode","id"],
   handler: import("./api/npm")
 }
+export const local_ip = {
+  name: "local_ip",
+  url: "/local-ip",
+  path: "app/srv/api/local-ip.ts",
+  args: [],
+  handler: import("./api/local-ip")
+}
 export const npm_bundle = {
   name: "npm_bundle",
   url: "/npm-bundle/:mode/:id",
