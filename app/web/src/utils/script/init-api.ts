@@ -130,16 +130,27 @@ export const reloadDBAPI = async (
 
     await set(url, JSON.stringify(w.prasiApi[url]), cache);
   };
+  const prasiBase = `${location.protocol}//${location.host}`;
 
   try {
     const found = await get(url, cache);
     if (found) {
       w.prasiApi[url] = JSON.parse(found);
-      forceReload();
+      forceReload().catch(() => {
+        if (url === prasiBase) {
+          console.error("Failed to load prasi. Reloading...");
+          setTimeout(() => location.reload(), 3000);
+        }
+      });
     } else {
       await forceReload();
     }
   } catch (e) {
     console.warn("Failed to load API");
+
+    if (url === prasiBase) {
+      console.error("Failed to load prasi. Reloading...");
+      setTimeout(() => location.reload(), 3000);
+    }
   }
 };

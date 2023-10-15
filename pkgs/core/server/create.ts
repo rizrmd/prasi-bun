@@ -4,14 +4,25 @@ import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
 import { WebSocketHandler } from "bun";
+import { waitUntil } from "web-utils/src/wait-until";
 
-const cache = { static: {} as Record<string, any> };
+const cache = {
+  static: {} as Record<
+    string,
+    { type: string; content: ReadableStream<Uint8Array> }
+  >,
+};
 
 export type WSData = { url: URL };
 
 export const createServer = async () => {
-  g.api = {};
+  await waitUntil(() => g.status !== "init");
   g.router = createRouter({ strictTrailingSlash: false });
+
+  for (const route of Object.values(g.api)) {
+    g.router.insert(route.url.replace(/\*/gi, "**"), route);
+  }
+
   g.server = Bun.serve({
     port: g.port,
     websocket: {
@@ -45,7 +56,6 @@ export const createServer = async () => {
       },
     } as WebSocketHandler<WSData>,
     async fetch(req, server) {
-      if (g.status === "init") return new Response("initializing...");
       const url = new URL(req.url);
 
       if (wsHandler[url.pathname]) {
@@ -71,14 +81,20 @@ export const createServer = async () => {
       }
 
       try {
-        if (cache.static[url.pathname]) {
-          return new Response(cache.static[url.pathname]);
+        const found = cache.static[url.pathname];
+        if (found || g.mode === "prod") {
+          const res = new Response(found.content);
+          res.headers.set("Content-Type", found.type);
         }
 
         const file = Bun.file(dir.path(`app/static${url.pathname}`));
         if ((await file.exists()) && file.type !== "application/octet-stream") {
-          cache.static[url.pathname] = file;
-          return new Response(file as any);
+          cache.static[url.pathname] = {
+            type: file.type,
+            content: file.stream(),
+          };
+          const found = cache.static[url.pathname];
+          return new Response(found.content);
         }
       } catch (e) {
         g.log.error(e);

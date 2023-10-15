@@ -6,8 +6,9 @@ export default page({
   url: "**",
   component: ({}) => {
     useEffect(() => {
+      
       if (localStorage.getItem("prasi-session")) {
-        navigate("/editor");
+        navigate("/editor/");
       } else {
         navigate("/login");
       }

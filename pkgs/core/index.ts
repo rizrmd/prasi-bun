@@ -13,6 +13,7 @@ import { prepareApiRoutes } from "./server/api-scan";
 g.status = "init";
 
 await createLogger();
+g.api = {};
 g.datadir = g.mode === "dev" ? ".data" : "../data";
 g.port = parseInt(process.env.PORT || "4550");
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
@@ -31,7 +32,7 @@ if (g.db) {
   });
 }
 
-await createServer();
+createServer();
 await parcelBuild();
 await generateAPIFrm();
 await prepareApiRoutes();
