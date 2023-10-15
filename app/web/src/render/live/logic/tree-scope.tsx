@@ -35,8 +35,10 @@ export const treeScopeEval = (
     }
 
     // prepare args
-    if (!p.script.db) p.script.db = createDB(p.site.api_url);
-    if (!p.script.api) p.script.api = createAPI(p.site.api_url);
+    if (p.site.api_url) {
+      if (!p.script.db) p.script.db = createDB(p.site.api_url);
+      if (!p.script.api) p.script.api = createAPI(p.site.api_url);
+    }
     const w = window as any;
 
     const finalScope = mergeScopeUpwards(p, meta);
