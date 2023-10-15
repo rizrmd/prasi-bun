@@ -37,12 +37,19 @@ export const apiContext = (ctx: any) => {
   };
 };
 
+const replacer = (key: string, value: string) => {
+  if (typeof value === "string" && value.startsWith("BigInt::")) {
+    return BigInt(value.substring(8));
+  }
+  return value;
+};
+
 export const createResponse = (existingRes: any, body: any) => {
   const status =
     typeof existingRes._status === "number" ? existingRes._status : undefined;
 
   let res = new Response(
-    typeof body === "string" ? body : JSON.stringify(body),
+    typeof body === "string" ? body : JSON.stringify(body, replacer),
     status
       ? {
           status,

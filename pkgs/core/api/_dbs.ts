@@ -1,15 +1,13 @@
 import { apiContext } from "../server/api-ctx";
-import { execQuery } from "../utils/query";
+import { DBArg, execQuery } from "../utils/query";
 
 export const _ = {
   url: "/_dbs/:dbName/:action",
   async api(dbName: any, action?: string) {
     const { req, res } = apiContext(this);
 
-    const body = req.params;
-
     try {
-      const result = await execQuery(body, db);
+      const result = await execQuery(req.params, db);
       res.send(result);
     } catch (e: any) {
       res.sendStatus(500);
