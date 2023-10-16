@@ -1,10 +1,9 @@
+import { WebSocketHandler } from "bun";
 import { createRouter } from "radix3";
 import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
-import { WebSocketHandler } from "bun";
-import { waitUntil } from "web-utils/src/wait-until";
 
 const cache = {
   static: {} as Record<
@@ -56,6 +55,7 @@ export const createServer = async () => {
     } as WebSocketHandler<WSData>,
     async fetch(req, server) {
       const url = new URL(req.url);
+      console.log(req.url);
 
       if (wsHandler[url.pathname]) {
         if (
