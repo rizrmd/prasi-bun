@@ -16,9 +16,6 @@ export const routeEditor = (p: PG, page_id: string) => {
       p.status = "loading";
       loadPage(p, page_id).then(async () => {
         await loadNpmPage(page_id);
-        p.status = "ready";
-        p.render();
-
         if (!p.mpage || p.mpage.getMap("map").get("id") !== page_id) {
           p.status = "reload";
           p.render();
@@ -27,6 +24,9 @@ export const routeEditor = (p: PG, page_id: string) => {
             p.render();
           };
           await api.page_reload(page_id);
+        } else {
+          p.status = "ready";
+          p.render();
         }
       });
     }
