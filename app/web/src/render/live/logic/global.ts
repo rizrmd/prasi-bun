@@ -12,7 +12,7 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 export type ItemMeta = {
   item: IContent;
   scope?: any;
-  scopeAttached?: any;
+  jsxParentId?: string;
   comp?: {
     id: string;
     propval?: any;

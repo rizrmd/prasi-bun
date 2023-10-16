@@ -111,7 +111,7 @@ export const ScriptMonacoElement: FC<{
       const prettier_estree = w.importCache.prettier_estree;
 
       const text = trim(
-        prettier.format(
+        await prettier.format(
           all
             ? newval
             : local.editor?.getValue().replace(/\{\s*children\s*\}/gi, newval),

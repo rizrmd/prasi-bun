@@ -64,5 +64,6 @@ export const Live: FC<{
   if (p.site.id) {
     routeLive(p, pathname);
   }
+
   return <LPage />;
 };

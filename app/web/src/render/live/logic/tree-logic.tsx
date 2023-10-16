@@ -141,7 +141,7 @@ const walk = async (
                       parent_id: item.id,
                       parent_comp: val.parent_comp,
                       idx: mprop.idx,
-                      isLayout: false,
+                      isLayout: meta.isLayout,
                     });
                 }
               }
@@ -208,7 +208,7 @@ const walk = async (
                           parent_id: item.id,
                           parent_comp: val.parent_comp,
                           idx: mprop.idx,
-                          isLayout: false,
+                          isLayout: meta.isLayout,
                         });
                     }
                   }
@@ -227,7 +227,7 @@ const walk = async (
             parent_comp: meta as any,
             parent_id: item.id,
             idx,
-            isLayout: false,
+            isLayout: meta.isLayout,
           });
         })
       );
