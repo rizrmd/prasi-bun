@@ -1,2 +1,2 @@
 bun run build
-ssh plansys@web.andromedia.co.id "cd /home/plansys/prasi/app && git pull && bun run deploy"
+ssh plansys@web.andromedia.co.id "cd /home/plansys/prasi/app && git reset --hard && git pull && bun run deploy"
