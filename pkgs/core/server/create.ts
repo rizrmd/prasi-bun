@@ -79,7 +79,7 @@ export const createServer = async () => {
         g.log.error(e);
       }
 
-      const webPath = g.mode === "dev" ? "app/static" : "app/web/static";
+      const webPath = "app/static";
       try {
         const found = cache.static[url.pathname];
         if (found && g.mode === "prod") {
