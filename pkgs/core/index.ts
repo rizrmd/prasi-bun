@@ -31,9 +31,9 @@ if (g.db) {
 }
 
 await parcelBuild();
-await createServer();
 await generateAPIFrm();
 await prepareApiRoutes();
+await createServer();
 await prepareAPITypes();
 
 g.status = "ready";
