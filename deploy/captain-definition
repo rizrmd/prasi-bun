@@ -1,13 +1,17 @@
 {
   "schemaVersion": 2,
   "dockerfileLines": [
-    "FROM oven/bun",
-    "COPY package.json bun.lockb /temp/prod/",
-    "RUN cd /temp/prod && bun install --frozen-lockfile --production",
-    "RUN mkdir -p /temp/prod",
-    "COPY /temp/prod/node_modules node_modules",
-    "ENV PORT 80",
-    "EXPOSE 4550",
-    "CMD [ \"bun\", \"prod\" ]"
+  "FROM oven/bun:debian",
+  "sudo apt install git",
+  "RUN mkdir -p /prasi",
+  "CD /prasi",
+  "RUN git clone https://github.com/rizrmd/prasi.git --depth=1",
+  "COPY package.json bun.lockb /temp/prod/",
+  "RUN cd /temp/prod && bun install --frozen-lockfile --production",
+  "RUN mkdir -p /temp/prod",
+  "COPY /temp/prod/node_modules node_modules",
+  "ENV PORT 80",
+  "EXPOSE 4550",
+  "CMD [ \"bun\", \"prod\" ]"
   ]
 }
