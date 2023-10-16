@@ -20,22 +20,13 @@ export const routeEditor = (p: PG, page_id: string) => {
         p.render();
 
         if (!p.mpage || p.mpage.getMap("map").get("id") !== page_id) {
-          if (!loadingCounter[page_id]) {
-            loadingCounter[page_id] = 1;
-          } else {
-            loadingCounter[page_id]++;
-          }
-
-          if (loadingCounter[page_id] > 2) {
-            p.status = "reload";
+          p.status = "reload";
+          await api.page_reload(page_id);
+          p.mpageLoaded = () => {
+            p.status = "ready";
             p.render();
-            p.mpageLoaded = () => {
-              p.status = "ready";
-              p.render();
-            };
-
-            await api.page_reload(page_id);
-          }
+          };
+          p.render();
         }
       });
     }
