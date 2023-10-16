@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "bun clean && bun run --silent --watch ./pkgs/core/index.ts dev",
     "clean": "rm -rf app/static && rm -rf app/web/.parcel-cache",
+    "build": "bun run --silent ./pkgs/core/build.ts",
     "prod": "bun run --silent ./pkgs/core/index.ts",
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",
     "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts"

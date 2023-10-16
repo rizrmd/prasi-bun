@@ -1,2 +1,2 @@
-git clean -fdx
-caprover deploy -a prasi -p "j\'Wk15+3)KDsIO" -b main
+bun run build
+ssh plansys@web.andromedia.co.id "cd /home/plansys/"
