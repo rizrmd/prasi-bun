@@ -21,12 +21,12 @@ export const routeEditor = (p: PG, page_id: string) => {
 
         if (!p.mpage || p.mpage.getMap("map").get("id") !== page_id) {
           p.status = "reload";
-          await api.page_reload(page_id);
+          p.render();
           p.mpageLoaded = () => {
             p.status = "ready";
             p.render();
           };
-          p.render();
+          await api.page_reload(page_id);
         }
       });
     }
