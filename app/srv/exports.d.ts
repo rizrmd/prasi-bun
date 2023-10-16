@@ -6,24 +6,16 @@ declare module "app/srv/api/npm-size" {
         api(mode: "site" | "page", id: string): Promise<string>;
     };
 }
-declare module "app/srv/api/auth/login" {
-    export const _: {
-        url: string;
-        api(username: string, password: string): Promise<{
-            status: string;
-            session: any;
-            reason?: undefined;
-        } | {
-            status: string;
-            reason: string;
-            session?: undefined;
-        }>;
-    };
-}
-declare module "app/srv/api/session" {
+declare module "app/srv/api/auth/session" {
     export const _: {
         url: string;
         api(): Promise<any>;
+    };
+}
+declare module "app/srv/api/site-dts" {
+    export const _: {
+        url: string;
+        api(site_id: string): Promise<string>;
     };
 }
 declare module "app/srv/global" {
@@ -50,18 +42,6 @@ declare module "app/srv/global" {
         user: user & {
             site: site[];
         };
-    };
-}
-declare module "app/srv/api/npm" {
-    export const _: {
-        url: string;
-        api(mode: "site" | "page", id: string): Promise<void>;
-    };
-}
-declare module "app/srv/api/local-ip" {
-    export const _: {
-        url: string;
-        api(): Promise<string[]>;
     };
 }
 declare module "app/web/src/utils/types/ws" {
@@ -606,10 +586,30 @@ declare module "app/srv/api/npm-bundle" {
         api(mode: "site" | "page", id: string): Promise<any>;
     };
 }
-declare module "app/srv/api/site-dts" {
+declare module "app/srv/api/npm" {
     export const _: {
         url: string;
-        api(site_id: string): Promise<string>;
+        api(mode: "site" | "page", id: string): Promise<void>;
+    };
+}
+declare module "app/srv/api/auth/login" {
+    export const _: {
+        url: string;
+        api(username: string, password: string): Promise<{
+            status: string;
+            session: any;
+            reason?: undefined;
+        } | {
+            status: string;
+            reason: string;
+            session?: undefined;
+        }>;
+    };
+}
+declare module "app/srv/api/local-ip" {
+    export const _: {
+        url: string;
+        api(): Promise<string[]>;
     };
 }
 declare module "app/srv/exports" {
@@ -620,33 +620,19 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/npm-size")>;
     };
-    export const login: {
-        name: string;
-        url: string;
-        path: string;
-        args: string[];
-        handler: Promise<typeof import("app/srv/api/auth/login")>;
-    };
     export const session: {
         name: string;
         url: string;
         path: string;
         args: any[];
-        handler: Promise<typeof import("app/srv/api/session")>;
+        handler: Promise<typeof import("app/srv/api/auth/session")>;
     };
-    export const npm: {
+    export const site_dts: {
         name: string;
         url: string;
         path: string;
         args: string[];
-        handler: Promise<typeof import("app/srv/api/npm")>;
-    };
-    export const local_ip: {
-        name: string;
-        url: string;
-        path: string;
-        args: any[];
-        handler: Promise<typeof import("app/srv/api/local-ip")>;
+        handler: Promise<typeof import("app/srv/api/site-dts")>;
     };
     export const npm_bundle: {
         name: string;
@@ -655,12 +641,26 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/npm-bundle")>;
     };
-    export const site_dts: {
+    export const npm: {
         name: string;
         url: string;
         path: string;
         args: string[];
-        handler: Promise<typeof import("app/srv/api/site-dts")>;
+        handler: Promise<typeof import("app/srv/api/npm")>;
+    };
+    export const login: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("app/srv/api/auth/login")>;
+    };
+    export const local_ip: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
+        handler: Promise<typeof import("app/srv/api/local-ip")>;
     };
     export const _upload: {
         name: string;
@@ -670,13 +670,6 @@ declare module "app/srv/exports" {
         handler: Promise<any>;
     };
     export const _prasi: {
-        name: string;
-        url: string;
-        path: string;
-        args: any[];
-        handler: Promise<any>;
-    };
-    export const _file: {
         name: string;
         url: string;
         path: string;
@@ -695,6 +688,13 @@ declare module "app/srv/exports" {
         url: string;
         path: string;
         args: string[];
+        handler: Promise<any>;
+    };
+    export const _file: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
         handler: Promise<any>;
     };
 }

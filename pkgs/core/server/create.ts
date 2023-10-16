@@ -16,7 +16,6 @@ const cache = {
 export type WSData = { url: URL };
 
 export const createServer = async () => {
-  await waitUntil(() => g.status !== "init");
   g.router = createRouter({ strictTrailingSlash: false });
 
   for (const route of Object.values(g.api)) {
