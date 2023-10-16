@@ -178,5 +178,5 @@ dist
 app/web/.parcel-cache
 app/static
 app/static/*
-.data
-.data/*
+data
+data/*
