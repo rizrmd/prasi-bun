@@ -26,6 +26,7 @@ export type ItemMeta = {
     Local: FC<any>;
     PassProp: FC<any>;
   };
+  isLayout: boolean,
   render?: () => void;
 };
 

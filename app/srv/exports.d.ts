@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference types="react" />
 declare module "app/srv/api/npm-size" {
     export const _: {
         url: string;
