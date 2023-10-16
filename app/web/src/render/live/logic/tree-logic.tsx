@@ -36,6 +36,7 @@ export const rebuildTree = async (
           item,
           parent_id: "root",
           idx,
+          isLayout: !!(p.layout.section && p.layout.content),
         });
       }) || []
     );
@@ -52,6 +53,7 @@ const walk = async (
   val: {
     treeMeta: (typeof LiveGlobal)["treeMeta"];
     item?: IContent;
+    isLayout: boolean;
     parent_id: string;
     idx: number;
     parent_comp?: ItemMeta["parent_comp"];
@@ -91,6 +93,7 @@ const walk = async (
         mode: p.mode,
       }),
       comp,
+      isLayout: val.isLayout,
     };
 
     treeMeta[meta.item.id] = meta;
@@ -138,6 +141,7 @@ const walk = async (
                       parent_id: item.id,
                       parent_comp: val.parent_comp,
                       idx: mprop.idx,
+                      isLayout: false,
                     });
                 }
               }
@@ -204,6 +208,7 @@ const walk = async (
                           parent_id: item.id,
                           parent_comp: val.parent_comp,
                           idx: mprop.idx,
+                          isLayout: false,
                         });
                     }
                   }
@@ -222,6 +227,7 @@ const walk = async (
             parent_comp: meta as any,
             parent_id: item.id,
             idx,
+            isLayout: false,
           });
         })
       );
@@ -229,12 +235,17 @@ const walk = async (
       if (item.type !== "text" && Array.isArray(item.childs)) {
         await Promise.all(
           item.childs.map(async (child, idx) => {
+            let isLayout = false;
+            if (meta.isLayout && item.name !== "content") {
+              isLayout = true;
+            }
             return await walk(p, {
               treeMeta,
               idx,
               item: child,
               parent_comp: val.parent_comp,
               parent_id: item.id || "",
+              isLayout,
             });
           })
         );

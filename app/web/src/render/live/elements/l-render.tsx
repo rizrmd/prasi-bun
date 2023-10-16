@@ -4,20 +4,65 @@ import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { FNAdv, FNCompDef, FNLinkTag } from "../../../utils/types/meta-fn";
 import { responsiveVal } from "../../editor/tools/responsive-val";
-import { LiveGlobal } from "../logic/global";
+import { ItemMeta, LiveGlobal, PG } from "../logic/global";
 import { preload } from "../logic/route";
 import { treePropEval } from "../logic/tree-prop";
 import { treeScopeEval } from "../logic/tree-scope";
 import { LTextInternal } from "./l-text";
+import { createPortal } from "react-dom";
 
 export const LRender: FC<{
   id: string;
   children?: (childs: IContent[]) => ReactNode;
   fromProp?: boolean;
-}> = ({ id, children }) => {
-  const [_, render] = useState({});
+}> = ({ id, children, fromProp }) => {
   const p = useGlobal(LiveGlobal, "LIVE");
   const meta = p.treeMeta[id];
+
+  if (meta) {
+    if (meta.item.name.startsWith("::")) {
+      if (meta.isLayout) {
+        meta.className = produceCSS(meta.item, {
+          mode: p.mode,
+        });
+
+        const className = meta.className;
+        return <div id={meta.item.name} className={className} />;
+      } else {
+        const el = document.getElementById(meta.item.name);
+        if (!el) return null;
+        return createPortal(
+          <LRenderInternal
+            p={p}
+            id={id}
+            children={children}
+            fromProp={fromProp}
+            meta={meta}
+          />,
+          el
+        );
+      }
+    }
+  }
+
+  return (
+    <LRenderInternal
+      p={p}
+      id={id}
+      children={children}
+      fromProp={fromProp}
+      meta={meta}
+    />
+  );
+};
+export const LRenderInternal: FC<{
+  id: string;
+  children?: (childs: IContent[]) => ReactNode;
+  fromProp?: boolean;
+  meta?: ItemMeta;
+  p: PG;
+}> = ({ id, children, meta, p }) => {
+  const [_, render] = useState({});
 
   if (!meta) {
     return null;
