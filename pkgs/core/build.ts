@@ -1,9 +1,10 @@
 import { spawn } from "bun";
 import { dir } from "dir";
-import { dirAsync, removeAsync } from "fs-jetpack";
-import { g } from "utils/global";
+import { removeAsync } from "fs-jetpack";
 await removeAsync(dir.path("app/static"));
 await removeAsync(dir.path("app/web/.parcel-cache"));
+
+await removeAsync(dir.path("app/web/static"));
 
 const args = [
   "node",

@@ -80,6 +80,7 @@ export const createServer = async () => {
         g.log.error(e);
       }
 
+      const webPath = g.mode === "dev" ? "app/static" : "app/web/static";
       try {
         const found = cache.static[url.pathname];
         if (found && g.mode === "prod") {
@@ -87,7 +88,7 @@ export const createServer = async () => {
           res.headers.set("Content-Type", found.type);
         }
 
-        const file = Bun.file(dir.path(`app/static${url.pathname}`));
+        const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
         if ((await file.exists()) && file.type !== "application/octet-stream") {
           cache.static[url.pathname] = {
             type: file.type,
@@ -101,7 +102,7 @@ export const createServer = async () => {
       }
 
       try {
-        return new Response(Bun.file(dir.path(`app/static/index.html`)) as any);
+        return new Response(Bun.file(dir.path(`${webPath}/index.html`)) as any);
       } catch (e) {
         g.log.error(e);
         return new Response("Loading...");

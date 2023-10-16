@@ -2,7 +2,8 @@
   "exclude": [
     ".git",
     "node_modules",
-    "app/static"
+    "app/static",
+    "app/web/static",
   ],
   "compilerOptions": {
     "lib": [
