@@ -11,6 +11,7 @@ import { preparePrisma } from "./utils/prisma";
 
 g.status = "init";
 
+
 await createLogger();
 g.api = {};
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
@@ -22,17 +23,17 @@ if (g.mode === "dev") {
 }
 
 await preparePrisma();
-await ensureNotRunning();
+// await ensureNotRunning();
 
-if (g.db) {
-  g.db.$connect().catch((e: any) => {
-    g.log.error(`[DB ERROR]\n${e.message}`);
-  });
-}
+// if (g.db) {
+//   g.db.$connect().catch((e: any) => {
+//     g.log.error(`[DB ERROR]\n${e.message}`);
+//   });
+// }
 
-createServer();
-await parcelBuild();
-await generateAPIFrm();
-await prepareApiRoutes();
-await prepareAPITypes();
-g.status = "ready";
+// createServer();
+// await parcelBuild();
+// await generateAPIFrm();
+// await prepareApiRoutes();
+// await prepareAPITypes();
+// g.status = "ready";
