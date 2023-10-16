@@ -65,17 +65,8 @@ export const treePropEval = (
               _jsx: true,
               Comp: ({ parent_id }: { parent_id: string }) => {
                 if (prop.content) {
-                  const meta = p.treeMeta[parent_id];
-                  const scopes: { meta: ItemMeta; value: any }[] = [];
-                  mergeScopeUpwards(p, meta, {
-                    each: (m, val) => {
-                      scopes.push({ meta: m, value: val });
-                      return true;
-                    },
-                  });
-
                   if (p.treeMeta[prop.content.id]) {
-                    p.treeMeta[prop.content.id].scopeAttached = scopes;
+                    p.treeMeta[prop.content.id].jsxParentId = parent_id;
                   }
 
                   return <LItem id={prop.content.id} fromProp={true} />;

@@ -51,7 +51,6 @@ export const routeLive = (p: PG, pathname: string) => {
       }
       if (!p.page || !p.page.content_tree) {
         promises.push(loadNpmPage(p, page_id));
-        p.status = "loading";
 
         if (!p.prod) {
           promises.push(streamPage(p, page_id));

@@ -43,7 +43,7 @@ export const initLive = async (p: PG, domain: string) => {
     w.apiHeaders = {};
 
     w.navigateOverride = (_href) => {
-      if (_href.startsWith("/")) {
+      if (_href && _href.startsWith("/")) {
         if (w.basepath.length > 1) {
           _href = `${w.basepath}${_href}`;
         }

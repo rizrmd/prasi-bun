@@ -71,26 +71,21 @@ export const treeScopeEval = (
       },
     };
 
-    try {
-      // execute
-      const fn = new Function(...Object.keys(args), js);
-      const res = fn(...Object.values(args));
-      if (res instanceof Promise) {
-        res.catch((e: any) => {
-          console.warn(e);
-          console.warn(
-            (
-              `ERROR in ${item.type} [${item.name}]:\n ` +
-              ((adv?.js || "") as any)
-            ).trim()
-          );
-          console.warn(`Available var:`, args, `\n\n`);
-        });
-      }
-    } catch (e) {
-      console.error(e);
+    // execute
+    const fn = new Function(...Object.keys(args), js);
+    const res = fn(...Object.values(args));
+    if (res instanceof Promise) {
+      res.catch((e: any) => {
+        console.warn(e);
+        console.warn(
+          (
+            `ERROR in ${item.type} [${item.name}]:\n ` +
+            ((adv?.js || "") as any)
+          ).trim()
+        );
+        console.warn(`Available var:`, args, `\n\n`);
+      });
     }
-
     return output.jsx;
   } catch (e) {
     console.warn(e);
@@ -122,22 +117,6 @@ export const mergeScopeUpwards = (
   while (cur) {
     let scope = null;
 
-    if (cur.scopeAttached) {
-      for (const s of cur.scopeAttached) {
-        if (s.value) {
-          for (const [k, v] of Object.entries(s.value)) {
-            if (typeof finalScope[k] === "undefined") finalScope[k] = v;
-          }
-
-          if (opt?.each) {
-            if (!opt.each(s.meta, s.value)) {
-              break;
-            }
-          }
-        }
-      }
-    }
-
     if (cur.scope || cur.comp?.propval) {
       scope = { ...cur.scope, ...cur.comp?.propval };
 
@@ -151,7 +130,11 @@ export const mergeScopeUpwards = (
       }
     }
 
-    cur = p.treeMeta[cur.parent_id];
+    if (cur.jsxParentId) {
+      cur = p.treeMeta[cur.jsxParentId];
+    } else {
+      cur = p.treeMeta[cur.parent_id];
+    }
   }
 
   return finalScope;
@@ -173,7 +156,7 @@ const createPassProp = (p: PG, meta: ItemMeta) => {
 
 const cachedLocal = {} as Record<string, Record<string, any>>;
 const cachedPath = {} as Record<string, Record<string, any>>;
-
+const cachedLayout = {} as Record<string, true>;
 const createLocal = (p: PG, meta: ItemMeta) => {
   const Local = ({
     name,
@@ -218,15 +201,23 @@ const createLocal = (p: PG, meta: ItemMeta) => {
       }
     };
 
-    const page_id = p.page?.id;
-    if (page_id) {
+    let page_id = p.page?.id || "";
+    const itemid = meta.item.id;
+
+    if (meta.isLayout) {
+      page_id = "layout";
+    }
+
+    if (
+      page_id !== "layout" ||
+      (page_id === "layout" && !cachedLayout[meta.item.id])
+    ) {
       if (!cachedLocal[page_id]) {
         cachedLocal[page_id] = {};
       }
       if (!cachedPath[page_id]) {
         cachedPath[page_id] = {};
       }
-      const itemid = meta.item.id;
       if (cachedLocal[page_id][itemid]) {
         if (cache === false && cachedPath[page_id][itemid] !== location.href) {
           cachedPath[page_id][itemid] = location.href;
@@ -256,6 +247,12 @@ const createLocal = (p: PG, meta: ItemMeta) => {
 
     useEffect(() => {
       if (effect) {
+        if (meta.isLayout) {
+          if (cachedLayout[meta.item.id]) {
+            return;
+          }
+          cachedLayout[meta.item.id] = true;
+        }
         try {
           effect(meta.scope[name]);
         } catch (e) {

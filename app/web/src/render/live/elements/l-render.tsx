@@ -118,7 +118,7 @@ export const LRenderInternal: FC<{
   const className = meta.className;
   const adv = item.adv;
 
-  if (!(adv?.jsBuilt && adv?.js) && (meta.scopeAttached || meta.comp)) {
+  if (!(adv?.jsBuilt && adv?.js) && (meta.jsxParentId || meta.comp)) {
     return treeScopeEval(
       p,
       meta,
