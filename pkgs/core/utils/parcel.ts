@@ -15,8 +15,9 @@ export const parcelBuild = async () => {
     "--dist-dir",
     dir.path(`app/static`),
   ];
-  g.log.info(`Building web with parcel`);
   if (g.mode === "dev") {
+    g.log.info(`Building web with parcel`);
+
     await new Promise<void>((resolve) => {
       const parcel = spawn({
         cmd: args,

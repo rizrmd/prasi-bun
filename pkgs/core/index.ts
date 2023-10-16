@@ -11,7 +11,6 @@ import { preparePrisma } from "./utils/prisma";
 
 g.status = "init";
 
-
 await createLogger();
 g.api = {};
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
@@ -31,9 +30,10 @@ if (g.db) {
   });
 }
 
-createServer();
 await parcelBuild();
+await createServer();
 await generateAPIFrm();
 await prepareApiRoutes();
 await prepareAPITypes();
+
 g.status = "ready";
