@@ -191,27 +191,35 @@ const streamPage = (p: PG, id: string) => {
 };
 
 export const extractNavigate = (str: string) => {
+  return [
+    ...findBetween(str, `navigate(`, `)`),
+    ...findBetween(str, `href = `, `;`),
+  ];
+};
+
+const findBetween = (text: string, opener: string, closer: string) => {
   let i = 0;
-  const nstr = "navigate(";
+  let last = 0;
   const founds: string[] = [];
-  let lasti = 0;
   while (true) {
-    const start = str.indexOf(nstr, i);
-    lasti = i;
-    if (start >= 0) {
-      const char = str[start + nstr.length];
+    const startIndex = text.indexOf(opener, i);
+    last = i;
+    if (startIndex >= 0) {
+      const char = text[startIndex + opener.length];
       if (char === '"' || char === "'" || char === "`") {
-        const end = str.indexOf(`${char})`, start + nstr.length + 1);
-        const text = str.substring(start + nstr.length + 1, end);
-        i = end + 3;
-        founds.push(text);
+        const end = text.indexOf(
+          `${char}${closer}`,
+          startIndex + opener.length + 1
+        );
+        const found = text.substring(startIndex + opener.length + 1, end);
+        i = end + 2 + closer.length;
+        founds.push(found);
       }
     }
 
-    if (lasti === i) {
+    if (last === i) {
       break;
     }
   }
-
   return founds;
 };
