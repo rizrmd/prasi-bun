@@ -168,8 +168,10 @@ export const initLive = async (p: PG, domain: string) => {
       /** execute site module */
       const exec = (fn: string, scopes: any) => {
         if (p) {
-          scopes["api"] = createAPI(p.site.api_url);
-          scopes["db"] = createDB(p.site.api_url);
+          if (p.site.api_url) {
+            scopes["api"] = createAPI(p.site.api_url);
+            scopes["db"] = createDB(p.site.api_url);
+          }
           scopes.params = w.params;
           scopes.module = {};
           const f = new Function(...Object.keys(scopes), fn);

@@ -15,7 +15,7 @@ g.status = "init";
 await createLogger();
 g.api = {};
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
-g.datadir = g.mode == "prod" ? "../data" : ".data";
+g.datadir = g.mode == "prod" ? "../data" : "data";
 g.port = parseInt(process.env.PORT || "4550");
 g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
 if (g.mode === "dev") {
