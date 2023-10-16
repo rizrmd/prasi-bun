@@ -1,5 +1,6 @@
 {
   "name": "web-utils",
+  "version": "0.0.1",
   "main": "src/export.ts",
   "dependencies": {
     "@paralleldrive/cuid2": "2.2.0",
