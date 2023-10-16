@@ -7,8 +7,8 @@
     "clean": "rm -rf app/static && rm -rf app/web/.parcel-cache",
     "build": "bun run --silent ./pkgs/core/build.ts",
     "db-pull": "bun run --silent ./pkgs/core/db-pull.ts",
-    "local-prod": "bun run --silent ./pkgs/core/index.ts",
-    "prod": "bun run build && bun run deploy && bun run ./pkgs/core/index.ts",
+    "prod": "bun run --silent ./pkgs/core/index.ts",
+    "local-prod": "bun run build && bun run deploy && bun run ./pkgs/core/index.ts",
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",
     "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts"
   },
