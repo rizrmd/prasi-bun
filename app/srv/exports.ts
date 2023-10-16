@@ -19,6 +19,13 @@ export const site_dts = {
   args: ["site_id"],
   handler: import("./api/site-dts")
 }
+export const page_reload = {
+  name: "page_reload",
+  url: "/page-reload/:page_id",
+  path: "app/srv/api/page-reload.ts",
+  args: ["page_id"],
+  handler: import("./api/page-reload")
+}
 export const npm_bundle = {
   name: "npm_bundle",
   url: "/npm-bundle/:mode/:id",

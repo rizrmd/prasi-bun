@@ -14,11 +14,19 @@ export const jscript = {
   editor: null as typeof MonacoEditor | null,
   build: null as null | FBuild,
   _init: false,
+  _editor: false,
   async init() {
     if (!this._init) {
       this._init = true;
       const { sendIPC } = await import("./esbuild/ipc");
       await initJS();
+
+      if (!this._editor) {
+        this._editor = true;
+        const e = await import("@monaco-editor/react");
+        jscript.editor = e.Editor;
+        e.loader.config({ paths: { vs: "/min/vs" } });
+      }
 
       this.build = async (entry, src, files, verbose?: boolean) => {
         const options: BuildOptions = {
@@ -51,13 +59,7 @@ export const EScriptElement: FC<{}> = ({}) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
 
   if (!jscript.editor) {
-    Promise.all([
-      import("@monaco-editor/react").then((e) => {
-        jscript.editor = e.Editor;
-        e.loader.config({ paths: { vs: "/min/vs" } });
-      }),
-      jscript.init(),
-    ]).then(() => {
+    jscript.init().then(() => {
       p.render();
     });
   }
