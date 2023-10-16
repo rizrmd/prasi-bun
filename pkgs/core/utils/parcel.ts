@@ -16,17 +16,7 @@ export const parcelBuild = async () => {
     dir.path(`app/static`),
   ];
   g.log.info(`Building web with parcel`);
-  if (g.mode !== "dev") {
-    await removeAsync(dir.path("app/static"));
-    await removeAsync(dir.path("app/web/.parcel-cache"));
-
-    const parcel = spawn({
-      cmd: args,
-      cwd: dir.path("app/web"),
-      stdio: ["ignore", "inherit", "inherit"],
-    });
-    await parcel.exited;
-  } else {
+  if (g.mode === "dev") {
     await new Promise<void>((resolve) => {
       const parcel = spawn({
         cmd: args,
