@@ -1,5 +1,6 @@
 {
   "name": "srv",
+  "version": "0.0.1",
   "dependencies": {
     "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
     "@hyrious/esbuild-plugin-style": "^0.3.5",
