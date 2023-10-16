@@ -1,3 +1,4 @@
+import { g } from "utils/global";
 import { apiContext } from "../server/api-ctx";
 import { dir } from "../utils/dir";
 
@@ -6,7 +7,7 @@ export const _ = {
   async api() {
     const { req } = apiContext(this);
     const rpath = decodeURIComponent(req.params._);
-    const path = dir.path(`../data/upload/${rpath}`);
+    const path = dir.path(`${g.datadir}/upload/${rpath}`);
 
     try {
       return new Response(Bun.file(path) as any);

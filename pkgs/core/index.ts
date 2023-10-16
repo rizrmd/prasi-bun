@@ -1,20 +1,19 @@
-import { startDevWatcher } from "./utils/dev-watcher";
-import { ensureNotRunning } from "./utils/ensure";
-import { preparePrisma } from "./utils/prisma";
+import { parcelBuild } from "utils/parcel";
 import { generateAPIFrm } from "./server/api-frm";
+import { prepareApiRoutes } from "./server/api-scan";
 import { createServer } from "./server/create";
 import { prepareAPITypes } from "./server/prep-api-ts";
-import { config } from "./utils/config";
+import { startDevWatcher } from "./utils/dev-watcher";
+import { ensureNotRunning } from "./utils/ensure";
 import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
-import { parcelBuild } from "utils/parcel";
-import { prepareApiRoutes } from "./server/api-scan";
+import { preparePrisma } from "./utils/prisma";
 
 g.status = "init";
 
 await createLogger();
 g.api = {};
-g.datadir = g.mode === "dev" ? ".data" : "../data";
+g.datadir = "data";
 g.port = parseInt(process.env.PORT || "4550");
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
 g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
@@ -24,7 +23,6 @@ if (g.mode === "dev") {
 
 await preparePrisma();
 await ensureNotRunning();
-await config.init();
 
 if (g.db) {
   g.db.$connect().catch((e: any) => {
