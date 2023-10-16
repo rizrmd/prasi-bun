@@ -72,7 +72,6 @@ addEventListener("message", async (e) => {
       }
       break;
     case "define-route":
-      console.log("defining route", e.data.routes);
       g.router = createRouter({ strictTrailingSlash: false });
       for (const route of e.data.routes) {
         g.router.insert(route.url, route);

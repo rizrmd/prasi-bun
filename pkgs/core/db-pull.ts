@@ -1,11 +1,14 @@
+import { spawn } from "bun";
 import { dir } from "dir";
-import { $ } from "execa";
 
-await $({
+await spawn({
+  cmd: ["bun", "prisma", "db", "pull"],
   cwd: dir.path("app/db"),
   stdio: ["ignore", "inherit", "inherit"],
-})`bun prisma db pull`;
-await $({
+}).exited;
+
+await spawn({
+  cmd: ["bun", "prisma", "generate"],
   cwd: dir.path("app/db"),
   stdio: ["ignore", "inherit", "inherit"],
-})`bun prisma generate`;
+}).exited;

@@ -49,6 +49,7 @@ export const initLive = async (p: PG, domain: string) => {
         }
         if (
           location.hostname === "prasi.app" ||
+          location.hostname === "prasi.web.andromedia.co.id" ||
           location.hostname === "localhost" ||
           location.hostname === "127.0.0.1" ||
           location.hostname === "10.0.2.2" // android localhost

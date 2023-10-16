@@ -55,7 +55,6 @@ export const createServer = async () => {
     } as WebSocketHandler<WSData>,
     async fetch(req, server) {
       const url = new URL(req.url);
-      console.log(req.url);
 
       if (wsHandler[url.pathname]) {
         if (
