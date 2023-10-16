@@ -25,6 +25,7 @@ export const createElProp = (item: IContent, p: PG) => {
       e.preventDefault();
     },
     onPointerDown: async (e: React.PointerEvent<HTMLDivElement>) => {
+      p.item.hover = "";
       e.stopPropagation();
       const render = () => {
         if (item.type !== "text") {
