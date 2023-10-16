@@ -4,7 +4,7 @@ import { removeAsync } from "fs-jetpack";
 await removeAsync(dir.path("app/static"));
 await removeAsync(dir.path("app/web/.parcel-cache"));
 
-await removeAsync(dir.path("app/web/static"));
+await removeAsync(dir.path("app/static"));
 
 const args = [
   "node",
@@ -13,7 +13,7 @@ const args = [
   "./src/index.tsx",
   "--no-optimize",
   "--dist-dir",
-  dir.path(`app/web/static`),
+  dir.path(`app/static`),
 ];
 
 const parcel = spawn({
