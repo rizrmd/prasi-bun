@@ -13,7 +13,7 @@ export const treePropEval = (
   p: PG,
   id: string,
   cprops: [string, FNCompDef][],
-  _scopeIndex?: any
+  _scopeIndex?: Record<string, string>
 ) => {
   const meta = p.treeMeta[id];
   if (meta.item.type === "item" && meta.item.component) {

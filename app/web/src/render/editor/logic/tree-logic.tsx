@@ -23,6 +23,7 @@ export const rebuildTree = async (
   p: PG,
   opt?: { render?: () => void; mode?: REBUILD_MODE; note: string }
 ) => {
+  if (p.treePending) return;
   p.treePending = new Promise<void>(async (resolve) => {
     const _render = () => {
       if (opt?.render) {
@@ -33,7 +34,6 @@ export const rebuildTree = async (
     };
 
     const mode = opt?.mode || "update";
-    // console.log("rebuild", mode);
 
     if (mode === "reset") {
       p.treeMeta = {};
@@ -222,15 +222,10 @@ export const walk = async (
       parent_id: p.cachedParentID[item.id] || val.parent_id,
       parent_comp: val.parent_comp as any,
       depth: val.depth || 0,
-      elprop: createElProp(item, p),
       parent_prop: val.parent_prop,
-      className: produceCSS(item, {
-        mode: p.mode,
-        hover: p.item.sideHover ? false : p.item.hover === item.id,
-        active: p.item.sideHover ? false : p.item.active === item.id,
-      }),
       indexedScope: p.treeMeta[item.id] ? p.treeMeta[item.id].indexedScope : {},
       comp,
+      render: p.render,
     };
 
     if (DEBUG) {

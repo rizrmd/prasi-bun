@@ -10,13 +10,27 @@ export const EItem: FC<{
 }> = ({ id, fromProp, _scopeIndex }) => {
   return (
     <ErrorBox id={id}>
-      <ERender id={id} fromProp={fromProp}>
+      <ERender id={id} fromProp={fromProp} _scopeIndex={_scopeIndex}>
         {(childs) => {
           return childs.map((e) => {
             if (e.type !== "text") {
-              return <EItem id={e.id} key={e.id} fromProp={fromProp} />;
+              return (
+                <EItem
+                  id={e.id}
+                  key={e.id}
+                  fromProp={fromProp}
+                  _scopeIndex={_scopeIndex}
+                />
+              );
             } else {
-              return <EText id={e.id} key={e.id} fromProp={fromProp} />;
+              return (
+                <EText
+                  id={e.id}
+                  key={e.id}
+                  fromProp={fromProp}
+                  _scopeIndex={_scopeIndex}
+                />
+              );
             }
           });
         }}

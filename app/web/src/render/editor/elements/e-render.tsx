@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 import { useGlobal } from "web-utils";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
@@ -25,11 +25,13 @@ export const ERender: FC<{
   _scopeIndex?: Record<string, any>;
 }> = ({ id, children, _scopeIndex }) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
+  const [_, setRender] = useState({});
   const meta = p.treeMeta[id];
 
   if (!meta) {
     return null;
   }
+  meta.render = () => setRender({});
   let item = meta.item;
 
   if (
@@ -45,7 +47,7 @@ export const ERender: FC<{
           mitem.parent.map(async (e, idx) => {
             if (e === mitem && item.adv?.js) {
               const json = e.toJSON() as IItem;
-              const scope = mergeScopeUpwards(p, meta);
+              const scope = mergeScopeUpwards(p, id, { _scopeIndex });
               let fn: any = null;
               const args = {
                 ...window.exports,
@@ -121,7 +123,19 @@ export const ERender: FC<{
   if (children) {
     if (item.type === "text") _children = children([]);
     else {
-      _children = children(item.childs || []);
+      _children = children(
+        item.childs.filter((c) => {
+          if (c.hidden) {
+            return false;
+          }
+
+          if (!p.treeMeta[c.id]) {
+            if (p.treePending) p.treePending.then(meta.render);
+            return false;
+          }
+          return true;
+        }) || []
+      );
     }
   }
 
@@ -182,12 +196,13 @@ export const ERender: FC<{
   if (!(adv?.jsBuilt && adv?.js) && (meta.scopeAttached || meta.comp)) {
     return treeScopeEval(
       p,
-      meta,
+      id,
       <>
         {_children}
         {componentOver}
       </>,
-      `render(React.createElement("div",{...props},children));`
+      `render(React.createElement("div",{...props},children));`,
+      _scopeIndex
     );
   }
 
@@ -198,12 +213,13 @@ export const ERender: FC<{
     } else if (adv.jsBuilt && adv.js) {
       const el = treeScopeEval(
         p,
-        meta,
+        id,
         <>
           {_children}
           {componentOver}
         </>,
-        adv.jsBuilt
+        adv.jsBuilt,
+        _scopeIndex
       );
       return el;
     }

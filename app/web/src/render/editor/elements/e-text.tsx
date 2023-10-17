@@ -13,7 +13,7 @@ export const EText: FC<{
 }> = ({ id, fromProp, _scopeIndex }) => {
   return (
     <ErrorBox id={id}>
-      <ERender id={id} fromProp={fromProp} />
+      <ERender id={id} fromProp={fromProp} _scopeIndex={_scopeIndex} />
     </ErrorBox>
   );
 };

@@ -426,7 +426,7 @@ async () => {
 
               let propVal: any = {};
 
-              const scope = mergeScopeUpwards(p, meta);
+              const scope = mergeScopeUpwards(p, p.item.active);
               propVal = {
                 ...(window.exports || {}),
                 ...scope,
