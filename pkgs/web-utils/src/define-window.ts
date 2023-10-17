@@ -9,7 +9,7 @@ export const defineWindow = async (awaitServerUrl = true) => {
   w.prasiContext = {
     global: {},
     render() {},
-  }; 
+  };
 
   const location = window["location"];
 
@@ -88,9 +88,9 @@ export const defineWindow = async (awaitServerUrl = true) => {
         w.preventPopRender = false;
         return;
       }
-      if (w.rootRender) {
+      if (w.prasiContext && w.prasiContext.render) {
         w.pathname = location.pathname;
-        w.rootRender();
+        w.prasiContext.render();
       }
     });
   }
