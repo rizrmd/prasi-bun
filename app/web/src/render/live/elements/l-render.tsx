@@ -73,7 +73,6 @@ export const LRenderInternal: FC<{
   }, []);
 
   if (!meta) {
-    console.log("meta not found", id);
     return null;
   }
   meta.render = () => {
