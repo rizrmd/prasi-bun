@@ -8,8 +8,6 @@ import { LPage, LiveGlobal, PG } from "./global";
 import { liveWS, wsend } from "./ws";
 import { rebuildTree } from "./tree-logic";
 
-const cacheMeta = {} as Record<string, (typeof LiveGlobal)["treeMeta"]>;
-
 export const routeLive = (p: PG, pathname: string) => {
   if (p.status !== "loading") {
     let page_id = "";
@@ -34,16 +32,9 @@ export const routeLive = (p: PG, pathname: string) => {
     if (page_id) {
       (window as any).prasiPageID = page_id;
       const promises: Promise<void>[] = [];
-      let hasCache = false;
       if (page_id !== p.page?.id) {
-        if (p.page) {
-          cacheMeta[p.page.id] = p.treeMeta;
-        }
-
         p.page = p.pages[page_id];
-
-        console.clear();
-        console.log("resetting page");
+        p.treeMeta = {};
       }
       if (!p.page || !p.page.content_tree) {
         promises.push(loadNpmPage(p, page_id));
@@ -66,7 +57,7 @@ export const routeLive = (p: PG, pathname: string) => {
           p.render();
         });
       } else {
-        if (p.prod && !hasCache && !firstRender[page_id]) {
+        if (p.prod && !firstRender[page_id]) {
           firstRender[page_id] = true;
           pageLoaded(p).then(p.render);
         } else {
