@@ -27,7 +27,6 @@ export const treePropEval = (
     const w = window as any;
     const finalScope = mergeScopeUpwards(p, id, { _scopeIndex });
 
-
     const args = {
       ...w.exports,
       ...finalScope,
@@ -75,8 +74,9 @@ export const treePropEval = (
                 _scopeIndex?: Record<string, any>;
               }) => {
                 if (prop.content) {
-                  if (p.treeMeta[prop.content.id]) {
-                    p.treeMeta[prop.content.id].parent_id = parent_id;
+                  const meta = p.treeMeta[prop.content.id];
+                  if (meta) {
+                    meta.parent_id = parent_id;
                     return (
                       <LItem
                         id={prop.content.id}
