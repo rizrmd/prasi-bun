@@ -277,10 +277,18 @@ const createLocal = (p: PG, id: string) => {
         cachedPath[page_id] = {};
       }
       if (cachedLocal[page_id][itemid]) {
-        if (cache === false && cachedPath[page_id][itemid] !== location.href) {
-          cachedPath[page_id][itemid] = location.href;
-          genScope();
-          cachedLocal[page_id][itemid] = meta.scope[name];
+        if (cache === false) {
+          if (cachedPath[page_id][itemid] !== location.href) {
+            cachedPath[page_id][itemid] = location.href;
+            genScope();
+            cachedLocal[page_id][itemid] = meta.scope[name];
+          } else {
+            meta.scope[name] = cachedLocal[page_id][itemid];
+            meta.scope[name].render = () => {
+              if (meta.render) meta.render();
+              else p.render();
+            };
+          }
         } else {
           meta.scope[name] = cachedLocal[page_id][itemid];
           meta.scope[name].render = () => {
