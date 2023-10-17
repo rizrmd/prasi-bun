@@ -35,6 +35,7 @@ export const routeLive = (p: PG, pathname: string) => {
       if (page_id !== p.page?.id) {
         p.page = p.pages[page_id];
         p.treeMeta = {};
+        p.portal = {};
       }
       if (!p.page || !p.page.content_tree) {
         promises.push(loadNpmPage(p, page_id));

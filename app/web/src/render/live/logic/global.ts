@@ -1,7 +1,7 @@
-import { FC } from "react";
 import { createRouter } from "radix3";
+import { FC, ReactNode } from "react";
 import { CompDoc } from "../../../base/global/content-editor";
-import { IContent, MContent, MPage } from "../../../utils/types/general";
+import { IContent, MPage } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { PRASI_COMPONENT } from "../../../utils/types/render";
 import { IRoot } from "../../../utils/types/root";
@@ -106,6 +106,7 @@ export const LiveGlobal = {
   }>(),
   treePending: null as null | Promise<void>,
   treeMeta: {} as Record<string, ItemMeta>,
+  portal: {} as Record<string, { el?: ReactNode; render: () => void }>,
   comps: {
     pending: {} as Record<string, Promise<PRASI_COMPONENT>>,
     resolve: {} as Record<string, (comp: PRASI_COMPONENT) => void>,

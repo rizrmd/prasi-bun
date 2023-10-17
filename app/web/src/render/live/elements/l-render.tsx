@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { FNAdv, FNCompDef, FNLinkTag } from "../../../utils/types/meta-fn";
@@ -27,12 +27,10 @@ export const LRender: FC<{
           mode: p.mode,
         });
 
-        const className = meta.className;
-        return <div id={meta.item.name} className={className} />;
+        return <PrasiPortal name={meta.item.name} />;
       } else {
-        const el = document.getElementById(meta.item.name);
-        if (!el) return null;
-        return createPortal(
+        if (!p.portal[meta.item.name]) return null;
+        p.portal[meta.item.name].el = (
           <LRenderInternal
             p={p}
             id={id}
@@ -40,9 +38,9 @@ export const LRender: FC<{
             fromProp={fromProp}
             meta={meta}
             _scopeIndex={_scopeIndex}
-          />,
-          el
+          />
         );
+        return null;
       }
     }
   }
@@ -233,4 +231,17 @@ export const renderHTML = (className: string, adv: FNAdv) => {
     );
   }
   return null;
+};
+
+const PrasiPortal = ({ name }: { name: string }) => {
+  const p = useGlobal(LiveGlobal, "LIVE");
+  const local = useLocal({});
+
+  if (!p.portal[name]) {
+    p.portal[name] = { render: local.render, el: null };
+  } else {
+    p.portal[name].render = local.render;
+  }
+
+  return p.portal[name].el;
 };
