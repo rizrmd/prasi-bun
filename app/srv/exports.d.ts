@@ -64,6 +64,12 @@ declare module "app/srv/api/local-ip" {
         api(): Promise<string[]>;
     };
 }
+declare module "app/srv/api/site-bundle" {
+    export const _: {
+        url: string;
+        api(mode: "md5" | "download"): Promise<string>;
+    };
+}
 declare module "app/web/src/utils/types/ws" {
     export type WS_MSG = WS_MSG_GET_COMP | WS_MSG_SET_COMP | WS_MSG_GET_PAGE | WS_MSG_SET_PAGE | WS_MSG_SV_LOCAL | WS_MSG_SVDIFF_REMOTE | WS_MSG_DIFF_LOCAL | WS_MSG_UNDO | WS_MSG_REDO | WS_MSG_NEW_COMP | WS_SITE_JS | {
         type: "ping";
@@ -612,6 +618,12 @@ declare module "app/srv/api/site-dts" {
         api(site_id: string): Promise<string>;
     };
 }
+declare module "app/srv/api/site-export" {
+    export const _: {
+        url: string;
+        api(site_id: string): Promise<void>;
+    };
+}
 declare module "app/srv/api/page-reload" {
     export const _: {
         url: string;
@@ -654,6 +666,13 @@ declare module "app/srv/exports" {
         args: any[];
         handler: Promise<typeof import("app/srv/api/local-ip")>;
     };
+    export const site_bundle: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("app/srv/api/site-bundle")>;
+    };
     export const npm_bundle: {
         name: string;
         url: string;
@@ -667,6 +686,13 @@ declare module "app/srv/exports" {
         path: string;
         args: string[];
         handler: Promise<typeof import("app/srv/api/site-dts")>;
+    };
+    export const site_export: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("app/srv/api/site-export")>;
     };
     export const page_reload: {
         name: string;

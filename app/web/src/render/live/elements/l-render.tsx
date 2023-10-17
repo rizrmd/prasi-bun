@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { useGlobal } from "web-utils";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
@@ -15,7 +15,8 @@ export const LRender: FC<{
   id: string;
   children?: (childs: IContent[]) => ReactNode;
   fromProp?: boolean;
-}> = ({ id, children, fromProp }) => {
+  _scopeIndex?: Record<string, any>;
+}> = ({ id, children, fromProp, _scopeIndex }) => {
   const p = useGlobal(LiveGlobal, "LIVE");
   const meta = p.treeMeta[id];
 
@@ -38,6 +39,7 @@ export const LRender: FC<{
             children={children}
             fromProp={fromProp}
             meta={meta}
+            _scopeIndex={_scopeIndex}
           />,
           el
         );
@@ -52,6 +54,7 @@ export const LRender: FC<{
       children={children}
       fromProp={fromProp}
       meta={meta}
+      _scopeIndex={_scopeIndex}
     />
   );
 };
@@ -60,22 +63,27 @@ export const LRenderInternal: FC<{
   children?: (childs: IContent[]) => ReactNode;
   fromProp?: boolean;
   meta?: ItemMeta;
+  _scopeIndex?: Record<string, any>;
   p: PG;
-}> = ({ id, children, meta, p }) => {
+}> = ({ id, children, meta, p, _scopeIndex }) => {
   const [_, render] = useState({});
 
+  useEffect(() => {
+    if (meta) {
+      meta.mounted = true;
+    }
+  }, []);
+
   if (!meta) {
+    console.log("meta not found", id);
     return null;
   }
-
   meta.render = () => {
-    render({});
+    if (meta && meta.mounted) {
+      render({});
+    }
   };
   let item = meta.item;
-
-  if (item.hidden) {
-    return null;
-  }
 
   if (meta.comp?.id) {
     const comp = meta.comp;
@@ -99,7 +107,7 @@ export const LRenderInternal: FC<{
       cprops = Object.entries(props);
     }
 
-    comp.propval = treePropEval(p, meta, cprops);
+    comp.propval = treePropEval(p, id, cprops, _scopeIndex);
   }
 
   let _children = null;
@@ -107,7 +115,19 @@ export const LRenderInternal: FC<{
   if (children) {
     if (item.type === "text") _children = children([]);
     else {
-      _children = children(item.childs || []);
+      _children = children(
+        item.childs.filter((c) => {
+          if (c.hidden === "all") {
+            return false;
+          }
+
+          if (!p.treeMeta[c.id]) {
+            if (p.treePending) p.treePending.then(meta.render);
+            return false;
+          }
+          return true;
+        }) || []
+      );
     }
   }
 
@@ -118,12 +138,13 @@ export const LRenderInternal: FC<{
   const className = meta.className;
   const adv = item.adv;
 
-  if (!(adv?.jsBuilt && adv?.js) && (meta.jsxParentId || meta.comp)) {
+  if (!(adv?.jsBuilt && adv?.js) && meta.comp) {
     return treeScopeEval(
       p,
-      meta,
+      id,
       _children,
-      `render(React.createElement("div",{...props},children));`
+      `render(React.createElement("div",{...props},children));`,
+      _scopeIndex
     );
   }
 
@@ -132,7 +153,7 @@ export const LRenderInternal: FC<{
       const html = renderHTML(className, adv);
       if (html) return html;
     } else if (adv.jsBuilt && adv.js) {
-      const el = treeScopeEval(p, meta, _children, adv.jsBuilt);
+      const el = treeScopeEval(p, id, _children, adv.jsBuilt, _scopeIndex);
       return el;
     }
   }

@@ -101,7 +101,6 @@ export const liveWS = async (p: PG) => {
             break;
           case "svd_remote":
             svdRemote({ p, bin: extract(msg.diff_remote), msg });
-            p.treeMeta = {};
             rebuildTree(p, { note: "page-changed" });
             break;
           case "diff_local":

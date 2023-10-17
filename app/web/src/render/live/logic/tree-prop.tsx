@@ -1,21 +1,21 @@
 import { FC } from "react";
 import { createAPI, createDB } from "../../../utils/script/init-api";
 import { FNCompDef } from "../../../utils/types/meta-fn";
-import { ItemMeta, PG } from "./global";
-import { mergeScopeUpwards } from "./tree-scope";
 import { LItem } from "../elements/l-item";
+import { PG } from "./global";
 import { extractNavigate, preload } from "./route";
-import { createId } from "@paralleldrive/cuid2";
-import { fillID } from "../../editor/tools/fill-id";
+import { mergeScopeUpwards } from "./tree-scope";
 
 export type PropCompFC = FC<{}>;
 
 const jsxProps = {} as Record<string, any>;
 export const treePropEval = (
   p: PG,
-  meta: ItemMeta,
-  cprops: [string, FNCompDef][]
+  id: string,
+  cprops: [string, FNCompDef][],
+  _scopeIndex?: any
 ) => {
+  const meta = p.treeMeta[id];
   if (meta.item.type === "item" && meta.item.component) {
     if (p.site.api_url) {
       if (!p.script.db) p.script.db = createDB(p.site.api_url);
@@ -25,7 +25,7 @@ export const treePropEval = (
     const props = meta.item.component.props;
 
     const w = window as any;
-    const finalScope = mergeScopeUpwards(p, meta);
+    const finalScope = mergeScopeUpwards(p, id, { _scopeIndex });
     const args = {
       ...w.exports,
       ...finalScope,
@@ -65,12 +65,23 @@ export const treePropEval = (
           if (!jsxProps[id]) {
             jsxProps[id] = {
               _jsx: true,
-              Comp: ({ parent_id }: { parent_id: string }) => {
+              Comp: ({
+                parent_id,
+                _scopeIndex,
+              }: {
+                parent_id: string;
+                _scopeIndex?: Record<string, any>;
+              }) => {
                 if (prop.content) {
                   if (p.treeMeta[prop.content.id]) {
-                    p.treeMeta[prop.content.id].jsxParentId = parent_id;
-
-                    return <LItem id={prop.content.id} fromProp={true} />;
+                    p.treeMeta[prop.content.id].parent_id = parent_id;
+                    return (
+                      <LItem
+                        id={prop.content.id}
+                        fromProp={true}
+                        _scopeIndex={_scopeIndex}
+                      />
+                    );
                   }
                 }
                 return <></>;

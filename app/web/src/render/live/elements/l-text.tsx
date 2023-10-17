@@ -6,8 +6,9 @@ import { LRender } from "./l-render";
 export const LText: FC<{
   id: string;
   fromProp?: boolean;
-}> = ({ id, fromProp }) => {
-  return <LRender id={id} fromProp={fromProp} />;
+  _scopeIndex?: Record<string, any>;
+}> = ({ id, fromProp, _scopeIndex }) => {
+  return <LRender id={id} fromProp={fromProp} _scopeIndex={_scopeIndex} />;
 };
 
 export const LTextInternal: FC<{
