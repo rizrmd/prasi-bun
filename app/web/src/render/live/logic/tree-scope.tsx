@@ -133,16 +133,6 @@ export const mergeScopeUpwards = (
 
   const finalScope: any = {};
 
-  const parent = p.treeMeta[meta.parent_id];
-  const condition =
-    meta.item.name === "label" &&
-    parent.item.name === "tree_lv_2" &&
-    p.treeMeta[parent.parent_id].item.name !== "tree_lv_1";
-
-  if (condition) {
-    console.log("------------------------");
-  }
-
   while (cur) {
     let scope = null;
 
@@ -152,14 +142,6 @@ export const mergeScopeUpwards = (
       if (typeof idx !== "undefined" && cur.indexedScope[idx]) {
         indexedScope = cur.indexedScope[idx];
       }
-    }
-
-    if (condition) {
-      console.log(
-        cur.item.name,
-        cur.item.id,
-        indexedScope ? indexedScope.idx : indexedScope
-      );
     }
 
     if (indexedScope || cur.scope || cur.comp?.propval) {
@@ -176,10 +158,6 @@ export const mergeScopeUpwards = (
     }
 
     cur = p.treeMeta[cur.parent_id];
-  }
-
-  if (condition) {
-    console.log(finalScope.lv2_item);
   }
 
   return finalScope;

@@ -10,7 +10,8 @@ export type PropCompFC = FC<{}>;
 export const treePropEval = (
   p: PG,
   meta: ItemMeta,
-  cprops: [string, FNCompDef][]
+  cprops: [string, FNCompDef][],
+  _scopeIndex?: Record<string, string>
 ) => {
   if (meta.item.type === "item" && meta.item.component) {
     if (p.site.api_url) {
@@ -21,7 +22,7 @@ export const treePropEval = (
     const props = meta.item.component.props;
 
     const w = window as any;
-    const finalScope = mergeScopeUpwards(p, meta);
+    const finalScope = mergeScopeUpwards(p, meta.item.id, { _scopeIndex });
     const args = {
       ...w.exports,
       ...finalScope,
@@ -57,21 +58,27 @@ export const treePropEval = (
         if (!(typeof value === "object" && !!value && value._jsx)) {
           value = {
             _jsx: true,
-            Comp: ({ parent_id }: { parent_id: string }) => {
+            Comp: ({
+              parent_id,
+              _scopeIndex,
+            }: {
+              parent_id: string;
+              _scopeIndex?: Record<string, string>;
+            }) => {
               if (prop.content) {
-                const meta = p.treeMeta[parent_id];
-                const scopes: { meta: ItemMeta; value: any }[] = [];
-                mergeScopeUpwards(p, meta, {
-                  each: (m, val) => {
-                    scopes.push({ meta: m, value: val });
-                    return true;
-                  },
-                });
-                if (p.treeMeta[prop.content.id]) {
-                  p.treeMeta[prop.content.id].scopeAttached = scopes;
-                }
+                const meta = p.treeMeta[prop.content.id];
+                if (meta) {
+                  meta.parent_id = parent_id;
+                  p.cachedParentID[prop.content.id] = parent_id;
 
-                return <EItem id={prop.content.id} fromProp={true} />;
+                  return (
+                    <EItem
+                      id={prop.content.id}
+                      fromProp={true}
+                      _scopeIndex={_scopeIndex}
+                    />
+                  );
+                }
               }
               return <></>;
             },

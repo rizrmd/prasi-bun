@@ -8,10 +8,12 @@ export const JS_DEBUG = false;
 
 export const treeScopeEval = (
   p: PG,
-  meta: ItemMeta,
+  id: string,
   children: ReactNode,
-  js: string
+  js: string,
+  _scopeIndex?: Record<string, string>
 ) => {
+  const meta = p.treeMeta[id];
   const className = meta.className;
   const elprop = meta.elprop;
 
@@ -21,8 +23,8 @@ export const treeScopeEval = (
   let args = {};
   if (!meta.memoize) {
     meta.memoize = {
-      Local: createLocal(p, meta),
-      PassProp: createPassProp(p, meta),
+      Local: createLocal(p, id),
+      PassProp: createPassProp(p, id),
     };
   }
 
@@ -33,13 +35,18 @@ export const treeScopeEval = (
   }
   const w = window as any;
 
-  const finalScope = mergeScopeUpwards(p, meta);
+  const finalScope = mergeScopeUpwards(p, id, { _scopeIndex });
 
   for (const [k, v] of Object.entries(finalScope)) {
     if (v && typeof v === "object") {
-      const t: { _jsx: true; Comp: FC<{ parent_id: string }> } = v as any;
+      const t: {
+        _jsx: true;
+        Comp: FC<{ parent_id: string; _scopeIndex?: Record<string, any> }>;
+      } = v as any;
       if (t._jsx && t.Comp) {
-        finalScope[k] = <t.Comp parent_id={meta.item.id} />;
+        finalScope[k] = (
+          <t.Comp parent_id={meta.item.id} _scopeIndex={_scopeIndex} />
+        );
       }
     }
   }
@@ -112,12 +119,15 @@ export const treeScopeEval = (
 
 export const mergeScopeUpwards = (
   p: PG,
-  meta: ItemMeta,
+  id: string,
   opt?: {
+    _scopeIndex?: Record<string, any>;
     debug?: boolean;
     each?: (meta: ItemMeta, values: Record<string, any>) => boolean;
   }
 ) => {
+  const meta = p.treeMeta[id];
+
   if (!meta.scope) {
     meta.scope = {};
   }
@@ -129,29 +139,20 @@ export const mergeScopeUpwards = (
   while (cur) {
     let scope = null;
 
-    if (cur.scopeAttached) {
-      for (const s of cur.scopeAttached) {
-        if (s.value) {
-          for (const [k, v] of Object.entries(s.value)) {
-            if (typeof finalScope[k] === "undefined") finalScope[k] = v;
-          }
-
-          if (opt?.each) {
-            if (!opt.each(s.meta, s.value)) {
-              break;
-            }
-          }
-        }
+    let indexedScope = null;
+    if (cur.indexedScope && opt?._scopeIndex) {
+      const idx = opt._scopeIndex[cur.item.id];
+      if (typeof idx !== "undefined" && cur.indexedScope[idx]) {
+        indexedScope = cur.indexedScope[idx];
       }
     }
 
-    if (cur.scope || cur.comp?.propval) {
-      scope = { ...cur.scope, ...cur.comp?.propval };
+    if (indexedScope || cur.scope || cur.comp?.propval) {
+      scope = { ...cur.scope, ...indexedScope, ...cur.comp?.propval };
 
       for (const [k, v] of Object.entries(scope)) {
         if (typeof finalScope[k] === "undefined") finalScope[k] = v;
       }
-
       if (opt?.each) {
         if (!opt.each(cur, scope)) {
           break;
@@ -165,8 +166,44 @@ export const mergeScopeUpwards = (
   return finalScope;
 };
 
-const createPassProp = (p: PG, meta: ItemMeta) => {
+const modifyChildIndex = (
+  child: ReactNode | ReactNode[],
+  _scopeIndex: Record<string, any>
+) => {
+  if (Array.isArray(child)) {
+    const childs: any[] = [];
+    for (const c of child) {
+      childs.push(modifyChildIndex(c, _scopeIndex));
+    }
+    return childs;
+  }
+  if (typeof child === "object" && child) {
+    return { ...child, props: { ...(child as any).props, _scopeIndex } };
+  }
+  return child;
+};
+
+const createPassProp = (
+  p: PG,
+  id: string,
+  _existingScopeIndex?: Record<string, any>
+) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
+    const meta = p.treeMeta[id];
+
+    if (typeof arg.idx !== "undefined" && meta && meta.item && meta.item.id) {
+      meta.indexedScope[arg.idx] = {};
+
+      for (const [k, v] of Object.entries(arg)) {
+        if (k === "children") continue;
+        meta.indexedScope[arg.idx][k] = v;
+      }
+
+      const scopeIndex = { ..._existingScopeIndex, [meta.item.id]: arg.idx };
+
+      return modifyChildIndex(arg.children, scopeIndex);
+    }
+
     if (!meta.scope) {
       meta.scope = {};
     }
@@ -174,12 +211,11 @@ const createPassProp = (p: PG, meta: ItemMeta) => {
       if (k === "children") continue;
       meta.scope[k] = v;
     }
-
     return arg.children;
   };
 };
 
-const createLocal = (p: PG, meta: ItemMeta) => {
+const createLocal = (p: PG, id: string) => {
   const Local = ({
     name,
     value,
@@ -195,6 +231,8 @@ const createLocal = (p: PG, meta: ItemMeta) => {
     hook?: (value: any) => void;
     deps?: any[];
   }) => {
+    const meta = p.treeMeta[id];
+
     if (!meta.scope) {
       meta.scope = {};
     }

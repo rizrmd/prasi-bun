@@ -273,7 +273,7 @@ async () => {
                   meta,
                   Object.entries(mprops.toJSON())
                 );
-                const scopes = mergeScopeUpwards(p, meta);
+                const scopes = mergeScopeUpwards(p, p.item.active);
                 let args = {
                   ...window.exports,
                   ...scopes,

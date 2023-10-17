@@ -1,8 +1,8 @@
 import { FC } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { useGlobal } from "web-utils";
 import { EditorGlobal } from "../../../logic/global";
-import { EScriptCustom } from "../../script/script-custom";
 import { mergeScopeUpwards } from "../../../logic/tree-scope";
+import { EScriptCustom } from "../../script/script-custom";
 
 export const CPCodeEdit: FC<{
   value: string;
@@ -12,7 +12,7 @@ export const CPCodeEdit: FC<{
   const p = useGlobal(EditorGlobal, "EDITOR");
   const meta = p.treeMeta[p.item.active];
 
-  const scope = mergeScopeUpwards(p, meta);
+  const scope = mergeScopeUpwards(p, p.item.active);
   const props: any = {
     ...window.exports,
     ...scope,

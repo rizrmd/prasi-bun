@@ -21,13 +21,14 @@ export type ItemMeta = {
   parent_prop?: ItemMeta;
   scope?: any;
   scopeAttached?: { meta: ItemMeta; value: any }[];
-  className: string;
-  elprop: any;
+  className?: string;
+  elprop?: any;
   depth: number;
   memoize?: {
     Local: FC<any>;
     PassProp: FC<any>;
   };
+  render: () => void;
   comp?: {
     id: string;
     mcomp?: MItem;
