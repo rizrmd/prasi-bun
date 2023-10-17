@@ -107,6 +107,7 @@ export const LiveGlobal = {
   }>(),
   treePending: null as null | Promise<void>,
   treeMeta: {} as Record<string, ItemMeta>,
+  cachedParentID: {} as Record<string, string>,
   portal: {} as Record<string, { el?: ReactNode; render: () => void }>,
   comps: {
     pending: {} as Record<string, Promise<PRASI_COMPONENT>>,

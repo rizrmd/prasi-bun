@@ -77,6 +77,8 @@ export const treePropEval = (
                   const meta = p.treeMeta[prop.content.id];
                   if (meta) {
                     meta.parent_id = parent_id;
+                    p.cachedParentID[prop.content.id] = parent_id;
+
                     return (
                       <LItem
                         id={prop.content.id}

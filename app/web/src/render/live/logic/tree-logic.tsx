@@ -94,7 +94,7 @@ const walk = async (
 
     const meta: ItemMeta = {
       item,
-      parent_id: val.parent_id,
+      parent_id: p.cachedParentID[item.id] || val.parent_id,
       parent_comp: val.parent_comp as any,
       className: produceCSS(item, {
         mode: p.mode,
