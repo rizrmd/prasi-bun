@@ -9,43 +9,48 @@ export const rebuildTree = async (
   p: PG,
   _: { note: string; render?: boolean; reset?: boolean }
 ) => {
-  const treeMeta = p.treeMeta;
+  p.treePending = new Promise<void>(async (resolve) => {
+    const treeMeta = p.treeMeta;
+    if (p.page) {
+      let childs = Object.values(p.page.content_tree.childs || []);
+      if (
+        p.layout.section &&
+        p.layout.content &&
+        !p.page?.name.startsWith("layout:")
+      ) {
+        childs = [p.layout.section];
 
-  if (p.page) {
-    let childs = Object.values(p.page.content_tree.childs || []);
-    if (
-      p.layout.section &&
-      p.layout.content &&
-      !p.page?.name.startsWith("layout:")
-    ) {
-      childs = [p.layout.section];
-
-      p.layout.content.type = "item";
-      if (p.layout.content.type === "item") {
-        p.layout.content.childs = p.page.content_tree.childs.map((e) => ({
-          ...e,
-          type: "item",
-        })) as IItem[];
+        p.layout.content.type = "item";
+        if (p.layout.content.type === "item") {
+          p.layout.content.childs = p.page.content_tree.childs.map((e) => ({
+            ...e,
+            type: "item",
+          })) as IItem[];
+        }
       }
+
+      await Promise.all(
+        childs.map(async (item, idx) => {
+          await walk(p, {
+            treeMeta,
+            item,
+            parent_id: "root",
+            idx,
+            isLayout: !!(p.layout.section && p.layout.content),
+          });
+        }) || []
+      );
     }
 
-    await Promise.all(
-      childs.map(async (item, idx) => {
-        await walk(p, {
-          treeMeta,
-          item,
-          parent_id: "root",
-          idx,
-          isLayout: !!(p.layout.section && p.layout.content),
-        });
-      }) || []
-    );
-  }
+    resolve();
+    p.treePending = null;
 
-  if (_.render !== false) {
-    console.log("rendering");
-    p.render();
-  }
+    if (_.render !== false) {
+      console.log("rendering");
+      p.render();
+    }
+  });
+  await p.treePending;
 };
 
 const walk = async (
@@ -61,6 +66,8 @@ const walk = async (
 ) => {
   const treeMeta = val.treeMeta;
   let item = val.item as IContent;
+
+  if (item.hidden) return;
 
   if (val.parent_comp) {
     const pchild_ids = val.parent_comp.comp?.child_ids;
@@ -93,6 +100,7 @@ const walk = async (
         mode: p.mode,
       }),
       comp,
+      indexedScope: treeMeta[item.id] ? treeMeta[item.id].indexedScope : {},
       isLayout: val.isLayout,
     };
 
@@ -206,7 +214,7 @@ const walk = async (
                           treeMeta,
                           item: cprop.content,
                           parent_id: item.id,
-                          parent_comp: val.parent_comp,
+                          parent_comp: meta as any,
                           idx: mprop.idx,
                           isLayout: meta.isLayout,
                         });

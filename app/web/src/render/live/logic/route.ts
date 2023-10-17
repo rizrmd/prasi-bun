@@ -31,7 +31,6 @@ export const routeLive = (p: PG, pathname: string) => {
       }
     }
 
-    console.log(page_id);
     if (page_id) {
       (window as any).prasiPageID = page_id;
       const promises: Promise<void>[] = [];
@@ -43,12 +42,8 @@ export const routeLive = (p: PG, pathname: string) => {
 
         p.page = p.pages[page_id];
 
-        if (p.page && cacheMeta[p.page.id]) {
-          p.treeMeta = cacheMeta[p.page.id];
-          hasCache = true;
-        } else {
-          p.treeMeta = {};
-        }
+        console.clear();
+        console.log("resetting page");
       }
       if (!p.page || !p.page.content_tree) {
         promises.push(loadNpmPage(p, page_id));

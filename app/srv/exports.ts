@@ -33,6 +33,13 @@ export const local_ip = {
   args: [],
   handler: import("./api/local-ip")
 }
+export const site_bundle = {
+  name: "site_bundle",
+  url: "/site-bundle/:mode",
+  path: "app/srv/api/site-bundle.ts",
+  args: ["mode"],
+  handler: import("./api/site-bundle")
+}
 export const npm_bundle = {
   name: "npm_bundle",
   url: "/npm-bundle/:mode/:id",
@@ -46,6 +53,13 @@ export const site_dts = {
   path: "app/srv/api/site-dts.ts",
   args: ["site_id"],
   handler: import("./api/site-dts")
+}
+export const site_export = {
+  name: "site_export",
+  url: "/site-export/:site_id",
+  path: "app/srv/api/site-export.ts",
+  args: ["site_id"],
+  handler: import("./api/site-export")
 }
 export const page_reload = {
   name: "page_reload",

@@ -12,7 +12,7 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 export type ItemMeta = {
   item: IContent;
   scope?: any;
-  jsxParentId?: string;
+  indexedScope: Record<string, any>;
   comp?: {
     id: string;
     propval?: any;
@@ -26,8 +26,9 @@ export type ItemMeta = {
     Local: FC<any>;
     PassProp: FC<any>;
   };
-  isLayout: boolean,
+  isLayout: boolean;
   render?: () => void;
+  mounted?: boolean;
 };
 
 export type LPage = {
@@ -103,6 +104,7 @@ export const LiveGlobal = {
     id: string;
     url: string;
   }>(),
+  treePending: null as null | Promise<void>,
   treeMeta: {} as Record<string, ItemMeta>,
   comps: {
     pending: {} as Record<string, Promise<PRASI_COMPONENT>>,

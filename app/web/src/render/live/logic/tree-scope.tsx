@@ -1,4 +1,4 @@
-import { FC, ReactNode, Suspense, useEffect } from "react";
+import { FC, ReactNode, Suspense, isValidElement, useEffect } from "react";
 import { deepClone } from "web-utils";
 import { createAPI, createDB } from "../../../utils/script/init-api";
 import { ErrorBox } from "../../editor/elements/e-error";
@@ -9,10 +9,12 @@ export const JS_DEBUG = false;
 
 export const treeScopeEval = (
   p: PG,
-  meta: ItemMeta,
+  id: string,
   children: ReactNode,
-  js: string
+  js: string,
+  _scopeIndex?: Record<string, any>
 ) => {
+  const meta = p.treeMeta[id];
   const className = meta.className;
 
   let item = meta.item;
@@ -22,8 +24,8 @@ export const treeScopeEval = (
   try {
     if (!meta.memoize) {
       meta.memoize = {
-        Local: createLocal(p, meta),
-        PassProp: createPassProp(p, meta),
+        Local: createLocal(p, id),
+        PassProp: createPassProp(p, id, _scopeIndex),
       };
     }
 
@@ -41,7 +43,7 @@ export const treeScopeEval = (
     }
     const w = window as any;
 
-    const finalScope = mergeScopeUpwards(p, meta);
+    const finalScope = mergeScopeUpwards(p, id, { _scopeIndex });
 
     for (const [k, v] of Object.entries(finalScope)) {
       if (v && typeof v === "object") {
@@ -100,12 +102,15 @@ export const treeScopeEval = (
 
 export const mergeScopeUpwards = (
   p: PG,
-  meta: ItemMeta,
+  id: string,
   opt?: {
+    _scopeIndex?: Record<string, any>;
     debug?: boolean;
     each?: (meta: ItemMeta, values: Record<string, any>) => boolean;
   }
 ) => {
+  const meta = p.treeMeta[id];
+
   if (!meta.scope) {
     meta.scope = {};
   }
@@ -117,8 +122,16 @@ export const mergeScopeUpwards = (
   while (cur) {
     let scope = null;
 
-    if (cur.scope || cur.comp?.propval) {
-      scope = { ...cur.scope, ...cur.comp?.propval };
+    let indexedScope = null;
+    if (cur.indexedScope && opt?._scopeIndex) {
+      const idx = opt._scopeIndex[cur.item.id];
+      if (typeof idx !== "undefined" && cur.indexedScope[idx]) {
+        indexedScope = cur.indexedScope[idx];
+      }
+    }
+
+    if (indexedScope || cur.scope || cur.comp?.propval) {
+      scope = { ...cur.scope, ...indexedScope, ...cur.comp?.propval };
 
       for (const [k, v] of Object.entries(scope)) {
         if (typeof finalScope[k] === "undefined") finalScope[k] = v;
@@ -130,18 +143,50 @@ export const mergeScopeUpwards = (
       }
     }
 
-    if (cur.jsxParentId) {
-      cur = p.treeMeta[cur.jsxParentId];
-    } else {
-      cur = p.treeMeta[cur.parent_id];
-    }
+    cur = p.treeMeta[cur.parent_id];
   }
-
   return finalScope;
 };
 
-const createPassProp = (p: PG, meta: ItemMeta) => {
-  return (arg: Record<string, any> & { children: ReactNode }) => {
+const modifyChildIndex = (
+  child: ReactNode | ReactNode[],
+  _scopeIndex: Record<string, any>
+) => {
+  if (Array.isArray(child)) {
+    const childs: any[] = [];
+    for (const c of child) {
+      childs.push(modifyChildIndex(c, _scopeIndex));
+    }
+    return childs;
+  }
+  if (typeof child === "object" && child) {
+    return { ...child, props: { ...(child as any).props, _scopeIndex } };
+  }
+  return child;
+};
+
+const createPassProp = (
+  p: PG,
+  id: string,
+  _existingScopeIndex?: Record<string, any>
+) => {
+  return function (
+    arg: Record<string, any> & { children: ReactNode; idx?: any }
+  ) {
+    const meta = p.treeMeta[id];
+
+    if (typeof arg.idx !== "undefined" && meta && meta.item && meta.item.id) {
+      meta.indexedScope[arg.idx] = {};
+
+      for (const [k, v] of Object.entries(arg)) {
+        if (k === "children") continue;
+        meta.indexedScope[arg.idx][k] = v;
+      }
+
+      const scopeIndex = { ..._existingScopeIndex, [meta.item.id]: arg.idx };
+
+      return modifyChildIndex(arg.children, scopeIndex);
+    }
     if (!meta.scope) {
       meta.scope = {};
     }
@@ -149,7 +194,6 @@ const createPassProp = (p: PG, meta: ItemMeta) => {
       if (k === "children") continue;
       meta.scope[k] = v;
     }
-
     return arg.children;
   };
 };
@@ -157,7 +201,7 @@ const createPassProp = (p: PG, meta: ItemMeta) => {
 const cachedLocal = {} as Record<string, Record<string, any>>;
 const cachedPath = {} as Record<string, Record<string, any>>;
 const cachedLayout = {} as Record<string, true>;
-const createLocal = (p: PG, meta: ItemMeta) => {
+const createLocal = (p: PG, id: string) => {
   const Local = ({
     name,
     value,
@@ -175,6 +219,8 @@ const createLocal = (p: PG, meta: ItemMeta) => {
     deps?: any[];
     cache?: boolean;
   }) => {
+    const meta = p.treeMeta[id];
+
     if (!meta.scope) {
       meta.scope = {};
     }
@@ -206,6 +252,13 @@ const createLocal = (p: PG, meta: ItemMeta) => {
 
     if (meta.isLayout) {
       page_id = "layout";
+      if (cachedLayout[meta.item.id]) {
+        meta.scope[name] = cachedLocal[page_id][itemid];
+        meta.scope[name].render = () => {
+          if (meta.render) meta.render();
+          else p.render();
+        };
+      }
     }
 
     if (

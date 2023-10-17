@@ -31,7 +31,7 @@ const props: {
 }; 
 const children: ReactNode; 
 
-const PassProp: FC<Record<string,any> & {children: React.ReactNode}>;
+const PassProp: FC<Record<string,any> & {children: React.ReactNode; }>;
 const PassChild: FC<{name: string}>;
 const Preload: FC<{url: string[]}>;
 const apiurl: string;
