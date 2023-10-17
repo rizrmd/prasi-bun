@@ -9,7 +9,8 @@ import { ERender } from "./e-render";
 export const EText: FC<{
   id: string;
   fromProp?: boolean;
-}> = ({ id, fromProp }) => {
+  _scopeIndex?: Record<string, any>;
+}> = ({ id, fromProp, _scopeIndex }) => {
   return (
     <ErrorBox id={id}>
       <ERender id={id} fromProp={fromProp} />

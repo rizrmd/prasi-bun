@@ -46,7 +46,6 @@ export const rebuildTree = async (
     p.treePending = null;
 
     if (_.render !== false) {
-      console.log("rendering");
       p.render();
     }
   });
@@ -67,7 +66,7 @@ const walk = async (
   const treeMeta = val.treeMeta;
   let item = val.item as IContent;
 
-  if (item.hidden) return;
+  if (item.hidden === 'all') return;
 
   if (val.parent_comp) {
     const pchild_ids = val.parent_comp.comp?.child_ids;

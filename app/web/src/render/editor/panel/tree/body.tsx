@@ -167,10 +167,15 @@ export const ETreeBody: FC<{ tree: NodeModel<NodeMeta>[]; meta?: any }> = ({
     [tree]
   );
 
+  const onOut = useCallback(() => {
+    p.item.hover = "";
+    p.softRender.all();
+  }, []);
+
   useEffect(() => {
     (async () => {
-      if (p.pendingRebuild) {
-        await waitUntil(() => !p.pendingRebuild);
+      if (p.treePending) {
+        await p.treePending;
       }
       const open = new Set<string>();
 
@@ -252,7 +257,10 @@ export const ETreeBody: FC<{ tree: NodeModel<NodeMeta>[]; meta?: any }> = ({
         </div>
       )}
       <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-        <div className="flex flex-col items-stretch bg-white right-0 left-0">
+        <div
+          className="flex flex-col items-stretch bg-white right-0 left-0"
+          onPointerOut={onOut}
+        >
           {local.rightClick.node && (
             <ETreeRightClick
               node={local.rightClick.node}

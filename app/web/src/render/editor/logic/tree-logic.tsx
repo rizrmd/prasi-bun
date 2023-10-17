@@ -23,88 +23,65 @@ export const rebuildTree = async (
   p: PG,
   opt?: { render?: () => void; mode?: REBUILD_MODE; note: string }
 ) => {
-  if (p.pendingRebuild || p.focused) {
-    return;
-  }
-  p.pendingRebuild = true;
+  p.treePending = new Promise<void>(async (resolve) => {
+    const _render = () => {
+      if (opt?.render) {
+        opt?.render();
+      } else {
+        p.render();
+      }
+    };
 
-  const _render = () => {
-    if (opt?.render) {
-      opt?.render();
-    } else {
-      p.render();
+    const mode = opt?.mode || "update";
+    // console.log("rebuild", mode);
+
+    if (mode === "reset") {
+      p.treeMeta = {};
+      p.compInstance = {};
     }
-  };
 
-  const mode = opt?.mode || "update";
-  // console.log("rebuild", mode);
+    p.treeFlatTemp = [];
 
-  if (mode === "reset") {
-    p.treeMeta = {};
-    p.compInstance = {};
-  }
+    if (p.mpage) {
+      if (DEBUG) {
+        DEBUG_CUR_IDX = 0;
+        console.clear();
+      }
+      const mpage = p.mpage.getMap("map").get("content_tree");
 
-  p.treeFlatTemp = [];
+      await mpage?.doc?.transact(async () => {
+        let parent_id = "root";
+        let includeTree = p.comp?.id ? false : true;
+        await Promise.all(
+          mpage?.get("childs")?.map(async (mitem) => {
+            await walk(p, mode, {
+              mitem,
+              parent_id,
+              depth: 0,
+              idx: 0,
+              includeTree,
+            });
+          }) || []
+        );
+      });
+      p.treeFlat = p.treeFlatTemp;
 
-  if (p.mpage) {
-    if (DEBUG) {
-      DEBUG_CUR_IDX = 0;
-      console.clear();
+      const root = p.treeFlat.find((e) => e.parent === "root");
+      if (
+        p.comp &&
+        root &&
+        p.comp.id === root.data.meta.comp?.id &&
+        p.comp.instance_id !== root.data.meta.item.id
+      ) {
+        p.comp.instance_id = root.id;
+      }
     }
-    const mpage = p.mpage.getMap("map").get("content_tree");
 
-    await mpage?.doc?.transact(async () => {
-      let parent_id = "root";
-      let includeTree = p.comp?.id ? false : true;
-      // const pageName = p.mpage?.getMap("map").get("name") as string;
-      // if (
-      //   p.layout.section &&
-      //   p.layout.content &&
-      //   !pageName.startsWith("layout:")
-      // ) {
-      //   await walk(p, mode, {
-      //     item: p.layout.section,
-      //     parent_id: "root",
-      //     depth: 0,
-      //     idx: 0,
-      //     includeTree: false,
-      //   });
+    resolve();
+    p.treePending = null;
 
-      //   parent_id = p.layout.content.id;
-      //   p.layout.content.type = "item";
-      //   if (p.layout.content.type === "item") {
-      //     p.layout.content.childs = (p.page?.content_tree.childs ||
-      //       []) as unknown as IItem[];
-      //   }
-      // }
-
-      await Promise.all(
-        mpage?.get("childs")?.map(async (mitem) => {
-          await walk(p, mode, {
-            mitem,
-            parent_id,
-            depth: 0,
-            idx: 0,
-            includeTree,
-          });
-        }) || []
-      );
-    });
-    p.treeFlat = p.treeFlatTemp;
-
-    const root = p.treeFlat.find((e) => e.parent === "root");
-    if (
-      p.comp &&
-      root &&
-      p.comp.id === root.data.meta.comp?.id &&
-      p.comp.instance_id !== root.data.meta.item.id
-    ) {
-      p.comp.instance_id = root.id;
-    }
-  }
-
-  p.pendingRebuild = false;
-  _render();
+    _render();
+  });
 };
 
 export const walk = async (
@@ -125,7 +102,6 @@ export const walk = async (
   }
 ) => {
   let item = val.item as IContent;
-
   let mitem = val.mitem;
 
   if (val.mitem) {
@@ -172,6 +148,7 @@ export const walk = async (
   }
 
   if (item) {
+    if (item.hidden) return;
     let comp: ItemMeta["comp"] = undefined as any;
 
     if (item.type === "item" && item.component?.id) {
@@ -242,7 +219,7 @@ export const walk = async (
     const meta: ItemMeta = {
       mitem: mitem,
       item,
-      parent_id: val.parent_id,
+      parent_id: p.cachedParentID[item.id] || val.parent_id,
       parent_comp: val.parent_comp as any,
       depth: val.depth || 0,
       elprop: createElProp(item, p),
@@ -252,6 +229,7 @@ export const walk = async (
         hover: p.item.sideHover ? false : p.item.hover === item.id,
         active: p.item.sideHover ? false : p.item.active === item.id,
       }),
+      indexedScope: p.treeMeta[item.id] ? p.treeMeta[item.id].indexedScope : {},
       comp,
     };
 
