@@ -29,7 +29,7 @@ export type ItemMeta = {
   isLayout: boolean;
   render?: () => void;
   mounted?: boolean;
-  pendingRender: boolean;
+  pendingRender?: boolean;
 };
 
 export type LPage = {
