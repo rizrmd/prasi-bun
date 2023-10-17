@@ -22,7 +22,8 @@ export const ERender: FC<{
   id: string;
   children?: (childs: IContent[]) => ReactNode;
   fromProp?: boolean;
-}> = ({ id, children }) => {
+  _scopeIndex?: Record<string, any>;
+}> = ({ id, children, _scopeIndex }) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
   const meta = p.treeMeta[id];
 
@@ -30,10 +31,6 @@ export const ERender: FC<{
     return null;
   }
   let item = meta.item;
-
-  if (item.hidden) {
-    return null;
-  }
 
   if (
     meta.parent_prop &&

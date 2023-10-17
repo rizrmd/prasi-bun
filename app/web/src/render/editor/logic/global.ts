@@ -16,6 +16,7 @@ export type ItemMeta = {
   mitem?: MContent;
   item: IContent;
   parent_id: string;
+  indexedScope: Record<string, any>;
   parent_comp?: WithRequired<ItemMeta, "comp"> & { item: IItem };
   parent_prop?: ItemMeta;
   scope?: any;
@@ -150,7 +151,10 @@ export const EditorGlobal = {
     text: string;
     data: { meta: ItemMeta; idx: number };
   }[],
+  treePending: null as null | Promise<void>,
   treeMeta: {} as Record<string, ItemMeta>,
+  cachedParentID: {} as Record<string, string>,
+  compInstance: {} as Record<string, Record<string, string>>,
 
   /** components */
   comp: null as null | {
@@ -177,7 +181,6 @@ export const EditorGlobal = {
   },
   compDirectEdit: false,
   compLoading: {} as Record<string, true>,
-  compInstance: {} as Record<string, Record<string, string>>,
 
   /** routing */
   pagePreload: {} as Record<string, true>,
