@@ -31,6 +31,7 @@ export const routeLive = (p: PG, pathname: string) => {
       }
     }
 
+    console.log(page_id);
     if (page_id) {
       (window as any).prasiPageID = page_id;
       const promises: Promise<void>[] = [];

@@ -5,6 +5,8 @@ import { ItemMeta, PG } from "./global";
 import { mergeScopeUpwards } from "./tree-scope";
 import { LItem } from "../elements/l-item";
 import { extractNavigate, preload } from "./route";
+import { createId } from "@paralleldrive/cuid2";
+import { fillID } from "../../editor/tools/fill-id";
 
 export type PropCompFC = FC<{}>;
 
@@ -67,9 +69,9 @@ export const treePropEval = (
                 if (prop.content) {
                   if (p.treeMeta[prop.content.id]) {
                     p.treeMeta[prop.content.id].jsxParentId = parent_id;
-                  }
 
-                  return <LItem id={prop.content.id} fromProp={true} />;
+                    return <LItem id={prop.content.id} fromProp={true} />;
+                  }
                 }
                 return <></>;
               },

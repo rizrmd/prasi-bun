@@ -18,7 +18,6 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
   w.prasiContext.render = () => {
     render({});
   };
-  w.rootRender = w.prasiContext.render;
 
   const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
   return (
