@@ -9,7 +9,6 @@ import { preload } from "../logic/route";
 import { treePropEval } from "../logic/tree-prop";
 import { treeScopeEval } from "../logic/tree-scope";
 import { LTextInternal } from "./l-text";
-import { createPortal } from "react-dom";
 
 export const LRender: FC<{
   id: string;
@@ -69,15 +68,23 @@ export const LRenderInternal: FC<{
   useEffect(() => {
     if (meta) {
       meta.mounted = true;
+      if (meta.pendingRender) {
+        meta.pendingRender = false;
+        render({});
+      }
     }
-  }, []);
+  });
 
   if (!meta) {
     return null;
   }
   meta.render = () => {
-    if (meta && meta.mounted) {
-      render({});
+    if (meta) {
+      if (meta.mounted) {
+        render({});
+      } else {
+        meta.pendingRender = true;
+      }
     }
   };
   let item = meta.item;
