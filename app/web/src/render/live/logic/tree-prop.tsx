@@ -26,6 +26,8 @@ export const treePropEval = (
 
     const w = window as any;
     const finalScope = mergeScopeUpwards(p, id, { _scopeIndex });
+
+
     const args = {
       ...w.exports,
       ...finalScope,
