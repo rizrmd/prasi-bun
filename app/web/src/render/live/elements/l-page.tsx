@@ -7,7 +7,7 @@ export const LPage = () => {
   const p = useGlobal(LiveGlobal, "LIVE");
   const mode = p.mode;
 
-  let childs = Object.values(p.page?.content_tree.childs || []);
+  let childs = Object.values(p.page?.content_tree?.childs || []);
   if (p.layout.section && p.layout.content) {
     childs = [p.layout.section];
   }

@@ -32,7 +32,7 @@ export const w = window as unknown as {
   };
 };
 
-export const initLive = async (p: PG, domain: string) => {
+export const initLive = async (p: PG, domain_or_siteid: string) => {
   if (p.status === "init") {
     p.status = "loading";
 
@@ -68,30 +68,12 @@ export const initLive = async (p: PG, domain: string) => {
 
     /** load site */
     let site = null as null | LSite;
-    if (!p.prod) {
-      try {
-        site = JSON.parse(localStorage.getItem(`prasi-site-${domain}`) || "");
-      } catch (e) {}
-
-      if (!site) {
-        site = await p.loader.site(
-          p,
-          validate(domain) ? { id: domain } : { domain }
-        );
-        localStorage.setItem(`prasi-site-${domain}`, JSON.stringify(site));
-      } else {
-        p.loader
-          .site(p, validate(domain) ? { id: domain } : { domain })
-          .then((site) => {
-            localStorage.setItem(`prasi-site-${domain}`, JSON.stringify(site));
-          });
-      }
-    } else {
-      site = await p.loader.site(
-        p,
-        validate(domain) ? { id: domain } : { domain }
-      );
-    }
+    site = await p.loader.site(
+      p,
+      validate(domain_or_siteid)
+        ? { type: "siteid", id: domain_or_siteid }
+        : { type: "domain", domain: domain_or_siteid }
+    );
 
     if (site) {
       /** import site module */
@@ -112,59 +94,11 @@ export const initLive = async (p: PG, domain: string) => {
 
       await validateLayout(p);
 
-      if (p.prod) {
-        p.site.api_url = await initApi(site.config, "prod");
-      } else {
-        w.externalAPI = {
-          mode: (localStorage.getItem(`prasi-ext-api-mode-${p.site.id}`) ||
-            "prod") as any,
-          devUrl: localStorage.getItem(`prasi-ext-dev-url-${p.site.id}`) || "",
-          prodUrl:
-            localStorage.getItem(`prasi-ext-prod-url-${p.site.id}`) || "",
-        };
-        p.site.api_url = await initApi(site.config);
+      p.site.api_url = await initApi(site.config, "prod");
 
-        if (w.externalAPI.prodUrl !== p.site.api_url) {
-          w.externalAPI.prodUrl = p.site.api_url;
-          localStorage.setItem(
-            `prasi-ext-prod-url-${p.site.id}`,
-            p.site.api_url
-          );
-        }
-        if (w.externalAPI.mode === "dev" && w.externalAPI.devUrl) {
-          p.site.api_url = w.externalAPI.devUrl;
-          await reloadDBAPI(w.externalAPI.devUrl, "dev");
-        }
-      }
       w.apiurl = p.site.api_url;
 
-      let pages = [];
-      if (!p.prod) {
-        /** load pages */
-        const pagesLocal = localStorage.getItem(`prasi-pages-[${domain}]`);
-        if (pagesLocal) {
-          try {
-            pages = JSON.parse(pagesLocal);
-          } catch (e) {}
-        }
-
-        if (pages.length === 0) {
-          pages = await p.loader.pages(p, site.id);
-          localStorage.setItem(
-            `prasi-pages-[${domain}]`,
-            JSON.stringify(pages)
-          );
-        } else {
-          p.loader.pages(p, site.id).then((pages) => {
-            localStorage.setItem(
-              `prasi-pages-[${domain}]`,
-              JSON.stringify(pages)
-            );
-          });
-        }
-      } else {
-        pages = await p.loader.pages(p, site.id);
-      }
+      let pages = await p.loader.pages(p, site.id);
 
       /** execute site module */
       const exec = (fn: string, scopes: any) => {
@@ -198,9 +132,11 @@ export const initLive = async (p: PG, domain: string) => {
       }
 
       /** create router */
+      p.pages = {};
       p.route = createRouter({ strictTrailingSlash: false });
       if (pages && pages.length > 0) {
         for (const page of pages) {
+          p.pages[page.id] = page;
           p.route.insert(page.url, page);
         }
       }

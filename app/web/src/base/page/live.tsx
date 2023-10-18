@@ -1,15 +1,19 @@
 import { validate } from "uuid";
 import { page } from "web-utils";
+import { devLoader } from "../../render/live/dev-loader";
 import { Live } from "../../render/live/live";
-import { defaultLoader } from "../../render/live/logic/default-loader";
 
 export default page({
   url: "/live/:domain/**",
   component: ({}) => {
     params.site_id = params.domain;
+    let pathname = `/${params._ === "_" ? "" : params._}`;
     if (validate(params._)) {
-      params.page_id = params._;
+      const arr = params._.split("/");
+      params.page_id = arr.shift();
+      pathname = `/${arr.join("/")}`;
     }
+    (window as any).pathname = pathname;
 
     navigator.serviceWorker.controller?.postMessage({
       type: "add-cache",
@@ -18,10 +22,9 @@ export default page({
 
     return (
       <Live
-        mode={"dev"}
-        domain={params.domain}
-        pathname={`/${params._ === "_" ? "" : params._}`}
-        loader={defaultLoader}
+        domain_or_siteid={params.domain}
+        pathname={pathname}
+        loader={devLoader}
       />
     );
   },

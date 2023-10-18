@@ -7,19 +7,16 @@ import { initLive, w } from "./logic/init";
 import { preload, routeLive } from "./logic/route";
 
 export const Live: FC<{
-  domain: string;
+  domain_or_siteid: string;
   pathname: string;
   loader: Loader;
-  mode: "dev" | "prod";
-}> = ({ domain, pathname, loader, mode = "dev" }) => {
+}> = ({ domain_or_siteid, pathname, loader }) => {
   const p = useGlobal(LiveGlobal, "LIVE");
   p.loader = loader;
 
   w.preload = (url: string) => {
     preload(p, url);
   };
-
-  if (mode === "prod") p.prod = true;
 
   if (p.site.id) {
     if (!p.mode && !!p.site.responsive) {
@@ -58,12 +55,20 @@ export const Live: FC<{
   }, [p.site.responsive]);
 
   if (p.status === "init") {
-    initLive(p, domain);
+    initLive(p, domain_or_siteid);
   }
 
   if (p.site.id) {
     routeLive(p, pathname);
   }
+
+  if (p.status === "not-found")
+    return (
+      <div className="absolute inset-0 flex items-center justify-center flex-col">
+        <div className="text-[40px]">404</div>
+        <div>NOT FOUND</div>
+      </div>
+    );
 
   return <LPage />;
 };
