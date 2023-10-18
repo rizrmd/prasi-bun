@@ -1,67 +1,15 @@
-/// <reference types="node" />
 /// <reference types="react" />
+/// <reference types="node" />
 declare module "app/srv/api/npm-size" {
     export const _: {
         url: string;
         api(mode: "site" | "page", id: string): Promise<string>;
     };
 }
-declare module "app/srv/api/auth/login" {
-    export const _: {
-        url: string;
-        api(username: string, password: string): Promise<{
-            status: string;
-            session: any;
-            reason?: undefined;
-        } | {
-            status: string;
-            reason: string;
-            session?: undefined;
-        }>;
-    };
-}
-declare module "app/srv/api/session" {
+declare module "app/srv/api/auth/session" {
     export const _: {
         url: string;
         api(): Promise<any>;
-    };
-}
-declare module "app/srv/global" {
-    import { site, user } from "dbgen";
-    import { ExecaChildProcess } from "execa";
-    export const glb: {
-        lastUpdate: Record<string, number>;
-        prasiSrv: {
-            status: Record<string, "unavailable" | "installing" | "starting" | "started" | "stopped" | "destroying">;
-            running: Record<string, ExecaChildProcess>;
-        };
-        npm: {
-            page: Record<string, null | {
-                file: Buffer;
-                etag: string;
-            }>;
-            site: Record<string, null | {
-                file: Buffer;
-                etag: string;
-            }>;
-        };
-    };
-    export type Session = {
-        user: user & {
-            site: site[];
-        };
-    };
-}
-declare module "app/srv/api/npm" {
-    export const _: {
-        url: string;
-        api(mode: "site" | "page", id: string): Promise<void>;
-    };
-}
-declare module "app/srv/api/local-ip" {
-    export const _: {
-        url: string;
-        api(): Promise<string[]>;
     };
 }
 declare module "app/srv/api/site-bundle" {
@@ -70,67 +18,10 @@ declare module "app/srv/api/site-bundle" {
         api(mode: "md5" | "download"): Promise<string>;
     };
 }
-declare module "app/web/src/utils/types/ws" {
-    export type WS_MSG = WS_MSG_GET_COMP | WS_MSG_SET_COMP | WS_MSG_GET_PAGE | WS_MSG_SET_PAGE | WS_MSG_SV_LOCAL | WS_MSG_SVDIFF_REMOTE | WS_MSG_DIFF_LOCAL | WS_MSG_UNDO | WS_MSG_REDO | WS_MSG_NEW_COMP | WS_SITE_JS | {
-        type: "ping";
-    } | {
-        type: "pong";
-    };
-    export type WS_SITE_JS = {
-        type: "site-js";
-        id_site: string;
-        src: string;
-    };
-    export type WS_MSG_GET_COMP = {
-        type: "get_comp";
-        comp_id: string;
-    };
-    export type WS_MSG_SET_COMP = {
-        type: "set_comp";
-        comp_id: string;
-        changes: string;
-    };
-    export type WS_MSG_GET_PAGE = {
-        type: "get_page";
-        page_id: string;
-    };
-    export type WS_MSG_SET_PAGE = {
-        type: "set_page";
-        changes: string;
-    };
-    export type WS_MSG_NEW_COMP = {
-        type: "new_comp";
-        id: string;
-        doc: string;
-    };
-    export type WS_MSG_UNDO = {
-        type: "undo";
-        mode: "page" | "site" | "comp";
-        id: string;
-    };
-    export type WS_MSG_REDO = {
-        type: "redo";
-        mode: "page" | "site" | "comp";
-        id: string;
-    };
-    export type WS_MSG_SV_LOCAL = {
-        type: "sv_local";
-        mode: "page" | "site" | "comp";
-        id: string;
-        sv_local: string;
-    };
-    export type WS_MSG_SVDIFF_REMOTE = {
-        type: "svd_remote";
-        mode: "page" | "site" | "comp";
-        id: string;
-        sv_remote: string;
-        diff_remote: string;
-    };
-    export type WS_MSG_DIFF_LOCAL = {
-        type: "diff_local";
-        mode: "page" | "site" | "comp";
-        id: string;
-        diff_local: string;
+declare module "app/srv/api/site-dts" {
+    export const _: {
+        url: string;
+        api(site_id: string): Promise<string>;
     };
 }
 declare module "app/web/src/utils/types/meta-fn" {
@@ -424,6 +315,69 @@ declare module "app/web/src/utils/types/general" {
         item: ITEM;
     };
 }
+declare module "app/web/src/utils/types/ws" {
+    export type WS_MSG = WS_MSG_GET_COMP | WS_MSG_SET_COMP | WS_MSG_GET_PAGE | WS_MSG_SET_PAGE | WS_MSG_SV_LOCAL | WS_MSG_SVDIFF_REMOTE | WS_MSG_DIFF_LOCAL | WS_MSG_UNDO | WS_MSG_REDO | WS_MSG_NEW_COMP | WS_SITE_JS | {
+        type: "ping";
+    } | {
+        type: "pong";
+    };
+    export type WS_SITE_JS = {
+        type: "site-js";
+        id_site: string;
+        src: string;
+    };
+    export type WS_MSG_GET_COMP = {
+        type: "get_comp";
+        comp_id: string;
+    };
+    export type WS_MSG_SET_COMP = {
+        type: "set_comp";
+        comp_id: string;
+        changes: string;
+    };
+    export type WS_MSG_GET_PAGE = {
+        type: "get_page";
+        page_id: string;
+    };
+    export type WS_MSG_SET_PAGE = {
+        type: "set_page";
+        changes: string;
+    };
+    export type WS_MSG_NEW_COMP = {
+        type: "new_comp";
+        id: string;
+        doc: string;
+    };
+    export type WS_MSG_UNDO = {
+        type: "undo";
+        mode: "page" | "site" | "comp";
+        id: string;
+    };
+    export type WS_MSG_REDO = {
+        type: "redo";
+        mode: "page" | "site" | "comp";
+        id: string;
+    };
+    export type WS_MSG_SV_LOCAL = {
+        type: "sv_local";
+        mode: "page" | "site" | "comp";
+        id: string;
+        sv_local: string;
+    };
+    export type WS_MSG_SVDIFF_REMOTE = {
+        type: "svd_remote";
+        mode: "page" | "site" | "comp";
+        id: string;
+        sv_remote: string;
+        diff_remote: string;
+    };
+    export type WS_MSG_DIFF_LOCAL = {
+        type: "diff_local";
+        mode: "page" | "site" | "comp";
+        id: string;
+        diff_local: string;
+    };
+}
 declare module "app/srv/ws/edit/tools/load-page" {
     import { Page } from "app/web/src/utils/types/general";
     export const loadPage: (page_id: string) => Promise<Page>;
@@ -598,6 +552,38 @@ declare module "app/srv/ws/edit/edit-global" {
         };
     };
 }
+declare module "app/srv/api/page-reload" {
+    export const _: {
+        url: string;
+        api(page_id: string): Promise<string>;
+    };
+}
+declare module "app/srv/global" {
+    import { site, user } from "dbgen";
+    import { ExecaChildProcess } from "execa";
+    export const glb: {
+        lastUpdate: Record<string, number>;
+        prasiSrv: {
+            status: Record<string, "unavailable" | "installing" | "starting" | "started" | "stopped" | "destroying">;
+            running: Record<string, ExecaChildProcess>;
+        };
+        npm: {
+            page: Record<string, null | {
+                file: Buffer;
+                etag: string;
+            }>;
+            site: Record<string, null | {
+                file: Buffer;
+                etag: string;
+            }>;
+        };
+    };
+    export type Session = {
+        user: user & {
+            site: site[];
+        };
+    };
+}
 declare module "app/srv/api/npm-bundle" {
     export type NPMImportAs = {
         main: {
@@ -612,10 +598,10 @@ declare module "app/srv/api/npm-bundle" {
         api(mode: "site" | "page", id: string): Promise<any>;
     };
 }
-declare module "app/srv/api/site-dts" {
+declare module "app/srv/api/npm" {
     export const _: {
         url: string;
-        api(site_id: string): Promise<string>;
+        api(mode: "site" | "page", id: string): Promise<void>;
     };
 }
 declare module "app/srv/api/site-export" {
@@ -624,10 +610,24 @@ declare module "app/srv/api/site-export" {
         api(site_id: string): Promise<void>;
     };
 }
-declare module "app/srv/api/page-reload" {
+declare module "app/srv/api/auth/login" {
     export const _: {
         url: string;
-        api(page_id: string): Promise<string>;
+        api(username: string, password: string): Promise<{
+            status: string;
+            session: any;
+            reason?: undefined;
+        } | {
+            status: string;
+            reason: string;
+            session?: undefined;
+        }>;
+    };
+}
+declare module "app/srv/api/local-ip" {
+    export const _: {
+        url: string;
+        api(): Promise<string[]>;
     };
 }
 declare module "app/srv/exports" {
@@ -638,33 +638,12 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/npm-size")>;
     };
-    export const login: {
-        name: string;
-        url: string;
-        path: string;
-        args: string[];
-        handler: Promise<typeof import("app/srv/api/auth/login")>;
-    };
     export const session: {
         name: string;
         url: string;
         path: string;
         args: any[];
-        handler: Promise<typeof import("app/srv/api/session")>;
-    };
-    export const npm: {
-        name: string;
-        url: string;
-        path: string;
-        args: string[];
-        handler: Promise<typeof import("app/srv/api/npm")>;
-    };
-    export const local_ip: {
-        name: string;
-        url: string;
-        path: string;
-        args: any[];
-        handler: Promise<typeof import("app/srv/api/local-ip")>;
+        handler: Promise<typeof import("app/srv/api/auth/session")>;
     };
     export const site_bundle: {
         name: string;
@@ -673,6 +652,20 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/site-bundle")>;
     };
+    export const site_dts: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("app/srv/api/site-dts")>;
+    };
+    export const page_reload: {
+        name: string;
+        url: string;
+        path: string;
+        args: string[];
+        handler: Promise<typeof import("app/srv/api/page-reload")>;
+    };
     export const npm_bundle: {
         name: string;
         url: string;
@@ -680,12 +673,12 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/npm-bundle")>;
     };
-    export const site_dts: {
+    export const npm: {
         name: string;
         url: string;
         path: string;
         args: string[];
-        handler: Promise<typeof import("app/srv/api/site-dts")>;
+        handler: Promise<typeof import("app/srv/api/npm")>;
     };
     export const site_export: {
         name: string;
@@ -694,12 +687,19 @@ declare module "app/srv/exports" {
         args: string[];
         handler: Promise<typeof import("app/srv/api/site-export")>;
     };
-    export const page_reload: {
+    export const login: {
         name: string;
         url: string;
         path: string;
         args: string[];
-        handler: Promise<typeof import("app/srv/api/page-reload")>;
+        handler: Promise<typeof import("app/srv/api/auth/login")>;
+    };
+    export const local_ip: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
+        handler: Promise<typeof import("app/srv/api/local-ip")>;
     };
     export const _upload: {
         name: string;
@@ -709,13 +709,6 @@ declare module "app/srv/exports" {
         handler: Promise<any>;
     };
     export const _prasi: {
-        name: string;
-        url: string;
-        path: string;
-        args: any[];
-        handler: Promise<any>;
-    };
-    export const _file: {
         name: string;
         url: string;
         path: string;
@@ -734,6 +727,13 @@ declare module "app/srv/exports" {
         url: string;
         path: string;
         args: string[];
+        handler: Promise<any>;
+    };
+    export const _file: {
+        name: string;
+        url: string;
+        path: string;
+        args: any[];
         handler: Promise<any>;
     };
 }
