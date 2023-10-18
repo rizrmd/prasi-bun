@@ -6,6 +6,10 @@
     "...",
     "@tinijs/parcel-reporter-copy-public"
   ],
+  "packagers": {
+    "*.wasm": "@parcel/packager-wasm"
+  },
+
   "transformers": {
     "*.wasm": [
       "...",

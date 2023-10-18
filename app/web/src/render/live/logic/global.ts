@@ -67,6 +67,11 @@ export type Loader = {
   comp: (p: PG, id: string) => Promise<PRASI_COMPONENT>;
 };
 export const LiveGlobal = {
+  liveSync: {
+    ws: null as null | WebSocket,
+    init: false,
+    decompress: null as null | ((buf: Uint8Array) => Uint8Array),
+  },
   prod: false,
   loader: undefined as unknown as Loader,
   mode: "" as "desktop" | "mobile",

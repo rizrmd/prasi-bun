@@ -1,12 +1,8 @@
-import { page } from "dbgen";
-import { validate } from "uuid";
 import { w } from "../../../utils/types/general";
-import { WS_MSG_GET_PAGE } from "../../../utils/types/ws";
 import importModule from "../../editor/tools/dynamic-import";
 import { loadComponent } from "./comp";
 import { LPage, PG } from "./global";
 import { rebuildTree } from "./tree-logic";
-import { liveWS, wsend } from "./ws";
 
 export const routeLive = (p: PG, pathname: string) => {
   if (p.status !== "loading" && p.status !== "not-found") {
@@ -127,7 +123,6 @@ const loadPage = async (p: PG, id: string) => {
       content_tree: page.content_tree as any,
       js: (page as any).js_compiled as any,
     };
-    console.log(p.pages[page.id]);
 
     const cur = p.pages[page.id];
     if (cur && cur.content_tree) {

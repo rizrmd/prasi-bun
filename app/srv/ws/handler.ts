@@ -1,15 +1,16 @@
 import { createId } from "@paralleldrive/cuid2";
+import brotliPromise from "brotli-wasm";
 import { WebSocketHandler } from "bun";
+import { decompress } from "lz-string";
 import { WSData } from "../../../pkgs/core/server/create";
 import { WS_MSG } from "../../web/src/utils/types/ws";
-import { eg } from "./edit/edit-global";
-import { decompress } from "lz-string";
-import { getPage } from "./edit/action/get-page";
-import { getComp } from "./edit/action/get-comp";
-import { svLocal } from "./edit/action/sv-local";
 import { diffLocal } from "./edit/action/diff-local";
+import { getComp } from "./edit/action/get-comp";
+import { getPage } from "./edit/action/get-page";
+import { svLocal } from "./edit/action/sv-local";
 import { svdiffRemote } from "./edit/action/svdiff-remote";
 import { redo, undo } from "./edit/action/undo-redo";
+import { eg } from "./edit/edit-global";
 
 eg.edit = {
   site: {},
@@ -21,7 +22,25 @@ const site = {
   saveTimeout: null as any,
 };
 
+const brotli = await brotliPromise;
 export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
+  "/live": {
+    async open(ws) {
+      ws.send(
+        brotli.compress(
+          Buffer.from(
+            JSON.stringify(
+              await db.page.findFirst({
+                where: { id: "324dde34-1e01-46ff-929c-124e5e01f585" },
+              })
+            )
+          ),
+          { quality: 11 }
+        )
+      );
+    },
+    message(ws, message) {},
+  },
   "/edit": {
     open(ws) {
       eg.edit.ws.set(ws, {

@@ -25,6 +25,7 @@ export default page({
         domain_or_siteid={params.domain}
         pathname={pathname}
         loader={devLoader}
+        liveSync
       />
     );
   },
