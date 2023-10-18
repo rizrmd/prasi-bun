@@ -4,8 +4,7 @@ import { type apiClient } from "web-utils";
 import {
   createAPI,
   createDB,
-  initApi,
-  reloadDBAPI,
+  initApi
 } from "../../../utils/script/init-api";
 import importModule from "../../editor/tools/dynamic-import";
 import { LSite, PG } from "./global";

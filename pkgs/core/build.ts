@@ -11,7 +11,8 @@ const args = [
   dir.path("node_modules/.bin/parcel"),
   "build",
   "./src/index.tsx",
-  "--no-optimize",
+  // "--no-optimize",
+  "--no-scope-hoist",
   "--dist-dir",
   dir.path(`app/static`),
 ];
