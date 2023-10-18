@@ -65,9 +65,10 @@ else metaOptions = resOpt;
   if (
     !local.metaFn &&
     (local.codeEditing ||
-      !metaOptions.find((e) => {
-        return e.value === evalue;
-      }))
+      (Array.isArray(metaOptions) &&
+        !metaOptions.find((e) => {
+          return e.value === evalue;
+        })))
   ) {
     return (
       <CPCoded
