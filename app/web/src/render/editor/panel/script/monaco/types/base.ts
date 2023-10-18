@@ -9,6 +9,7 @@ const isValidElement = React.isValidElement;
 const useEffect = React.useEffect;
 const useState = React.useState;
 
+const pathname: string;
 const isEditor: boolean;
 const isLayout: boolean;
 const isMobile: boolean;
