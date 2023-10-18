@@ -101,7 +101,7 @@ export const CPMaster: FC<{ mitem: MItem }> = ({ mitem }) => {
                 const indexes: (number | undefined)[] = [];
                 mprops.forEach((e) => indexes.push(e.get("idx")));
                 let idx: any = (indexes.sort().pop() || 0) + 1;
-                const name = `prop_${idx};`
+                const name = `prop_${idx}`;
                 mprops.set(
                   name,
                   newMap({
