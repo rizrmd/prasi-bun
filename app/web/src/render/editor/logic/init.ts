@@ -5,12 +5,12 @@ import {
   initApi,
   reloadDBAPI,
 } from "../../../utils/script/init-api";
-import { defaultLoader } from "../../live/logic/default-loader";
 import { LSite } from "../../live/logic/global";
 import { validateLayout } from "../../live/logic/layout";
 import { jscript } from "../panel/script/script-element";
 import importModule from "../tools/dynamic-import";
 import { PG } from "./global";
+import { devLoader } from "../../live/dev-loader";
 
 export const w = window as unknown as {
   basepath: string;
@@ -70,7 +70,10 @@ export const initEditor = async (p: PG, site_id: string) => {
   } catch (e) {}
 
   const querySite = async () => {
-    const site = await defaultLoader.site(p as any, { id: site_id });
+    const site = await devLoader.site(p as any, {
+      type: "siteid",
+      id: site_id,
+    });
 
     localStorage.setItem(`prasi-site-${site_id}`, JSON.stringify(site));
     return site;

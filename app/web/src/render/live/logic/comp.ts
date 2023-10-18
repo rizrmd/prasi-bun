@@ -44,29 +44,18 @@ export const loadComponent = async (
   if (typeof itemOrID !== "string") {
     tree = itemOrID;
   } else {
-    if (!!p.comps.pending[itemOrID]) {
-      await p.comps.pending[itemOrID];
-    } else {
-      loadSingleComponent(p, itemOrID);
-      const res = await p.comps.pending[itemOrID];
-      tree = res.content_tree;
-    }
+    await loadComponentById(p, itemOrID);
   }
 
   scanComponent(tree, compIds);
   const promises = [...compIds]
     .filter((id) => {
-      if (p.prod) {
-        if (!p.comps.all[id] && !p.comps.pending[id]) return true;
-      } else {
-        if (!p.comps.doc[id] && !p.comps.pending[id]) return true;
-      }
+      if (!p.comps.all[id] && !p.comps.pending[id]) return true;
       return false;
     })
     .map(async (id) => {
-      const res = await loadSingleComponent(p, id);
-      await loadComponent(p, res.content_tree);
-      return res;
+      const comp = await loadComponentById(p, id);
+      await loadComponent(p, comp.content_tree);
     });
 
   if (promises.length > 0) {
@@ -74,8 +63,14 @@ export const loadComponent = async (
   }
 };
 
-const loadSingleComponent = (p: PG, comp_id: string) => {
-  return p.loader.comp(p, comp_id);
+const loadComponentById = async (p: PG, id: string) => {
+  if (!!p.comps.pending[id]) {
+    return await p.comps.pending[id];
+  }
+  const res = p.loader.comp(p, id);
+  p.comps.pending[id] = res;
+  p.comps.all[id] = await res;
+  return p.comps.all[id];
 };
 
 export const instantiateComp = (

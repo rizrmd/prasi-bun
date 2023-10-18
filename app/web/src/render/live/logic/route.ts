@@ -4,18 +4,16 @@ import { w } from "../../../utils/types/general";
 import { WS_MSG_GET_PAGE } from "../../../utils/types/ws";
 import importModule from "../../editor/tools/dynamic-import";
 import { loadComponent } from "./comp";
-import { LPage, LiveGlobal, PG } from "./global";
-import { liveWS, wsend } from "./ws";
+import { LPage, PG } from "./global";
 import { rebuildTree } from "./tree-logic";
+import { liveWS, wsend } from "./ws";
 
 export const routeLive = (p: PG, pathname: string) => {
-  if (p.status !== "loading") {
-    let page_id = "";
-    if (validate(pathname.substring(1))) {
-      page_id = pathname.substring(1);
-    } else {
-      const found = p.route.lookup(pathname);
+  if (p.status !== "loading" && p.status !== "not-found") {
+    let page_id = params.page_id;
 
+    if (!page_id) {
+      const found = p.route.lookup(pathname);
       if (!found) {
         p.status = "not-found";
       } else {
@@ -30,48 +28,34 @@ export const routeLive = (p: PG, pathname: string) => {
     }
 
     if (page_id) {
-      (window as any).prasiPageID = page_id;
+      (window as any).pageid = page_id;
       const promises: Promise<void>[] = [];
       if (page_id !== p.page?.id) {
         p.page = p.pages[page_id];
         p.treeMeta = {};
         p.portal = {};
       }
+
       if (!p.page || !p.page.content_tree) {
         promises.push(loadNpmPage(p, page_id));
-
-        if (!p.prod) {
-          promises.push(streamPage(p, page_id));
-        } else {
-          promises.push(loadPage(p, page_id));
-        }
-      } else {
-        if (!p.prod) {
-          streamPage(p, page_id);
-        }
+        promises.push(loadPage(p, page_id));
       }
 
       if (promises.length > 0) {
+        p.status = "loading";
         Promise.all(promises).then(async () => {
-          await pageLoaded(p);
-          p.status = "ready";
-          p.render();
+          p.page = p.pages[page_id];
+          if (p.page) {
+            await pageLoaded(p);
+            p.render();
+          }
         });
       } else {
-        if (p.prod && !firstRender[page_id]) {
+        if (!firstRender[page_id]) {
           firstRender[page_id] = true;
           pageLoaded(p).then(p.render);
         } else {
-          if (!p.prod) {
-            pageLoaded(p).then(() => {
-              if (stream.page_id !== page_id) {
-                stream.page_id = page_id;
-                p.render();
-              }
-            });
-          } else {
-            pageLoaded(p);
-          }
+          pageLoaded(p);
         }
       }
     }
@@ -91,7 +75,11 @@ const pageLoaded = async (p: PG) => {
 export const preload = async (p: PG, pathname: string) => {
   const found = p.route.lookup(pathname);
   if (found) {
-    if (!p.pages[found.id] && !p.pagePreload[found.id]) {
+    if (
+      (!p.pages[found.id] ||
+        (p.pages[found.id] && !p.pages[found.id].content_tree)) &&
+      !p.pagePreload[found.id]
+    ) {
       p.pagePreload[found.id] = true;
       const dbpage = await p.loader.page(p, found.id);
       if (dbpage) {
@@ -139,42 +127,13 @@ const loadPage = async (p: PG, id: string) => {
       content_tree: page.content_tree as any,
       js: (page as any).js_compiled as any,
     };
+    console.log(p.pages[page.id]);
 
     const cur = p.pages[page.id];
     if (cur && cur.content_tree) {
       await loadComponent(p, cur.content_tree);
     }
   }
-};
-
-const stream = { page_id: "" };
-
-const streamPage = (p: PG, id: string) => {
-  return new Promise<void>(async (resolve) => {
-    await liveWS(p);
-    p.mpageLoaded = async (mpage) => {
-      const dbpage = mpage.getMap("map").toJSON() as page;
-      p.pages[dbpage.id] = {
-        id: dbpage.id,
-        url: dbpage.url,
-        name: dbpage.name,
-        content_tree: dbpage.content_tree as any,
-        js: dbpage.js_compiled as any,
-      };
-      const page = p.pages[dbpage.id];
-      if (page && page.content_tree) {
-        await loadComponent(p, page.content_tree);
-      }
-      resolve();
-    };
-    wsend(
-      p,
-      JSON.stringify({
-        type: "get_page",
-        page_id: id,
-      } as WS_MSG_GET_PAGE)
-    );
-  });
 };
 
 export const extractNavigate = (str: string) => {

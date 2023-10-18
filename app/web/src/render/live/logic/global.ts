@@ -16,7 +16,6 @@ export type ItemMeta = {
   comp?: {
     id: string;
     propval?: any;
-    mcomp?: MItem;
     child_ids: Record<string, string>;
   };
   className?: string;
@@ -36,7 +35,7 @@ export type LPage = {
   id: string;
   name: string;
   url: string;
-  content_tree: IRoot;
+  content_tree?: IRoot;
   js: string;
 };
 
@@ -60,7 +59,7 @@ export type LSite = {
 export type Loader = {
   site: (
     p: PG,
-    where: { domain: string } | { id: string }
+    where: { type: "domain"; domain: string } | { type: "siteid"; id: string }
   ) => Promise<LSite | null>;
   page: (p: PG, id: string) => Promise<LPage | null>;
   pages: (p: PG, site_id: string) => Promise<LPage[]>;
@@ -112,7 +111,6 @@ export const LiveGlobal = {
   comps: {
     pending: {} as Record<string, Promise<PRASI_COMPONENT>>,
     resolve: {} as Record<string, (comp: PRASI_COMPONENT) => void>,
-    doc: {} as Record<string, CompDoc>,
     all: {} as Record<string, PRASI_COMPONENT>,
   },
   script: {

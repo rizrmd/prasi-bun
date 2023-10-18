@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { GlobalContext, defineReact, defineWindow } from "web-utils";
-import { SiteLoader } from "./site-loader";
+import { siteLoader } from "./site-loader";
 
 const w = window as unknown as {
   prasiContext: any;
@@ -25,8 +25,7 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
       <Live
         domain={url.host}
         pathname={location.pathname}
-        loader={SiteLoader}
-        mode="prod"
+        loader={siteLoader}
       />
     </Provider>
   );

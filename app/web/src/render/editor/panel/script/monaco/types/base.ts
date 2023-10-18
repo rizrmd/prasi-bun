@@ -36,7 +36,7 @@ const PassProp: FC<Record<string,any> & {children: React.ReactNode; }>;
 const PassChild: FC<{name: string}>;
 const Preload: FC<{url: string[]}>;
 const apiurl: string;
-const prasiPageID: string;
+const pageid: string;
 type ITEM = {
   id: string
   name: string;
