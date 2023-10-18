@@ -17,6 +17,7 @@ import { fillID } from "../tools/fill-id";
 import { newMap } from "../tools/yjs-tools";
 import { ComponentOver, ElProp, createElProp } from "./e-relprop";
 import { ETextInternal } from "./e-text";
+import { DefaultScript } from "../panel/script/monaco/monaco-el";
 
 export const ERender: FC<{
   id: string;
@@ -174,7 +175,14 @@ export const ERender: FC<{
     }
   }
 
-  if (adv && adv.js && !adv.jsBuilt && meta.mitem) {
+  if (
+    adv &&
+    adv.js &&
+    typeof adv.js === "string" &&
+    adv.js.replace(/\W/gi, "") !== DefaultScript.js.replace(/\W/gi, "") &&
+    !adv.jsBuilt &&
+    meta.mitem
+  ) {
     if (!jscript.build) {
       jscript.init().then(() => {
         p.render();
@@ -188,12 +196,22 @@ export const ERender: FC<{
         undefined,
         true
       )
-      .then((js) => {});
+      .then((js) => {
+        console.log(js);
+        if (meta.mitem) {
+          const adv = meta.mitem.get("adv");
+          if (adv) adv.set("jsBuilt", js);
+          if (item.adv) {
+            item.adv.jsBuilt = js;
+          }
+          p.render();
+        }
+      });
 
     return null;
   }
 
-  if (!(adv?.jsBuilt && adv?.js) && (meta.scopeAttached || meta.comp)) {
+  if (!(adv?.jsBuilt && adv?.js) && meta.comp) {
     return treeScopeEval(
       p,
       id,
@@ -242,7 +260,6 @@ export const ERender: FC<{
     <div className={className} {...elprop}>
       {/* <pre className={"text-[9px] font-mono text-black"}>
         {item.id}-{item.name}
-        {item.name === "coba" && JSON.stringify(item.childs)}
       </pre> */}
       {_children}
       {componentOver}

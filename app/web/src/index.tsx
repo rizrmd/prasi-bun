@@ -16,36 +16,44 @@ const start = async () => {
   w.api = createAPI(base);
   w.db = createDB(base);
 
-  navigator.serviceWorker.addEventListener("message", (e) => {
-    if (e.data.type === "activated") {
-      if (e.data.shouldRefresh && sw) {
-        sw.unregister().then(() => {
-          window.location.reload();
-        });
+  if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
+    navigator.serviceWorker.addEventListener("message", (e) => {
+      if (e.data.type === "activated") {
+        if (e.data.shouldRefresh && sw) {
+          sw.unregister().then(() => {
+            window.location.reload();
+          });
+        }
       }
-    }
-    if (e.data.type === "ready") {
-      const sw = navigator.serviceWorker.controller;
+      if (e.data.type === "ready") {
+        const sw = navigator.serviceWorker.controller;
 
-      if (sw) {
-        const routes = Object.entries(w.prasiApi[base].apiEntry).map(
-          ([k, v]: any) => ({
-            url: v.url,
-            name: k,
-          })
-        );
+        if (sw) {
+          const routes = Object.entries(w.prasiApi[base].apiEntry).map(
+            ([k, v]: any) => ({
+              url: v.url,
+              name: k,
+            })
+          );
 
-        sw.postMessage({
-          type: "add-cache",
-          url: location.href,
-        });
-        sw.postMessage({
-          type: "define-route",
-          routes,
-        });
+          sw.postMessage({
+            type: "add-cache",
+            url: location.href,
+          });
+          sw.postMessage({
+            type: "define-route",
+            routes,
+          });
+        }
       }
-    }
-  });
+    });
+  } else {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
 
   const el = document.getElementById("root");
   if (el) {

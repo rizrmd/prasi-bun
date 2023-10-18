@@ -20,7 +20,6 @@ export type ItemMeta = {
   parent_comp?: WithRequired<ItemMeta, "comp"> & { item: IItem };
   parent_prop?: ItemMeta;
   scope?: any;
-  scopeAttached?: { meta: ItemMeta; value: any }[];
   className?: string;
   elprop?: any;
   depth: number;
