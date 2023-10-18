@@ -21,7 +21,6 @@ export const CPOption: FC<CPArgs> = ({ prop, onChange, editCode, reset }) => {
   if (prop.meta?.options || prop.meta?.optionsBuilt) {
     if (!local.loaded) {
       try {
-        local.loaded = true;
         const args = {
           ...window.exports,
           db: p.script.db,
@@ -58,8 +57,10 @@ else metaOptions = resOpt;
   } catch (e) {}
 
   useEffect(() => {
-    local.val = evalue;
-    local.render();
+    if (Array.isArray(metaOptions)) {
+      local.val = evalue;
+      local.render();
+    }
   }, [evalue]);
 
   if (

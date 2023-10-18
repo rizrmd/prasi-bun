@@ -5,40 +5,19 @@ export const npm_size = {
   args: ["mode","id"],
   handler: import("./api/npm-size")
 }
+export const login = {
+  name: "login",
+  url: "/_login",
+  path: "app/srv/api/auth/login.ts",
+  args: ["username","password"],
+  handler: import("./api/auth/login")
+}
 export const session = {
   name: "session",
-  url: "/_session",
-  path: "app/srv/api/auth/session.ts",
+  url: "/session",
+  path: "app/srv/api/session.ts",
   args: [],
-  handler: import("./api/auth/session")
-}
-export const site_bundle = {
-  name: "site_bundle",
-  url: "/site-bundle/:mode",
-  path: "app/srv/api/site-bundle.ts",
-  args: ["mode"],
-  handler: import("./api/site-bundle")
-}
-export const site_dts = {
-  name: "site_dts",
-  url: "/site-dts/:site_id",
-  path: "app/srv/api/site-dts.ts",
-  args: ["site_id"],
-  handler: import("./api/site-dts")
-}
-export const page_reload = {
-  name: "page_reload",
-  url: "/page-reload/:page_id",
-  path: "app/srv/api/page-reload.ts",
-  args: ["page_id"],
-  handler: import("./api/page-reload")
-}
-export const npm_bundle = {
-  name: "npm_bundle",
-  url: "/npm-bundle/:mode/:id",
-  path: "app/srv/api/npm-bundle.ts",
-  args: ["mode","id"],
-  handler: import("./api/npm-bundle")
+  handler: import("./api/session")
 }
 export const npm = {
   name: "npm",
@@ -47,6 +26,34 @@ export const npm = {
   args: ["mode","id"],
   handler: import("./api/npm")
 }
+export const local_ip = {
+  name: "local_ip",
+  url: "/local-ip",
+  path: "app/srv/api/local-ip.ts",
+  args: [],
+  handler: import("./api/local-ip")
+}
+export const site_bundle = {
+  name: "site_bundle",
+  url: "/site-bundle/:mode",
+  path: "app/srv/api/site-bundle.ts",
+  args: ["mode"],
+  handler: import("./api/site-bundle")
+}
+export const npm_bundle = {
+  name: "npm_bundle",
+  url: "/npm-bundle/:mode/:id",
+  path: "app/srv/api/npm-bundle.ts",
+  args: ["mode","id"],
+  handler: import("./api/npm-bundle")
+}
+export const site_dts = {
+  name: "site_dts",
+  url: "/site-dts/:site_id",
+  path: "app/srv/api/site-dts.ts",
+  args: ["site_id"],
+  handler: import("./api/site-dts")
+}
 export const site_export = {
   name: "site_export",
   url: "/site-export/:site_id",
@@ -54,19 +61,12 @@ export const site_export = {
   args: ["site_id"],
   handler: import("./api/site-export")
 }
-export const login = {
-  name: "login",
-  url: "/_login",
-  path: "app/srv/api/auth/login.ts",
-  args: ["username","password"],
-  handler: import("./api/auth/login")
-}
-export const local_ip = {
-  name: "local_ip",
-  url: "/local-ip",
-  path: "app/srv/api/local-ip.ts",
-  args: [],
-  handler: import("./api/local-ip")
+export const page_reload = {
+  name: "page_reload",
+  url: "/page-reload/:page_id",
+  path: "app/srv/api/page-reload.ts",
+  args: ["page_id"],
+  handler: import("./api/page-reload")
 }
 export const _upload = {
   name: "_upload",
@@ -82,6 +82,13 @@ export const _prasi = {
   args: [],
   handler: import("./api/_prasi")
 }
+export const _file = {
+  name: "_file",
+  url: "/_file/*",
+  path: "app/srv/api/_file.ts",
+  args: [],
+  handler: import("./api/_file")
+}
 export const _api_frm = {
   name: "_api_frm",
   url: "/_api_frm",
@@ -95,11 +102,4 @@ export const _dbs = {
   path: "app/srv/api/_dbs.ts",
   args: ["dbName","action"],
   handler: import("./api/_dbs")
-}
-export const _file = {
-  name: "_file",
-  url: "/_file/*",
-  path: "app/srv/api/_file.ts",
-  args: [],
-  handler: import("./api/_file")
 }
