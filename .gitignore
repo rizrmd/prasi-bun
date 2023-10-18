@@ -180,3 +180,5 @@ app/static
 app/static/*
 data
 data/*
+app/srv/exports.ts
+app/srv/exports.d.ts
