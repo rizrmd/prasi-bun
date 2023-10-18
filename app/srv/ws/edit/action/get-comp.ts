@@ -9,12 +9,14 @@ import {
   WS_MSG_SET_COMP,
   WS_MSG_SV_LOCAL,
 } from "../../../../web/src/utils/types/ws";
-
+import { validate } from "uuid";
 export const getComp = async (
   ws: ServerWebSocket<WSData>,
   msg: WS_MSG_GET_COMP
 ) => {
   const comp_id = msg.comp_id;
+
+  if (!validate(comp_id)) return;
 
   if (!eg.edit.comp[comp_id]) {
     const rawComp = await db.component.findFirst({
