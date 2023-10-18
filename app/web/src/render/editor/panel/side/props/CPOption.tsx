@@ -21,6 +21,7 @@ export const CPOption: FC<CPArgs> = ({ prop, onChange, editCode, reset }) => {
   if (prop.meta?.options || prop.meta?.optionsBuilt) {
     if (!local.loaded) {
       try {
+        local.loaded = true;
         const args = {
           ...window.exports,
           db: p.script.db,

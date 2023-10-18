@@ -84,7 +84,7 @@ export const ETreeItemAction: FC<{
 
           {resetJSXProp && (
             <Tooltip
-              content="Reset JSX"
+              content="Generate JSX"
               className={cx("text-purple-600 mx-1")}
               onClick={async () => {
                 if (mitem) {
