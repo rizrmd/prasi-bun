@@ -93,6 +93,10 @@ export const createServer = async () => {
 
         const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
         if ((await file.exists()) && file.type !== "application/octet-stream") {
+          if (g.mode === "dev") {
+            return new Response(file as any);
+          }
+
           if (!cache.static[url.pathname]) {
             cache.static[url.pathname] = {
               type: lookup(url.pathname) || "text/plain",
