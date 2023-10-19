@@ -4,8 +4,7 @@ import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
-import brotliPromise from "brotli-wasm";
-const brotli = await brotliPromise;
+import { lookup } from "mime-types";
 
 export const cache = {
   static: {} as Record<
@@ -89,36 +88,21 @@ export const createServer = async () => {
       try {
         const found = cache.static[url.pathname];
         if (found && g.mode === "prod") {
-          const res = new Response(found.content);
-          res.headers.set("Content-Type", found.type);
+          return responseCached(req, found);
         }
 
         const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
         if ((await file.exists()) && file.type !== "application/octet-stream") {
           if (!cache.static[url.pathname]) {
             cache.static[url.pathname] = {
-              type: file.type,
+              type: lookup(url.pathname) || "text/plain",
               content: await file.arrayBuffer(),
             };
           }
           const found = cache.static[url.pathname];
-          const enc = req.headers.get("accept-encoding");
-          if (enc && g.mode === "prod") {
-            if (enc.includes("br") && found.br) {
-              const res = new Response(found.br);
-              res.headers.set("Content-Encoding", "br");
-              return res;
-            } else if (enc.includes("gz")) {
-              if (!found.gz) {
-                found.gz = gzipSync(new Uint8Array(found.content));
-              }
-              const res = new Response(found.gz);
-              res.headers.set("Content-Encoding", "gzip");
-              return res;
-            }
+          if (found) {
+            return responseCached(req, found);
           }
-
-          return new Response(found.content);
         }
       } catch (e) {
         g.log.error(e);
@@ -138,4 +122,28 @@ export const createServer = async () => {
   } else {
     g.log.info(`Started at port: ${g.server.port}`);
   }
+};
+
+const responseCached = (req: Request, found: (typeof cache.static)[string]) => {
+  const enc = req.headers.get("accept-encoding");
+  if (enc && g.mode === "prod") {
+    if (enc.includes("br") && found.br) {
+      const res = new Response(found.br);
+      res.headers.set("content-type", found.type);
+      res.headers.set("content-encoding", "br");
+      return res;
+    } else if (enc.includes("gz")) {
+      if (!found.gz) {
+        found.gz = gzipSync(new Uint8Array(found.content));
+      }
+      const res = new Response(found.gz);
+      res.headers.set("content-type", found.type);
+      res.headers.set("content-encoding", "gzip");
+      return res;
+    }
+  }
+
+  const res = new Response(found.content);
+  res.headers.set("content-type", found.type);
+  return res;
 };
