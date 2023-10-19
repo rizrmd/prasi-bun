@@ -103,7 +103,7 @@ export const createServer = async () => {
           }
           const found = cache.static[url.pathname];
           const enc = req.headers.get("accept-encoding");
-          if (enc) {
+          if (enc && g.mode === "prod") {
             if (enc.includes("br") && found.br) {
               const res = new Response(found.br);
               res.headers.set("Content-Encoding", "br");
