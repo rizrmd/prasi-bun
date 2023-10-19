@@ -9,7 +9,7 @@ import { svLocal } from "./edit/action/sv-local";
 import { svdiffRemote } from "./edit/action/svdiff-remote";
 import { redo, undo } from "./edit/action/undo-redo";
 import { eg } from "./edit/edit-global";
-import { syncHandler } from "./sync/sync-handler";
+import { sendWS } from "./edit/send";import { syncHandler } from "./sync/sync-handler";
 
 eg.edit = {
   site: {},
@@ -35,7 +35,7 @@ export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
           const msg = JSON.parse(raw) as WS_MSG;
 
           if (msg.type === "ping") {
-            ws.send(JSON.stringify({ type: "pong" }));
+            sendWS(ws, JSON.stringify({ type: "pong" }));
             return;
           }
 

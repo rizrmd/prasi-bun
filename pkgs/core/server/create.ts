@@ -30,6 +30,9 @@ export const createServer = async () => {
     websocket: {
       maxPayloadLength: 9999999,
       closeOnBackpressureLimit: true,
+      drain(ws) {
+        console.log("Backpressure relieved...");
+      },
       close(ws, code, reason) {
         const pathname = ws.data.url.pathname;
         if (wsHandler[pathname]) {
@@ -61,63 +64,75 @@ export const createServer = async () => {
     async fetch(req, server) {
       const url = new URL(req.url);
 
-      if (wsHandler[url.pathname]) {
-        if (
-          server.upgrade(req, {
-            data: {
-              url: new URL(req.url),
-            },
-          })
-        ) {
-          return;
-        }
-        return new Response("Upgrade failed :(", { status: 500 });
-      }
-
-      try {
-        const api = await serveAPI(url, req);
-        if (api) {
-          return api;
-        }
-      } catch (e) {
-        g.log.error(e);
-      }
-
-      const webPath = "app/static";
-      try {
-        const found = cache.static[url.pathname];
-        if (found && g.mode === "prod") {
-          return responseCached(req, found);
-        }
-
-        const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
-        if ((await file.exists()) && file.type !== "application/octet-stream") {
-          if (g.mode === "dev") {
-            return new Response(file as any);
+      const response = async () => {
+        if (wsHandler[url.pathname]) {
+          if (
+            server.upgrade(req, {
+              data: {
+                url: new URL(req.url),
+              },
+            })
+          ) {
+            return;
           }
+          return new Response("Upgrade failed :(", { status: 500 });
+        }
 
-          if (!cache.static[url.pathname]) {
-            cache.static[url.pathname] = {
-              type: lookup(url.pathname) || "text/plain",
-              content: await file.arrayBuffer(),
-            };
+        try {
+          const api = await serveAPI(url, req);
+          if (api) {
+            return api;
           }
+        } catch (e) {
+          g.log.error(e);
+        }
+
+        const webPath = "app/static";
+        try {
           const found = cache.static[url.pathname];
-          if (found) {
+          if (found && g.mode === "prod") {
             return responseCached(req, found);
           }
+
+          const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
+          if (
+            (await file.exists()) &&
+            file.type !== "application/octet-stream"
+          ) {
+            if (g.mode === "dev") {
+              return new Response(file as any);
+            }
+
+            if (!cache.static[url.pathname]) {
+              cache.static[url.pathname] = {
+                type: lookup(url.pathname) || "text/plain",
+                content: await file.arrayBuffer(),
+              };
+            }
+            const found = cache.static[url.pathname];
+            if (found) {
+              return responseCached(req, found);
+            }
+          }
+        } catch (e) {
+          g.log.error(e);
         }
-      } catch (e) {
-        g.log.error(e);
-      }
 
-      try {
-        return new Response(Bun.file(dir.path(`${webPath}/index.html`)) as any);
-      } catch (e) {
-        g.log.error(e);
+        try {
+          return new Response(
+            Bun.file(dir.path(`${webPath}/index.html`)) as any
+          );
+        } catch (e) {
+          g.log.error(e);
 
-        return new Response("Loading...");
-      }
+          return new Response("Loading...");
+        }
+      };
+      console.log("[START]", req.url);
+      console.time(req.url);
+      const res = await response();
+      console.timeEnd(req.url);
+      return res;
     },
   });
 

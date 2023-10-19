@@ -11,6 +11,7 @@ import {
 } from "../../../../web/src/utils/types/ws";
 import { eg } from "../edit-global";
 import { loadPage } from "../tools/load-page";
+import { sendWS } from "../send";
 
 export const getPage = async (
   ws: ServerWebSocket<WSData>,
@@ -56,5 +57,5 @@ export const getPage = async (
     type: "set_page",
     changes: Y.encodeStateAsUpdate(page.doc as any).toString(),
   };
-  ws.send(JSON.stringify(sent));
+  sendWS(ws,JSON.stringify(sent));
 };
