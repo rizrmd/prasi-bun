@@ -249,7 +249,7 @@ export const walk = async (
       }
     }
 
-    if (!val.skip && !item.hidden) {
+    if (!val.skip) {
       if (p.treeMeta[meta.item.id]) {
         for (const [k, v] of Object.entries(meta)) {
           (p.treeMeta[meta.item.id] as any)[k] = v;
