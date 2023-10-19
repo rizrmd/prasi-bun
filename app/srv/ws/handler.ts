@@ -24,23 +24,6 @@ const site = {
 
 const brotli = await brotliPromise;
 export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
-  "/live": {
-    async open(ws) {
-      ws.send(
-        brotli.compress(
-          Buffer.from(
-            JSON.stringify(
-              await db.page.findFirst({
-                where: { id: "324dde34-1e01-46ff-929c-124e5e01f585" },
-              })
-            )
-          ),
-          { quality: 11 }
-        )
-      );
-    },
-    message(ws, message) {},
-  },
   "/edit": {
     open(ws) {
       eg.edit.ws.set(ws, {
