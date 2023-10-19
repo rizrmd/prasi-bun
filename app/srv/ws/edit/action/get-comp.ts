@@ -9,6 +9,7 @@ import {
   WS_MSG_SV_LOCAL,
 } from "../../../../web/src/utils/types/ws";
 import { SingleComp, eg } from "../edit-global";
+import { sendWS } from "../send";
 export const getComp = async (
   ws: ServerWebSocket<WSData>,
   msg: WS_MSG_GET_COMP
@@ -39,7 +40,7 @@ export const getComp = async (
         comp_id: comp_id,
         changes: "",
       };
-      ws.send(JSON.stringify(sent));
+      sendWS(ws, JSON.stringify(sent));
       return;
     }
 
@@ -80,6 +81,6 @@ export const getComp = async (
       comp_id: comp_id,
       changes: Y.encodeStateAsUpdate(comp.doc as any).toString(),
     };
-    ws.send(JSON.stringify(sent));
+    sendWS(ws, JSON.stringify(sent));
   }
 };

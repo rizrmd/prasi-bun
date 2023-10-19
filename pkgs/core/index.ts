@@ -16,6 +16,8 @@ g.api = {};
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
 g.datadir = g.mode == "prod" ? "../data" : "data";
 g.port = parseInt(process.env.PORT || "4550");
+
+
 g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
 if (g.mode === "dev") {
   await startDevWatcher();
@@ -30,9 +32,18 @@ if (g.db) {
   });
 }
 
+
 await parcelBuild();
+
 await generateAPIFrm();
 await prepareApiRoutes();
+
+// Bun.serve({
+//   port: g.port,
+//   async fetch(req, server) {
+//     return new Response("test. sabar. ya....");
+//   },
+// });
 await createServer();
 await prepareAPITypes();
 

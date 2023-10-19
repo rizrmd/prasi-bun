@@ -15,7 +15,7 @@ import {
 } from "../../../utils/types/ws";
 import { scanComponent } from "./comp";
 import { rebuildTree } from "./tree-logic";
-
+import init, { compress, decompress } from "wasm-gzip";
 const timeout = {
   reconnect: null as any,
   svd: null as any,
@@ -25,6 +25,7 @@ export const editorWS = async (p: PG) => {
   if (p.ws && p.ws.readyState === p.ws.OPEN) {
     return;
   }
+  await init();
 
   const render = () => {
     if (!p.focused && !p.script.active) {
@@ -98,8 +99,10 @@ export const editorWS = async (p: PG) => {
           p.softRender.topR();
         }
       }, 5000);
+      const decoder = new TextDecoder();
       ws.addEventListener("message", async (e) => {
-        const msg = JSON.parse(e.data) as WS_MSG;
+        const raw = decoder.decode(decompress(e.data));
+        const msg = JSON.parse(raw) as WS_MSG;
 
         if (msg.type === "pong") {
           p.wsPing = Date.now() - p.wsPingTs;

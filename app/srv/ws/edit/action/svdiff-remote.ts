@@ -4,6 +4,7 @@ import {
   WS_MSG_SVDIFF_REMOTE,
 } from "../../../../web/src/utils/types/ws";
 import { eg } from "../edit-global";
+import { sendWS } from "../send";
 
 export const svdiffRemote = async (ws: any, msg: WS_MSG_SVDIFF_REMOTE) => {
   const sv_remote = Uint8Array.from(
@@ -32,6 +33,6 @@ export const svdiffRemote = async (ws: any, msg: WS_MSG_SVDIFF_REMOTE) => {
       id: msg.id,
       diff_local: diff_local.toString(),
     };
-    ws.send(JSON.stringify(sendmsg));
+    sendWS(ws,JSON.stringify(sendmsg));
   }
 };

@@ -6,6 +6,7 @@ import {
 import { eg } from "../edit-global";
 import { getComp } from "./get-comp";
 import { getPage } from "./get-page";
+import { sendWS } from "../send";
 
 export const svLocal = async (ws: any, msg: WS_MSG_SV_LOCAL) => {
   const changes = Uint8Array.from(
@@ -39,6 +40,6 @@ export const svLocal = async (ws: any, msg: WS_MSG_SV_LOCAL) => {
       mode: msg.mode,
       type: "svd_remote",
     };
-    ws.send(JSON.stringify(sendmsg));
+    sendWS(ws,JSON.stringify(sendmsg));
   }
 };
