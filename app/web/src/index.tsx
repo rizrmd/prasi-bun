@@ -6,17 +6,8 @@ import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
 
 const start = async () => {
-  const sw = await registerServiceWorker();
-
-  defineReact();
-  await defineWindow(false);
-  const base = `${location.protocol}//${location.host}`;
-  w.serverurl = base;
-  await reloadDBAPI(base);
-  w.api = createAPI(base);
-  w.db = createDB(base);
-
   if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
+    const sw = await registerServiceWorker();
     navigator.serviceWorker.addEventListener("message", (e) => {
       if (e.data.type === "activated") {
         if (e.data.shouldRefresh && sw) {
@@ -54,6 +45,14 @@ const start = async () => {
       }
     });
   }
+
+  defineReact();
+  await defineWindow(false);
+  const base = `${location.protocol}//${location.host}`;
+  w.serverurl = base;
+  await reloadDBAPI(base, "prod");
+  w.api = createAPI(base);
+  w.db = createDB(base);
 
   const el = document.getElementById("root");
   if (el) {

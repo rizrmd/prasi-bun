@@ -6,6 +6,7 @@
     "@swc/core": "^1.3.91",
     "@types/mime": "^3.0.2",
     "@types/unzipper": "^0.10.7",
+    "brotli-wasm": "^2.0.1",
     "execa": "^8.0.1",
     "fs-jetpack": "^5.1.0",
     "lmdb": "^2.8.5",

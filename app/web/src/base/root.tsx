@@ -3,6 +3,7 @@ import { FC, Suspense, lazy } from "react";
 import { GlobalContext, useLocal } from "web-utils";
 import { Loading } from "../utils/ui/loading";
 import { w } from "../utils/types/general";
+import * as pages from "./pages";
 
 export const Root: FC<{}> = ({}) => {
   const local = useLocal(
@@ -13,7 +14,6 @@ export const Root: FC<{}> = ({}) => {
       Page: null as any,
     },
     async () => {
-      const pages = await import("./pages");
       for (const [_, v] of Object.entries(pages)) {
         local.router.insert(v.url, {
           url: v.url,
@@ -36,7 +36,7 @@ export const Root: FC<{}> = ({}) => {
     w.params = found.params;
     local.Page = found.Page;
   }
- 
+
   if (!local.Page) {
     return <Loading />;
   }

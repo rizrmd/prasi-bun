@@ -1,14 +1,21 @@
-import { WebSocketHandler } from "bun";
+import { WebSocketHandler, gzipSync } from "bun";
 import { createRouter } from "radix3";
 import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
+import brotliPromise from "brotli-wasm";
+const brotli = await brotliPromise;
 
-const cache = {
+export const cache = {
   static: {} as Record<
     string,
-    { type: string; content: ReadableStream<Uint8Array> }
+    {
+      type: string;
+      content: ArrayBuffer;
+      br?: Uint8Array;
+      gz?: Uint8Array;
+    }
   >,
 };
 
@@ -88,11 +95,29 @@ export const createServer = async () => {
 
         const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
         if ((await file.exists()) && file.type !== "application/octet-stream") {
-          cache.static[url.pathname] = {
-            type: file.type,
-            content: file.stream(),
-          };
+          if (!cache.static[url.pathname]) {
+            cache.static[url.pathname] = {
+              type: file.type,
+              content: await file.arrayBuffer(),
+            };
+          }
           const found = cache.static[url.pathname];
+          const enc = req.headers.get("accept-encoding");
+          if (enc) {
+            if (enc.includes("br") && found.br) {
+              const res = new Response(found.br);
+              res.headers.set("Content-Encoding", "br");
+              return res;
+            } else if (enc.includes("gz")) {
+              if (!found.gz) {
+                found.gz = gzipSync(new Uint8Array(found.content));
+              }
+              const res = new Response(found.gz);
+              res.headers.set("Content-Encoding", "gzip");
+              return res;
+            }
+          }
+
           return new Response(found.content);
         }
       } catch (e) {
