@@ -128,10 +128,7 @@ export const createServer = async () => {
           return new Response("Loading...");
         }
       };
-      console.log("[START]", req.url);
-      console.time(req.url);
       const res = await response();
-      console.timeEnd(req.url);
       return res;
     },
   });
