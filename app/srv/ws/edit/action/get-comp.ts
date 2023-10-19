@@ -1,15 +1,14 @@
 import { ServerWebSocket } from "bun";
-import { compress } from "lz-string";
+import { validate } from "uuid";
 import { syncronize } from "y-pojo";
 import * as Y from "yjs";
 import { WSData } from "../../../../../pkgs/core/server/create";
-import { SingleComp, eg } from "../edit-global";
 import {
   WS_MSG_GET_COMP,
   WS_MSG_SET_COMP,
   WS_MSG_SV_LOCAL,
 } from "../../../../web/src/utils/types/ws";
-import { validate } from "uuid";
+import { SingleComp, eg } from "../edit-global";
 export const getComp = async (
   ws: ServerWebSocket<WSData>,
   msg: WS_MSG_GET_COMP
@@ -52,7 +51,7 @@ export const getComp = async (
       const ws = new Set<ServerWebSocket<WSData>>();
       const um = new Y.UndoManager(map, { ignoreRemoteMapChanges: true });
       const broadcast = () => {
-        const sv_local = compress(Y.encodeStateVector(ydoc as any).toString());
+        const sv_local = Y.encodeStateVector(ydoc as any).toString();
         const broadcast: WS_MSG_SV_LOCAL = {
           type: "sv_local",
           sv_local,
@@ -79,7 +78,7 @@ export const getComp = async (
     const sent: WS_MSG_SET_COMP = {
       type: "set_comp",
       comp_id: comp_id,
-      changes: compress(Y.encodeStateAsUpdate(comp.doc as any).toString()),
+      changes: Y.encodeStateAsUpdate(comp.doc as any).toString(),
     };
     ws.send(JSON.stringify(sent));
   }

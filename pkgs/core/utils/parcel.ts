@@ -1,13 +1,8 @@
 import { spawn } from "bun";
-import { dirAsync, inspectTreeAsync, writeAsync } from "fs-jetpack";
-import { InspectTreeResult } from "fs-jetpack/types";
-import { cache } from "../server/create";
+import { dirAsync } from "fs-jetpack";
 import { dir } from "./dir";
 import { g } from "./global";
-import { lookup } from "mime-types";
 
-import brotliPromise from "brotli-wasm";
-const brotli = await brotliPromise;
 
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {

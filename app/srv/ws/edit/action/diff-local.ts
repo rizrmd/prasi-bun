@@ -1,17 +1,13 @@
-import { Websocket } from "hyper-express";
-import { decompress } from "lz-string";
 import * as Y from "yjs";
 import { eg } from "../edit-global";
 
-export const diffLocal = (ws: Websocket, msg: any) => {
+export const diffLocal = (ws: any, msg: any) => {
   return new Promise<void>((resolve) => {
     const diff_local = Uint8Array.from(
-      decompress(msg.diff_local)
-        .split(",")
-        .map((x) => parseInt(x, 10))
+      msg.diff_local.split(",").map((x: any) => parseInt(x, 10))
     );
     let doc = null as unknown as Y.Doc;
-    let wss: Set<Websocket> = null as any;
+    let wss: Set<any> = null as any;
     let um: Y.UndoManager = null as any;
     if (msg.mode === "page") {
       doc = eg.edit.page[msg.id].doc as any;

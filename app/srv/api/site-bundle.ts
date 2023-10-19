@@ -13,8 +13,8 @@ export const _ = {
     const { req, res } = apiContext(this);
 
     if (!cache.md5) {
-      const content = await readAsync(dir.path("srv/site.zip"), "buffer");
-
+      const content = await readAsync(dir.path("app/srv/site.zip"), "buffer");
+      
       if (content) {
         cache.md5 = createHash("md5").update(content).digest("hex");
         cache.content = content;

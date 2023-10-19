@@ -1,7 +1,6 @@
 import { PG } from "./global";
 
 import throttle from "lodash.throttle";
-import { compress, decompress } from "lz-string";
 import * as Y from "yjs";
 import { CompDoc } from "../../../base/global/content-editor";
 import { MPage } from "../../../utils/types/general";
@@ -15,7 +14,6 @@ import {
   WS_MSG_SV_LOCAL,
 } from "../../../utils/types/ws";
 import { scanComponent } from "./comp";
-import { execSiteJS } from "./init";
 import { rebuildTree } from "./tree-logic";
 
 const timeout = {
@@ -27,7 +25,7 @@ export const editorWS = async (p: PG) => {
   if (p.ws && p.ws.readyState === p.ws.OPEN) {
     return;
   }
-  
+
   const render = () => {
     if (!p.focused && !p.script.active) {
       p.render();
@@ -134,9 +132,7 @@ export const editorWS = async (p: PG) => {
                         type: "sv_local",
                         mode: "page",
                         id,
-                        sv_local: compress(
-                          Y.encodeStateVector(doc as any).toString()
-                        ),
+                        sv_local: Y.encodeStateVector(doc as any).toString(),
                       };
                       wsend(p, JSON.stringify(sendmsg));
                     }
@@ -207,9 +203,9 @@ export const editorWS = async (p: PG) => {
                               type: "sv_local",
                               mode: "comp",
                               id,
-                              sv_local: compress(
-                                Y.encodeStateVector(doc as any).toString()
-                              ),
+                              sv_local: Y.encodeStateVector(
+                                doc as any
+                              ).toString(),
                             };
                             wsend(p, JSON.stringify(sendmsg));
                           }
@@ -259,11 +255,7 @@ export const editorWS = async (p: PG) => {
 };
 
 const extract = (str: string) => {
-  return Uint8Array.from(
-    decompress(str)
-      .split(",")
-      .map((x) => parseInt(x, 10))
-  );
+  return Uint8Array.from(str.split(",").map((x) => parseInt(x, 10)));
 };
 
 const svLocal = async (arg: {
@@ -287,8 +279,8 @@ const svLocal = async (arg: {
   const sv_remote = Y.encodeStateVector(doc);
 
   const sendmsg: any = {
-    diff_remote: compress(diff_remote.toString()),
-    sv_remote: compress(sv_remote.toString()),
+    diff_remote: diff_remote.toString(),
+    sv_remote: sv_remote.toString(),
     id: id,
     mode: mode,
     type: type,
@@ -304,14 +296,10 @@ const svdRemote = async (arg: {
   const { bin, msg, p } = arg;
   const { id, mode, type } = msg;
   const sv_remote = Uint8Array.from(
-    decompress(msg.sv_remote)
-      .split(",")
-      .map((x) => parseInt(x, 10))
+    msg.sv_remote.split(",").map((x) => parseInt(x, 10))
   );
   const diff_remote = Uint8Array.from(
-    decompress(msg.diff_remote)
-      .split(",")
-      .map((x) => parseInt(x, 10))
+    msg.diff_remote.split(",").map((x) => parseInt(x, 10))
   );
 
   const sendDoc = async (doc: any) => {
@@ -321,7 +309,7 @@ const svdRemote = async (arg: {
       type: "diff_local",
       mode: msg.mode,
       id: msg.id,
-      diff_local: compress(diff_local.toString()),
+      diff_local: diff_local.toString(),
     };
     await wsend(p, JSON.stringify(sendmsg));
   };
@@ -354,9 +342,7 @@ export const wsend = async (local: PG, payload: string) => {
 
 const setPage = async (msg: WS_MSG_SET_PAGE) => {
   const page = Uint8Array.from(
-    decompress(msg.changes)
-      .split(",")
-      .map((x) => parseInt(x, 10))
+    msg.changes.split(",").map((x) => parseInt(x, 10))
   );
 
   const doc = new Y.Doc();

@@ -11,8 +11,7 @@ export const cache = {
     string,
     {
       type: string;
-      content: ReadableStream<Uint8Array>;
-      br?: ReadableStream<Uint8Array>;
+      content: ArrayBuffer;
     }
   >,
 };
@@ -30,6 +29,7 @@ export const createServer = async () => {
     port: g.port,
     websocket: {
       maxPayloadLength: 9999999,
+      closeOnBackpressureLimit: true,
       close(ws, code, reason) {
         const pathname = ws.data.url.pathname;
         if (wsHandler[pathname]) {
@@ -99,7 +99,7 @@ export const createServer = async () => {
           if (!cache.static[url.pathname]) {
             cache.static[url.pathname] = {
               type: lookup(url.pathname) || "text/plain",
-              content: file.stream(),
+              content: await file.arrayBuffer(),
             };
           }
           const found = cache.static[url.pathname];
@@ -115,6 +115,7 @@ export const createServer = async () => {
         return new Response(Bun.file(dir.path(`${webPath}/index.html`)) as any);
       } catch (e) {
         g.log.error(e);
+
         return new Response("Loading...");
       }
     },
