@@ -1,4 +1,4 @@
-import { FC, ReactNode, Suspense, isValidElement, useEffect } from "react";
+import { FC, ReactNode, Suspense, useEffect } from "react";
 import { deepClone } from "web-utils";
 import { createAPI, createDB } from "../../../utils/script/init-api";
 import { ErrorBox } from "../../editor/elements/e-error";
@@ -148,7 +148,7 @@ export const mergeScopeUpwards = (
       scope = { ...cur.scope, ...indexedScope, ...cur.comp?.propval };
 
       for (const [k, v] of Object.entries(scope)) {
-        if (typeof finalScope[k] === "undefined") finalScope[k] = v;
+        finalScope[k] = v;
       }
       if (opt?.each) {
         if (!opt.each(cur, scope)) {
