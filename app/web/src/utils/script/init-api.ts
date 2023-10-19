@@ -64,6 +64,7 @@ export const initApi = async (config: any, mode: "dev" | "prod" = "dev") => {
   if (url) {
     if (!w.prasiApi[url]) {
       try {
+
         await reloadDBAPI(url, mode);
       } catch (e) {}
     }

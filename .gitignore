@@ -178,6 +178,8 @@ dist
 app/web/.parcel-cache
 app/static
 app/static/*
+app/static-br
+app/static-br/*
 data
 data/*
 app/srv/exports.ts
