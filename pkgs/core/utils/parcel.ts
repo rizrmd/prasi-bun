@@ -21,61 +21,6 @@ export const parcelBuild = async () => {
     "--dist-dir",
     dir.path(`app/static`),
   ];
-  if (g.mode === "prod") {
-    setTimeout(() => {
-      inspectTreeAsync(dir.path("app/static")).then((tree) => {
-        if (tree) {
-          const walk = async (item: InspectTreeResult, parent: string[]) => {
-            if (item.type === "file") {
-              let path = `${parent.slice(1).join("/")}/${item.name}`;
-              if (!path.startsWith("/")) path = `/${path}`;
-
-              if (!cache.static[path]) {
-                const file = Bun.file(dir.path(`/app/static${path}`));
-                cache.static[path] = {
-                  type: lookup(path) || "text/plain",
-                  content: await file.arrayBuffer(),
-                };
-              }
-              const found = cache.static[path];
-
-              const staticBr = Bun.file(dir.path(`app/static-br${path}`));
-              if (await staticBr.exists()) {
-                found.br = new Uint8Array(await staticBr.arrayBuffer());
-              } else {
-                const pubFile = Bun.file(dir.path(`/app/web/public${path}`));
-                const pubBr = Bun.file(dir.path(`/app/web/public-br${path}`));
-                if (await pubFile.exists()) {
-                  if (await pubBr.exists()) {
-                    found.br = new Uint8Array(await pubBr.arrayBuffer());
-                  } else {
-                    found.br = brotli.compress(
-                      new Uint8Array(cache.static[path].content)
-                    );
-                    if (found.br) {
-                      await writeAsync(
-                        dir.path(`/app/web/public-br${path}`),
-                        Buffer.from(found.br)
-                      );
-                    }
-                  }
-                } else {
-                  found.br = brotli.compress(
-                    new Uint8Array(cache.static[path].content)
-                  );
-                }
-              }
-            } else if (item.type === "dir") {
-              for (const child of item.children) {
-                await walk(child, [...parent, item.name]);
-              }
-            }
-          };
-          walk(tree, []);
-        }
-      });
-    }, 1000);
-  }
 
   if (g.mode === "dev") {
     g.log.info(`Building web with parcel`);
