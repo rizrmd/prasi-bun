@@ -9,6 +9,7 @@ import { svLocal } from "./edit/action/sv-local";
 import { svdiffRemote } from "./edit/action/svdiff-remote";
 import { redo, undo } from "./edit/action/undo-redo";
 import { eg } from "./edit/edit-global";
+import { syncHandler } from "./sync/sync-handler";
 
 eg.edit = {
   site: {},
@@ -21,6 +22,7 @@ const site = {
 };
 
 export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
+  "/sync": syncHandler,
   "/edit": {
     open(ws) {
       eg.edit.ws.set(ws, {
