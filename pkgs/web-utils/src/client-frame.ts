@@ -179,6 +179,8 @@ export const fetchSendApi = async (
 
   if (!win.frmapi) {
     win.frmapi = {};
+  }
+  if (!win.frmapi[base]) {
     win.frmapi[base] = await createFrameCors(base, win);
   }
 

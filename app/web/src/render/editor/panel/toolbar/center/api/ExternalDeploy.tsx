@@ -38,11 +38,14 @@ export const ExternalDeploy = () => {
       local.render();
 
       try {
-        local.api = createAPI(p.site.api_url);
+        const url = p.site.api_url;
+
+        local.api = createAPI(url);
         let res = await local.api._deploy({
           type: "check",
           id_site: p.site.id,
         });
+
         if (res) {
           local.db.url = res.db.url;
           local.now = res.now;
