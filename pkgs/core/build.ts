@@ -4,27 +4,26 @@ import { Plugin, context } from "esbuild";
 import { $ } from "execa";
 import { removeAsync, writeAsync } from "fs-jetpack";
 
-// await removeAsync(dir.path("app/static"));
-// await removeAsync(dir.path("app/web/.parcel-cache"));
-// await removeAsync(dir.path("app/static"));
+await removeAsync(dir.path("app/web/.parcel-cache"));
+await removeAsync(dir.path("app/static"));
 
-// const args = [
-//   "node",
-//   dir.path("node_modules/.bin/parcel"),
-//   "build",
-//   "./src/index.tsx",
-//   // "--no-optimize",
-//   "--no-scope-hoist",
-//   "--dist-dir",
-//   dir.path(`app/static`),
-// ];
+const args = [
+  "node",
+  dir.path("node_modules/.bin/parcel"),
+  "build",
+  "./src/index.tsx",
+  // "--no-optimize",
+  "--no-scope-hoist",
+  "--dist-dir",
+  dir.path(`app/static`),
+];
 
-// const parcel = spawn({
-//   cmd: args,
-//   cwd: dir.path("app/web"),
-//   stdio: ["ignore", "inherit", "inherit"],
-// });
-// await parcel.exited;
+const parcel = spawn({
+  cmd: args,
+  cwd: dir.path("app/web"),
+  stdio: ["ignore", "inherit", "inherit"],
+});
+await parcel.exited;
 
 // listAsync(dir.path("app/static")).then(async (files) => {
 //   if (files) {
