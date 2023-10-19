@@ -1,13 +1,10 @@
 import { spawn } from "bun";
-import {
-  dirAsync,
-  inspectTreeAsync,
-  writeAsync
-} from "fs-jetpack";
+import { dirAsync, inspectTreeAsync, writeAsync } from "fs-jetpack";
 import { InspectTreeResult } from "fs-jetpack/types";
 import { cache } from "../server/create";
 import { dir } from "./dir";
 import { g } from "./global";
+import { lookup } from "mime-types";
 
 import brotliPromise from "brotli-wasm";
 const brotli = await brotliPromise;
@@ -36,7 +33,7 @@ export const parcelBuild = async () => {
               if (!cache.static[path]) {
                 const file = Bun.file(dir.path(`/app/static${path}`));
                 cache.static[path] = {
-                  type: item.type,
+                  type: lookup(path) || "text/plain",
                   content: await file.arrayBuffer(),
                 };
               }
