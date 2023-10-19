@@ -1,12 +1,10 @@
 import { createId } from "@paralleldrive/cuid2";
 import { syncronize } from "y-pojo";
 import * as Y from "yjs";
-import { produceCSS } from "../../../utils/css/gen";
 import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { FNAdv, FNCompDef } from "../../../utils/types/meta-fn";
 import { IText } from "../../../utils/types/text";
-import { createElProp } from "../elements/e-relprop";
 import { DefaultScript } from "../panel/script/monaco/monaco-el";
 import { fillID } from "../tools/fill-id";
 import { newMap } from "../tools/yjs-tools";
@@ -148,7 +146,6 @@ export const walk = async (
   }
 
   if (item) {
-    if (item.hidden) return;
     let comp: ItemMeta["comp"] = undefined as any;
 
     if (item.type === "item" && item.component?.id) {
@@ -252,7 +249,7 @@ export const walk = async (
       }
     }
 
-    if (!val.skip) {
+    if (!val.skip && !item.hidden) {
       if (p.treeMeta[meta.item.id]) {
         for (const [k, v] of Object.entries(meta)) {
           (p.treeMeta[meta.item.id] as any)[k] = v;
