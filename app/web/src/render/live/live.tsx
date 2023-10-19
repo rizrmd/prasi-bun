@@ -5,7 +5,6 @@ import { LPage } from "./elements/l-page";
 import { LiveGlobal, Loader } from "./logic/global";
 import { initLive, w } from "./logic/init";
 import { preload, routeLive } from "./logic/route";
-import { liveSyncWS } from "./logic/ws-sync";
 
 export const Live: FC<{
   domain_or_siteid: string;
@@ -57,9 +56,6 @@ export const Live: FC<{
   }, [p.site.responsive]);
 
   if (p.status === "init") {
-    if (liveSync) {
-      liveSyncWS(p);
-    }
     initLive(p, domain_or_siteid);
   }
 
