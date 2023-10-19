@@ -11,9 +11,8 @@ export const cache = {
     string,
     {
       type: string;
-      content: ArrayBuffer;
-      br?: Uint8Array;
-      gz?: Uint8Array;
+      content: ReadableStream<Uint8Array>;
+      br?: ReadableStream<Uint8Array>;
     }
   >,
 };
@@ -100,7 +99,7 @@ export const createServer = async () => {
           if (!cache.static[url.pathname]) {
             cache.static[url.pathname] = {
               type: lookup(url.pathname) || "text/plain",
-              content: await file.arrayBuffer(),
+              content: file.stream(),
             };
           }
           const found = cache.static[url.pathname];
@@ -129,24 +128,6 @@ export const createServer = async () => {
 };
 
 const responseCached = (req: Request, found: (typeof cache.static)[string]) => {
-  const enc = req.headers.get("accept-encoding");
-  if (enc && g.mode === "prod") {
-    if (enc.includes("br") && found.br) {
-      const res = new Response(found.br);
-      res.headers.set("content-type", found.type);
-      res.headers.set("content-encoding", "br");
-      return res;
-    } else if (enc.includes("gz")) {
-      if (!found.gz) {
-        found.gz = gzipSync(new Uint8Array(found.content));
-      }
-      const res = new Response(found.gz);
-      res.headers.set("content-type", found.type);
-      res.headers.set("content-encoding", "gzip");
-      return res;
-    }
-  }
-
   const res = new Response(found.content);
   res.headers.set("content-type", found.type);
   return res;
