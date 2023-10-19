@@ -50,7 +50,9 @@ export const ExternalDeploy = () => {
           local.domains = res.domains;
           local.deploys = res.deploys;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(p.site.api_url, e);
+      }
       local.render();
     })();
   }, [p.site.api_url]);
