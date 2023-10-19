@@ -1,4 +1,3 @@
-import { compress } from "lz-string";
 import { syncronize } from "y-pojo";
 import * as Y from "yjs";
 import { MPage } from "../../web/src/utils/types/general";
@@ -18,9 +17,7 @@ export const _ = {
         syncronize(root as any, rawPage);
         const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
         const broadcast = () => {
-          const sv_local = compress(
-            Y.encodeStateVector(ydoc as any).toString()
-          );
+          const sv_local = Y.encodeStateVector(ydoc as any).toString();
           const broadcast: WS_MSG_SV_LOCAL = {
             type: "sv_local",
             sv_local,
@@ -40,7 +37,7 @@ export const _ = {
         eg.edit.page[page_id].ws.forEach((w) => {
           const sent: WS_MSG_SET_PAGE = {
             type: "set_page",
-            changes: compress(Y.encodeStateAsUpdate(ydoc as any).toString()),
+            changes: Y.encodeStateAsUpdate(ydoc as any).toString(),
           };
           w.send(JSON.stringify(sent));
         });

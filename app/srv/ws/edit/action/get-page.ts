@@ -1,5 +1,4 @@
 import { ServerWebSocket } from "bun";
-import { compress } from "lz-string";
 import { validate } from "uuid";
 import { syncronize } from "y-pojo";
 import * as Y from "yjs";
@@ -29,7 +28,7 @@ export const getPage = async (
       const ws = new Set<ServerWebSocket<WSData>>();
       const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
       const broadcast = () => {
-        const sv_local = compress(Y.encodeStateVector(ydoc as any).toString());
+        const sv_local = Y.encodeStateVector(ydoc as any).toString();
         const broadcast: WS_MSG_SV_LOCAL = {
           type: "sv_local",
           sv_local,
@@ -55,7 +54,7 @@ export const getPage = async (
   page.ws.add(ws);
   const sent: WS_MSG_SET_PAGE = {
     type: "set_page",
-    changes: compress(Y.encodeStateAsUpdate(page.doc as any).toString()),
+    changes: Y.encodeStateAsUpdate(page.doc as any).toString(),
   };
   ws.send(JSON.stringify(sent));
 };

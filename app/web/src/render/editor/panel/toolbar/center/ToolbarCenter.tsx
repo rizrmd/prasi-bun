@@ -1,4 +1,3 @@
-import { compress } from "lz-string";
 import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { w } from "../../../../../utils/types/general";
@@ -85,7 +84,7 @@ export const ToolbarCenter = () => {
                 JSON.stringify({
                   type: "site-js",
                   id_site: p.site.id,
-                  src: compress(JSON.stringify({ src, compiled })),
+                  src: JSON.stringify({ src, compiled }),
                 })
               );
             }}

@@ -1,7 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import brotliPromise from "brotli-wasm";
 import { WebSocketHandler } from "bun";
-import { decompress } from "lz-string";
 import { WSData } from "../../../pkgs/core/server/create";
 import { WS_MSG } from "../../web/src/utils/types/ws";
 import { diffLocal } from "./edit/action/diff-local";
@@ -22,7 +20,6 @@ const site = {
   saveTimeout: null as any,
 };
 
-const brotli = await brotliPromise;
 export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
   "/edit": {
     open(ws) {
@@ -44,7 +41,7 @@ export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
             case "site-js":
               clearTimeout(site.saveTimeout);
               site.saveTimeout = setTimeout(async () => {
-                const js = JSON.parse(decompress(msg.src));
+                const js = JSON.parse(msg.src);
                 await db.site.update({
                   where: {
                     id: msg.id_site,

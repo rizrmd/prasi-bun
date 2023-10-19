@@ -19,21 +19,31 @@ export const ${name} = {
   await Bun.write(dir.path(`app/srv/exports.ts`), out.join(`\n`));
 
   const targetFile = dir.path("app/srv/exports.d.ts");
-  const tsc = spawn(
-    [
-      dir.path("node_modules/.bin/tsc"),
-      dir.path("app/srv/exports.ts"),
-      "--declaration",
-      "--emitDeclarationOnly",
-      "--outFile",
-      targetFile,
-    ],
-    {
-      cwd: dir.path(`node_modules/.bin`),
-    }
-  );
 
-  await tsc.exited;
+  const args = [
+    dir.path("node_modules/.bin/tsc"),
+    dir.path("app/srv/exports.ts"),
+    "--declaration",
+    "--emitDeclarationOnly",
+    "--outFile",
+    targetFile,
+  ];
+  if (g.mode === "dev") {
+    const tsc = spawn(
+      [
+        dir.path("node_modules/.bin/tsc"),
+        dir.path("app/srv/exports.ts"),
+        "--declaration",
+        "--emitDeclarationOnly",
+        "--outFile",
+        targetFile,
+      ],
+      {
+        cwd: dir.path(`node_modules/.bin`),
+      }
+    );
+    await tsc.exited;
+  }
 
   let res = await readAsync(targetFile);
   if (res) {
