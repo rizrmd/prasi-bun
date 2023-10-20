@@ -31,7 +31,7 @@ if (g.db) {
     g.log.error(`[DB ERROR]\n${e.message}`);
   });
 }
- 
+
 await syncActionDefinition();
 await parcelBuild();
 await generateAPIFrm();

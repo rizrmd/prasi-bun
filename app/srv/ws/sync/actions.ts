@@ -1,14 +1,21 @@
 import { component, site, page } from "dbgen";
+import { ESite } from "../../../web/src/render/ed/logic/ed-global";
 
+/* 
+   WARNING:
+   CHANGING FUNCTION NAME / OBJECT STRUCTURE 
+   WILL *BREAK* OFFLINE STORAGE --
+   ONLY ADDITION IS ALLOWED 
+*/
+
+export type SAction = typeof SyncActions;
 
 export const SyncActions = {
   site: {
-    list: () =>
-      ({}) as Promise<
-        Record<string, { id: string; name: string; domain: string }>
-      >,
-    group: () => ({}) as Promise<Record<string, string[]>>,
-    load: (id: string) => ({}) as Promise<site>,
+    list: async () =>
+      ({}) as Record<string, { id: string; name: string; domain: string }>,
+    group: async () => ({}) as Record<string, string[]>,
+    load: async (id: string) => ({}) as ESite | undefined,
   },
   comp: {
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
