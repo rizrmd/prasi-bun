@@ -1,5 +1,5 @@
 import { dir } from "dir";
-import { open } from "lmdb";
+import { RootDatabase, open } from "lmdb";
 import { g } from "utils/global";
 
 const defaultConf = {
@@ -8,33 +8,38 @@ const defaultConf = {
 };
 export type UserConf = typeof defaultConf;
 
-const db = open<UserConf, string>({
-  name: "user-conf",
-  path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
-});
-
 export const user = {
   conf: {
+    _db: null as null | RootDatabase<UserConf>,
+    get db() {
+      if (!this._db) {
+        this._db = open<UserConf, string>({
+          name: "user-conf",
+          path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
+        });
+      }
+      return this._db;
+    },
     getOrCreate(user_id: string) {
-      let res = db.get(user_id);
+      let res = this.db.get(user_id);
       if (!res) {
-        db.put(user_id, structuredClone(defaultConf));
-        res = db.get(user_id);
+        this.db.put(user_id, structuredClone(defaultConf));
+        res = this.db.get(user_id);
       }
       return res as UserConf;
     },
     get(user_id: string) {
-      return db.get(user_id);
+      return this.db.get(user_id);
     },
     set<T extends keyof UserConf>(user_id: string, key: T, value: UserConf[T]) {
       let current = this.get(user_id);
       if (!current) {
-        db.put(user_id, structuredClone(defaultConf));
+        this.db.put(user_id, structuredClone(defaultConf));
         current = this.get(user_id);
       }
 
       if (current) {
-        db.put(user_id, { ...current, [key]: value });
+        this.db.put(user_id, { ...current, [key]: value });
       }
     },
   },
