@@ -1,91 +1,106 @@
+import { DeepProxy } from "@qiwi/deep-proxy";
+import { xxhash32 } from "hash-wasm";
+import { UseStore, get } from "idb-keyval";
 import { Packr } from "msgpackr";
-import {
-  ClientAction,
-  MSG_TO_CLIENT,
-  MSG_TO_SERVER,
-  ServerAction,
-} from "../../../../srv/ws/sync/type";
-import { SyncSite } from "./site";
-import { createId } from "@paralleldrive/cuid2";
+import { stringify } from "safe-stable-stringify";
+import { SyncActions } from "../../../../srv/ws/sync/actions";
+import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
+import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });
+const conf = {
+  ws: null as null | WebSocket,
+  client_id: "",
+  idb: null as null | UseStore,
+};
 
-export class SyncClient {
-  private id = "";
-  private ws: WebSocket;
-  private wsPending?: Promise<void>;
-  public connected = false;
-  public loaded = {
-    site: new Map<string, SyncSite>(),
+type User = {
+  id: string;
+  name: string;
+};
+
+export const clientStartSync = async (arg: {
+  user_id: string;
+  events: {
+    site_open: (arg: { site_id: string; user: User }) => void;
   };
-
-  public site = {
-    load: async (id: string) => {
-      this.loaded.site.set(id, new SyncSite(this, id));
-    },
-  };
-
-  public _internal = {
-    msg: {
-      pending: {} as Record<string, Promise<any>>,
-      resolve: {} as Record<string, (result: any) => void>,
-    },
-    send: async (msg: MSG_TO_SERVER) => {
-      const { resolve, pending } = this._internal.msg;
-      const msg_client_id = createId();
-      pending[msg_client_id] = new Promise((done) => {
-        resolve[msg_client_id] = done;
-      });
-
-      if (this.wsPending) {
-        await this.wsPending;
+}) => {
+  const { user_id, events } = arg;
+  conf.idb = initIDB(user_id);
+  await connect(user_id);
+  const path: any[] = [];
+  return new DeepProxy(
+    SyncActionDefinition,
+    ({ trapName, value, key, DEFAULT, PROXY }) => {
+      if (trapName === "set") {
+        throw new TypeError("target is immutable");
       }
 
-      this.ws.send(packr.pack({ ...msg, msg_client_id: createId() }));
-    },
-  };
+      path.push(key);
+      if (typeof value === "string") {
+        if (path[0] === "then") path.shift();
+        return (...args: any[]) =>
+          new Promise((resolve) => {
+            operation({
+              path: path.join("."),
+              resolve,
+              args,
+            });
+          });
+      }
 
-  constructor(ws: WebSocket) {
-    this.ws = ws;
-  }
+      if (trapName === "get") {
+        if (typeof value === "object" && value !== null) {
+          return PROXY;
+        }
+      }
 
-  private static instance = null as SyncClient | null;
-  static connect() {
-    if (SyncClient.instance) return SyncClient.instance;
+      return DEFAULT;
+    }
+  ) as unknown as typeof SyncActions;
+};
 
-    const url = new URL(location.href);
-    url.pathname = "/sync";
-    url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
+const connect = (user_id: string) => {
+  return new Promise<WebSocket>((resolve) => {
+    if (!conf.ws) {
+      const url = new URL(location.href);
+      url.pathname = "/sync";
+      url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
 
-    const ws = new WebSocket(url.toString());
-    const client = new SyncClient(ws);
-    SyncClient.instance = client;
-    let promise = {
-      resolve: null as null | (() => void),
-    };
-    client.wsPending = new Promise((resolve) => {
-      promise.resolve = resolve;
-    });
-    ws.onopen = () => {
-      promise.resolve?.();
-    };
-
-    ws.onmessage = async (e) => {
-      const raw = e.data as Blob;
-      const msg = packr.unpack(
-        Buffer.from(await raw.arrayBuffer())
-      ) as MSG_TO_CLIENT & {
-        msg_server_id: string;
+      const ws = new WebSocket(url.toString());
+      conf.ws = ws;
+      ws.onopen = () => {
+        ws.send(packr.pack({ type: "user_id", user_id }));
       };
 
-      if (!client.id) {
-        if (msg.action === ClientAction.Identify) {
-          client.id = msg.id;
-          client.connected = true;
+      ws.onmessage = async (e) => {
+        const raw = e.data as Blob;
+        const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
+        if (msg.type === "client_id") {
+          conf.client_id = msg.client_id;
+          resolve(ws);
         }
-      } else {
-      }
-    };
+      };
+    }
+  });
+};
 
-    return client;
+const operation = async (arg: {
+  path: string;
+  resolve: (value: any) => void;
+  args: any[];
+}) => {
+  const ws = conf.ws;
+  const idb = conf.idb;
+  if (idb) {
+    const sargs = stringify(arg.args);
+    const hargs = await xxhash32(`${arg.path}-${sargs}`);
+
+    if (ws && ws.readyState === ws.OPEN) {
+      // online
+    } else {
+      // offline
+      const cache = await get(hargs, idb);
+      console.log(cache);
+    }
   }
-}
+};

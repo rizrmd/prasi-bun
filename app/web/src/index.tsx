@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import { Root as ReactRoot, createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { Root } from "./base/root";
 import "./index.css";
@@ -6,35 +6,107 @@ import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
 
 const start = async () => {
+  const base = `${location.protocol}//${location.host}`;
+  let react = {
+    root: null as null | ReactRoot,
+  };
   if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
     const sw = await registerServiceWorker();
     navigator.serviceWorker.addEventListener("message", (e) => {
-      if (e.data.type === "activated") {
-        if (e.data.shouldRefresh && sw) {
-          sw.unregister().then(() => {
-            window.location.reload();
-          });
-        }
-      }
-      if (e.data.type === "ready") {
-        const sw = navigator.serviceWorker.controller;
-
-        if (sw) {
-          const routes = Object.entries(w.prasiApi[base].apiEntry).map(
-            ([k, v]: any) => ({
-              url: v.url,
-              name: k,
-            })
+      if (react.root) {
+        if (e.data.type === "offline") {
+          w.offline = true;
+          const click = () => {
+            if (react.root) react.root.render(<Root />);
+          };
+          setTimeout(click, 5000);
+          react.root.render(
+            <>
+              <Root />
+              <div
+                className={cx(
+                  css`
+                    position: fixed;
+                    bottom: 20px;
+                    left: 0px;
+                    right: 0px;
+                    z-index: 999;
+                  `,
+                  "flex justify-center cursor-pointer"
+                )}
+              >
+                <div
+                  className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm"
+                  onClick={click}
+                >
+                  Network Failed: Offline Mode
+                </div>
+              </div>
+            </>
           );
+        }
 
-          sw.postMessage({
-            type: "add-cache",
-            url: location.href,
-          });
-          sw.postMessage({
-            type: "define-route",
-            routes,
-          });
+        if (e.data.type === "activated") {
+          if (e.data.shouldRefresh && sw) {
+            react.root.render(
+              <>
+                <Root />
+                <div
+                  className={cx(
+                    css`
+                      position: fixed;
+                      bottom: 20px;
+                      left: 0px;
+                      right: 0px;
+                      z-index: 999;
+                    `,
+                    "flex justify-center"
+                  )}
+                >
+                  <div className="bg-blue-400 text-white px-4 py-2 rounded-full text-sm">
+                    Updating App...
+                  </div>
+                </div>
+              </>
+            );
+
+            sw.unregister().then(() => {
+              window.location.reload();
+            });
+          } else {
+            const localVersion = localStorage.getItem("prasi-version");
+            if (localVersion !== e.data.version) {
+              localStorage.setItem("prasi-version", e.data.version);
+              const click = () => {
+                if (react.root) react.root.render(<Root />);
+              };
+              setTimeout(click, 5000);
+              react.root.render(
+                <>
+                  <Root />
+                  <div
+                    className={cx(
+                      css`
+                        position: fixed;
+                        bottom: 20px;
+                        left: 0px;
+                        right: 0px;
+                        z-index: 999;
+                      `,
+                      "flex justify-center cursor-pointer"
+                    )}
+                  >
+                    <div
+                      className="bg-green-600 text-white px-4 py-2 rounded-full text-sm"
+                      onClick={click}
+                    >
+                      App Updated, Ready to use offline
+                    </div>
+                  </div>
+                </>
+              );
+            }
+          }
         }
       }
     });
@@ -48,15 +120,36 @@ const start = async () => {
 
   defineReact();
   await defineWindow(false);
-  const base = `${location.protocol}//${location.host}`;
   w.serverurl = base;
   await reloadDBAPI(base, "prod");
+
+  const swc = navigator.serviceWorker.controller;
+  if (swc) {
+    swc.postMessage({
+      type: "add-cache",
+      url: location.href,
+    });
+    if (w.prasiApi && w.prasiApi[base] && w.prasiApi[base].apiEntry) {
+      const routes = Object.entries(w.prasiApi[base].apiEntry).map(
+        ([k, v]: any) => ({
+          url: v.url,
+          name: k,
+        })
+      );
+
+      swc.postMessage({
+        type: "define-route",
+        routes,
+      });
+    }
+  }
   w.api = createAPI(base);
   w.db = createDB(base);
 
   const el = document.getElementById("root");
   if (el) {
-    createRoot(el).render(<Root />);
+    react.root = createRoot(el);
+    react.root.render(<Root />);
   }
 };
 

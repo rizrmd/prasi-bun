@@ -26,3 +26,7 @@ export const live = {
   url:  "/live/:domain/**",
   page: () => import("./page/live"),
 };
+export const ned = {
+  url:  "/ned/:site_id/:page_id",
+  page: () => import("./page/ned"),
+};

@@ -9,6 +9,7 @@ import { IRoot } from "../../../utils/types/root";
 import { LSite } from "../../live/logic/global";
 import { ISection } from "../../../utils/types/section";
 import { IText } from "../../../utils/types/text";
+import { clientStartSync } from "../../../utils/sync/client";
 
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 export type NodeMeta = { meta: ItemMeta; idx: number };
@@ -40,6 +41,7 @@ export type ItemMeta = {
 export const EditorGlobal = {
   /** ui */
   mode: "" as "desktop" | "mobile",
+  sync: null as unknown as ReturnType<typeof clientStartSync>,
   status: "init" as
     | "init"
     | "loading"

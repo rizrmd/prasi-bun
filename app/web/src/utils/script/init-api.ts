@@ -64,7 +64,6 @@ export const initApi = async (config: any, mode: "dev" | "prod" = "dev") => {
   if (url) {
     if (!w.prasiApi[url]) {
       try {
-
         await reloadDBAPI(url, mode);
       } catch (e) {}
     }
@@ -137,12 +136,7 @@ export const reloadDBAPI = async (
     const found = await get(url, cache);
     if (found) {
       w.prasiApi[url] = JSON.parse(found);
-      forceReload().catch(() => {
-        if (url === prasiBase) {
-          console.error("Failed to load prasi. Reloading...");
-          setTimeout(() => location.reload(), 3000);
-        }
-      });
+      forceReload();
     } else {
       await forceReload();
     }
