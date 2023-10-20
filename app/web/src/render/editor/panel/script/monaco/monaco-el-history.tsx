@@ -1,7 +1,7 @@
-import { UseStore, del, getMany, keys } from "idb-keyval";
+import { UseStore, getMany, keys } from "idb-keyval";
 import { useGlobal, useLocal } from "web-utils";
-import { EditorGlobal } from "../../../logic/global";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
+import { EditorGlobal } from "../../../logic/global";
 
 export const MonacoElHistory = ({
   store,

@@ -2,6 +2,7 @@ import { manifest, version } from "@parcel/service-worker";
 import { RadixRouter, createRouter } from "radix3";
 const g = {
   router: null as null | RadixRouter<any>,
+  offline: false,
   broadcast(msg: any) {
     // @ts-ignore
     const c: Clients = self.clients;
@@ -22,17 +23,19 @@ addEventListener("install", (e) => (e as ExtendableEvent).waitUntil(install()));
 
 async function activate() {
   let shouldRefresh = false;
-  const keys = await caches.keys();
-  await Promise.all(
-    keys.map(async (key) => {
-      if (key !== version) {
-        await caches.delete(key);
-        shouldRefresh = true;
-      }
-    })
-  );
+  if (!g.offline) {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys.map(async (key) => {
+        if (key !== version) {
+          await caches.delete(key);
+          shouldRefresh = true;
+        }
+      })
+    );
 
-  g.broadcast({ type: "activated", shouldRefresh });
+    g.broadcast({ type: "activated", shouldRefresh, version });
+  }
 }
 addEventListener("activate", (e) =>
   (e as ExtendableEvent).waitUntil(activate())
@@ -56,19 +59,29 @@ addEventListener("fetch", async (evt) => {
       if (r) {
         return r;
       }
-      return fetch(e.request);
+
+      try {
+        g.offline = false;
+        return await fetch(e.request);
+      } catch (e) {
+        g.offline = true;
+        g.broadcast({ type: "offline" });
+        return new Response();
+      }
     })()
   );
 });
-g.broadcast({ type: "ready" });
 addEventListener("message", async (e) => {
   const type = e.data.type;
   const cache = await caches.open(version);
 
   switch (type) {
     case "add-cache":
-      if (!(await cache.match(e.data.url))) {
-        await cache.add(e.data.url);
+      {
+        const cached = await cache.match(e.data.url);
+        if (!cached) {
+          await cache.add(e.data.url);
+        }
       }
       break;
     case "define-route":

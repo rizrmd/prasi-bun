@@ -33,6 +33,7 @@ export const w = window as unknown as {
   serverurl: string;
   api: any;
   db: any;
+  offline: boolean;
 };
 
 export type Page = {

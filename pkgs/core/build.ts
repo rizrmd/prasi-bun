@@ -2,7 +2,7 @@ import { spawn } from "bun";
 import { dir } from "dir";
 import { Plugin, context } from "esbuild";
 import { $ } from "execa";
-import { removeAsync, writeAsync } from "fs-jetpack";
+import { listAsync, removeAsync, writeAsync } from "fs-jetpack";
 
 await removeAsync(dir.path("app/web/.parcel-cache"));
 await removeAsync(dir.path("app/static"));

@@ -8,6 +8,7 @@ import { ensureNotRunning } from "./utils/ensure";
 import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
+import { syncActionDefinition } from "utils/sync-def";
 
 g.status = "init";
 
@@ -16,7 +17,6 @@ g.api = {};
 g.mode = process.argv.includes("dev") ? "dev" : "prod";
 g.datadir = g.mode == "prod" ? "../data" : "data";
 g.port = parseInt(process.env.PORT || "4550");
-
 
 g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
 if (g.mode === "dev") {
@@ -31,19 +31,11 @@ if (g.db) {
     g.log.error(`[DB ERROR]\n${e.message}`);
   });
 }
-
-
+ 
+await syncActionDefinition();
 await parcelBuild();
-
 await generateAPIFrm();
 await prepareApiRoutes();
-
-// Bun.serve({
-//   port: g.port,
-//   async fetch(req, server) {
-//     return new Response("test. sabar. ya....");
-//   },
-// });
 await createServer();
 await prepareAPITypes();
 

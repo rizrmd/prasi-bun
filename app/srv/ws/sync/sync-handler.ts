@@ -1,13 +1,13 @@
-import { ServerWebSocket, WebSocketHandler } from "bun";
-import { WSData } from "../../../../pkgs/core/server/create";
-import { Packr } from "msgpackr";
 import { createId } from "@paralleldrive/cuid2";
-import { MSG_TO_SERVER } from "./type";
+import { ServerWebSocket, WebSocketHandler } from "bun";
+import { Packr } from "msgpackr";
+import { WSData } from "../../../../pkgs/core/server/create";
 const packr = new Packr({ structuredClone: true });
 
 const conns = new Map<
   string,
   {
+    user_id: string;
     ws: ServerWebSocket<WSData>;
     msg: {
       pending: Record<string, Promise<any>>;
@@ -18,21 +18,31 @@ const conns = new Map<
 const wconns = new WeakMap<ServerWebSocket<WSData>, string>();
 export const syncHandler: WebSocketHandler<WSData> = {
   open(ws) {
-    const id = createId();
-    conns.set(id, { ws, msg: { pending: {}, resolve: {} } });
-    wconns.set(ws, id);
-    ws.sendBinary(packr.pack({ type: "identify", id }));
+    const client_id = createId();
+    conns.set(client_id, {
+      user_id: "",
+      ws,
+      msg: { pending: {}, resolve: {} },
+    });
+    wconns.set(ws, client_id);
+    ws.sendBinary(packr.pack({ type: "client_id", client_id }));
+  },
+  close(ws, code, reason) {
+    const conn_id = wconns.get(ws);
+    if (conn_id) {
+      conns.delete(conn_id);
+      wconns.delete(ws);
+    }
   },
   message(ws, raw) {
     const conn_id = wconns.get(ws);
     if (conn_id) {
       const conn = conns.get(conn_id);
       if (conn) {
-        const msg = packr.unpack(Buffer.from(raw)) as MSG_TO_SERVER & {
-          msg_client_id: string;
-        };
-
-        switch (msg.action) {
+        const msg = packr.unpack(Buffer.from(raw));
+        if (msg.type === "user_id") {
+          const { user_id } = msg;
+          conn.user_id = user_id;
         }
       }
     }
