@@ -8,6 +8,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/mime-types": "^2.1.2",
     "esbuild": "^0.19.4",
+    "lmdb": "^2.8.5",
     "mime-types": "^2.1.35",
     "msgpackr": "^1.9.9",
     "radix3": "^1.1.0"

@@ -1,5 +1,6 @@
 import { component, site, page } from "dbgen";
 
+
 export const SyncActions = {
   site: {
     all: () =>
