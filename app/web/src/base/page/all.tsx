@@ -19,6 +19,8 @@ export default page({
           } else if (arr.length === 3) {
             navigate(location.pathname + "/");
           }
+        } else {
+          navigate("/editor/_/_");
         }
       } else {
         navigate("/login");
