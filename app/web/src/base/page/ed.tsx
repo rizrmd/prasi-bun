@@ -1,8 +1,7 @@
 import { page, useGlobal } from "web-utils";
-import { EditorGlobal } from "../../render/editor/logic/global";
-import { Loading } from "../../utils/ui/loading";
-import { clientStartSync } from "../../utils/sync/client";
 import { EDGlobal } from "../../render/ed/logic/global";
+import { clientStartSync } from "../../utils/sync/client";
+import { Loading } from "../../utils/ui/loading";
 
 export default page({
   url: "/ed/:site_id/:page_id",
@@ -20,9 +19,14 @@ export default page({
     if (!p.sync) {
       p.sync = clientStartSync({
         user_id: session.data.user.id,
-        events: { editor_start() {} },
+        events: {
+          editor_start(e) {
+            if (e.site_id && e.page_id) {
+              navigate(`/ed/${e.site_id}/${e.page_id}`);
+            }
+          },
+        },
       });
-
       return <Loading />;
     }
 

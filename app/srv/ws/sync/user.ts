@@ -15,6 +15,14 @@ const db = open<UserConf, string>({
 
 export const user = {
   conf: {
+    getOrCreate(user_id: string) {
+      const res = db.get(user_id);
+      if (!res) {
+        db.put(user_id, structuredClone(defaultConf));
+        return db.get(user_id);
+      }
+      return res;
+    },
     get(user_id: string) {
       return db.get(user_id);
     },
