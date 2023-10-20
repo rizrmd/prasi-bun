@@ -3,7 +3,6 @@ import { dirAsync } from "fs-jetpack";
 import { dir } from "./dir";
 import { g } from "./global";
 
-
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
   await dirAsync("app/static");

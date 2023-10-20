@@ -10,9 +10,23 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
-  if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
+  if (true || !["localhost", "127.0.0.1"].includes(location.hostname)) {
     const sw = await registerServiceWorker();
+
+    const cacheCurrentPage = () => {
+      const swc = navigator.serviceWorker.controller;
+      if (swc) {
+        [location.href, "", "/", "/ed", "/ed/_/_", "/login"].forEach((url) => {
+          swc.postMessage({
+            type: "add-cache",
+            url: url,
+          });
+        });
+      }
+    };
+    cacheCurrentPage();
     navigator.serviceWorker.addEventListener("message", (e) => {
+      cacheCurrentPage();
       if (react.root) {
         if (e.data.type === "offline") {
           w.offline = true;
@@ -100,7 +114,8 @@ const start = async () => {
                       className="bg-green-600 text-white px-4 py-2 rounded-full text-sm"
                       onClick={click}
                     >
-                      App Updated, Ready to use offline
+                      App Updated{" "}
+                      <span className="opacity-50">{e.data.version}</span>
                     </div>
                   </div>
                 </>

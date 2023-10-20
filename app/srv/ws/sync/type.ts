@@ -1,3 +1,5 @@
+import { UserConf } from "./user";
+
 export enum SyncType {
   ClientID,
   UserID,
@@ -5,3 +7,6 @@ export enum SyncType {
   Action,
   ActionResult,
 }
+export type ActionCtx = {
+  user: { id: string; conf: UserConf & { toJSON: () => UserConf } };
+};

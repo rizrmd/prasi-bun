@@ -1,5 +1,5 @@
 import { page, useGlobal } from "web-utils";
-import { EDGlobal } from "../../render/ed/logic/global";
+import { EDGlobal } from "../../render/ed/logic/ed-global";
 import { clientStartSync } from "../../utils/sync/client";
 import { Loading } from "../../utils/ui/loading";
 import { Ed } from "../../render/ed/ed";

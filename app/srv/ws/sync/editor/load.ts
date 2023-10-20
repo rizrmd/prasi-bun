@@ -1,7 +1,7 @@
 import { user } from "../user";
 
-export const loadUserConf = async (user_id: string) => {
-  const conf = user.conf.getOrCreate(user_id);
+export const loadDefaultSite = async (user_id: string) => {
+  const conf = user.conf.get(user_id);
   if (conf) {
     if (!conf.site_id) {
       const site = await db.site.findFirst({

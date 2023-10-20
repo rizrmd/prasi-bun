@@ -6,7 +6,7 @@ const defaultConf = {
   site_id: "",
   page_id: "",
 };
-type UserConf = typeof defaultConf;
+export type UserConf = typeof defaultConf;
 
 const db = open<UserConf, string>({
   name: "user-conf",
@@ -16,12 +16,12 @@ const db = open<UserConf, string>({
 export const user = {
   conf: {
     getOrCreate(user_id: string) {
-      const res = db.get(user_id);
+      let res = db.get(user_id);
       if (!res) {
         db.put(user_id, structuredClone(defaultConf));
-        return db.get(user_id);
+        res = db.get(user_id);
       }
-      return res;
+      return res as UserConf;
     },
     get(user_id: string) {
       return db.get(user_id);

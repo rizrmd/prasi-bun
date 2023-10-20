@@ -3,16 +3,18 @@ import { ServerWebSocket, WebSocketHandler } from "bun";
 import { Packr } from "msgpackr";
 import { WSData } from "../../../../pkgs/core/server/create";
 import { ClientEvent } from "../../../web/src/utils/sync/client";
-import { loadUserConf } from "./editor/load";
-import { SyncType } from "./type";
+import { loadDefaultSite } from "./editor/load";
+import { ActionCtx, SyncType } from "./type";
 import { SyncActionPaths } from "./actions-def";
 import * as actions from "./actions/index";
+import { UserConf, user } from "./user";
 const packr = new Packr({ structuredClone: true });
 
 const conns = new Map<
   string,
   {
     user_id: string;
+    conf?: UserConf & { toJSON: () => UserConf };
     ws: ServerWebSocket<WSData>;
     msg: {
       pending: Record<string, Promise<any>>;
@@ -51,18 +53,35 @@ export const syncHandler: WebSocketHandler<WSData> = {
         if (msg.type === SyncType.UserID) {
           const { user_id } = msg;
           conn.user_id = user_id;
-          const conf = await loadUserConf(user_id);
+
+          const conf = user.conf.getOrCreate(user_id);
+          if (!conf.site_id) {
+            await loadDefaultSite(user_id);
+          }
+          conn.conf = new Proxy(conf, {
+            get(_, p) {
+              const conf = user.conf.get(user_id);
+              if (p === "toJSON") return () => conf;
+              if (conf) return conf[p as keyof typeof conf];
+            },
+            set(_, p, newValue) {
+              user.conf.set(user_id, p as keyof UserConf, newValue);
+              return true;
+            },
+          }) as UserConf & { toJSON: () => UserConf };
           send(ws, {
             type: SyncType.Event,
             event: "editor_start" as ClientEvent,
-            data: conf,
+            data: conn.conf.toJSON(),
           });
         }
         if (msg.type === SyncType.Action) {
           const code = msg.code as keyof typeof SyncActionPaths;
           const actionName = SyncActionPaths[code].replace(/\./gi, "_");
           if (actionName) {
-            const action = (actions as any)[actionName];
+            const action = (actions as any)[actionName].bind({
+              user: { id: conn.user_id, conf: conn.conf },
+            } as ActionCtx);
 
             ws.sendBinary(
               packr.pack({

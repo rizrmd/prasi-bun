@@ -8,7 +8,7 @@ import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
 import { initIDB } from "./idb";
 import { SyncType } from "../../../../srv/ws/sync/type";
 import { w } from "../types/general";
-import { ESite } from "../../render/ed/logic/global";
+import { ESite } from "../../render/ed/logic/ed-global";
 const packr = new Packr({ structuredClone: true });
 const conf = {
   ws: null as null | WebSocket,

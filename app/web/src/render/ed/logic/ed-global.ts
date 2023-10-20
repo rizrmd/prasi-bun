@@ -14,6 +14,12 @@ const EmptyPage = {
 };
 
 export const EDGlobal = {
+  status: "init" as
+    | "init"
+    | "loading"
+    | "site-not-found"
+    | "page-not-found"
+    | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: EmptySite,
   page: EmptyPage,
