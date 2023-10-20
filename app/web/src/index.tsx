@@ -10,7 +10,7 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
-  if (true || !["localhost", "127.0.0.1"].includes(location.hostname)) {
+  if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
     const sw = await registerServiceWorker();
 
     const cacheCurrentPage = () => {
