@@ -1,17 +1,19 @@
 import { DeepProxy } from "@qiwi/deep-proxy";
 import { xxhash32 } from "hash-wasm";
-import { UseStore, get } from "idb-keyval";
+import { UseStore, get, set } from "idb-keyval";
 import { Packr } from "msgpackr";
 import { stringify } from "safe-stable-stringify";
 import { SyncActions } from "../../../../srv/ws/sync/actions";
 import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
 import { initIDB } from "./idb";
 import { SyncType } from "../../../../srv/ws/sync/type";
+import { w } from "../types/general";
 const packr = new Packr({ structuredClone: true });
 const conf = {
   ws: null as null | WebSocket,
   client_id: "",
   idb: null as null | UseStore,
+  event: null as null | ClientEventObject,
 };
 
 type User = {
@@ -48,7 +50,7 @@ export const clientStartSync = async (arg: {
         if (path[0] === "then") path.shift();
         return (...args: any[]) =>
           new Promise((resolve) => {
-            operation({
+            doAction({
               path: path.join("."),
               resolve,
               args,
@@ -68,52 +70,95 @@ export const clientStartSync = async (arg: {
 };
 
 const connect = (user_id: string, event: ClientEventObject) => {
-  return new Promise<WebSocket>((resolve) => {
-    if (!conf.ws) {
-      const url = new URL(location.href);
-      url.pathname = "/sync";
-      url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
+  conf.event = event;
+  if (w.offline) {
+    return new Promise<void>(async (resolve) => {
+      resolve();
+      const eventName = "editor_start";
+      const data = await loadOfflineMsg("ev", eventName);
 
-      const ws = new WebSocket(url.toString());
-      conf.ws = ws;
-      ws.onopen = () => {
-        ws.send(packr.pack({ type: SyncType.UserID, user_id }));
-      };
+      if (event[eventName]) {
+        event[eventName](data);
+      }
+    });
+  } else {
+    return new Promise<void>((resolve) => {
+      if (!conf.ws) {
+        const url = new URL(location.href);
+        url.pathname = "/sync";
+        url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
 
-      ws.onmessage = async (e) => {
-        const raw = e.data as Blob;
-        const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
-        if (msg.type === SyncType.ClientID) {
-          conf.client_id = msg.client_id;
-          resolve(ws);
-        } else if (msg.type === SyncType.Event) {
-          const eventName = msg.event as keyof ClientEventObject;
-          if (event[eventName]) {
-            event[eventName](msg.data);
+        const ws = new WebSocket(url.toString());
+
+        ws.onopen = () => {
+          ws.send(packr.pack({ type: SyncType.UserID, user_id }));
+          conf.ws = ws;
+        };
+        ws.onclose = async () => {
+          w.offline = true;
+          if (!conf.ws) {
+            await connect(user_id, event);
+            resolve();
           }
-        }
-      };
-    }
-  });
+        };
+        ws.onmessage = async (e) => {
+          const raw = e.data as Blob;
+          const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
+          if (msg.type === SyncType.ClientID) {
+            conf.client_id = msg.client_id;
+            resolve();
+          } else if (msg.type === SyncType.Event) {
+            const eventName = msg.event as ClientEvent;
+
+            if (event[eventName]) {
+              if (offlineEvents.includes(eventName)) {
+                saveOfflineMsg("ev", eventName, msg.data);
+              }
+              event[eventName](msg.data);
+            }
+          }
+        };
+      }
+    });
+  }
 };
 
-const operation = async (arg: {
+const offlineEvents: ClientEvent[] = ["editor_start"];
+const saveOfflineMsg = async (type: "ev", name: ClientEvent, data: any) => {
+  const idb = conf.idb;
+  if (idb) {
+    const hargs = await xxhash32(`${type}-${name}`);
+    await set(hargs, data, idb);
+  }
+};
+
+const loadOfflineMsg = async (type: "ev", name: ClientEvent) => {
+  const idb = conf.idb;
+  if (idb) {
+    const hargs = await xxhash32(`${type}-${name}`);
+    return await get(hargs, idb);
+  }
+};
+
+const doAction = <T>(arg: {
   path: string;
   resolve: (value: any) => void;
   args: any[];
 }) => {
-  const ws = conf.ws;
-  const idb = conf.idb;
-  if (idb) {
-    const sargs = stringify(arg.args);
-    const hargs = await xxhash32(`${arg.path}-${sargs}`);
+  return new Promise<T>(async (resolve) => {
+    const ws = conf.ws;
+    const idb = conf.idb;
+    if (idb) {
+      const sargs = stringify(arg.args);
+      const hargs = await xxhash32(`op-${arg.path}-${sargs}`);
 
-    if (ws && ws.readyState === ws.OPEN) {
-      // online
-    } else {
-      // offline
-      const cache = await get(hargs, idb);
-      console.log(cache);
+      if (w.offline || (ws && ws.readyState === ws.OPEN)) {
+        // online
+      } else {
+        // offline
+        const cache = await get(hargs, idb);
+        resolve(cache as T);
+      }
     }
-  }
+  });
 };

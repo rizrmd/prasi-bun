@@ -21,8 +21,12 @@ export default page({
         user_id: session.data.user.id,
         events: {
           editor_start(e) {
-            if (e.site_id && e.page_id) {
-              navigate(`/ed/${e.site_id}/${e.page_id}`);
+            if (params.site_id !== "_" && params.page_id !== "_") {
+              p.render();
+            } else {
+              if (e.site_id && e.page_id) {
+                navigate(`/ed/${e.site_id}/${e.page_id}`);
+              }
             }
           },
         },
