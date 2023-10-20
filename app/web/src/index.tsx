@@ -10,7 +10,7 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
-  if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
+  if (true || !["localhost", "127.0.0.1"].includes(location.hostname)) {
     const sw = await registerServiceWorker();
     navigator.serviceWorker.addEventListener("message", (e) => {
       if (react.root) {
@@ -125,9 +125,11 @@ const start = async () => {
 
   const swc = navigator.serviceWorker.controller;
   if (swc) {
-    swc.postMessage({
-      type: "add-cache",
-      url: location.href,
+    [location.href, "", "/", "/ed", "/ed/_/_", "/login"].forEach((url) => {
+      swc.postMessage({
+        type: "add-cache",
+        url: url,
+      });
     });
     if (w.prasiApi && w.prasiApi[base] && w.prasiApi[base].apiEntry) {
       const routes = Object.entries(w.prasiApi[base].apiEntry).map(

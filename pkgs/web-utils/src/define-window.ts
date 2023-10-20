@@ -84,6 +84,13 @@ export const defineWindow = async (awaitServerUrl = true) => {
 
   if (typeof window === "object") {
     window.addEventListener("popstate", () => {
+      const sw = navigator.serviceWorker.controller;
+      if (sw) {
+        sw.postMessage({
+          type: "add-cache",
+          url: location.href,
+        });
+      }
       if (w.preventPopRender) {
         w.preventPopRender = false;
         return;
