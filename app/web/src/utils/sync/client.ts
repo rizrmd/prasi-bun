@@ -8,12 +8,22 @@ import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
 import { initIDB } from "./idb";
 import { SyncType } from "../../../../srv/ws/sync/type";
 import { w } from "../types/general";
+import { ESite } from "../../render/ed/logic/global";
 const packr = new Packr({ structuredClone: true });
 const conf = {
   ws: null as null | WebSocket,
   client_id: "",
   idb: null as null | UseStore,
   event: null as null | ClientEventObject,
+};
+
+const runtime = {
+  action: {
+    pending: {} as Record<
+      string,
+      { ts: number; resolve: (value: any) => void }
+    >,
+  },
 };
 
 type User = {
@@ -32,6 +42,7 @@ export const clientStartSync = async (arg: {
       site_id?: string;
       page_id?: string;
     }) => void;
+    site_loaded: (arg: { site: ESite }) => void;
   };
 }) => {
   const { user_id, events } = arg;
@@ -47,11 +58,17 @@ export const clientStartSync = async (arg: {
 
       path.push(key);
       if (typeof value === "string") {
-        if (path[0] === "then") path.shift();
+        for (let i = 0; i < path.length; i++) {
+          if (path[i] !== "then") {
+            path.splice(0, i);
+            break;
+          }
+        }
         return (...args: any[]) =>
           new Promise((resolve) => {
             doAction({
               path: path.join("."),
+              code: value,
               resolve,
               args,
             });
@@ -75,7 +92,7 @@ const connect = (user_id: string, event: ClientEventObject) => {
     return new Promise<void>(async (resolve) => {
       resolve();
       const eventName = "editor_start";
-      const data = await loadOfflineMsg("ev", eventName);
+      const data = await loadEventOffline(eventName);
 
       if (event[eventName]) {
         event[eventName](data);
@@ -112,9 +129,19 @@ const connect = (user_id: string, event: ClientEventObject) => {
 
             if (event[eventName]) {
               if (offlineEvents.includes(eventName)) {
-                saveOfflineMsg("ev", eventName, msg.data);
+                saveEventOffline(eventName, msg.data);
               }
               event[eventName](msg.data);
+            }
+          } else if (msg.type === SyncType.ActionResult) {
+            const pending = runtime.action.pending[msg.argid];
+            if (pending) {
+              delete runtime.action.pending[msg.argid];
+              const idb = conf.idb;
+              if (idb) {
+                await set(msg.argid, msg.val, idb);
+              }
+              pending.resolve(msg.val);
             }
           }
         };
@@ -124,41 +151,46 @@ const connect = (user_id: string, event: ClientEventObject) => {
 };
 
 const offlineEvents: ClientEvent[] = ["editor_start"];
-const saveOfflineMsg = async (type: "ev", name: ClientEvent, data: any) => {
+const saveEventOffline = async (name: ClientEvent, data: any) => {
   const idb = conf.idb;
   if (idb) {
-    const hargs = await xxhash32(`${type}-${name}`);
+    const hargs = await xxhash32(`ev-${name}`);
     await set(hargs, data, idb);
   }
 };
 
-const loadOfflineMsg = async (type: "ev", name: ClientEvent) => {
+const loadEventOffline = async (name: ClientEvent) => {
   const idb = conf.idb;
   if (idb) {
-    const hargs = await xxhash32(`${type}-${name}`);
+    const hargs = await xxhash32(`ev-${name}`);
     return await get(hargs, idb);
   }
 };
 
-const doAction = <T>(arg: {
+const doAction = async <T>(arg: {
   path: string;
+  code: string;
   resolve: (value: any) => void;
   args: any[];
 }) => {
-  return new Promise<T>(async (resolve) => {
-    const ws = conf.ws;
-    const idb = conf.idb;
-    if (idb) {
-      const sargs = stringify(arg.args);
-      const hargs = await xxhash32(`op-${arg.path}-${sargs}`);
+  const { path, args, code, resolve } = arg;
+  const ws = conf.ws;
+  const idb = conf.idb;
+  if (idb) {
+    const sargs = stringify(args);
+    const argid = await xxhash32(`op-${path}-${sargs}`);
 
-      if (w.offline || (ws && ws.readyState === ws.OPEN)) {
-        // online
-      } else {
-        // offline
-        const cache = await get(hargs, idb);
-        resolve(cache as T);
-      }
+    if (ws && ws.readyState === ws.OPEN) {
+      // online
+      runtime.action.pending[argid] = {
+        ts: Date.now(),
+        resolve,
+      };
+      ws.send(packr.pack({ type: SyncType.Action, code, args, argid }));
+    } else {
+      // offline
+      const cache = await get(argid, idb);
+      resolve(cache as T);
     }
-  });
+  }
 };
