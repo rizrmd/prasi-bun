@@ -3,7 +3,7 @@ import { component, site, page } from "dbgen";
 
 export const SyncActions = {
   site: {
-    all: () =>
+    list: () =>
       ({}) as Promise<
         Record<string, { id: string; name: string; domain: string }>
       >,
@@ -11,12 +11,12 @@ export const SyncActions = {
     load: (id: string) => ({}) as Promise<site>,
   },
   comp: {
-    all: () => ({}) as Record<string, Exclude<component, "content_tree">>,
+    list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
     group: () => ({}) as Record<string, string[]>,
     doc: (id: string) => ({}) as Uint8Array,
   },
   page: {
-    all: (id_site: string) =>
+    list: (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
     load: (id: string) => ({}) as Uint8Array,
   },

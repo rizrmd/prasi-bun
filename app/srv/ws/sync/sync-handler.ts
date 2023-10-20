@@ -5,6 +5,8 @@ import { WSData } from "../../../../pkgs/core/server/create";
 import { ClientEvent } from "../../../web/src/utils/sync/client";
 import { loadUserConf } from "./editor/load";
 import { SyncType } from "./type";
+import { SyncActionPaths } from "./actions-def";
+import * as actions from "./actions/index";
 const packr = new Packr({ structuredClone: true });
 
 const conns = new Map<
@@ -55,6 +57,21 @@ export const syncHandler: WebSocketHandler<WSData> = {
             event: "editor_start" as ClientEvent,
             data: conf,
           });
+        }
+        if (msg.type === SyncType.Action) {
+          const code = msg.code as keyof typeof SyncActionPaths;
+          const actionName = SyncActionPaths[code].replace(/\./gi, "_");
+          if (actionName) {
+            const action = (actions as any)[actionName];
+
+            ws.sendBinary(
+              packr.pack({
+                type: SyncType.ActionResult,
+                argid: msg.argid,
+                val: await action(...msg.args),
+              })
+            );
+          }
         }
       }
     }
