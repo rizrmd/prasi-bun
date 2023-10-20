@@ -2,6 +2,8 @@ import { createId } from "@paralleldrive/cuid2";
 import { ServerWebSocket, WebSocketHandler } from "bun";
 import { Packr } from "msgpackr";
 import { WSData } from "../../../../pkgs/core/server/create";
+import { ClientEvent } from "../../../web/src/utils/sync/client";
+import { loadUserConf } from "./editor/load";
 import { SyncType } from "./type";
 const packr = new Packr({ structuredClone: true });
 
@@ -17,6 +19,9 @@ const conns = new Map<
   }
 >();
 const wconns = new WeakMap<ServerWebSocket<WSData>, string>();
+const send = (ws: ServerWebSocket<WSData>, msg: any) => {
+  ws.sendBinary(packr.pack(msg));
+};
 export const syncHandler: WebSocketHandler<WSData> = {
   open(ws) {
     const client_id = createId();
@@ -26,7 +31,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
       msg: { pending: {}, resolve: {} },
     });
     wconns.set(ws, client_id);
-    ws.sendBinary(packr.pack({ type: SyncType.ClientID, client_id }));
+    send(ws, { type: SyncType.ClientID, client_id });
   },
   close(ws, code, reason) {
     const conn_id = wconns.get(ws);
@@ -35,7 +40,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
       wconns.delete(ws);
     }
   },
-  message(ws, raw) {
+  async message(ws, raw) {
     const conn_id = wconns.get(ws);
     if (conn_id) {
       const conn = conns.get(conn_id);
@@ -44,6 +49,12 @@ export const syncHandler: WebSocketHandler<WSData> = {
         if (msg.type === SyncType.UserID) {
           const { user_id } = msg;
           conn.user_id = user_id;
+          const conf = await loadUserConf(user_id);
+          send(ws, {
+            type: SyncType.Event,
+            event: "editor_start" as ClientEvent,
+            data: conf,
+          });
         }
       }
     }

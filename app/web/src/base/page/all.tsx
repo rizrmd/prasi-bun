@@ -7,7 +7,10 @@ export default page({
   component: ({}) => {
     useEffect(() => {
       if (localStorage.getItem("prasi-session")) {
-        if (location.pathname.startsWith("/ed/")) {
+        if (
+          location.pathname === "/ed" ||
+          location.pathname.startsWith("/ed/")
+        ) {
           navigate("/ed/_/_");
         } else {
           navigate("/editor/_/_");

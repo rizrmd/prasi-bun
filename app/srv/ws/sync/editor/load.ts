@@ -1,7 +1,7 @@
 import { user } from "../user";
 
-export const syncEditorLoad = async (user_id: string) => {
-  const conf = user.conf.get(user_id);
+export const loadUserConf = async (user_id: string) => {
+  const conf = user.conf.getOrCreate(user_id);
   if (conf) {
     if (!conf.site_id) {
       const site = await db.site.findFirst({
@@ -11,7 +11,10 @@ export const syncEditorLoad = async (user_id: string) => {
         },
         select: { id: true },
       });
-      if (site) conf.site_id = site.id;
+      if (site) {
+        conf.site_id = site.id;
+        user.conf.set(user_id, "site_id", site.id);
+      }
     }
 
     if (conf.site_id && !conf.page_id) {
@@ -25,7 +28,9 @@ export const syncEditorLoad = async (user_id: string) => {
 
       if (page) {
         conf.page_id = page.id;
+        user.conf.set(user_id, "page_id", page.id);
       }
     }
   }
+  return conf;
 };

@@ -19,6 +19,9 @@ type User = {
   name: string;
 };
 
+export type ClientEventObject = Parameters<typeof clientStartSync>[0]["events"];
+export type ClientEvent = keyof ClientEventObject;
+
 export const clientStartSync = async (arg: {
   user_id: string;
   events: {
@@ -31,7 +34,7 @@ export const clientStartSync = async (arg: {
 }) => {
   const { user_id, events } = arg;
   conf.idb = initIDB(user_id);
-  await connect(user_id);
+  await connect(user_id, events);
   const path: any[] = [];
   return new DeepProxy(
     SyncActionDefinition,
@@ -64,7 +67,7 @@ export const clientStartSync = async (arg: {
   ) as unknown as typeof SyncActions;
 };
 
-const connect = (user_id: string) => {
+const connect = (user_id: string, event: ClientEventObject) => {
   return new Promise<WebSocket>((resolve) => {
     if (!conf.ws) {
       const url = new URL(location.href);
@@ -83,7 +86,11 @@ const connect = (user_id: string) => {
         if (msg.type === SyncType.ClientID) {
           conf.client_id = msg.client_id;
           resolve(ws);
-        } else if (msg.type === "event") {
+        } else if (msg.type === SyncType.Event) {
+          const eventName = msg.event as keyof ClientEventObject;
+          if (event[eventName]) {
+            event[eventName](msg.data);
+          }
         }
       };
     }
