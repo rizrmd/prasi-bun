@@ -6,6 +6,7 @@ import { stringify } from "safe-stable-stringify";
 import { SyncActions } from "../../../../srv/ws/sync/actions";
 import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
 import { initIDB } from "./idb";
+import { SyncType } from "../../../../srv/ws/sync/type";
 const packr = new Packr({ structuredClone: true });
 const conf = {
   ws: null as null | WebSocket,
@@ -21,7 +22,11 @@ type User = {
 export const clientStartSync = async (arg: {
   user_id: string;
   events: {
-    site_open: (arg: { site_id: string; user: User }) => void;
+    editor_start: (arg: {
+      user_id: string;
+      site_id?: string;
+      page_id?: string;
+    }) => void;
   };
 }) => {
   const { user_id, events } = arg;
@@ -69,15 +74,16 @@ const connect = (user_id: string) => {
       const ws = new WebSocket(url.toString());
       conf.ws = ws;
       ws.onopen = () => {
-        ws.send(packr.pack({ type: "user_id", user_id }));
+        ws.send(packr.pack({ type: SyncType.UserID, user_id }));
       };
 
       ws.onmessage = async (e) => {
         const raw = e.data as Blob;
         const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
-        if (msg.type === "client_id") {
+        if (msg.type === SyncType.ClientID) {
           conf.client_id = msg.client_id;
           resolve(ws);
+        } else if (msg.type === "event") {
         }
       };
     }

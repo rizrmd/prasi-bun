@@ -14,10 +14,6 @@ export const all = {
   url:  "**",
   page: () => import("./page/all"),
 };
-export const ed = {
-  url:  "/editor/**",
-  page: () => import("./page/ed"),
-};
 export const editor = {
   url:  "/editor/:site_id/:page_id",
   page: () => import("./page/editor"),
@@ -27,6 +23,6 @@ export const live = {
   page: () => import("./page/live"),
 };
 export const ned = {
-  url:  "/ned/:site_id/:page_id",
+  url:  "/ed/:site_id/:page_id",
   page: () => import("./page/ned"),
 };

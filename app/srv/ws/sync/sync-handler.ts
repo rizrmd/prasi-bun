@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { ServerWebSocket, WebSocketHandler } from "bun";
 import { Packr } from "msgpackr";
 import { WSData } from "../../../../pkgs/core/server/create";
+import { SyncType } from "./type";
 const packr = new Packr({ structuredClone: true });
 
 const conns = new Map<
@@ -25,7 +26,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
       msg: { pending: {}, resolve: {} },
     });
     wconns.set(ws, client_id);
-    ws.sendBinary(packr.pack({ type: "client_id", client_id }));
+    ws.sendBinary(packr.pack({ type: SyncType.ClientID, client_id }));
   },
   close(ws, code, reason) {
     const conn_id = wconns.get(ws);
@@ -40,7 +41,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
       const conn = conns.get(conn_id);
       if (conn) {
         const msg = packr.unpack(Buffer.from(raw));
-        if (msg.type === "user_id") {
+        if (msg.type === SyncType.UserID) {
           const { user_id } = msg;
           conn.user_id = user_id;
         }
