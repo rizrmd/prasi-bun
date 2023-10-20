@@ -12,8 +12,13 @@ export default page({
           location.pathname.startsWith("/ed/")
         ) {
           navigate("/ed/_/_");
-        } else {
-          navigate("/editor/_/_");
+        } else if (location.pathname.startsWith("/editor")) {
+          const arr = location.pathname.split("/");
+          if (arr.length <= 2) {
+            navigate("/editor/_/_");
+          } else if (arr.length === 3) {
+            navigate(location.pathname + "/");
+          }
         }
       } else {
         navigate("/login");
