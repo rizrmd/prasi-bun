@@ -81,7 +81,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
           if (actionName) {
             const baseAction = (actions as any)[actionName];
             if (!baseAction) {
-              console.log(`app/ws/edit/sync/${actionName}.ts not found}`);
+              console.log(`app/ws/edit/sync/${actionName}.ts not found`);
             }
             if (baseAction) {
               const action = baseAction.bind({

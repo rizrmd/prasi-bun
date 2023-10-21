@@ -7,7 +7,7 @@ export const SyncActionDefinition = {
   "comp": {
     "list": "3",
     "group": "4",
-    "doc": "5"
+    "load": "5"
   },
   "page": {
     "list": "6",
@@ -20,7 +20,7 @@ export const SyncActionPaths = {
   "2": "site.load",
   "3": "comp.list",
   "4": "comp.group",
-  "5": "comp.doc",
+  "5": "comp.load",
   "6": "page.list",
   "7": "page.load"
 };

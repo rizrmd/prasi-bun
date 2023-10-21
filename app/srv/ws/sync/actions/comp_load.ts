@@ -1,25 +1,21 @@
 import { syncronize } from "y-pojo";
-import { SAction } from "../actions";
-import { Y, docs } from "../entity/docs";
+import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { ActionCtx } from "../type";
 
-export const page_load: SAction["page"]["load"] = async function (
-  this: ActionCtx,
-  id: string
-) {
-  let snap = snapshot.get("page", id);
-  let ydoc = docs.page[id];
+export const comp_load = async function (this: ActionCtx, id: string) {
+  let snap = snapshot.get("comp", id);
+  let ydoc = docs.comp[id];
 
   if (!snap || !ydoc) {
-    const page = await db.page.findFirst({ where: { id } });
-    if (page) {
+    const comp = await db.component.findFirst({ where: { id } });
+    if (comp) {
       const doc = new Y.Doc();
       let root = doc.getMap("map");
-      syncronize(root, { id, root: page.content_tree });
+      syncronize(root, { id, item: comp.content_tree });
 
       const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
-      docs.page[id] = {
+      docs.comp[id] = {
         doc: doc as any,
         id,
         um,
@@ -29,16 +25,15 @@ export const page_load: SAction["page"]["load"] = async function (
       snapshot.set({
         bin,
         id,
-        type: "page",
-        name: page.name,
+        type: "comp",
+        name: comp.name,
+        url: "",
         ts: Date.now(),
-        url: page.url,
       });
 
       return {
         id: id,
-        url: page.url,
-        name: page.name,
+        name: comp.name,
         snapshot: bin,
       };
     }
@@ -47,7 +42,6 @@ export const page_load: SAction["page"]["load"] = async function (
   if (snap) {
     return {
       id: snap.id,
-      url: snap.url,
       name: snap.name,
       snapshot: snap.bin,
     };

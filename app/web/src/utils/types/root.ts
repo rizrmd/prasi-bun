@@ -1,5 +1,6 @@
 import { TypedArray, TypedDoc, TypedMap } from "yjs-types";
 import { ISection } from "./section";
+import { MItem } from "./item";
 
 export type IRoot = {
   id: "root";
@@ -14,3 +15,4 @@ export type MRoot = TypedMap<{
 }>;
 
 export type DPage = TypedDoc<{ map: TypedMap<{ id: string; root: MRoot }> }>;
+export type DComp = TypedDoc<{ map: TypedMap<{ id: string; item: MItem }> }>;

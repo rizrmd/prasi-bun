@@ -16,7 +16,7 @@ export const edRoute = async (p: PG) => {
       p.site = site;
     }
 
-    if (p.page.current.id !== params.page_id || !p.page.current.snapshot) {
+    if (p.page.cur.id !== params.page_id || !p.page.cur.snapshot) {
       p.status = "loading";
       const page = await p.sync.page.load(params.page_id);
 
@@ -26,7 +26,7 @@ export const edRoute = async (p: PG) => {
         return;
       }
 
-      p.page.current = page;
+      p.page.cur = page;
       if (page.snapshot) {
         const doc = new Y.Doc();
         Y.applyUpdate(doc, page.snapshot);
