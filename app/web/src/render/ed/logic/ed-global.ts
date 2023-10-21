@@ -2,9 +2,8 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { clientStartSync } from "../../../utils/sync/client";
 import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
-import { DPage, IRoot } from "../../../utils/types/root";
+import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { IText, MText } from "../../../utils/types/text";
-import { NodeMeta } from "../../editor/logic/global";
 
 const EmptySite = {
   id: "",
@@ -16,6 +15,7 @@ const EmptySite = {
 };
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
+export type EComp = typeof EmptyComp;
 
 const EmptyPage = {
   id: "",
@@ -24,9 +24,18 @@ const EmptyPage = {
   snapshot: null as null | Uint8Array,
 };
 
+const EmptyComp = {
+  id: "",
+  snapshot: null as null | Uint8Array,
+};
+
 export type EdMeta = {
   item: IItem | IText;
   mitem?: MItem | MText;
+  parent_comp?: {
+    ref_ids: Record<string, string>;
+    mcomp: MItem;
+  };
 };
 
 export const EDGlobal = {
@@ -39,12 +48,19 @@ export const EDGlobal = {
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: EmptySite,
   page: {
-    current: EmptyPage,
+    cur: EmptyPage,
     doc: null as null | DPage,
     root: null as null | IRoot,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
     meta: {} as Record<string, { item: IContent; mitem?: MContent }>,
+    list: {} as Record<string, EPage>,
+  },
+  comp: {
+    cur: EmptyComp,
+    doc: null as null | DComp,
+    item: null as null | IItem,
+    list: {} as Record<string, { cur: EComp; doc: DComp }>,
   },
 };
 

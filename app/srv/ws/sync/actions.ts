@@ -1,5 +1,5 @@
 import { component, page } from "dbgen";
-import { EPage, ESite } from "../../../web/src/render/ed/logic/ed-global";
+import { EComp, EPage, ESite } from "../../../web/src/render/ed/logic/ed-global";
 
 /* 
    WARNING:
@@ -20,7 +20,7 @@ export const SyncActions = {
   comp: {
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
     group: () => ({}) as Record<string, string[]>,
-    doc: (id: string) => ({}) as Uint8Array,
+    load: async (id: string) => ({}) as EComp | void,
   },
   page: {
     list: (id_site: string) =>

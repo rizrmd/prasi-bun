@@ -8,7 +8,7 @@ const emptySnapshot = {
   bin: new Uint8Array(),
   url: "",
   name: "",
-  ts: Date.now(),
+  ts: Date.now()
 };
 export type DocSnapshot = typeof emptySnapshot;
 
