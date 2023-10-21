@@ -66,8 +66,8 @@ const Renaming: FC<{
         const target = e.currentTarget;
         let position = target.selectionStart;
         if (shouldReplace) {
-          local.newname = local.newname.replace("<=", "⇦");
-          local.newname = local.newname.replace("=>", "⇨");
+          local.newname = local.newname.replace("<=", "⬅");
+          local.newname = local.newname.replace("=>", "⮕");
         }
         local.render();
         setTimeout(() => {

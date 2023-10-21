@@ -20,12 +20,13 @@ export const treeRebuild = async (p: PG) => {
     p.page.tree = [];
     p.page.meta = {};
 
+    const portal = {};
     const sections = root.get("childs");
     if (sections) {
       await Promise.all(
         sections.map(async (e) => {
           p.page.entry.push(e.get("id"));
-          await walkMap(p, { mitem: e, tree_parent_id: "root" });
+          await walkMap(p, { mitem: e, tree_parent_id: "root", portal });
         })
       );
       console.log(p.page);
@@ -53,6 +54,7 @@ const walkMap = async (
   p: PG,
   arg: {
     mitem: MItem | MSection;
+    portal: Record<string, EdMeta>;
     tree_parent_id: string;
     parent_comp?: EdMeta["parent_comp"];
     skip_add_tree?: boolean;
@@ -122,6 +124,7 @@ const walkMap = async (
                       mitem: mcontent,
                       tree_parent_id: item.id,
                       parent_comp: { ref_ids, mcomp },
+                      portal: arg.portal,
                     });
                   }
                 }
@@ -137,6 +140,7 @@ const walkMap = async (
               tree_parent_id: item.id,
               parent_comp: { ref_ids, mcomp },
               skip_add_tree: true,
+              portal: arg.portal,
             });
           }) || []
         );
@@ -155,6 +159,15 @@ const walkMap = async (
     parent_comp,
   };
 
+  if (!item_comp) {
+    if (item.name.startsWith("⬅")) {
+      arg.portal[item.name] = meta;
+    }
+    if (item.name.startsWith("⮕")) {
+      arg.portal[item.name] = meta;
+    }
+  }
+
   p.page.meta[item.id] = meta;
 
   if (!arg.skip_add_tree) {
@@ -171,7 +184,11 @@ const walkMap = async (
     await Promise.all(
       mchilds.map(async (e, k) => {
         item.childs.push(e.get("id"));
-        await walkMap(p, { mitem: e, tree_parent_id: item.id });
+        await walkMap(p, {
+          mitem: e,
+          tree_parent_id: item.id,
+          portal: arg.portal,
+        });
       }) || []
     );
   }
