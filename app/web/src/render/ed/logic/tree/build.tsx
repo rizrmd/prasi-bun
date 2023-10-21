@@ -4,6 +4,14 @@ import { IItem, MItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
+import {
+  FMCompDef,
+  FMComponent,
+  FNCompDef,
+  FNComponent,
+} from "../../../../utils/types/meta-fn";
+import { syncronize } from "y-pojo";
+import { TypedMap } from "yjs-types";
 
 export const treeRebuild = async (p: PG) => {
   const root = p.page.doc?.getMap("map").get("root");
@@ -47,6 +55,7 @@ const walkMap = async (
     mitem: MItem | MSection;
     tree_parent_id: string;
     parent_comp?: EdMeta["parent_comp"];
+    skip_add_tree?: boolean;
   }
 ) => {
   const { mitem, tree_parent_id, parent_comp } = arg;
@@ -66,28 +75,19 @@ const walkMap = async (
   }
 
   const metaNotFound = () => {
-    p.page.tree.push({
-      id: item.id,
-      parent: tree_parent_id,
-      text: item.name,
-    });
+    if (!arg.skip_add_tree) {
+      p.page.tree.push({
+        id: item.id,
+        parent: tree_parent_id,
+        text: item.name,
+      });
+    }
   };
 
   const item_comp = item.component;
   if (item_comp && item_comp.id) {
     if (!p.comp.list[item_comp.id]) {
-      let found = false;
-      const cur = await p.sync.comp.load(item_comp.id);
-      if (cur && cur.snapshot) {
-        const doc = new Y.Doc() as DComp;
-        if (cur.snapshot) {
-          Y.applyUpdate(doc as any, cur.snapshot);
-          p.comp.list[item_comp.id] = { cur, doc };
-          found = true;
-        }
-      }
-
-      if (!found) {
+      if (!(await loadComponent(p, item_comp))) {
         metaNotFound();
         return;
       }
@@ -99,15 +99,35 @@ const walkMap = async (
       if (mcomp) {
         const ref_ids: Record<string, string> = {};
 
-        if (parent_comp) {
-          let old_id = item.id;
-          mapItem(mcomp, item);
-          ref_ids[item.id] = old_id;
-          item.id = old_id;
-        } else {
-          mapItem(mcomp, item);
-          ref_ids[item.id] = createId();
-          item.id = ref_ids[item.id];
+        mapItemComp({ parent_comp, item, mcomp, ref_ids });
+
+        const mprops = mcomp.get("component")?.get("props")?.toJSON() as Record<
+          string,
+          FNCompDef
+        >;
+
+        if (mprops) {
+          const mitem_comp = mitem.get("component");
+          if (mitem_comp) {
+            const mitem_props = ensureMItemProps(mitem_comp, item_comp);
+            if (mitem_props) {
+              for (const [k, v] of Object.entries(mprops)) {
+                const mprop = ensureMProp(mitem_props, k, v);
+                item_comp.props[k] = v;
+
+                if (mprop && v.meta?.type === "content-element") {
+                  const mcontent = createPropContent(mprop, k);
+                  if (mcontent) {
+                    walkMap(p, {
+                      mitem: mcontent,
+                      tree_parent_id: item.id,
+                      parent_comp: { ref_ids, mcomp },
+                    });
+                  }
+                }
+              }
+            }
+          }
         }
 
         await Promise.all(
@@ -116,6 +136,7 @@ const walkMap = async (
               mitem: e,
               tree_parent_id: item.id,
               parent_comp: { ref_ids, mcomp },
+              skip_add_tree: true,
             });
           }) || []
         );
@@ -136,12 +157,14 @@ const walkMap = async (
 
   p.page.meta[item.id] = meta;
 
-  p.page.tree.push({
-    id: item.id,
-    parent: tree_parent_id,
-    text: item.name,
-    data: meta,
-  });
+  if (!arg.skip_add_tree) {
+    p.page.tree.push({
+      id: item.id,
+      parent: tree_parent_id,
+      text: item.name,
+      data: meta,
+    });
+  }
 
   const mchilds = mitem.get("childs");
   if (mchilds) {
@@ -151,5 +174,85 @@ const walkMap = async (
         await walkMap(p, { mitem: e, tree_parent_id: item.id });
       }) || []
     );
+  }
+};
+
+const loadComponent = async (p: PG, item_comp: FNComponent) => {
+  let found = false;
+  const cur = await p.sync.comp.load(item_comp.id);
+  if (cur && cur.snapshot) {
+    const doc = new Y.Doc() as DComp;
+    if (cur.snapshot) {
+      Y.applyUpdate(doc as any, cur.snapshot);
+      p.comp.list[item_comp.id] = { cur, doc };
+      found = true;
+    }
+  }
+  return false;
+};
+
+const createPropContent = (mprop: FMCompDef, k: string) => {
+  let mcontent = mprop.get("content");
+  if (!mcontent) {
+    const newcontent = new Y.Map();
+    syncronize(newcontent, {
+      id: createId(),
+      name: k,
+      type: "item",
+      dim: { w: "full", h: "full" },
+      childs: [],
+      adv: {
+        css: "",
+      },
+    });
+    mprop.set("content", newcontent as MItem);
+    mcontent = mprop.get("content");
+  }
+  return mcontent;
+};
+
+const ensureMProp = (
+  mitem_props: TypedMap<Record<string, FMCompDef>>,
+  k: string,
+  v: FNCompDef
+) => {
+  let mprop = mitem_props.get(k);
+  if (!mprop) {
+    const newprop = new Y.Map();
+    syncronize(newprop, v);
+    mitem_props.set(k, newprop as FMCompDef);
+    mprop = mitem_props.get(k);
+  }
+  return mprop;
+};
+
+const ensureMItemProps = (mitem_comp: FMComponent, item_comp: FNComponent) => {
+  let mitem_props = mitem_comp.get("props");
+  if (!mitem_props) {
+    mitem_comp.set("props", new Y.Map() as any);
+    mitem_props = mitem_comp.get("props");
+  }
+  if (!item_comp.props) {
+    item_comp.props = {};
+  }
+  return mitem_props;
+};
+
+const mapItemComp = (arg: {
+  parent_comp: EdMeta["parent_comp"];
+  mcomp: MItem;
+  item: IItem;
+  ref_ids: Record<string, string>;
+}) => {
+  const { parent_comp, mcomp, item, ref_ids } = arg;
+  if (parent_comp) {
+    let old_id = item.id;
+    mapItem(mcomp, item);
+    ref_ids[item.id] = old_id;
+    item.id = old_id;
+  } else {
+    mapItem(mcomp, item);
+    ref_ids[item.id] = createId();
+    item.id = ref_ids[item.id];
   }
 };
