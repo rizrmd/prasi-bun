@@ -4,6 +4,7 @@ import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { IText, MText } from "../../../utils/types/text";
+import { FNCompDef } from "../../../utils/types/meta-fn";
 
 const EmptySite = {
   id: "",
