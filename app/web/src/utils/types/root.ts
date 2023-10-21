@@ -1,4 +1,4 @@
-import { TypedArray, TypedMap } from "yjs-types";
+import { TypedArray, TypedDoc, TypedMap } from "yjs-types";
 import { ISection } from "./section";
 
 export type IRoot = {
@@ -12,3 +12,5 @@ export type MRoot = TypedMap<{
   type: "root";
   childs: TypedArray<ISection>;
 }>;
+
+export type DPage = TypedDoc<{ map: TypedMap<{ id: string; root: MRoot }> }>;

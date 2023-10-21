@@ -1,4 +1,4 @@
-import { UserConf } from "./user";
+import { UserConf } from "./entity/user";
 
 export enum SyncType {
   ClientID,

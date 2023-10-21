@@ -1,4 +1,6 @@
 import { clientStartSync } from "../../../utils/sync/client";
+import { IItem } from "../../../utils/types/item";
+import { DPage, IRoot } from "../../../utils/types/root";
 
 const EmptySite = {
   id: "",
@@ -9,8 +11,13 @@ const EmptySite = {
   config: { api_url: "" },
 };
 export type ESite = typeof EmptySite;
+export type EPage = typeof EmptyPage;
+
 const EmptyPage = {
   id: "",
+  name: "",
+  url: "",
+  snapshot: null as null | Uint8Array,
 };
 
 export const EDGlobal = {
@@ -22,7 +29,11 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: EmptySite,
-  page: EmptyPage,
+  page: {
+    current: EmptyPage,
+    doc: null as null | DPage,
+    root: null as null | IRoot,
+  },
 };
 
 export type PG = typeof EDGlobal & { render: () => void };

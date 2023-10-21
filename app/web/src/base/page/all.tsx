@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { page, useGlobal } from "web-utils";
-import { Loading } from "../../utils/ui/loading";
-import { bootEd } from "../../render/ed/ed";
 import { EDGlobal } from "../../render/ed/logic/ed-global";
+import { edInitSync } from "../../render/ed/logic/ed-sync";
+import { Loading } from "../../utils/ui/loading";
 
 export default page({
   url: "**",
@@ -14,7 +14,7 @@ export default page({
           location.pathname === "/ed" ||
           location.pathname.startsWith("/ed/")
         ) {
-          bootEd(p);
+          edInitSync(p);
         } else if (location.pathname.startsWith("/editor")) {
           const arr = location.pathname.split("/");
           if (arr.length <= 2) {

@@ -9,7 +9,8 @@ import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
 import { syncActionDefinition } from "utils/sync-def";
-import { user } from "../../app/srv/ws/sync/user";
+import { user } from "../../app/srv/ws/sync/entity/user";
+import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
 
 g.status = "init";
 
@@ -24,7 +25,10 @@ if (g.mode === "dev") {
   await startDevWatcher();
 }
 
+/** init lmdb */
 user.conf.init();
+snapshot.init();
+
 await preparePrisma();
 await ensureNotRunning();
 
@@ -37,8 +41,8 @@ if (g.db) {
 await syncActionDefinition();
 await generateAPIFrm();
 await prepareApiRoutes();
-await createServer();
 await prepareAPITypes();
 await parcelBuild();
+await createServer();
 
 g.status = "ready";

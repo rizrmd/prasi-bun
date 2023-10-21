@@ -16,13 +16,11 @@ export const user = {
         name: "user-conf",
         path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
       });
+      return this._db;
     },
     get db() {
       if (!this._db) {
-        this._db = open<UserConf, string>({
-          name: "user-conf",
-          path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
-        });
+        this._db = this.init();
       }
       return this._db;
     },

@@ -1,4 +1,4 @@
-import { user } from "../user";
+import { user } from "../entity/user";
 
 export const loadDefaultSite = async (user_id: string) => {
   const conf = user.conf.get(user_id);

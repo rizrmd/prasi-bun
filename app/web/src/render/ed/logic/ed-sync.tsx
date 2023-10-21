@@ -1,28 +1,8 @@
-import { useGlobal } from "web-utils";
-import { Loading } from "../../utils/ui/loading";
-import { EDGlobal, PG } from "./logic/ed-global";
-import { edRoute } from "./logic/ed-route";
-import { clientStartSync } from "../../utils/sync/client";
+import { clientStartSync } from "../../../utils/sync/client";
+import { Loading } from "../../../utils/ui/loading";
+import { PG } from "./ed-global";
 
-export const Ed = () => {
-  const p = useGlobal(EDGlobal, "EDITOR");
-
-  edRoute(p);
-
-  if (p.status === "loading") {
-    return <Loading />;
-  }
-  if (p.status === "site-not-found" || p.status === "page-not-found") {
-    return (
-      <div className="flex fixed inset-0 items-center justify-center">
-        {p.status === "site-not-found" ? "Site not found" : "Page not found"}
-      </div>
-    );
-  }
-  return <div>asfa</div>;
-};
-
-export const bootEd = (p: PG) => {
+export const edInitSync = (p: PG) => {
   const session = JSON.parse(
     localStorage.getItem("prasi-session") || "null"
   ) as { data: { user: { id: string } } };

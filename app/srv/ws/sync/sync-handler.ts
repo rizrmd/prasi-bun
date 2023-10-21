@@ -7,7 +7,7 @@ import { loadDefaultSite } from "./editor/load";
 import { ActionCtx, SyncType } from "./type";
 import { SyncActionPaths } from "./actions-def";
 import * as actions from "./actions/index";
-import { UserConf, user } from "./user";
+import { UserConf, user } from "./entity/user";
 const packr = new Packr({ structuredClone: true });
 
 const conns = new Map<
@@ -79,17 +79,23 @@ export const syncHandler: WebSocketHandler<WSData> = {
           const code = msg.code as keyof typeof SyncActionPaths;
           const actionName = SyncActionPaths[code].replace(/\./gi, "_");
           if (actionName) {
-            const action = (actions as any)[actionName].bind({
-              user: { id: conn.user_id, conf: conn.conf },
-            } as ActionCtx);
+            const baseAction = (actions as any)[actionName];
+            if (!baseAction) {
+              console.log(`app/ws/edit/sync/${actionName}.ts not found}`);
+            }
+            if (baseAction) {
+              const action = baseAction.bind({
+                user: { id: conn.user_id, conf: conn.conf },
+              } as ActionCtx);
 
-            ws.sendBinary(
-              packr.pack({
-                type: SyncType.ActionResult,
-                argid: msg.argid,
-                val: await action(...msg.args),
-              })
-            );
+              ws.sendBinary(
+                packr.pack({
+                  type: SyncType.ActionResult,
+                  argid: msg.argid,
+                  val: await action(...msg.args),
+                })
+              );
+            }
           }
         }
       }

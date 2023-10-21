@@ -32,7 +32,6 @@ export const svLocal = async (ws: any, msg: WS_MSG_SV_LOCAL) => {
   if (doc) {
     const diff_remote = Y.encodeStateAsUpdate(doc, changes);
     const sv_remote = Y.encodeStateVector(doc);
-
     const sendmsg: WS_MSG_SVDIFF_REMOTE = {
       diff_remote: diff_remote.toString(),
       sv_remote: sv_remote.toString(),

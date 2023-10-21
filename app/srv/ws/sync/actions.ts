@@ -1,5 +1,5 @@
-import { component, site, page } from "dbgen";
-import { ESite } from "../../../web/src/render/ed/logic/ed-global";
+import { component, page } from "dbgen";
+import { EPage, ESite } from "../../../web/src/render/ed/logic/ed-global";
 
 /* 
    WARNING:
@@ -15,7 +15,7 @@ export const SyncActions = {
     list: async () =>
       ({}) as Record<string, { id: string; name: string; domain: string }>,
     group: async () => ({}) as Record<string, string[]>,
-    load: async (id: string) => ({}) as ESite | undefined,
+    load: async (id: string) => ({}) as ESite | void,
   },
   comp: {
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
@@ -25,6 +25,6 @@ export const SyncActions = {
   page: {
     list: (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
-    load: (id: string) => ({}) as Uint8Array,
+    load: async (id: string) => ({}) as EPage | void,
   },
 };
