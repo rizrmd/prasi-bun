@@ -11,6 +11,12 @@ export type UserConf = typeof defaultConf;
 export const user = {
   conf: {
     _db: null as null | RootDatabase<UserConf>,
+    init() {
+      this._db = open<UserConf, string>({
+        name: "user-conf",
+        path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
+      });
+    },
     get db() {
       if (!this._db) {
         this._db = open<UserConf, string>({

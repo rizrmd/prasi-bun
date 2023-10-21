@@ -1,17 +1,20 @@
 import { useEffect } from "react";
-import { page } from "web-utils";
+import { page, useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
+import { bootEd } from "../../render/ed/ed";
+import { EDGlobal } from "../../render/ed/logic/ed-global";
 
 export default page({
   url: "**",
   component: ({}) => {
+    const p = useGlobal(EDGlobal, "EDITOR");
     useEffect(() => {
       if (localStorage.getItem("prasi-session")) {
         if (
           location.pathname === "/ed" ||
           location.pathname.startsWith("/ed/")
         ) {
-          navigate("/ed/_/_");
+          bootEd(p);
         } else if (location.pathname.startsWith("/editor")) {
           const arr = location.pathname.split("/");
           if (arr.length <= 2) {

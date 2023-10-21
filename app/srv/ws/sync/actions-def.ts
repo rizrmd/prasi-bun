@@ -23,4 +23,4 @@ export const SyncActionPaths = {
   "5": "comp.doc",
   "6": "page.list",
   "7": "page.load"
-};    
+};
