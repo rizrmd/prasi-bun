@@ -1,7 +1,8 @@
+import { IRoot } from "../../../utils/types/root";
 import { PG } from "./ed-global";
-
+import { produce } from "immer";
 export const edRoute = async (p: PG) => {
-  if (p.status === "init") {
+  if (p.status === "ready") {
     if (!p.site.domain && !p.site.name) {
       p.status = "loading";
       const site = await p.sync.site.load(p.site.id);
@@ -14,8 +15,31 @@ export const edRoute = async (p: PG) => {
       p.site = site;
     }
 
-    if (p.site) {
-      console.log(p.site);
+    if (p.page.current.id !== params.page_id || !p.page.current.snapshot) {
+      p.status = "loading";
+      const page = await p.sync.page.load(params.page_id);
+
+      if (!page) {
+        p.status = "page-not-found";
+        p.render();
+        return;
+      }
+
+      p.page.current = page;
+      if (page.snapshot) {
+        const doc = new Y.Doc();
+        Y.applyUpdate(doc, page.snapshot);
+        p.page.doc = doc as any;
+
+        if (p.page.doc) {
+          const root = p.page.doc.getMap("map").get("root")?.toJSON() as IRoot;
+          if (root) {
+            p.page.root = produce(root, () => {});
+          }
+        }
+      }
+      p.status = "ready";
+      p.render();
     }
   }
 };

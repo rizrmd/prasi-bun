@@ -22,6 +22,7 @@
     "esbuild-wasm": "^0.19.4",
     "hash-wasm": "^4.10.0",
     "idb-keyval": "^6.2.1",
+    "immer": "^10.0.3",
     "js-base64": "^3.7.5",
     "lodash.capitalize": "^4.2.1",
     "lodash.concat": "^4.5.0",

@@ -4,7 +4,10 @@ import { UseStore, get, set } from "idb-keyval";
 import { Packr } from "msgpackr";
 import { stringify } from "safe-stable-stringify";
 import { SyncActions } from "../../../../srv/ws/sync/actions";
-import { SyncActionDefinition } from "../../../../srv/ws/sync/actions-def";
+import {
+  SyncActionDefinition,
+  SyncActionPaths,
+} from "../../../../srv/ws/sync/actions-def";
 import { initIDB } from "./idb";
 import { SyncType } from "../../../../srv/ws/sync/type";
 import { w } from "../types/general";
@@ -48,31 +51,23 @@ export const clientStartSync = async (arg: {
   const { user_id, events } = arg;
   conf.idb = initIDB(user_id);
   await connect(user_id, events);
-  const path: any[] = [];
   return new DeepProxy(
     SyncActionDefinition,
-    ({ trapName, value, key, DEFAULT, PROXY }) => {
+    ({ target, trapName, value, key, DEFAULT, PROXY }) => {
       if (trapName === "set") {
         throw new TypeError("target is immutable");
       }
 
-      path.push(key);
       if (typeof value === "string") {
-        for (let i = 0; i < path.length; i++) {
-          if (path[i] !== "then") {
-            path.splice(0, i);
-            break;
-          }
-        }
-        return (...args: any[]) =>
-          new Promise((resolve) => {
+        return (...args: any[]) => {
+          return new Promise((resolve) => {
             doAction({
-              path: path.join("."),
               code: value,
               resolve,
               args,
             });
           });
+        };
       }
 
       if (trapName === "get") {
@@ -168,16 +163,16 @@ const loadEventOffline = async (name: ClientEvent) => {
 };
 
 const doAction = async <T>(arg: {
-  path: string;
   code: string;
   resolve: (value: any) => void;
   args: any[];
 }) => {
-  const { path, args, code, resolve } = arg;
+  const { args, code, resolve } = arg;
   const ws = conf.ws;
   const idb = conf.idb;
   if (idb) {
     const sargs = stringify(args);
+    const path = (SyncActionPaths as any)[code];
     const argid = await xxhash32(`op-${path}-${sargs}`);
 
     if (ws && ws.readyState === ws.OPEN) {
@@ -186,6 +181,7 @@ const doAction = async <T>(arg: {
         ts: Date.now(),
         resolve,
       };
+
       ws.send(packr.pack({ type: SyncType.Action, code, args, argid }));
     } else {
       // offline

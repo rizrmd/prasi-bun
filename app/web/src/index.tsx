@@ -4,6 +4,9 @@ import { Root } from "./base/root";
 import "./index.css";
 import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
+import * as Y from "yjs";
+
+(window as any).Y = Y;
 
 const start = async () => {
   const base = `${location.protocol}//${location.host}`;
