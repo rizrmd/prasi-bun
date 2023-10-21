@@ -61,7 +61,21 @@ const Renaming: FC<{
       spellCheck={false}
       onChange={(e) => {
         local.newname = e.currentTarget.value;
+        let shouldReplace =
+          local.newname.includes("=>") || local.newname.includes("<=");
+        const target = e.currentTarget;
+        let position = target.selectionStart;
+        if (shouldReplace) {
+          local.newname = local.newname.replace("<=", "⇦");
+          local.newname = local.newname.replace("=>", "⇨");
+        }
         local.render();
+        setTimeout(() => {
+          if (position && shouldReplace) target.selectionEnd = position - 1;
+        });
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
       }}
       onFocus={(e) => {
         e.currentTarget.select();
@@ -71,32 +85,36 @@ const Renaming: FC<{
           e.currentTarget.blur();
         }
       }}
-      onBlur={() => {
-        doneRenaming();
-        if (isComponent) {
-          const comp = item.get("component");
-          if (comp) comp.set("name", local.newname);
-        } else {
-          item.set("name", local.newname);
-        }
+      onBlur={(e) => {
+        setTimeout(() => {
+          if (document.activeElement !== e.currentTarget) {
+            doneRenaming();
+            if (isComponent) {
+              const comp = item.get("component");
+              if (comp) comp.set("name", local.newname);
+            } else {
+              item.set("name", local.newname);
+            }
 
-        if (isRootComponent && rootComponentID) {
-          const doc = p.comps.doc[rootComponentID];
-          if (doc) {
-            doc.transact(() => {
-              const comp = doc.getMap("map");
-              comp.set("name", local.newname);
-              const ctree = comp.get("content_tree");
-              if (ctree) {
-                ctree.set("name", local.newname);
-                const ccomp = ctree.get("component");
-                if (ccomp) {
-                  ccomp.set("name", local.newname);
-                }
+            if (isRootComponent && rootComponentID) {
+              const doc = p.comps.doc[rootComponentID];
+              if (doc) {
+                doc.transact(() => {
+                  const comp = doc.getMap("map");
+                  comp.set("name", local.newname);
+                  const ctree = comp.get("content_tree");
+                  if (ctree) {
+                    ctree.set("name", local.newname);
+                    const ccomp = ctree.get("component");
+                    if (ccomp) {
+                      ccomp.set("name", local.newname);
+                    }
+                  }
+                });
               }
-            });
+            }
           }
-        }
+        }, 100);
       }}
       autoFocus
     />
