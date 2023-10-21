@@ -13,6 +13,9 @@ import { SyncType } from "../../../../srv/ws/sync/type";
 import { w } from "../types/general";
 import { ESite } from "../../render/ed/logic/ed-global";
 const packr = new Packr({ structuredClone: true });
+
+const WS_DEBUG = false;
+
 const conf = {
   ws: null as null | WebSocket,
   client_id: "",
@@ -36,6 +39,11 @@ type User = {
 
 export type ClientEventObject = Parameters<typeof clientStartSync>[0]["events"];
 export type ClientEvent = keyof ClientEventObject;
+
+const sendWs = (ws: WebSocket, msg: any) => {
+  if (WS_DEBUG) console.log(`%c⬆`, "color:blue", msg);
+  ws.send(packr.pack(msg));
+};
 
 export const clientStartSync = async (arg: {
   user_id: string;
@@ -103,7 +111,7 @@ const connect = (user_id: string, event: ClientEventObject) => {
         const ws = new WebSocket(url.toString());
 
         ws.onopen = () => {
-          ws.send(packr.pack({ type: SyncType.UserID, user_id }));
+          sendWs(ws, { type: SyncType.UserID, user_id });
           conf.ws = ws;
         };
         ws.onclose = async () => {
@@ -116,6 +124,8 @@ const connect = (user_id: string, event: ClientEventObject) => {
         ws.onmessage = async (e) => {
           const raw = e.data as Blob;
           const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
+          if (WS_DEBUG) console.log(`%c⬇`, `color:red`, msg);
+
           if (msg.type === SyncType.ClientID) {
             conf.client_id = msg.client_id;
             resolve();
@@ -182,7 +192,7 @@ const doAction = async <T>(arg: {
         resolve,
       };
 
-      ws.send(packr.pack({ type: SyncType.Action, code, args, argid }));
+      sendWs(ws, { type: SyncType.Action, code, args, argid });
     } else {
       // offline
       const cache = await get(argid, idb);
