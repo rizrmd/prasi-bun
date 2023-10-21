@@ -1,6 +1,7 @@
 import { IRoot } from "../../../utils/types/root";
 import { PG } from "./ed-global";
 import { produce } from "immer";
+import { treeRebuild } from "./tree/build";
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {
     if (!p.site.domain && !p.site.name) {
@@ -32,10 +33,7 @@ export const edRoute = async (p: PG) => {
         p.page.doc = doc as any;
 
         if (p.page.doc) {
-          const root = p.page.doc.getMap("map").get("root")?.toJSON() as IRoot;
-          if (root) {
-            p.page.root = produce(root, () => {});
-          }
+          treeRebuild(p);
         }
       }
       p.status = "ready";
