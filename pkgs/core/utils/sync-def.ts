@@ -1,6 +1,6 @@
 import { dir } from "dir";
 import { SyncActions } from "../../../app/srv/ws/sync/actions";
-import { writeAsync } from "fs-jetpack";
+import { readAsync, writeAsync } from "fs-jetpack";
 
 export const syncActionDefinition = async () => {
   const def: any = {};
@@ -22,10 +22,13 @@ export const syncActionDefinition = async () => {
   };
   walk(SyncActions, def, []);
 
-  await writeAsync(
-    dir.path("app/srv/ws/sync/actions-def.ts"),
-    `\
+  const content = `\
 export const SyncActionDefinition = ${JSON.stringify(def, null, 2)};
-export const SyncActionPaths = ${JSON.stringify(paths, null, 2)};    `
-  );
+export const SyncActionPaths = ${JSON.stringify(paths, null, 2)};
+`;
+
+  const path = dir.path("app/srv/ws/sync/actions-def.ts");
+  if ((await readAsync(path)) !== content) {
+    await writeAsync(path, content);
+  }
 };

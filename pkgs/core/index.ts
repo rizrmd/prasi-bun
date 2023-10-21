@@ -9,6 +9,7 @@ import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
 import { syncActionDefinition } from "utils/sync-def";
+import { user } from "../../app/srv/ws/sync/user";
 
 g.status = "init";
 
@@ -23,6 +24,7 @@ if (g.mode === "dev") {
   await startDevWatcher();
 }
 
+user.conf.init();
 await preparePrisma();
 await ensureNotRunning();
 
@@ -33,10 +35,10 @@ if (g.db) {
 }
 
 await syncActionDefinition();
-await parcelBuild();
 await generateAPIFrm();
 await prepareApiRoutes();
 await createServer();
 await prepareAPITypes();
+await parcelBuild();
 
 g.status = "ready";
