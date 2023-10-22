@@ -1,51 +1,64 @@
 import { createId } from "@paralleldrive/cuid2";
+import { syncronize } from "y-pojo";
+import { TypedMap } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
-import { DComp } from "../../../../utils/types/root";
-import { MSection } from "../../../../utils/types/section";
-import { EdMeta, PG } from "../ed-global";
 import {
   FMCompDef,
   FMComponent,
   FNCompDef,
   FNComponent,
 } from "../../../../utils/types/meta-fn";
-import { syncronize } from "y-pojo";
-import { TypedMap } from "yjs-types";
+import { DComp } from "../../../../utils/types/root";
+import { MSection } from "../../../../utils/types/section";
+import { EdMeta, PG } from "../ed-global";
 
 export const treeRebuild = async (p: PG) => {
-  const root = p.page.doc?.getMap("map").get("root");
-  if (root) {
-    p.page.entry = [];
-    p.page.tree = [];
-    p.page.meta = {};
+  const doc = p.page.doc;
+  if (!doc) return;
 
-    const portal = {
-      in: {} as Record<string, EdMeta>,
-      out: {} as Record<string, EdMeta>,
-    };
+  const root = doc.getMap("map").get("root");
+  if (root) {
     const sections = root.get("childs");
     if (sections) {
+      const loaded = new Set<string>();
       await Promise.all(
-        sections.map(async (e) => {
+        sections.map((e) => {
           p.page.entry.push(e.get("id"));
-          await walkMap(p, { mitem: e, parent_item: { id: "root" }, portal });
+          return walkLoad(p, e, loaded);
         })
       );
+    }
+    doc.transact(async () => {
+      p.page.entry = [];
+      p.page.tree = [];
+      p.page.meta = {};
 
-      for (const [k, portal_out] of Object.entries(portal.out)) {
-        const name = k.replace(/⮕/gi, "").trim();
-        const portal_in = portal.in[`⬅${name}`];
-        if (portal_in) {
-          for (const key of Object.keys(portal_in)) {
-            delete (portal_in as any)[key];
-          }
-          for (const [k, v] of Object.entries(portal_out)) {
-            (portal_in as any)[k] = v;
+      const portal = {
+        in: {} as Record<string, EdMeta>,
+        out: {} as Record<string, EdMeta>,
+      };
+      const sections = root.get("childs");
+      if (sections) {
+        sections.map((e) => {
+          p.page.entry.push(e.get("id"));
+          walkMap(p, { mitem: e, parent_item: { id: "root" }, portal });
+        });
+
+        for (const [k, portal_out] of Object.entries(portal.out)) {
+          const name = k.replace(/⮕/gi, "").trim();
+          const portal_in = portal.in[`⬅${name}`];
+          if (portal_in) {
+            for (const key of Object.keys(portal_in)) {
+              delete (portal_in as any)[key];
+            }
+            for (const [k, v] of Object.entries(portal_out)) {
+              (portal_in as any)[k] = v;
+            }
           }
         }
       }
-    }
+    });
     p.render();
   }
 };
@@ -66,7 +79,45 @@ const mapItem = (mitem: MContent, item: any) => {
   });
 };
 
-const walkMap = async (
+const walkLoad = async (p: PG, mitem: MItem, loaded: Set<string>) => {
+  const mcomp = mitem.get("component");
+  if (mcomp) {
+    const id = mcomp.get("id");
+    const comp = mcomp.toJSON() as FNComponent;
+    if (id) {
+      loaded.add(id);
+      if (!p.comp.list[id]) {
+        await loadComponent(p, comp);
+      }
+
+      const pcomp = p.comp.list[id];
+      if (pcomp) {
+        const pitem = pcomp.doc.getMap("map").get("item");
+        if (pitem && !loaded.has(id)) {
+          await walkLoad(p, pitem, loaded);
+        }
+      }
+    }
+
+    for (const [propName, prop] of Object.entries(comp.props || {})) {
+      if (prop.meta?.type === "content-element") {
+        const mprop = mcomp.get("props")?.get(propName);
+        if (mprop) {
+          const mcontent = ensurePropContent(mprop, propName);
+          if (mcontent) {
+            await walkLoad(p, mcontent, loaded);
+          }
+        }
+      }
+    }
+  }
+
+  for (const e of mitem.get("childs")?.map((e) => e) || []) {
+    await walkLoad(p, e, loaded);
+  }
+};
+
+const walkMap = (
   p: PG,
   arg: {
     mitem: MItem | MSection;
@@ -96,7 +147,7 @@ const walkMap = async (
   }
 
   const item_comp = item.component;
-
+  const mitem_comp = mitem.get("component");
   const metaNotFound = () => {
     if (!arg.skip_add_tree) {
       p.page.tree.push({
@@ -109,20 +160,19 @@ const walkMap = async (
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
     if (!p.comp.list[item_comp.id]) {
-      if (!(await loadComponent(p, item_comp))) {
-        console.log("not found");
-        metaNotFound();
-        return;
-      }
+      return;
     }
 
     const ref_comp = p.comp.list[item_comp.id];
-    if (ref_comp) {
+    if (ref_comp && mitem_comp) {
       const mcomp = ref_comp.doc.getMap("map").get("item");
       if (mcomp) {
-        const ref_ids: Record<string, string> = {};
-
-        mapItemComp({ parent_comp, item, mcomp, ref_ids });
+        let ref_ids: Record<string, string> = item_comp.ref_ids;
+        if (!ref_ids) {
+          mitem_comp.set("ref_ids", new Y.Map() as any);
+          ref_ids = {};
+        }
+        mapItemComp({ parent_comp, item, mcomp, mitem_comp, ref_ids });
 
         const meta: EdMeta = {
           item,
@@ -156,9 +206,7 @@ const walkMap = async (
                 if (mprop && v.meta?.type === "content-element") {
                   const mcontent = ensurePropContent(mprop, k);
                   if (mcontent) {
-                    console.log(p.page.meta[item.id]);
-
-                    await walkMap(p, {
+                    walkMap(p, {
                       mitem: mcontent,
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_comp: { ref_ids, mcomp },
@@ -173,7 +221,7 @@ const walkMap = async (
 
         const childs = mcomp.get("childs")?.map((e) => e) || [];
         for (const e of childs) {
-          await walkMap(p, {
+          walkMap(p, {
             mitem: e,
             parent_item: { id: item.id, mitem: mitem as MItem },
             parent_comp: { ref_ids, mcomp },
@@ -216,7 +264,7 @@ const walkMap = async (
 
   const childs = mitem.get("childs")?.map((e) => e) || [];
   for (const e of childs) {
-    await walkMap(p, {
+    walkMap(p, {
       mitem: e,
       parent_item: { id: item.id, mitem: mitem as MItem },
       portal: arg.portal,
@@ -288,17 +336,27 @@ const mapItemComp = (arg: {
   parent_comp: EdMeta["parent_comp"];
   mcomp: MItem;
   item: IItem;
+  mitem_comp: FMComponent;
   ref_ids: Record<string, string>;
 }) => {
-  const { parent_comp, mcomp, item, ref_ids } = arg;
+  const { parent_comp, mcomp, item, ref_ids, mitem_comp } = arg;
+  let ref_id = "";
   if (parent_comp) {
-    let old_id = item.id;
+    ref_id = item.id;
     mapItem(mcomp, item);
-    ref_ids[item.id] = old_id;
-    item.id = old_id;
   } else {
     mapItem(mcomp, item);
-    ref_ids[item.id] = createId();
-    item.id = ref_ids[item.id];
+    if (ref_ids[item.id]) {
+      ref_id = ref_ids[item.id];
+    } else {
+      ref_id = createId();
+      const mref = mitem_comp.get("ref_ids");
+      if (mref) {
+        mref.set(item.id, ref_id);
+      }
+    }
   }
+
+  ref_ids[item.id] = ref_id;
+  item.id = ref_ids[item.id];
 };

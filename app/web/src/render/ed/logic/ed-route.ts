@@ -1,6 +1,6 @@
+import { decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
-import { decompress } from "wasm-gzip";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {
@@ -30,6 +30,10 @@ export const edRoute = async (p: PG) => {
       if (page.snapshot) {
         const doc = new Y.Doc();
         Y.applyUpdate(doc, decompress(page.snapshot));
+        doc.on("update", (bin: Uint8Array, origin: any) => {
+          console.log(bin);
+        });
+
         p.page.doc = doc as any;
 
         if (p.page.doc) {

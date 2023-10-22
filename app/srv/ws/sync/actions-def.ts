@@ -12,6 +12,9 @@ export const SyncActionDefinition = {
   "page": {
     "list": "6",
     "load": "7"
+  },
+  "yjs": {
+    "sv_local": "8"
   }
 };
 export const SyncActionPaths = {
@@ -22,5 +25,6 @@ export const SyncActionPaths = {
   "4": "comp.group",
   "5": "comp.load",
   "6": "page.list",
-  "7": "page.load"
+  "7": "page.load",
+  "8": "yjs.sv_local"
 };

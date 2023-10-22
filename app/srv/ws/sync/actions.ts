@@ -1,5 +1,9 @@
 import { component, page } from "dbgen";
-import { EComp, EPage, ESite } from "../../../web/src/render/ed/logic/ed-global";
+import {
+  EComp,
+  EPage,
+  ESite,
+} from "../../../web/src/render/ed/logic/ed-global";
 
 /* 
    WARNING:
@@ -26,5 +30,8 @@ export const SyncActions = {
     list: (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
     load: async (id: string) => ({}) as EPage | void,
+  },
+  yjs: {
+    sv_local: async (mode: "page" | "comp", id: string, bin: Uint8Array) => {},
   },
 };
