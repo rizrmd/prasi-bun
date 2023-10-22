@@ -12,7 +12,10 @@ export const EdTreeName = ({
   if (!item) return <></>;
   return (
     <div className="text-[14px] flex items-center cursor-pointer flex-1">
-      {item.name}
+      <div className="flex flex-col">
+        {item.name}
+        {/* <div className={"text-[11px] text-gray-500 -mt-1"}>{item.id}</div> */}
+      </div>
     </div>
   );
 };
