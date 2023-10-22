@@ -89,9 +89,7 @@ export const ETreeItemAction: FC<{
               onClick={async () => {
                 if (mitem) {
                   const ijson = mitem.toJSON() as IItem;
-
                   mitem.doc?.transact(() => {
-                    mitem.set("childs", new Y.Array());
                     syncronize(mitem as any, {
                       ...resetJSXProp,
                       name: ijson.name,

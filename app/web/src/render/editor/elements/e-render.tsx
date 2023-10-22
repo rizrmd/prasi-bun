@@ -41,6 +41,7 @@ export const ERender: FC<{
     item.adv.js.startsWith("newElement")
   ) {
     const mitem = meta.mitem;
+
     if (mitem && item.type === "item") {
       (async () => {
         let childs: any[] = [];

@@ -101,6 +101,8 @@ export const editorWS = async (p: PG) => {
       }, 5000);
       const decoder = new TextDecoder();
       ws.addEventListener("message", async (e) => {
+        if (!e.data || !e.data.arrayBuffer) return;
+
         const raw = decoder.decode(
           decompress(new Uint8Array(await e.data.arrayBuffer()))
         );

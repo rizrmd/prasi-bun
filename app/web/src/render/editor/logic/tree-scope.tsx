@@ -41,11 +41,19 @@ export const treeScopeEval = (
     if (v && typeof v === "object") {
       const t: {
         _jsx: true;
-        Comp: FC<{ parent_id: string; _scopeIndex?: Record<string, any> }>;
+        Comp: FC<{
+          prop_name: string;
+          parent_id: string;
+          _scopeIndex?: Record<string, any>;
+        }>;
       } = v as any;
       if (t._jsx && t.Comp) {
         finalScope[k] = (
-          <t.Comp parent_id={meta.item.id} _scopeIndex={_scopeIndex} />
+          <t.Comp
+            prop_name={k}
+            parent_id={meta.item.id}
+            _scopeIndex={_scopeIndex}
+          />
         );
       }
     }

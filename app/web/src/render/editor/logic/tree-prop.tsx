@@ -59,12 +59,16 @@ export const treePropEval = (
           value = {
             _jsx: true,
             Comp: ({
+              prop_name,
               parent_id,
               _scopeIndex,
             }: {
+              prop_name: string;
               parent_id: string;
               _scopeIndex?: Record<string, string>;
             }) => {
+              console.log(prop_name);
+
               if (prop.content) {
                 const meta = p.treeMeta[prop.content.id];
                 if (meta) {

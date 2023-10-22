@@ -99,19 +99,21 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
   }
 
   if (p.status === "init") {
-    (window as any).mok = ((window as any).mok || 0) + 1;
-    p.ui.loading = <Loading note="load-page" />;
-    p.ui.preload = <Loading note="preload-root" backdrop={false} />;
-    p.ui.notfound = (
-      <div className="flex-1 flex items-center justify-center">NOT FOUND</div>
-    );
-    p.ui.error = (
-      <div className="flex-1 flex items-center justify-center">
-        PREVIEW ERROR
-      </div>
-    );
-    p.status = "loading";
-    initEditor(p, site_id);
+    if (p.ui) {
+      (window as any).mok = ((window as any).mok || 0) + 1;
+      p.ui.loading = <Loading note="load-page" />;
+      p.ui.preload = <Loading note="preload-root" backdrop={false} />;
+      p.ui.notfound = (
+        <div className="flex-1 flex items-center justify-center">NOT FOUND</div>
+      );
+      p.ui.error = (
+        <div className="flex-1 flex items-center justify-center">
+          PREVIEW ERROR
+        </div>
+      );
+      p.status = "loading";
+      initEditor(p, site_id);
+    }
   }
 
   routeEditor(p, page_id);
