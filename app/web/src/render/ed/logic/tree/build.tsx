@@ -20,16 +20,25 @@ export const treeRebuild = async (p: PG) => {
     p.page.tree = [];
     p.page.meta = {};
 
-    const portal = {};
+    const portal = {
+      in: {} as Record<string, EdMeta>,
+      out: {} as Record<string, EdMeta>,
+    };
     const sections = root.get("childs");
     if (sections) {
       await Promise.all(
         sections.map(async (e) => {
           p.page.entry.push(e.get("id"));
-          await walkMap(p, { mitem: e, tree_parent_id: "root", portal });
+          await walkMap(p, { mitem: e, parent_item: { id: "root" }, portal });
         })
       );
-      console.log(p.page);
+
+      for (const [k, v] of Object.entries(portal.out)) {
+        const name = k.replace(/⮕/gi, "").trim();
+        const portal_in = portal.in[`⬅${name}`];
+        if (portal_in) {
+        }
+      }
     }
   }
 };
@@ -54,13 +63,16 @@ const walkMap = async (
   p: PG,
   arg: {
     mitem: MItem | MSection;
-    portal: Record<string, EdMeta>;
-    tree_parent_id: string;
+    portal: {
+      in: Record<string, EdMeta>;
+      out: Record<string, EdMeta>;
+    };
+    parent_item: EdMeta["parent_item"];
     parent_comp?: EdMeta["parent_comp"];
     skip_add_tree?: boolean;
   }
 ) => {
-  const { mitem, tree_parent_id, parent_comp } = arg;
+  const { mitem, parent_item, parent_comp } = arg;
 
   const item = {} as unknown as IItem;
   mapItem(mitem, item);
@@ -80,7 +92,7 @@ const walkMap = async (
     if (!arg.skip_add_tree) {
       p.page.tree.push({
         id: item.id,
-        parent: tree_parent_id,
+        parent: parent_item.id,
         text: item.name,
       });
     }
@@ -122,7 +134,7 @@ const walkMap = async (
                   if (mcontent) {
                     walkMap(p, {
                       mitem: mcontent,
-                      tree_parent_id: item.id,
+                      parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_comp: { ref_ids, mcomp },
                       portal: arg.portal,
                     });
@@ -137,7 +149,7 @@ const walkMap = async (
           mcomp.get("childs")?.map(async (e) => {
             await walkMap(p, {
               mitem: e,
-              tree_parent_id: item.id,
+              parent_item: { id: item.id, mitem: mitem as MItem },
               parent_comp: { ref_ids, mcomp },
               skip_add_tree: true,
               portal: arg.portal,
@@ -156,15 +168,16 @@ const walkMap = async (
   const meta: EdMeta = {
     item,
     mitem: mitem as MItem,
+    parent_item,
     parent_comp,
   };
 
   if (!item_comp) {
     if (item.name.startsWith("⬅")) {
-      arg.portal[item.name] = meta;
+      arg.portal.in[item.name] = meta;
     }
     if (item.name.startsWith("⮕")) {
-      arg.portal[item.name] = meta;
+      arg.portal.out[item.name] = meta;
     }
   }
 
@@ -173,7 +186,7 @@ const walkMap = async (
   if (!arg.skip_add_tree) {
     p.page.tree.push({
       id: item.id,
-      parent: tree_parent_id,
+      parent: parent_item.id,
       text: item.name,
       data: meta,
     });
@@ -186,7 +199,7 @@ const walkMap = async (
         item.childs.push(e.get("id"));
         await walkMap(p, {
           mitem: e,
-          tree_parent_id: item.id,
+          parent_item: { id: item.id, mitem: mitem as MItem },
           portal: arg.portal,
         });
       }) || []
@@ -195,14 +208,13 @@ const walkMap = async (
 };
 
 const loadComponent = async (p: PG, item_comp: FNComponent) => {
-  let found = false;
   const cur = await p.sync.comp.load(item_comp.id);
   if (cur && cur.snapshot) {
     const doc = new Y.Doc() as DComp;
     if (cur.snapshot) {
       Y.applyUpdate(doc as any, cur.snapshot);
       p.comp.list[item_comp.id] = { cur, doc };
-      found = true;
+      return true;
     }
   }
   return false;

@@ -33,6 +33,10 @@ const EmptyComp = {
 export type EdMeta = {
   item: IItem | IText;
   mitem?: MItem | MText;
+  parent_item: {
+    id: string;
+    mitem?: MItem;
+  };
   parent_comp?: {
     ref_ids: Record<string, string>;
     mcomp: MItem;
