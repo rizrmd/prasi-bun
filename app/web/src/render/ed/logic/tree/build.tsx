@@ -33,10 +33,16 @@ export const treeRebuild = async (p: PG) => {
         })
       );
 
-      for (const [k, v] of Object.entries(portal.out)) {
+      for (const [k, portal_out] of Object.entries(portal.out)) {
         const name = k.replace(/⮕/gi, "").trim();
         const portal_in = portal.in[`⬅${name}`];
         if (portal_in) {
+          for (const key of Object.keys(portal_in)) {
+            delete (portal_in as any)[key];
+          }
+          for (const [k, v] of Object.entries(portal_out)) {
+            (portal_in as any)[k] = v;
+          }
         }
       }
     }

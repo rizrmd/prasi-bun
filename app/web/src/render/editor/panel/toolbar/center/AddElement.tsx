@@ -50,7 +50,7 @@ export const AddElement: FC<{}> = ({}) => {
                 id: createId(),
                 name: `New Text`,
                 type: "text",
-                dim: { w: "full", h: "fit" },
+                dim: { w: "full", h: "full" },
                 layout: { align: "center", dir: "col", gap: 0 },
                 text: "",
                 html: "",
@@ -122,7 +122,7 @@ export const AddElement: FC<{}> = ({}) => {
                 id: createId(),
                 name: `New Item`,
                 type: "item",
-                dim: { w: "fit", h: "fit" },
+                dim: { w: "full", h: "full" },
                 childs: [],
                 adv: {
                   css: "",
