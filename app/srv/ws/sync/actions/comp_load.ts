@@ -1,6 +1,7 @@
 import { syncronize } from "y-pojo";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
+import { gzipAsync } from "../entity/zlib";
 import { ActionCtx } from "../type";
 
 export const comp_load = async function (this: ActionCtx, id: string) {
@@ -34,16 +35,31 @@ export const comp_load = async function (this: ActionCtx, id: string) {
       return {
         id: id,
         name: comp.name,
-        snapshot: bin,
+        snapshot: await gzipAsync(bin),
       };
     }
-  }
+  } else if (snap && !ydoc) {
+    const doc = new Y.Doc();
+    Y.applyUpdate(doc, snap.bin);
+    let root = doc.getMap("map");
 
-  if (snap) {
+    const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
+    docs.page[id] = {
+      doc: doc as any,
+      id,
+      um,
+    };
+
+    return {
+      id: id,
+      name: snap.name,
+      snapshot: await gzipAsync(snap.bin),
+    };
+  } else if (snap && ydoc) {
     return {
       id: snap.id,
       name: snap.name,
-      snapshot: snap.bin,
+      snapshot: await gzipAsync(snap.bin),
     };
   }
 };

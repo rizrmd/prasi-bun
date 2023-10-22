@@ -39,7 +39,7 @@ export type EdMeta = {
     mitem?: MItem;
   };
   parent_comp?: {
-    ref_ids: Record<string, string>;
+    mitem: MItem;
     mcomp: MItem;
   };
 };

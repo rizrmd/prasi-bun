@@ -12,7 +12,7 @@ export const page_load: SAction["page"]["load"] = async function (
   let snap = snapshot.get("page", id);
   let ydoc = docs.page[id];
 
-  if (!snap || !ydoc) {
+  if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
     if (page) {
       const doc = new Y.Doc();
@@ -43,9 +43,25 @@ export const page_load: SAction["page"]["load"] = async function (
         snapshot: await gzipAsync(bin),
       };
     }
-  }
+  } else if (snap && !ydoc) {
+    const doc = new Y.Doc();
+    Y.applyUpdate(doc, snap.bin);
+    let root = doc.getMap("map");
 
-  if (snap) {
+    const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
+    docs.page[id] = {
+      doc: doc as any,
+      id,
+      um,
+    };
+
+    return {
+      id: id,
+      url: snap.url,
+      name: snap.name,
+      snapshot: await gzipAsync(snap.bin),
+    };
+  } else if (snap && ydoc) {
     return {
       id: snap.id,
       url: snap.url,

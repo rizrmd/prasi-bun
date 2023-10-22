@@ -12,6 +12,7 @@ import {
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
+import { decompress } from "wasm-gzip";
 
 export const treeRebuild = async (p: PG) => {
   const doc = p.page.doc;
@@ -133,17 +134,26 @@ const walkMap = (
   const { mitem, parent_item, parent_comp } = arg;
 
   const item = {} as unknown as IItem;
+  let override_id = "";
+  const id = mitem.get("id");
+
+  if (parent_comp && id) {
+    const fcomp = parent_comp.mitem.get("component");
+    if (fcomp) {
+      const ref_ids = fcomp.get("ref_ids");
+      if (ref_ids) {
+        let ref_id = ref_ids.get(id);
+        if (!ref_id) {
+          ref_id = createId();
+          ref_ids.set(id, ref_id);
+        }
+        override_id = ref_id;
+      }
+    }
+  }
   mapItem(mitem, item);
-
-  // sesuaikan item instance id dengan parent comp
-  if (parent_comp) {
-    if (!parent_comp["ref_ids"][item.id]) {
-      parent_comp["ref_ids"][item.id] = createId();
-    }
-
-    if (parent_comp["ref_ids"][item.id]) {
-      item.id = parent_comp["ref_ids"][item.id];
-    }
+  if (override_id) {
+    item.id = override_id;
   }
 
   const item_comp = item.component;
@@ -172,7 +182,7 @@ const walkMap = (
           mitem_comp.set("ref_ids", new Y.Map() as any);
           ref_ids = {};
         }
-        mapItemComp({ parent_comp, item, mcomp, mitem_comp, ref_ids });
+        mapItem(mcomp, item);
 
         const meta: EdMeta = {
           item,
@@ -209,7 +219,7 @@ const walkMap = (
                     walkMap(p, {
                       mitem: mcontent,
                       parent_item: { id: item.id, mitem: mitem as MItem },
-                      parent_comp: { ref_ids, mcomp },
+                      parent_comp: { mitem: mitem as MItem, mcomp },
                       portal: arg.portal,
                     });
                   }
@@ -224,7 +234,7 @@ const walkMap = (
           walkMap(p, {
             mitem: e,
             parent_item: { id: item.id, mitem: mitem as MItem },
-            parent_comp: { ref_ids, mcomp },
+            parent_comp: { mitem: mitem as MItem, mcomp },
             skip_add_tree: true,
             portal: arg.portal,
           });
@@ -267,6 +277,7 @@ const walkMap = (
     walkMap(p, {
       mitem: e,
       parent_item: { id: item.id, mitem: mitem as MItem },
+      parent_comp: arg.parent_comp,
       portal: arg.portal,
     });
   }
@@ -277,7 +288,7 @@ const loadComponent = async (p: PG, item_comp: FNComponent) => {
   if (cur && cur.snapshot) {
     const doc = new Y.Doc() as DComp;
     if (cur.snapshot) {
-      Y.applyUpdate(doc as any, cur.snapshot);
+      Y.applyUpdate(doc as any, decompress(cur.snapshot));
       p.comp.list[item_comp.id] = { cur, doc };
       return true;
     }
@@ -330,33 +341,4 @@ const ensureMItemProps = (mitem_comp: FMComponent, item_comp: FNComponent) => {
     item_comp.props = {};
   }
   return mitem_props;
-};
-
-const mapItemComp = (arg: {
-  parent_comp: EdMeta["parent_comp"];
-  mcomp: MItem;
-  item: IItem;
-  mitem_comp: FMComponent;
-  ref_ids: Record<string, string>;
-}) => {
-  const { parent_comp, mcomp, item, ref_ids, mitem_comp } = arg;
-  let ref_id = "";
-  if (parent_comp) {
-    ref_id = item.id;
-    mapItem(mcomp, item);
-  } else {
-    mapItem(mcomp, item);
-    if (ref_ids[item.id]) {
-      ref_id = ref_ids[item.id];
-    } else {
-      ref_id = createId();
-      const mref = mitem_comp.get("ref_ids");
-      if (mref) {
-        mref.set(item.id, ref_id);
-      }
-    }
-  }
-
-  ref_ids[item.id] = ref_id;
-  item.id = ref_ids[item.id];
 };
