@@ -22,7 +22,7 @@ export const comp_load = async function (this: ActionCtx, id: string) {
       };
 
       const bin = Y.encodeStateAsUpdate(doc);
-      snapshot.set({
+      snapshot.update({
         bin,
         id,
         type: "comp",

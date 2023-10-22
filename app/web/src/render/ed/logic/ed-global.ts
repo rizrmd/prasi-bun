@@ -1,5 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { clientStartSync } from "../../../utils/sync/client";
+import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";

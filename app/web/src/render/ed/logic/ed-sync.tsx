@@ -1,4 +1,4 @@
-import { clientStartSync } from "../../../utils/sync/client";
+import { clientStartSync } from "../../../utils/sync/ws-client";
 import { Loading } from "../../../utils/ui/loading";
 import { PG } from "./ed-global";
 

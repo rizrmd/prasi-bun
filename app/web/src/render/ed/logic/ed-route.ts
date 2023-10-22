@@ -1,4 +1,4 @@
-import { decompress } from "wasm-gzip";
+import { compress, decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 
@@ -30,8 +30,25 @@ export const edRoute = async (p: PG) => {
       if (page.snapshot) {
         const doc = new Y.Doc();
         Y.applyUpdate(doc, decompress(page.snapshot));
-        doc.on("update", (bin: Uint8Array, origin: any) => {
-          console.log(bin);
+        doc.on("update", async (bin: Uint8Array, origin: any) => {
+          const res = await p.sync.yjs.sv_local(
+            "page",
+            p.page.cur.id,
+            compress(bin)
+          );
+
+          if (res) {
+            const diff_local = Y.encodeStateAsUpdate(
+              doc as any,
+              decompress(res.sv)
+            );
+            Y.applyUpdate(doc as any, decompress(res.diff), "local");
+            await p.sync.yjs.diff_local(
+              "page",
+              p.page.cur.id,
+              compress(diff_local)
+            );
+          }
         });
 
         p.page.doc = doc as any;
