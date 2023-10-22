@@ -24,6 +24,7 @@ export type FNComponent = {
   name: string;
   updated_at?: number;
   props: Record<string, FNCompDef>;
+  ref_ids: Record<string, string>;
 };
 
 export type FNCompDef = {
@@ -54,6 +55,7 @@ export type FMCompDef = TypedMap<
 export type FMComponent = TypedMap<
   Omit<FNComponent, "group" | "props"> & {
     props: TypedMap<Record<string, FMCompDef>>;
+    ref_ids: TypedMap<Record<string, string>>;
   }
 >;
 
