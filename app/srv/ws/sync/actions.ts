@@ -32,6 +32,12 @@ export const SyncActions = {
     load: async (id: string) => ({}) as EPage | void,
   },
   yjs: {
-    sv_local: async (mode: "page" | "comp", id: string, bin: Uint8Array) => {},
+    sv_local: async (mode: "page" | "comp", id: string, bin: Uint8Array) =>
+      ({}) as { diff: Uint8Array; sv: Uint8Array } | void,
+    diff_local: async (
+      mode: "page" | "comp",
+      id: string,
+      bin: Uint8Array
+    ) => {},
   },
 };

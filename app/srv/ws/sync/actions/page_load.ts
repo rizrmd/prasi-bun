@@ -2,8 +2,8 @@ import { syncronize } from "y-pojo";
 import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
+import { gzipAsync } from "../entity/zlib";
 import { ActionCtx } from "../type";
-import { gzip } from "zlib";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: ActionCtx,
@@ -27,7 +27,7 @@ export const page_load: SAction["page"]["load"] = async function (
       };
 
       const bin = Y.encodeStateAsUpdate(doc);
-      snapshot.set({
+      snapshot.update({
         bin,
         id,
         type: "page",
@@ -53,16 +53,4 @@ export const page_load: SAction["page"]["load"] = async function (
       snapshot: await gzipAsync(snap.bin),
     };
   }
-};
-
-const gzipAsync = (bin: Uint8Array) => {
-  return new Promise<Buffer>((resolve, reject) => {
-    gzip(bin, (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
-  });
 };

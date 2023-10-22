@@ -8,7 +8,7 @@ const emptySnapshot = {
   bin: new Uint8Array(),
   url: "",
   name: "",
-  ts: Date.now()
+  ts: Date.now(),
 };
 export type DocSnapshot = typeof emptySnapshot;
 
@@ -18,6 +18,7 @@ export const snapshot = {
     this._db = open<DocSnapshot, string>({
       name: "user-conf",
       path: dir.path(`${g.datadir}/lmdb/doc-snapshot.lmdb`),
+      compression: true,
     });
     return this._db;
   },
@@ -27,11 +28,11 @@ export const snapshot = {
     }
     return this._db;
   },
-  getOrCreate(data: DocSnapshot) {
+  async getOrCreate(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
     let res = this.db.get(id);
     if (!res) {
-      this.db.put(id, structuredClone(emptySnapshot));
+      await this.db.put(id, structuredClone(emptySnapshot));
       res = this.db.get(id);
     }
     return res as DocSnapshot;
@@ -39,8 +40,23 @@ export const snapshot = {
   get(type: string, id: string) {
     return this.db.get(`${type}-${id}`);
   },
-  set(data: DocSnapshot) {
+  async update(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
-    this.db.put(id, data);
+    await this.db.put(id, data);
+    return true;
+  },
+  async set<T extends keyof DocSnapshot>(
+    type: string,
+    id: string,
+    key: T,
+    value: DocSnapshot[T]
+  ) {
+    const item = this.get(type, id);
+    if (item) {
+      item[key] = value;
+      await this.update(item);
+      return true;
+    }
+    return false;
   },
 };

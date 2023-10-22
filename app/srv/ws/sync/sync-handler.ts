@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { ServerWebSocket, WebSocketHandler } from "bun";
 import { Packr } from "msgpackr";
 import { WSData } from "../../../../pkgs/core/server/create";
-import { ClientEvent } from "../../../web/src/utils/sync/client";
+import { ClientEvent } from "../../../web/src/utils/sync/ws-client";
 import { loadDefaultSite } from "./editor/load";
 import { ActionCtx, SyncType } from "./type";
 import { SyncActionPaths } from "./actions-def";
@@ -54,7 +54,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
           const { user_id } = msg;
           conn.user_id = user_id;
 
-          const conf = user.conf.getOrCreate(user_id);
+          const conf = await user.conf.getOrCreate(user_id);
           if (!conf.site_id) {
             await loadDefaultSite(user_id);
           }

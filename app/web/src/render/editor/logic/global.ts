@@ -9,7 +9,7 @@ import { IRoot } from "../../../utils/types/root";
 import { LSite } from "../../live/logic/global";
 import { ISection } from "../../../utils/types/section";
 import { IText } from "../../../utils/types/text";
-import { clientStartSync } from "../../../utils/sync/client";
+import { clientStartSync } from "../../../utils/sync/ws-client";
 
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 export type NodeMeta = { meta: ItemMeta; idx: number };
