@@ -1,6 +1,7 @@
 import { dir } from "dir";
 import { RootDatabase, open } from "lmdb";
 import { g } from "utils/global";
+import { KeyMap } from "../../../../web/src/utils/sync/keymap";
 
 const defaultConf = {
   site_id: "",
@@ -9,6 +10,11 @@ const defaultConf = {
 export type UserConf = typeof defaultConf;
 
 export const user = {
+  active: KeyMap.create<{
+    user_id: string;
+    site_id: string;
+    page_id: string;
+  }>("user_id"),
   conf: {
     _db: null as null | RootDatabase<UserConf>,
     init() {

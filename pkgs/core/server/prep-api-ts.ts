@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from "bun";
-import { readAsync } from "fs-jetpack";
+import { existsAsync, readAsync } from "fs-jetpack";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 
@@ -7,13 +7,27 @@ export const prepareAPITypes = async () => {
   const out: string[] = [];
   for (const [k, v] of Object.entries(g.api)) {
     const name = k.substring(0, k.length - 3).replace(/\W/gi, "_");
+
+    let p = {
+      path: `app/srv/api/${v.path}`,
+      handler: `"./api/${v.path.substring(0, v.path.length - 3)}"`,
+    };
+
+    if (!(await existsAsync(dir.path(p.path)))) {
+      p.path = `pkgs/core/api/${v.path}`;
+      p.handler = `"../../pkgs/core/api/${v.path.substring(
+        0,
+        v.path.length - 3
+      )}"`;
+    }
+
     out.push(`\
 export const ${name} = {
   name: "${name}",
   url: "${v.url}",
-  path: "app/srv/api/${v.path}",
+  path: "${p.path}",
   args: ${JSON.stringify(v.args)},
-  handler: import("./api/${v.path.substring(0, v.path.length - 3)}")
+  handler: import(${p.handler})
 }`);
   }
   await Bun.write(dir.path(`app/srv/exports.ts`), out.join(`\n`));
