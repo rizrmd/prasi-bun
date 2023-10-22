@@ -2,6 +2,8 @@ import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { EDGlobal } from "./logic/ed-global";
 import { edRoute } from "./logic/ed-route";
+import { EdTree } from "./panel/tree/tree";
+import { EdMain } from "./panel/main/main";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -22,5 +24,13 @@ export const EdBase = () => {
       </div>
     );
   }
-  return <div>Editor</div>;
+  return (
+    <div className="flex flex-col flex-1">
+      <div className="flex justify-between"></div>
+      <div className="flex flex-1 items-stretch">
+        <EdTree />
+        <EdMain />
+      </div>
+    </div>
+  );
 };

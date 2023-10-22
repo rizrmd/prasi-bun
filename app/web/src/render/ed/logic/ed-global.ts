@@ -67,6 +67,12 @@ export const EDGlobal = {
     item: null as null | IItem,
     list: {} as Record<string, { cur: EComp; doc: DComp }>,
   },
+
+  ui: {
+    tree: {
+      open: {} as Record<string, string[]>,
+    },
+  },
 };
 
 export type PG = typeof EDGlobal & { render: () => void };
