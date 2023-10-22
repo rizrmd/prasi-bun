@@ -5,6 +5,7 @@ import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { IText, MText } from "../../../utils/types/text";
 import { FNCompDef } from "../../../utils/types/meta-fn";
+import { ISection } from "../../../utils/types/section";
 
 const EmptySite = {
   id: "",
@@ -31,7 +32,7 @@ const EmptyComp = {
 };
 
 export type EdMeta = {
-  item: IItem | IText;
+  item: IItem | IText | ISection;
   mitem?: MItem | MText;
   parent_item: {
     id: string;

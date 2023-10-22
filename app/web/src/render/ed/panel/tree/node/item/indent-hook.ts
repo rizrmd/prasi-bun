@@ -1,6 +1,4 @@
-import {
-  TreeMethods
-} from "@minoru/react-dnd-treeview";
+import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { PG } from "../../../../logic/ed-global";
 
@@ -15,5 +13,5 @@ export const indentHook = (
       local.tree.open(open[p.page.cur.id]);
       local.render();
     }
-  }, []);
+  }, [p.page.tree]);
 };

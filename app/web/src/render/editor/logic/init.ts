@@ -46,6 +46,8 @@ export const initEditor = async (p: PG, site_id: string) => {
     return "";
   };
 
+  if (!p.item) return;
+
   p.item.active = localStorage.getItem("prasi-item-active-id") || "";
   p.item.activeOriginalId = localStorage.getItem("prasi-item-active-oid") || "";
   const comp: any = {

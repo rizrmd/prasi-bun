@@ -9,7 +9,7 @@ export const EdTree = () => {
   return (
     <div className="flex flex-col min-w-[300px] relative border-r">
       <div className=""></div>
-      <div className="flex flex-1 overflow-y-auto overflow-x-hidden">
+      <div className="flex relative flex-1 overflow-y-auto overflow-x-hidden">
         <div className="absolute inset-0">
           <DndProvider backend={MultiBackend} options={getBackendOptions()}>
             <EdTreeBody />

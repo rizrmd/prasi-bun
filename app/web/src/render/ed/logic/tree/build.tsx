@@ -46,6 +46,7 @@ export const treeRebuild = async (p: PG) => {
         }
       }
     }
+    p.render();
   }
 };
 
@@ -94,6 +95,8 @@ const walkMap = async (
     }
   }
 
+  const item_comp = item.component;
+
   const metaNotFound = () => {
     if (!arg.skip_add_tree) {
       p.page.tree.push({
@@ -104,10 +107,10 @@ const walkMap = async (
     }
   };
 
-  const item_comp = item.component;
-  if (item_comp && item_comp.id) {
+  if (item_comp && item_comp.id && parent_item.id !== "root") {
     if (!p.comp.list[item_comp.id]) {
       if (!(await loadComponent(p, item_comp))) {
+        console.log("not found");
         metaNotFound();
         return;
       }
@@ -120,6 +123,22 @@ const walkMap = async (
         const ref_ids: Record<string, string> = {};
 
         mapItemComp({ parent_comp, item, mcomp, ref_ids });
+
+        const meta: EdMeta = {
+          item,
+          mitem: mitem as MItem,
+          parent_item,
+          parent_comp,
+        };
+        p.page.meta[item.id] = meta;
+        if (!arg.skip_add_tree) {
+          p.page.tree.push({
+            id: item.id,
+            parent: parent_item.id,
+            text: item.name,
+            data: meta,
+          });
+        }
 
         const mprops = mcomp.get("component")?.get("props")?.toJSON() as Record<
           string,
@@ -134,11 +153,12 @@ const walkMap = async (
               for (const [k, v] of Object.entries(mprops)) {
                 const mprop = ensureMProp(mitem_props, k, v);
                 item_comp.props[k] = v;
-
                 if (mprop && v.meta?.type === "content-element") {
-                  const mcontent = createPropContent(mprop, k);
+                  const mcontent = ensurePropContent(mprop, k);
                   if (mcontent) {
-                    walkMap(p, {
+                    console.log(p.page.meta[item.id]);
+
+                    await walkMap(p, {
                       mitem: mcontent,
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_comp: { ref_ids, mcomp },
@@ -151,23 +171,21 @@ const walkMap = async (
           }
         }
 
-        await Promise.all(
-          mcomp.get("childs")?.map(async (e) => {
-            await walkMap(p, {
-              mitem: e,
-              parent_item: { id: item.id, mitem: mitem as MItem },
-              parent_comp: { ref_ids, mcomp },
-              skip_add_tree: true,
-              portal: arg.portal,
-            });
-          }) || []
-        );
+        const childs = mcomp.get("childs")?.map((e) => e) || [];
+        for (const e of childs) {
+          await walkMap(p, {
+            mitem: e,
+            parent_item: { id: item.id, mitem: mitem as MItem },
+            parent_comp: { ref_ids, mcomp },
+            skip_add_tree: true,
+            portal: arg.portal,
+          });
+        }
         return;
       }
     }
 
     metaNotFound();
-
     return;
   }
 
@@ -178,13 +196,11 @@ const walkMap = async (
     parent_comp,
   };
 
-  if (!item_comp) {
-    if (item.name.startsWith("⬅")) {
-      arg.portal.in[item.name] = meta;
-    }
-    if (item.name.startsWith("⮕")) {
-      arg.portal.out[item.name] = meta;
-    }
+  if (item.name.startsWith("⬅")) {
+    arg.portal.in[item.name] = meta;
+  }
+  if (item.name.startsWith("⮕")) {
+    arg.portal.out[item.name] = meta;
   }
 
   p.page.meta[item.id] = meta;
@@ -198,18 +214,13 @@ const walkMap = async (
     });
   }
 
-  const mchilds = mitem.get("childs");
-  if (mchilds) {
-    await Promise.all(
-      mchilds.map(async (e, k) => {
-        item.childs.push(e.get("id"));
-        await walkMap(p, {
-          mitem: e,
-          parent_item: { id: item.id, mitem: mitem as MItem },
-          portal: arg.portal,
-        });
-      }) || []
-    );
+  const childs = mitem.get("childs")?.map((e) => e) || [];
+  for (const e of childs) {
+    await walkMap(p, {
+      mitem: e,
+      parent_item: { id: item.id, mitem: mitem as MItem },
+      portal: arg.portal,
+    });
   }
 };
 
@@ -226,7 +237,7 @@ const loadComponent = async (p: PG, item_comp: FNComponent) => {
   return false;
 };
 
-const createPropContent = (mprop: FMCompDef, k: string) => {
+const ensurePropContent = (mprop: FMCompDef, k: string) => {
   let mcontent = mprop.get("content");
   if (!mcontent) {
     const newcontent = new Y.Map();
