@@ -9,8 +9,14 @@ import { indentHook } from "./item/indent-hook";
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   if (!node || !node.data) return <></>;
   const item = node.data?.item;
+  const isComponent = item.type === "item" && item.component?.id;
   return (
-    <div className={cx("border-b flex items-stretch hover:bg-blue-50")}>
+    <div
+      className={cx(
+        "relative border-b flex items-stretch hover:bg-blue-50 min-h-[26px]",
+        isComponent && `bg-purple-50`
+      )}
+    >
       <EdTreeCtxMenu node={node} prm={prm} />
       <EdTreeIndent node={node} prm={prm} />
       <EdTreeName node={node} prm={prm} />

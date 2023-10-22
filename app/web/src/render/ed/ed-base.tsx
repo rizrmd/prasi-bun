@@ -1,15 +1,16 @@
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { EDGlobal } from "./logic/ed-global";
+import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
-import { EdTree } from "./panel/tree/tree";
 import { EdMain } from "./panel/main/main";
+import { EdTree } from "./panel/tree/tree";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
   if (p.status === "init") {
-    p.status = "ready";
+    edInit(p);
   }
 
   edRoute(p);

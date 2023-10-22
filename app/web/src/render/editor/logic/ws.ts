@@ -1,6 +1,7 @@
 import { PG } from "./global";
 
 import throttle from "lodash.throttle";
+import init, { decompress } from "wasm-gzip";
 import * as Y from "yjs";
 import { CompDoc } from "../../../base/global/content-editor";
 import { MPage } from "../../../utils/types/general";
@@ -15,7 +16,6 @@ import {
 } from "../../../utils/types/ws";
 import { scanComponent } from "./comp";
 import { rebuildTree } from "./tree-logic";
-import init, { compress, decompress } from "wasm-gzip";
 const timeout = {
   reconnect: null as any,
   svd: null as any,

@@ -11,15 +11,11 @@ import get from "lodash.get";
 import set from "lodash.set";
 import uniqBy from "lodash.uniqby";
 import { FC } from "react";
-import { syncronize } from "y-pojo";
-import * as Y from "yjs";
 import { IContent, MContent } from "../../../../../utils/types/general";
-import { IItem, MItem } from "../../../../../utils/types/item";
 import { NodeMeta, PG } from "../../../logic/global";
 import { fillID } from "../../../tools/fill-id";
 import { newMap } from "../../../tools/yjs-tools";
 import { walk } from "../body";
-import { rebuildTree } from "../../../logic/tree-logic";
 export const DEPTH_WIDTH = 8;
 
 export const Placeholder: FC<{

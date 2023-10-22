@@ -3,6 +3,7 @@ import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { ActionCtx } from "../type";
+import { gzip } from "zlib";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: ActionCtx,
@@ -39,7 +40,7 @@ export const page_load: SAction["page"]["load"] = async function (
         id: id,
         url: page.url,
         name: page.name,
-        snapshot: bin,
+        snapshot: await gzipAsync(bin),
       };
     }
   }
@@ -49,7 +50,19 @@ export const page_load: SAction["page"]["load"] = async function (
       id: snap.id,
       url: snap.url,
       name: snap.name,
-      snapshot: snap.bin,
+      snapshot: await gzipAsync(snap.bin),
     };
   }
+};
+
+const gzipAsync = (bin: Uint8Array) => {
+  return new Promise<Buffer>((resolve, reject) => {
+    gzip(bin, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
+  });
 };

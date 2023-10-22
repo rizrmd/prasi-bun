@@ -1,7 +1,7 @@
-import { IRoot } from "../../../utils/types/root";
 import { PG } from "./ed-global";
-import { produce } from "immer";
 import { treeRebuild } from "./tree/build";
+import { decompress } from "wasm-gzip";
+
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {
     if (!p.site.domain && !p.site.name) {
@@ -29,11 +29,11 @@ export const edRoute = async (p: PG) => {
       p.page.cur = page;
       if (page.snapshot) {
         const doc = new Y.Doc();
-        Y.applyUpdate(doc, page.snapshot);
+        Y.applyUpdate(doc, decompress(page.snapshot));
         p.page.doc = doc as any;
 
         if (p.page.doc) {
-          treeRebuild(p);
+          await treeRebuild(p);
         }
       }
       p.status = "ready";
