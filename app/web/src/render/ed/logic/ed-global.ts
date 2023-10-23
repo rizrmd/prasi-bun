@@ -86,6 +86,12 @@ export const EDGlobal = {
   ui: {
     tree: {
       search: "",
+      searchMode: {
+        Name: true,
+        JS: false,
+        HTML: false,
+        CSS: false,
+      },
       open: {} as Record<string, string[]>,
     },
     popup: {
