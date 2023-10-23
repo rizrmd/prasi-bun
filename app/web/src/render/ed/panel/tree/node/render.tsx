@@ -1,13 +1,13 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
-import { EdMeta } from "../../../logic/ed-global";
+import { useGlobal, useLocal } from "web-utils";
+import { EDGlobal, EdMeta, active } from "../../../logic/ed-global";
 import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
-import { indentHook } from "./item/indent-hook";
-import { useLocal } from "web-utils";
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     rightClick: null as null | React.MouseEvent<HTMLDivElement, MouseEvent>,
   });
@@ -18,13 +18,20 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   return (
     <div
       className={cx(
-        "relative border-b flex items-stretch hover:bg-blue-50 min-h-[26px]",
-        isComponent && `bg-purple-50`
+        item.id,
+        "relative border-b flex items-stretch  min-h-[26px]",
+        active.item_id === item.id
+          ? ["bg-blue-100"]
+          : ["hover:bg-blue-50", isComponent && `bg-purple-50`]
       )}
       onContextMenu={(event) => {
         event.preventDefault();
         local.rightClick = event;
         local.render();
+      }}
+      onClick={() => {
+        active.item_id = item.id;
+        p.render();
       }}
     >
       {local.rightClick && (
