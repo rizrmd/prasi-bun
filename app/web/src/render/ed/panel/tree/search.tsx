@@ -164,7 +164,6 @@ export const doTreeSearch = (p: PG) => {
       if (js) {
         if (p.ui.tree.searchMode.JS) {
           if ((js as string).toLowerCase().includes(search)) {
-            console.log(js);
             tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
           }
         }
