@@ -31,6 +31,7 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
       }}
       onClick={() => {
         active.item_id = item.id;
+        p.ui.tree.search = "";
         p.render();
       }}
     >

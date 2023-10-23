@@ -5,6 +5,7 @@ import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
+import { ReactElement } from "react";
 
 const EmptySite = {
   id: "",
@@ -55,6 +56,7 @@ export type EdMeta = {
     mitem: MItem;
     mcomp: MItem;
   };
+  el?: ReactElement;
 };
 
 export const EDGlobal = {
@@ -83,6 +85,7 @@ export const EDGlobal = {
   },
   ui: {
     tree: {
+      search: "",
       open: {} as Record<string, string[]>,
     },
     popup: {
