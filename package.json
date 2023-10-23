@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --silent --watch ./pkgs/core/index.ts dev",
-    "clean": "rm -rf app/static && rm -rf app/web/.parcel-cache",
+    "clean": "rm -rf data && rm -rf app/static && rm -rf app/web/.parcel-cache",
     "build": "bun run --silent ./pkgs/core/build.ts",
     "db-pull": "bun run ./pkgs/core/db-pull.ts",
     "parcel": "bun clean && bun run ./pkgs/core/parcel.ts",
@@ -13,7 +13,7 @@
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",
     "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts"
   },
-  "workspaces": [ 
+  "workspaces": [
     "app/*",
     "pkgs/*"
   ],

@@ -14,7 +14,7 @@ import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
 import { decompress } from "wasm-gzip";
 
-export const treeRebuild = async (p: PG) => {
+export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const doc = p.page.doc;
   if (!doc) return;
 

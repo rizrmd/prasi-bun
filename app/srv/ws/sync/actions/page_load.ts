@@ -11,7 +11,7 @@ export const page_load: SAction["page"]["load"] = async function (
 ) {
   let snap = snapshot.get("page", id);
   let ydoc = docs.page[id];
-
+ 
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
     if (page) {

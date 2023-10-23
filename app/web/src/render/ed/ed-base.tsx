@@ -5,9 +5,12 @@ import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { EdMain } from "./panel/main/main";
 import { EdTree } from "./panel/tree/tree";
+import { edUndoManager } from "./logic/ed-undo";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
+
+  edUndoManager(p);
 
   if (p.status === "init") {
     edInit(p);

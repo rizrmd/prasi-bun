@@ -68,10 +68,15 @@ export const EDGlobal = {
     item: null as null | IItem,
     list: {} as Record<string, { cur: EComp; doc: DComp }>,
   },
-
   ui: {
+    select: {
+      id: "",
+    },
     tree: {
       open: {} as Record<string, string[]>,
+    },
+    popup: {
+      comp: null as null | ((comp_id: string) => void | Promise<void>),
     },
   },
 };
