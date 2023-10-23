@@ -50,6 +50,11 @@ export const EdTreeIndent = ({
             <Text />
           </div>
         )}
+        {item.type === "item" && !isComponent && !prm.hasChild && (
+          <div className="">
+            <ItemIcon />
+          </div>
+        )}
         {isComponent && !prm.hasChild && (
           <div className="text-purple-600 mt-[1px]">
             <ComponentIcon />

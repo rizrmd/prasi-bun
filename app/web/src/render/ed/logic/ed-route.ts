@@ -36,7 +36,7 @@ export const edRoute = async (p: PG) => {
           const res = await p.sync.yjs.sv_local(
             "page",
             p.page.cur.id,
-            compress(bin)
+            Buffer.from(compress(bin))
           );
 
           if (res) {
@@ -48,7 +48,7 @@ export const edRoute = async (p: PG) => {
             await p.sync.yjs.diff_local(
               "page",
               p.page.cur.id,
-              compress(diff_local)
+              Buffer.from(compress(diff_local))
             );
           }
         });

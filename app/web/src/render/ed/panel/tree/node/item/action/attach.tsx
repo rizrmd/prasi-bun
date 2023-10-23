@@ -1,5 +1,4 @@
 import { IItem } from "../../../../../../../utils/types/item";
-import { MenuItem } from "../../../../../../../utils/ui/context-menu";
 import { PG } from "../../../../../logic/ed-global";
 
 export const edActionAttach = (p: PG, item: IItem) => {

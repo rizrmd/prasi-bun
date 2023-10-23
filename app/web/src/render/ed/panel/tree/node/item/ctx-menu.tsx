@@ -12,6 +12,8 @@ import { edActionDetach } from "./action/detach";
 import { edActionHide } from "./action/hide";
 import { edActionNewComp } from "./action/new-comp";
 import { edActionPaste } from "./action/paste";
+import { edActionWrap } from "./action/wrap";
+import { edActionUnwrap } from "./action/unwrap";
 
 export const EdTreeCtxMenu = ({
   node,
@@ -49,6 +51,7 @@ export const EdTreeCtxMenu = ({
   const type = item?.type;
   const comp = (item as IItem).component as FNComponent | undefined;
   const rootComp = p.comp.cur;
+  const isComponent = comp?.id;
   const isActiveComponent = rootComp && rootComp.id === item?.id && rootComp.id;
 
   if (!item) {
@@ -85,8 +88,20 @@ export const EdTreeCtxMenu = ({
       <MenuItem label="Clone" onClick={() => edActionClone(p, item)} />
       <MenuItem label="Cut" onClick={() => edActionCut(p, item)} />
       <MenuItem label="Copy" onClick={() => edActionCopy(p, item)} />
-      {local.allowCopy && local.allowPaste && (
-        <MenuItem label="Paste" onClick={() => edActionPaste(p, item)} />
+      {local.allowCopy &&
+        local.allowPaste &&
+        !isComponent &&
+        item.type !== "text" && (
+          <MenuItem label="Paste" onClick={() => edActionPaste(p, item)} />
+        )}
+      {["text", "item"].includes(item.type) && (
+        <MenuItem label="Wrap" onClick={() => edActionWrap(p, item as IItem)} />
+      )}
+      {["item"].includes(item.type) && !isComponent && (
+        <MenuItem
+          label="Unwrap"
+          onClick={() => edActionUnwrap(p, item as IItem)}
+        />
       )}
     </Menu>
   );
