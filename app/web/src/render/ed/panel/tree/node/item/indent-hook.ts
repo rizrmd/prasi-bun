@@ -30,5 +30,5 @@ export const indentHook = (
         });
       }
     }
-  }, [p.page.tree]);
+  }, [p.page.tree, active.item_id]);
 };

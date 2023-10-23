@@ -1,6 +1,7 @@
 import {
   Tree as DNDTree,
   DragPreviewRender,
+  NodeModel,
   PlaceholderRender,
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
@@ -11,6 +12,7 @@ import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
 import { FC } from "react";
 import { DEPTH_WIDTH } from "./node/item/indent";
+import { doTreeSearch } from "./search";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -19,10 +21,17 @@ export const EdTreeBody = () => {
 
   indentHook(p, local);
 
+  let tree: NodeModel<EdMeta>[] = [];
+  if (p.ui.tree.search) {
+    tree = doTreeSearch(p);
+  } else {
+    tree = p.page.tree;
+  }
+
   if (p.page.tree.length === 0) return <div>No Item </div>;
   return (
     <TypedTree
-      tree={p.page.tree}
+      tree={tree}
       rootId={"root"}
       insertDroppableFirst={false}
       classes={treeClasses}
