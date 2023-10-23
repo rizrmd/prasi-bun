@@ -43,5 +43,11 @@ export const SyncActions = {
       id: string,
       bin: Uint8Array
     ) => {},
+    sv_remote: async (
+      mode: "page" | "comp",
+      id: string,
+      sv: Uint8Array,
+      diff: Uint8Array
+    ) => ({}) as { diff: Uint8Array } | void,
   },
 };

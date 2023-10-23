@@ -1,6 +1,9 @@
+import { compress, decompress } from "wasm-gzip";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { Loading } from "../../../utils/ui/loading";
 import { PG } from "./ed-global";
+import { Y } from "../../../../../srv/ws/sync/entity/docs";
+import { treeRebuild } from "./tree/build";
 
 export const edInitSync = (p: PG) => {
   const session = JSON.parse(
@@ -24,18 +27,44 @@ export const edInitSync = (p: PG) => {
           if (!paramsOK) {
             if (e.site_id && e.page_id) {
               p.site.id = e.site_id;
-              p.page.id = e.page_id;
+              p.page.cur.id = e.page_id;
               navigate(`/ed/${e.site_id}/${e.page_id}`);
             }
           } else {
             p.site.id = params.site_id;
-            p.page.id = params.page_id;
+            p.page.cur.id = params.page_id;
             p.render();
           }
         },
         site_loaded({ site }) {
           p.site = site;
           p.render();
+        },
+        async remote_svlocal(data) {
+          if (p[data.type].cur.id === data.id) {
+            const doc = p[data.type].doc as Y.Doc;
+
+            if (doc) {
+              const diff_remote = Y.encodeStateAsUpdate(
+                doc,
+                decompress(data.sv_local)
+              );
+              const sv_remote = Y.encodeStateVector(doc);
+
+              const sv = Buffer.from(compress(sv_remote));
+              const diff = Buffer.from(compress(diff_remote));
+              const res = await p.sync.yjs.sv_remote(
+                data.type,
+                data.id,
+                sv,
+                diff
+              );
+              if (res) {
+                Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
+                await treeRebuild(p, { note: "sv_remote" });
+              }
+            }
+          }
         },
       },
     }).then((e) => (p.sync = e));

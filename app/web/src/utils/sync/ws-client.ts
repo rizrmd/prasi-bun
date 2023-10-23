@@ -8,6 +8,7 @@ import {
   SyncActionDefinition,
   SyncActionPaths,
 } from "../../../../srv/ws/sync/actions-def";
+import { UserConf } from "../../../../srv/ws/sync/entity/user";
 import { SyncType } from "../../../../srv/ws/sync/type";
 import { ESite } from "../../render/ed/logic/ed-global";
 import { w } from "../types/general";
@@ -48,12 +49,13 @@ const sendWs = (ws: WebSocket, msg: any) => {
 export const clientStartSync = async (arg: {
   user_id: string;
   events: {
-    editor_start: (arg: {
-      user_id: string;
-      site_id?: string;
-      page_id?: string;
-    }) => void;
+    editor_start: (arg: UserConf) => void;
     site_loaded: (arg: { site: ESite }) => void;
+    remote_svlocal: (arg: {
+      type: "page" | "comp";
+      id: string;
+      sv_local: Uint8Array;
+    }) => void;
   };
 }) => {
   const { user_id, events } = arg;
@@ -115,6 +117,7 @@ const connect = (user_id: string, event: ClientEventObject) => {
           conf.ws = ws;
         };
         ws.onclose = async () => {
+          console.log("disconnected..");
           w.offline = true;
           if (!conf.ws) {
             await connect(user_id, event);

@@ -8,3 +8,4 @@ export * from "./comp_undo";
 export * from "./comp_redo";
 export * from "./yjs_sv_local";
 export * from "./yjs_diff_local";
+export * from "./yjs_sv_remote";

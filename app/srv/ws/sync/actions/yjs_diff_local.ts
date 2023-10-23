@@ -2,10 +2,10 @@ import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { gunzipAsync } from "../entity/zlib";
-import { ActionCtx } from "../type";
+import { SyncConnection } from "../type";
 
 export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
-  this: ActionCtx,
+  this: SyncConnection,
   mode,
   id,
   bin
@@ -15,7 +15,10 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
   }
   const doc = docs[mode][id].doc as Y.Doc;
   const diff = await gunzipAsync(bin);
-  Y.applyUpdate(doc, diff);
+
+  const um = docs[mode][id].um;
+  um.addTrackedOrigin(this.client_id);
+  Y.applyUpdate(doc, diff, this.client_id);
 
   const save = Y.encodeStateAsUpdate(doc);
   snapshot.set(mode, id, "bin", save);

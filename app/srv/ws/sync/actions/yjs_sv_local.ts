@@ -1,10 +1,10 @@
 import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
 import { gunzipAsync, gzipAsync } from "../entity/zlib";
-import { ActionCtx } from "../type";
+import { SyncConnection } from "../type";
 
 export const yjs_sv_local: SAction["yjs"]["sv_local"] = async function (
-  this: ActionCtx,
+  this: SyncConnection,
   mode,
   id,
   bin

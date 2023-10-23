@@ -3,27 +3,15 @@ import { ServerWebSocket, WebSocketHandler } from "bun";
 import { Packr } from "msgpackr";
 import { WSData } from "../../../../pkgs/core/server/create";
 import { ClientEvent } from "../../../web/src/utils/sync/ws-client";
-import { loadDefaultSite } from "./editor/load";
-import { ActionCtx, SyncType } from "./type";
 import { SyncActionPaths } from "./actions-def";
 import * as actions from "./actions/index";
+import { loadDefaultSite } from "./editor/load";
 import { UserConf, user } from "./entity/user";
+import { SyncType } from "./type";
+import { conns, wconns } from "./entity/conn";
 const packr = new Packr({ structuredClone: true });
 
-const conns = new Map<
-  string,
-  {
-    user_id: string;
-    conf?: UserConf & { toJSON: () => UserConf };
-    ws: ServerWebSocket<WSData>;
-    msg: {
-      pending: Record<string, Promise<any>>;
-      resolve: Record<string, (result: any) => void>;
-    };
-  }
->();
-const wconns = new WeakMap<ServerWebSocket<WSData>, string>();
-const send = (ws: ServerWebSocket<WSData>, msg: any) => {
+export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
   ws.sendBinary(packr.pack(msg));
 };
 export const syncHandler: WebSocketHandler<WSData> = {
@@ -31,11 +19,12 @@ export const syncHandler: WebSocketHandler<WSData> = {
     const client_id = createId();
     conns.set(client_id, {
       user_id: "",
+      client_id,
       ws,
       msg: { pending: {}, resolve: {} },
     });
     wconns.set(ws, client_id);
-    send(ws, { type: SyncType.ClientID, client_id });
+    sendWS(ws, { type: SyncType.ClientID, client_id });
   },
   close(ws, code, reason) {
     const conn_id = wconns.get(ws);
@@ -69,7 +58,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
               return true;
             },
           }) as UserConf & { toJSON: () => UserConf };
-          send(ws, {
+          sendWS(ws, {
             type: SyncType.Event,
             event: "editor_start" as ClientEvent,
             data: conn.conf.toJSON(),
@@ -84,9 +73,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
               console.log(`app/ws/edit/sync/${actionName}.ts not found`);
             }
             if (baseAction) {
-              const action = baseAction.bind({
-                user: { id: conn.user_id, conf: conn.conf },
-              } as ActionCtx);
+              const action = baseAction.bind(conn);
 
               ws.sendBinary(
                 packr.pack({

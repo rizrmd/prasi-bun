@@ -2,16 +2,49 @@ import { syncronize } from "y-pojo";
 import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
+import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
-import { ActionCtx } from "../type";
+import { SyncConnection, SyncType } from "../type";
+import { conns } from "../entity/conn";
+import { sendWS } from "../sync-handler";
 
 export const page_load: SAction["page"]["load"] = async function (
-  this: ActionCtx,
+  this: SyncConnection,
   id: string
 ) {
   let snap = snapshot.get("page", id);
   let ydoc = docs.page[id];
- 
+
+  if (this.conf) this.conf.page_id = id;
+
+  const createUndoManager = (root: Y.Map<any>) => {
+    const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: false });
+    return um;
+  };
+
+  const attachOnUpdate = (doc: Y.Doc, um: Y.UndoManager) => {
+    doc.on("update", async (update: Uint8Array, origin: any) => {
+      if (origin === um) {
+      } else {
+        const sv_local = await gzipAsync(update);
+        user.active.findAll({ page_id: id }).map((e) => {
+          if (e.client_id === origin) return;
+          const ws = conns.get(e.client_id)?.ws;
+          if (ws)
+            sendWS(ws, {
+              type: SyncType.Event,
+              event: "remote_svlocal",
+              data: { type: "page", sv_local, id },
+            });
+        });
+      }
+    });
+  };
+
+  const defaultActive = {
+    select: "" as "" | "comp" | "item" | "section" | "text",
+  };
+
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
     if (page) {
@@ -19,7 +52,7 @@ export const page_load: SAction["page"]["load"] = async function (
       let root = doc.getMap("map");
       syncronize(root, { id, root: page.content_tree });
 
-      const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
+      const um = createUndoManager(root);
       docs.page[id] = {
         doc: doc as any,
         id,
@@ -27,6 +60,8 @@ export const page_load: SAction["page"]["load"] = async function (
       };
 
       const bin = Y.encodeStateAsUpdate(doc);
+      attachOnUpdate(doc, um);
+
       snapshot.update({
         bin,
         id,
@@ -34,6 +69,15 @@ export const page_load: SAction["page"]["load"] = async function (
         name: page.name,
         ts: Date.now(),
         url: page.url,
+        id_site: page.id_site,
+      });
+
+      user.active.add({
+        ...defaultActive,
+        client_id: this.client_id,
+        user_id: this.user_id,
+        site_id: page.id_site,
+        page_id: page.id,
       });
 
       return {
@@ -48,12 +92,22 @@ export const page_load: SAction["page"]["load"] = async function (
     Y.applyUpdate(doc, snap.bin);
     let root = doc.getMap("map");
 
-    const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: true });
+    const um = createUndoManager(root);
+    attachOnUpdate(doc, um);
+
     docs.page[id] = {
       doc: doc as any,
       id,
       um,
     };
+
+    user.active.add({
+      ...defaultActive,
+      client_id: this.client_id,
+      user_id: this.user_id,
+      site_id: snap.id_site,
+      page_id: snap.id,
+    });
 
     return {
       id: id,
@@ -62,6 +116,14 @@ export const page_load: SAction["page"]["load"] = async function (
       snapshot: await gzipAsync(snap.bin),
     };
   } else if (snap && ydoc) {
+    user.active.add({
+      ...defaultActive,
+      client_id: this.client_id,
+      user_id: this.user_id,
+      site_id: snap.id_site,
+      page_id: snap.id,
+    });
+
     return {
       id: snap.id,
       url: snap.url,

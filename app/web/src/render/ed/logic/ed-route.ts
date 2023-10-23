@@ -31,6 +31,8 @@ export const edRoute = async (p: PG) => {
         const doc = new Y.Doc();
         Y.applyUpdate(doc, decompress(page.snapshot));
         doc.on("update", async (bin: Uint8Array, origin: any) => {
+          if (origin === "sv_remote") return;
+
           const res = await p.sync.yjs.sv_local(
             "page",
             p.page.cur.id,
