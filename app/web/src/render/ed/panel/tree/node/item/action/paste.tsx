@@ -1,7 +1,7 @@
 import { syncronize } from "y-pojo";
 import { IContent } from "../../../../../../../utils/types/general";
 import { MItem } from "../../../../../../../utils/types/item";
-import { PG } from "../../../../../logic/ed-global";
+import { PG, active } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
 import { fillID } from "../../../../../../editor/tools/fill-id";
 
@@ -31,8 +31,10 @@ export const edActionPaste = async (p: PG, item: IContent) => {
             }
           }
           const map = new Y.Map();
-          syncronize(map, fillID(child));
+          const newchild = fillID(child);
+          syncronize(map, newchild);
           mchilds.push([map]);
+          active.item_id = newchild.id;
         }
       });
     }

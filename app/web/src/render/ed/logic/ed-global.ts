@@ -3,9 +3,8 @@ import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
-import { IText, MText } from "../../../utils/types/text";
-import { FNCompDef } from "../../../utils/types/meta-fn";
 import { ISection } from "../../../utils/types/section";
+import { IText, MText } from "../../../utils/types/text";
 
 const EmptySite = {
   id: "",
@@ -29,6 +28,20 @@ const EmptyPage = {
 const EmptyComp = {
   id: "",
   snapshot: null as null | Uint8Array,
+};
+
+const target = { active_id: false as any };
+export const active = {
+  get item_id() {
+    if (target.active_id === false) {
+      target.active_id = localStorage.getItem("prasi-active-id") || "";
+    }
+    return target.active_id;
+  },
+  set item_id(val: string) {
+    localStorage.setItem("prasi-active-id", val);
+    target.active_id = val;
+  },
 };
 
 export type EdMeta = {
@@ -59,7 +72,7 @@ export const EDGlobal = {
     root: null as null | IRoot,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
-    meta: {} as Record<string, { item: IContent; mitem?: MContent }>,
+    meta: {} as Record<string, EdMeta>,
     list: {} as Record<string, EPage>,
   },
   comp: {
@@ -69,9 +82,6 @@ export const EDGlobal = {
     list: {} as Record<string, { cur: EComp; doc: DComp }>,
   },
   ui: {
-    select: {
-      id: "",
-    },
     tree: {
       open: {} as Record<string, string[]>,
     },
