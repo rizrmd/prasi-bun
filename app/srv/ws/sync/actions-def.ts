@@ -5,28 +5,36 @@ export const SyncActionDefinition = {
     "load": "2"
   },
   "comp": {
-    "list": "3",
-    "group": "4",
-    "load": "5"
-  },
-  "page": {
-    "list": "6",
+    "undo": "3",
+    "redo": "4",
+    "list": "5",
+    "group": "6",
     "load": "7"
   },
+  "page": {
+    "undo": "8",
+    "redo": "9",
+    "list": "10",
+    "load": "11"
+  },
   "yjs": {
-    "sv_local": "8",
-    "diff_local": "9"
+    "sv_local": "12",
+    "diff_local": "13"
   }
 };
 export const SyncActionPaths = {
   "0": "site.list",
   "1": "site.group",
   "2": "site.load",
-  "3": "comp.list",
-  "4": "comp.group",
-  "5": "comp.load",
-  "6": "page.list",
-  "7": "page.load",
-  "8": "yjs.sv_local",
-  "9": "yjs.diff_local"
+  "3": "comp.undo",
+  "4": "comp.redo",
+  "5": "comp.list",
+  "6": "comp.group",
+  "7": "comp.load",
+  "8": "page.undo",
+  "9": "page.redo",
+  "10": "page.list",
+  "11": "page.load",
+  "12": "yjs.sv_local",
+  "13": "yjs.diff_local"
 };

@@ -5,19 +5,39 @@ import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { indentHook } from "./item/indent-hook";
+import { useLocal } from "web-utils";
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
+  const local = useLocal({
+    rightClick: null as null | React.MouseEvent<HTMLDivElement, MouseEvent>,
+  });
   if (!node || !node.data) return <></>;
   const item = node.data?.item;
   const isComponent = item.type === "item" && item.component?.id;
+
   return (
     <div
       className={cx(
         "relative border-b flex items-stretch hover:bg-blue-50 min-h-[26px]",
         isComponent && `bg-purple-50`
       )}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        local.rightClick = event;
+        local.render();
+      }}
     >
-      <EdTreeCtxMenu node={node} prm={prm} />
+      {local.rightClick && (
+        <EdTreeCtxMenu
+          node={node}
+          prm={prm}
+          event={local.rightClick}
+          onClose={() => {
+            local.rightClick = null;
+            local.render();
+          }}
+        />
+      )}
       <EdTreeIndent node={node} prm={prm} />
       <EdTreeName node={node} prm={prm} />
       <EdTreeAction node={node} prm={prm} />
