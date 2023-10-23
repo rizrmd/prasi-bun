@@ -18,7 +18,11 @@ export const edUndoManager = async (p: PG) => {
         (evt.ctrlKey || evt.metaKey) &&
         !evt.shiftKey
       ) {
-        console.log("redo");
+        if (p.comp.cur.id) {
+          p.sync.comp.redo(p.comp.cur.id);
+        } else {
+          p.sync.page.redo(p.page.cur.id);
+        }
         return;
       }
 
@@ -27,7 +31,11 @@ export const edUndoManager = async (p: PG) => {
         (evt.ctrlKey || evt.metaKey) &&
         evt.shiftKey
       ) {
-        console.log("redo");
+        if (p.comp.cur.id) {
+          p.sync.comp.redo(p.comp.cur.id);
+        } else {
+          p.sync.page.redo(p.page.cur.id);
+        }
 
         return;
       }

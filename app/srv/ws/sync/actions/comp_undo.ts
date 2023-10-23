@@ -1,3 +1,3 @@
-import { ActionCtx } from "../type";
+import { SyncConnection } from "../type";
 
-export const comp_undo = async function (this: ActionCtx, id: string) {};
+export const comp_undo = async function (this: SyncConnection, id: string) {};

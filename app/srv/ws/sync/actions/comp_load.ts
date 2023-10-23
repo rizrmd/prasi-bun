@@ -2,9 +2,9 @@ import { syncronize } from "y-pojo";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { gzipAsync } from "../entity/zlib";
-import { ActionCtx } from "../type";
+import { SyncConnection } from "../type";
 
-export const comp_load = async function (this: ActionCtx, id: string) {
+export const comp_load = async function (this: SyncConnection, id: string) {
   let snap = snapshot.get("comp", id);
   let ydoc = docs.comp[id];
 

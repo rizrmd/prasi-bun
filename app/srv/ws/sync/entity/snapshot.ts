@@ -6,11 +6,14 @@ const emptySnapshot = {
   type: "" as "" | "comp" | "page",
   id: "",
   bin: new Uint8Array(),
-  url: "",
   name: "",
   ts: Date.now(),
 };
-export type DocSnapshot = typeof emptySnapshot;
+export type DocSnapshot = typeof emptySnapshot & {
+  type: "page";
+  url: string;
+  id_site: string;
+};
 
 export const snapshot = {
   _db: null as null | RootDatabase<DocSnapshot>,
@@ -32,7 +35,7 @@ export const snapshot = {
     const id = `${data.type}-${data.id}`;
     let res = this.db.get(id);
     if (!res) {
-      await this.db.put(id, structuredClone(emptySnapshot));
+      await this.db.put(id, structuredClone(emptySnapshot as DocSnapshot));
       res = this.db.get(id);
     }
     return res as DocSnapshot;
