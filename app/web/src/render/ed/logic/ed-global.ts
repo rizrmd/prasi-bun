@@ -99,6 +99,7 @@ export const EDGlobal = {
         HTML: false,
         CSS: false,
       },
+      rename_id: "",
       open: {} as Record<string, string[]>,
     },
     popup: {

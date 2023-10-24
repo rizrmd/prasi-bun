@@ -16,11 +16,15 @@
   width: 100%;
   background: white;
   font-size: 14px;
-  padding: 3px 20px 3px 10px;
+  padding: 3px 5px 3px 10px;
   text-align: left;
   line-height: 1.5;
   margin: 0;
   outline: 0;
+}
+
+.MenuItem:hover .hot-key {
+  border-color: white !important;
 }
 
 .MenuItem:last-child {

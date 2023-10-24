@@ -169,22 +169,27 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         }
 
         if (e.key === "Enter") {
-          p.ui.tree.search = "";
-          p.ui.prevent_indent_hook = false;
-          active.item_id = "";
-          p.render();
-          setTimeout(() => {
-            active.item_id = item.id;
+          if (p.ui.tree.search) {
+            p.ui.tree.search = "";
+            p.ui.prevent_indent_hook = false;
+            active.item_id = "";
             p.render();
             setTimeout(() => {
-              const f = document.querySelector(
-                `.tree-${item.id}`
-              ) as HTMLInputElement;
-              if (f) {
-                f.focus();
-              }
+              active.item_id = item.id;
+              p.render();
+              setTimeout(() => {
+                const f = document.querySelector(
+                  `.tree-${item.id}`
+                ) as HTMLInputElement;
+                if (f) {
+                  f.focus();
+                }
+              });
             });
-          });
+          } else {
+            p.ui.tree.rename_id = item.id;
+            p.render();
+          }
           return;
         }
 
