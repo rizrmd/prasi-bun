@@ -200,6 +200,14 @@ const createPassProp = (
 
       const scopeIndex = { ..._existingScopeIndex, [meta.item.id]: arg.idx };
 
+      if (!meta.scope) {
+        meta.scope = {};
+      }
+      for (const [k, v] of Object.entries(arg)) {
+        if (k === "children") continue;
+        meta.scope[k] = v;
+      }
+      
       return modifyChildIndex(arg.children, scopeIndex);
     }
 
