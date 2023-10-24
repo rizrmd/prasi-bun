@@ -78,7 +78,7 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
 
   useEffect(() => {
     if (p.status !== "init" && w.prasiApi) {
-      for (const [k, v] of Object.entries(deepClone(EditorGlobal))) {
+      for (const [k, v] of Object.entries(EditorGlobal)) {
         if (k === "session" || k === "site" || "status") continue;
         (p as any)[k] = v;
       }
