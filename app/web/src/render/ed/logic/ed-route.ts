@@ -33,7 +33,6 @@ export const edRoute = async (p: PG) => {
         doc.on("update", async (bin: Uint8Array, origin: any) => {
           if (origin === "sv_remote" || origin === "local") return;
 
-          console.log(origin);
           const res = await p.sync.yjs.sv_local(
             "page",
             p.page.cur.id,

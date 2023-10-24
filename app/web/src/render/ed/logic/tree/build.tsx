@@ -147,8 +147,10 @@ const walkMap = (
     const fcomp = parent_comp.mitem.get("component");
     if (fcomp) {
       const ref_ids = fcomp.get("ref_ids");
+
       if (ref_ids) {
         let ref_id = ref_ids.get(id);
+
         if (!ref_id) {
           ref_id = createId();
           ref_ids.set(id, ref_id);
@@ -157,7 +159,9 @@ const walkMap = (
       }
     }
   }
+
   mapItem(mitem, item);
+
   if (override_id) {
     item.id = override_id;
   }
@@ -190,8 +194,9 @@ const walkMap = (
           mitem_comp.set("ref_ids", new Y.Map() as any);
           ref_ids = {};
         }
-
+        const original_id = item.id;
         mapItem(mcomp, item);
+        item.id = original_id;
 
         const meta: EdMeta = {
           item,
@@ -200,6 +205,7 @@ const walkMap = (
           parent_comp,
         };
         p.page.meta[item.id] = meta;
+
         if (!skip_tree) {
           p.page.tree.push({
             id: item.id,

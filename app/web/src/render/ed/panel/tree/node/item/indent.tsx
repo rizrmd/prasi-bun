@@ -60,7 +60,11 @@ export const EdTreeIndent = ({
             <ComponentIcon />
           </div>
         )}
-        {item.type !== "text" && prm.hasChild && (
+        {item.type === "item" && prm.hasChild && (
+          <>{prm.isOpen ? <ChevronDown /> : <ChevronRight />}</>
+        )}
+
+        {item.type === "section" && (
           <>{prm.isOpen ? <ChevronDown /> : <ChevronRight />}</>
         )}
       </div>
