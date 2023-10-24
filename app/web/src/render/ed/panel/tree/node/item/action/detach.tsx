@@ -17,14 +17,15 @@ export const edActionDetach = (p: PG, item: IItem) => {
       if (comp) {
         fillID(comp);
         comp.id = item.id;
-        delete comp.component;
+        if (comp.component) comp.component.id = "";
         mitem.doc?.transact(() => {
           mitem.parent.forEach((e, k) => {
-            if (e == mitem) {
+            if (e.get("id") === mitem.get("id")) {
               mitem.parent.delete(k);
               const nmap = new Y.Map();
               syncronize(nmap, comp);
               mitem.parent.insert(k, [nmap]);
+              console.log(nmap.toJSON());
             }
           });
         });

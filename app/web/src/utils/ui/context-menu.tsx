@@ -29,13 +29,14 @@ export const MenuItem = forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     label: ReactNode;
+    hotKey?: ReactNode;
     disabled?: boolean;
   }
->(({ label, disabled, ...props }, ref) => {
+>(({ label, disabled, hotKey, ...props }, ref) => {
   return (
     <button
       {...props}
-      className="MenuItem"
+      className="MenuItem flex justify-between items-center"
       ref={ref}
       role="menuitem"
       disabled={disabled}
@@ -45,6 +46,7 @@ export const MenuItem = forwardRef<
       }}
     >
       {label}
+      {hotKey && <div className="hotKey">{hotKey}</div>}
     </button>
   );
 });
@@ -165,7 +167,7 @@ export const Menu = forwardRef<
         // >
         //   <FloatingFocusManager context={context} initialFocus={refs.floating}>
         <div
-          className="ContextMenu"
+          className="ContextMenu min-w-[150px]"
           ref={refs.setFloating}
           style={floatingStyles}
           {...getFloatingProps()}
