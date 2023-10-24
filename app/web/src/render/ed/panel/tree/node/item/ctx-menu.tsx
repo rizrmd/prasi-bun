@@ -57,7 +57,10 @@ export const EdTreeCtxMenu = ({
   if (!item) {
     return (
       <Menu mouseEvent={event} onClose={onClose}>
-        <MenuItem label={<div className="text-gray-400">Unavailable</div>} />
+        <MenuItem
+          disabled
+          label={<div className="text-slate-500">Unavailable</div>}
+        />
       </Menu>
     );
   }
@@ -79,7 +82,7 @@ export const EdTreeCtxMenu = ({
       {type === "item" && !comp?.id && (
         <MenuItem
           label="Create Component"
-          onClick={() => edActionNewComp(p, item)}
+          onClick={(e) => edActionNewComp(p, item, e)}
         />
       )}
       {!item.hidden && (

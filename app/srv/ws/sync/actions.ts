@@ -4,6 +4,7 @@ import {
   EPage,
   ESite,
 } from "../../../web/src/render/ed/logic/ed-global";
+import { IItem } from "../../../web/src/utils/types/item";
 
 /* 
    WARNING:
@@ -22,8 +23,10 @@ export const SyncActions = {
     load: async (id: string) => ({}) as ESite | void,
   },
   comp: {
+    new: async (arg: { group_id: string; item: IItem }) => {},
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
-    group: () => ({}) as Record<string, string[]>,
+    group: async (id_site: string) =>
+      ({}) as Record<string, { id: string; name: string; comps: string[] }>,
     load: async (id: string) => ({}) as EComp | void,
   },
   page: {

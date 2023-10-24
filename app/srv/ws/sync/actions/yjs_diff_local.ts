@@ -1,6 +1,5 @@
 import { SAction } from "../actions";
 import { Y, docs } from "../entity/docs";
-import { snapshot } from "../entity/snapshot";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 

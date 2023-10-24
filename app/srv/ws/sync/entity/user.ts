@@ -15,6 +15,7 @@ export const user = {
       user_id: string;
       site_id: string;
       page_id: string;
+      comp_id?: string;
       select: "" | "comp" | "item" | "section" | "text";
     },
     "client_id"

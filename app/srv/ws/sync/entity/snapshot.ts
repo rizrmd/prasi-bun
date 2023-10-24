@@ -2,18 +2,46 @@ import { dir } from "dir";
 import { RootDatabase, open } from "lmdb";
 import { g } from "utils/global";
 
-const emptySnapshot = {
-  type: "" as "" | "comp" | "page" | "site",
+type EmptySnapshot = {
+  type: "";
+  id: string;
+  bin: Uint8Array;
+  id_doc: number;
+  name: string;
+  ts: number;
+};
+type CompSnapshot = {
+  type: "comp";
+  id: string;
+  bin: Uint8Array;
+  id_doc: number;
+  name: string;
+  ts: number;
+};
+type PageSnapshot = {
+  type: "page";
+  id: string;
+  bin: Uint8Array;
+  id_doc: number;
+  name: string;
+  ts: number;
+  url: string;
+  id_site: string;
+};
+type DocSnapshotMap = {
+  page: PageSnapshot;
+  comp: CompSnapshot;
+  "": EmptySnapshot;
+};
+export type DocSnapshot = EmptySnapshot | CompSnapshot | PageSnapshot;
+
+const emptySnapshot: DocSnapshot = {
+  type: "",
   id: "",
   bin: new Uint8Array(),
   id_doc: 0,
   name: "",
   ts: Date.now(),
-};
-export type DocSnapshot = typeof emptySnapshot & {
-  type: "page";
-  url: string;
-  id_site: string;
 };
 
 export const snapshot = {
@@ -41,8 +69,8 @@ export const snapshot = {
     }
     return res as DocSnapshot;
   },
-  get(type: string, id: string) {
-    return this.db.get(`${type}-${id}`);
+  get<K extends DocSnapshot["type"]>(type: K, id: string) {
+    return this.db.get(`${type}-${id}`) as DocSnapshotMap[K] | null;
   },
   async update(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
@@ -50,7 +78,7 @@ export const snapshot = {
     return true;
   },
   async set<T extends keyof DocSnapshot>(
-    type: string,
+    type: keyof DocSnapshotMap,
     id: string,
     key: T,
     value: DocSnapshot[T]
