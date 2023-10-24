@@ -52,8 +52,6 @@ export const syncHandler: WebSocketHandler<WSData> = {
             await loadDefaultSite(user_id);
           }
 
-          console.log(conf);
-
           conn.conf = new Proxy(conf, {
             get(_, p) {
               const conf = user.conf.get(user_id);

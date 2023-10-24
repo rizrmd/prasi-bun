@@ -93,7 +93,7 @@ const walkLoad = async (p: PG, mitem: MItem, loaded: Set<string>) => {
 
       const pcomp = p.comp.list[id];
       if (pcomp) {
-        const pitem = pcomp.doc.getMap("map").get("item");
+        const pitem = pcomp.doc.getMap("map").get("root");
         if (pitem && !loaded.has(id)) {
           await walkLoad(p, pitem, loaded);
         }
@@ -137,6 +137,12 @@ const walkMap = (
   let override_id = "";
   const id = mitem.get("id");
 
+  let skip_tree = arg.skip_add_tree;
+  let skip_tree_child = skip_tree;
+  if (id && p.ui.tree.item_loading.includes(id)) {
+    skip_tree_child = true;
+  }
+
   if (parent_comp && id) {
     const fcomp = parent_comp.mitem.get("component");
     if (fcomp) {
@@ -159,7 +165,7 @@ const walkMap = (
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
   const metaNotFound = () => {
-    if (!arg.skip_add_tree) {
+    if (!skip_tree) {
       p.page.tree.push({
         id: item.id,
         parent: parent_item.id,
@@ -174,14 +180,17 @@ const walkMap = (
     }
 
     const ref_comp = p.comp.list[item_comp.id];
+
     if (ref_comp && mitem_comp) {
-      const mcomp = ref_comp.doc.getMap("map").get("item");
+      const mcomp = ref_comp.doc.getMap("map").get("root");
+
       if (mcomp) {
         let ref_ids: Record<string, string> = item_comp.ref_ids;
         if (!ref_ids) {
           mitem_comp.set("ref_ids", new Y.Map() as any);
           ref_ids = {};
         }
+
         mapItem(mcomp, item);
 
         const meta: EdMeta = {
@@ -191,7 +200,7 @@ const walkMap = (
           parent_comp,
         };
         p.page.meta[item.id] = meta;
-        if (!arg.skip_add_tree) {
+        if (!skip_tree) {
           p.page.tree.push({
             id: item.id,
             parent: parent_item.id,
@@ -221,6 +230,7 @@ const walkMap = (
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_comp: { mitem: mitem as MItem, mcomp },
                       portal: arg.portal,
+                      skip_add_tree: skip_tree_child,
                     });
                   }
                 }
@@ -263,7 +273,7 @@ const walkMap = (
 
   p.page.meta[item.id] = meta;
 
-  if (!arg.skip_add_tree) {
+  if (!skip_tree) {
     p.page.tree.push({
       id: item.id,
       parent: parent_item.id,
@@ -279,6 +289,7 @@ const walkMap = (
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_comp: arg.parent_comp,
       portal: arg.portal,
+      skip_add_tree: skip_tree_child,
     });
   }
 };

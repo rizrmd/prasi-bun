@@ -15,7 +15,7 @@ import { w } from "../types/general";
 import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });
 
-const WS_DEBUG = false;
+const WS_DEBUG = true;
 
 const conf = {
   ws: null as null | WebSocket,

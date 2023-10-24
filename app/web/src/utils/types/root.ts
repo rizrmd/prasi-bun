@@ -15,4 +15,4 @@ export type MRoot = TypedMap<{
 }>;
 
 export type DPage = TypedDoc<{ map: TypedMap<{ id: string; root: MRoot }> }>;
-export type DComp = TypedDoc<{ map: TypedMap<{ id: string; item: MItem }> }>;
+export type DComp = TypedDoc<{ map: TypedMap<{ id: string; root: MItem }> }>;
