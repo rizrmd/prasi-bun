@@ -43,7 +43,7 @@ export const useGlobal = <T extends object>(
   const { global, render } = ctx;
 
   if (!global[_id]) {
-    global[_id] = defaultValue;
+    global[_id] = structuredClone(defaultValue);
   }
 
   useEffect(() => {

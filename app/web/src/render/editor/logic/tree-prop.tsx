@@ -67,8 +67,6 @@ export const treePropEval = (
               parent_id: string;
               _scopeIndex?: Record<string, string>;
             }) => {
-              console.log(prop_name);
-
               if (prop.content) {
                 const meta = p.treeMeta[prop.content.id];
                 if (meta) {
