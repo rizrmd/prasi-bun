@@ -160,9 +160,6 @@ export const mergeScopeUpwards = (
     cur = p.treeMeta[cur.parent_id];
   }
 
-  if (meta.item.name === "item" && meta.item.type === "item") {
-    console.log(finalScope);
-  }
 
   return finalScope;
 };
