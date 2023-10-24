@@ -3,9 +3,10 @@ import { RootDatabase, open } from "lmdb";
 import { g } from "utils/global";
 
 const emptySnapshot = {
-  type: "" as "" | "comp" | "page",
+  type: "" as "" | "comp" | "page" | "site",
   id: "",
   bin: new Uint8Array(),
+  id_doc: 0,
   name: "",
   ts: Date.now(),
 };

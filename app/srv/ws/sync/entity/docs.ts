@@ -5,6 +5,14 @@ import { DPage } from "../../../../web/src/utils/types/root";
 export * as Y from "yjs";
 
 export const docs = {
+  site: {} as Record<
+    string,
+    {
+      id: string;
+      doc: DPage;
+      um: Y.UndoManager;
+    }
+  >,
   page: {} as Record<
     string,
     {

@@ -76,7 +76,7 @@ export const EdTreeCtxMenu = ({
           onClick={() => edActionDetach(p, item)}
         />
       )}
-      {type === "item" && comp?.id && (
+      {type === "item" && !comp?.id && (
         <MenuItem
           label="Create Component"
           onClick={() => edActionNewComp(p, item)}

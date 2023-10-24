@@ -1,19 +1,20 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
+import { ReactElement } from "react";
 import { clientStartSync } from "../../../utils/sync/ws-client";
-import { IContent, MContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
-import { ReactElement } from "react";
 
 const EmptySite = {
   id: "",
   name: "",
   domain: "",
-  js: "",
-  js_compiled: "",
   config: { api_url: "" },
+  snapshot: null as null | Uint8Array,
+
+  // js: "",
+  // js_compiled: "",
 };
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
@@ -95,7 +96,14 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
-      comp: null as null | ((comp_id: string) => void | Promise<void>),
+      comp: null as null | true | ((comp_id: string) => void | Promise<void>),
+      compGroup: null as
+        | null
+        | true
+        | {
+            event: React.MouseEvent<HTMLElement, MouseEvent>;
+            pick: (group_id: string) => void | Promise<void>;
+          },
     },
   },
 };

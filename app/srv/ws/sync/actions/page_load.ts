@@ -1,12 +1,12 @@
 import { syncronize } from "y-pojo";
 import { SAction } from "../actions";
+import { conns } from "../entity/conn";
 import { Y, docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
-import { SyncConnection, SyncType } from "../type";
-import { conns } from "../entity/conn";
 import { sendWS } from "../sync-handler";
+import { SyncConnection, SyncType } from "../type";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
@@ -17,27 +17,34 @@ export const page_load: SAction["page"]["load"] = async function (
 
   if (this.conf) this.conf.page_id = id;
 
-  const createUndoManager = (root: Y.Map<any>) => {
-    const um = new Y.UndoManager(root, { ignoreRemoteMapChanges: false });
+  const createUndoManager = async (root: Y.Map<any>) => {
+    const um = new Y.UndoManager(root, {
+      ignoreRemoteMapChanges: true,
+    });
+
     return um;
   };
 
-  const attachOnUpdate = (doc: Y.Doc, um: Y.UndoManager) => {
+  const attachOnUpdate = async (doc: Y.Doc, um: Y.UndoManager) => {
+    snapshot.set("page", id, "id_doc", um.doc.clientID);
+
     doc.on("update", async (update: Uint8Array, origin: any) => {
-      if (origin === um) {
-      } else {
-        const sv_local = await gzipAsync(update);
-        user.active.findAll({ page_id: id }).map((e) => {
+      const bin = Y.encodeStateAsUpdate(doc);
+      snapshot.set("page", id, "bin", bin);
+
+      const sv_local = await gzipAsync(update);
+      user.active.findAll({ page_id: id }).map((e) => {
+        if (origin !== um) {
           if (e.client_id === origin) return;
-          const ws = conns.get(e.client_id)?.ws;
-          if (ws)
-            sendWS(ws, {
-              type: SyncType.Event,
-              event: "remote_svlocal",
-              data: { type: "page", sv_local, id },
-            });
-        });
-      }
+        }
+        const ws = conns.get(e.client_id)?.ws;
+        if (ws)
+          sendWS(ws, {
+            type: SyncType.Event,
+            event: "remote_svlocal",
+            data: { type: "page", sv_local, id },
+          });
+      });
     });
   };
 
@@ -52,7 +59,7 @@ export const page_load: SAction["page"]["load"] = async function (
       let root = doc.getMap("map");
       syncronize(root, { id, root: page.content_tree });
 
-      const um = createUndoManager(root);
+      const um = await createUndoManager(root);
       docs.page[id] = {
         doc: doc as any,
         id,
@@ -60,7 +67,7 @@ export const page_load: SAction["page"]["load"] = async function (
       };
 
       const bin = Y.encodeStateAsUpdate(doc);
-      attachOnUpdate(doc, um);
+      await attachOnUpdate(doc, um);
 
       snapshot.update({
         bin,
@@ -69,6 +76,7 @@ export const page_load: SAction["page"]["load"] = async function (
         name: page.name,
         ts: Date.now(),
         url: page.url,
+        id_doc: doc.clientID,
         id_site: page.id_site,
       });
 
@@ -89,11 +97,12 @@ export const page_load: SAction["page"]["load"] = async function (
     }
   } else if (snap && !ydoc) {
     const doc = new Y.Doc();
+    snapshot.set("page", id, "id_doc", doc.clientID);
     Y.applyUpdate(doc, snap.bin);
     let root = doc.getMap("map");
 
-    const um = createUndoManager(root);
-    attachOnUpdate(doc, um);
+    const um = await createUndoManager(root);
+    await attachOnUpdate(doc, um);
 
     docs.page[id] = {
       doc: doc as any,
