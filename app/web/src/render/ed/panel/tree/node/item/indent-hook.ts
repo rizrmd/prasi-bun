@@ -7,6 +7,10 @@ export const indentHook = (
   local: { tree: null | TreeMethods; render: () => void }
 ) => {
   useEffect(() => {
+    if (p.ui.prevent_indent_hook) {
+      p.ui.prevent_indent_hook = false;
+      return;
+    }
     const open = JSON.parse(localStorage.getItem("prasi-tree-open") || "{}");
     p.ui.tree.open = open;
 

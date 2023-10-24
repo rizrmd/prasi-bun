@@ -1,5 +1,5 @@
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta, PG } from "../../logic/ed-global";
+import { EDGlobal, EdMeta, PG, active } from "../../logic/ed-global";
 import { NodeModel } from "@minoru/react-dnd-treeview";
 
 import uFuzzy from "@leeoniya/ufuzzy";
@@ -14,6 +14,8 @@ export const EdTreeSearch = () => {
     hover: false,
     cursor: null as number | null,
   });
+
+  p.ui.tree.search_ref = local.sref;
 
   useEffect(() => {
     const input = local.sref;
@@ -59,6 +61,14 @@ export const EdTreeSearch = () => {
             if (!local.hover && !p.ui.tree.search) {
               local.focus = false;
               local.render();
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "Enter") {
+              const first = document.querySelector(
+                ".tree-item:first-child"
+              ) as HTMLInputElement;
+              if (first) first.focus();
             }
           }}
         />
@@ -129,9 +139,8 @@ export const doTreeSearch = (p: PG) => {
           <div
             className={css`
               b {
-                font-weight: bold;
-                color: #df9100;
-                text-decoration: underline;
+                background: #4c71f6;
+                color: white;
               }
             `}
             dangerouslySetInnerHTML={{ __html: text }}

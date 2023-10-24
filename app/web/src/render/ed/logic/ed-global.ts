@@ -87,10 +87,12 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
+    prevent_indent_hook: false,
     syncing: false,
     tree: {
       item_loading: [] as string[],
       search: "",
+      search_ref: null as null | HTMLInputElement,
       search_mode: {
         Name: true,
         JS: false,
