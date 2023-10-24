@@ -4,6 +4,7 @@ import { Loading } from "../../../utils/ui/loading";
 import { PG } from "./ed-global";
 import { Y } from "../../../../../srv/ws/sync/entity/docs";
 import { treeRebuild } from "./tree/build";
+import { w } from "../../../utils/types/general";
 
 export const edInitSync = (p: PG) => {
   const session = JSON.parse(
@@ -13,26 +14,34 @@ export const edInitSync = (p: PG) => {
     navigate("/login");
     return <Loading note="logging in" />;
   }
-  const paramsOK =
-    !!params.site_id &&
-    !!params.page_id &&
-    params.site_id !== "_" &&
-    params.page_id !== "_";
 
   if (!p.sync) {
     clientStartSync({
       user_id: session.data.user.id,
+      site_id: params.site_id,
+      page_id: params.page_id,
       events: {
+        connected() {
+          if (w.offline) console.log("connected");
+          w.offline = false;
+          p.render();
+        },
+        disconnected() {
+          console.log("offline, reconnecting...");
+          w.offline = true;
+          p.render();
+          return {
+            reconnect: true,
+          };
+        },
         editor_start(e) {
-          if (!paramsOK) {
-            if (e.site_id && e.page_id) {
-              p.site.id = e.site_id;
-              p.page.cur.id = e.page_id;
-              navigate(`/ed/${e.site_id}/${e.page_id}`);
-            }
+          if (params.site_id !== e.site_id || params.page_id !== e.page_id) {
+            p.site.id = e.site_id;
+            p.page.cur.id = e.page_id;
+            navigate(`/ed/${e.site_id}/${e.page_id}`);
           } else {
-            p.site.id = params.site_id;
-            p.page.cur.id = params.page_id;
+            p.site.id = e.site_id;
+            p.page.cur.id = e.page_id;
             p.render();
           }
         },

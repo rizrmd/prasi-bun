@@ -48,6 +48,8 @@ const sendWs = (ws: WebSocket, msg: any) => {
 
 export const clientStartSync = async (arg: {
   user_id: string;
+  site_id?: string;
+  page_id?: string;
   events: {
     editor_start: (arg: UserConf) => void;
     site_loaded: (arg: { site: ESite }) => void;
@@ -56,11 +58,13 @@ export const clientStartSync = async (arg: {
       id: string;
       sv_local: Uint8Array;
     }) => void;
+    disconnected: () => { reconnect: boolean };
+    connected: () => void;
   };
 }) => {
-  const { user_id, events } = arg;
+  const { user_id, site_id, page_id, events } = arg;
   conf.idb = initIDB(user_id);
-  await connect(user_id, events);
+  await connect({ user_id, site_id, page_id }, events);
   return new DeepProxy(
     SyncActionDefinition,
     ({ target, trapName, value, key, DEFAULT, PROXY }) => {
@@ -91,7 +95,11 @@ export const clientStartSync = async (arg: {
   ) as unknown as typeof SyncActions;
 };
 
-const connect = (user_id: string, event: ClientEventObject) => {
+const connect = (
+  opt: { user_id: string; page_id?: string; site_id?: string },
+  event: ClientEventObject
+) => {
+  const { user_id, page_id, site_id } = opt;
   conf.event = event;
   if (w.offline) {
     return new Promise<void>(async (resolve) => {
@@ -104,55 +112,64 @@ const connect = (user_id: string, event: ClientEventObject) => {
       }
     });
   } else {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       if (!conf.ws) {
-        const url = new URL(location.href);
-        url.pathname = "/sync";
-        url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
+        let reconnect = 0;
+        const retry = () => {
+          const url = new URL(location.href);
+          url.pathname = "/sync";
+          url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
 
-        const ws = new WebSocket(url.toString());
+          const ws = new WebSocket(url.toString());
 
-        ws.onopen = () => {
-          sendWs(ws, { type: SyncType.UserID, user_id });
-          conf.ws = ws;
-        };
-        ws.onclose = async () => {
-          console.log("disconnected..");
-          w.offline = true;
-          if (!conf.ws) {
-            await connect(user_id, event);
-            resolve();
-          }
-        };
-        ws.onmessage = async (e) => {
-          const raw = e.data as Blob;
-          const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
-          if (WS_DEBUG) console.log(`%c⬇`, `color:red`, msg);
-
-          if (msg.type === SyncType.ClientID) {
-            conf.client_id = msg.client_id;
-            resolve();
-          } else if (msg.type === SyncType.Event) {
-            const eventName = msg.event as ClientEvent;
-
-            if (event[eventName]) {
-              if (offlineEvents.includes(eventName)) {
-                saveEventOffline(eventName, msg.data);
-              }
-              event[eventName](msg.data);
+          ws.onopen = () => {
+            console.clear();
+            sendWs(ws, { type: SyncType.UserID, user_id, site_id, page_id });
+            conf.ws = ws;
+            event.connected();
+          };
+          ws.onclose = async () => {
+            const res = event.disconnected();
+            if (res.reconnect) {
+              setTimeout(async () => {
+                reconnect++;
+                retry();
+              }, reconnect * 5000);
+            } else {
+              reject();
             }
-          } else if (msg.type === SyncType.ActionResult) {
-            const pending = runtime.action.pending[msg.argid];
-            if (pending) {
-              delete runtime.action.pending[msg.argid];
-              const idb = conf.idb;
-              if (idb) {
-                await set(msg.argid, msg.val, idb);
+          };
+          ws.onmessage = async (e) => {
+            const raw = e.data as Blob;
+            const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
+            if (WS_DEBUG) console.log(`%c⬇`, `color:red`, msg);
+
+            if (msg.type === SyncType.ClientID) {
+              conf.client_id = msg.client_id;
+              resolve();
+            } else if (msg.type === SyncType.Event) {
+              const eventName = msg.event as ClientEvent;
+
+              if (event[eventName]) {
+                if (offlineEvents.includes(eventName)) {
+                  saveEventOffline(eventName, msg.data);
+                }
+                event[eventName](msg.data);
               }
-              pending.resolve(msg.val);
+            } else if (msg.type === SyncType.ActionResult) {
+              const pending = runtime.action.pending[msg.argid];
+              if (pending) {
+                delete runtime.action.pending[msg.argid];
+                const idb = conf.idb;
+                if (idb) {
+                  await set(msg.argid, msg.val, idb);
+                }
+                pending.resolve(msg.val);
+              }
             }
-          }
+          };
         };
+        retry();
       }
     });
   }
