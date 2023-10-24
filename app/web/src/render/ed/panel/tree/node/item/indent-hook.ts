@@ -7,6 +7,7 @@ export const indentHook = (
   local: { tree: null | TreeMethods; render: () => void }
 ) => {
   useEffect(() => {
+    p.ui.tree.rename_id = "";
     if (p.ui.prevent_indent_hook) {
       p.ui.prevent_indent_hook = false;
       return;

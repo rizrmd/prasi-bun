@@ -1,6 +1,7 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
 import { EDGlobal, EdMeta } from "../../../../logic/ed-global";
 import { useGlobal, useLocal } from "web-utils";
+import { useEffect } from "react";
 
 export const EdTreeName = ({
   node,
@@ -10,17 +11,18 @@ export const EdTreeName = ({
   prm: RenderParams;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal(
-    {
-      rename: "",
-    },
-    () => {
-      local.rename = item?.name || "";
-    }
-  );
+  const local = useLocal({
+    rename: "",
+  });
+  useEffect(() => {
+    local.rename = item?.name || "";
+  }, [p.ui.tree.rename_id]);
+
   const item = node.data?.item;
   const mitem = node.data?.mitem;
+
   if (!item || !mitem) return <></>;
+
   const isRenaming = p.ui.tree.rename_id === item.id;
   return (
     <div className="text-[14px] relative flex items-center cursor-pointer flex-1">
