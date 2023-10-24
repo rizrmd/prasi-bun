@@ -5,10 +5,11 @@ import { WSData } from "../../../../pkgs/core/server/create";
 import { ClientEvent } from "../../../web/src/utils/sync/ws-client";
 import { SyncActionPaths } from "./actions-def";
 import * as actions from "./actions/index";
-import { loadDefaultSite } from "./editor/load";
+import { loadDefaultSite } from "./editor/load-default";
+import { loadSitePage } from "./editor/load-sitepage";
+import { conns, wconns } from "./entity/conn";
 import { UserConf, user } from "./entity/user";
 import { SyncType } from "./type";
-import { conns, wconns } from "./entity/conn";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
@@ -40,13 +41,19 @@ export const syncHandler: WebSocketHandler<WSData> = {
       if (conn) {
         const msg = packr.unpack(Buffer.from(raw));
         if (msg.type === SyncType.UserID) {
-          const { user_id } = msg;
+          const { user_id, page_id, site_id } = msg;
           conn.user_id = user_id;
 
-          const conf = await user.conf.getOrCreate(user_id);
-          if (!conf.site_id) {
+          let conf = await user.conf.getOrCreate(user_id);
+          if (site_id) {
+            const newconf = await loadSitePage(user_id, site_id, page_id);
+            if (newconf) conf = newconf;
+          } else if (!conf.site_id) {
             await loadDefaultSite(user_id);
           }
+
+          console.log(conf);
+
           conn.conf = new Proxy(conf, {
             get(_, p) {
               const conf = user.conf.get(user_id);

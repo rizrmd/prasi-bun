@@ -9,13 +9,14 @@ export const EdPopCompGroup = () => {
 
   useEffect(() => {
     (async () => {
-      if (!p.comp.group[p.site.id]) {
-        p.comp.group[p.site.id] = await p.sync.comp.group(p.site.id);
+      if (p.ui.popup.comp_group) {
+        if (!p.comp.group[p.site.id]) {
+          p.comp.group[p.site.id] = await p.sync.comp.group(p.site.id);
+        }
+        p.render();
       }
-      console.log(p.comp.group[p.site.id]);
-      p.render();
     })();
-  }, []);
+  }, [p.ui.popup.comp_group]);
 
   if (!p.ui.popup.comp_group) return null;
   const pop = p.ui.popup.comp_group;
