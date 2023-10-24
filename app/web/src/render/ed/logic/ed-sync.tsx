@@ -21,12 +21,16 @@ export const edInitSync = (p: PG) => {
       site_id: params.site_id,
       page_id: params.page_id,
       events: {
-        connected() {
+        async connected() {
           if (w.offline) {
             console.log("reconnected, syncing...");
+            w.offline = false;
+            p.ui.syncing = true;
+            p.render();
+          } else {
+            w.offline = false;
+            p.render();
           }
-          w.offline = false;
-          p.render();
         },
         disconnected() {
           console.log("offline, reconnecting...");
@@ -36,7 +40,16 @@ export const edInitSync = (p: PG) => {
             reconnect: true,
           };
         },
-        editor_start(e) {
+        async editor_start(e) {
+          if (p.ui.syncing) {
+            await p.sync.page.load(params.page_id);
+            if (p.page.doc) {
+              p.page.doc.transact(() => {
+                p.page.doc?.getMap("map").set("ts", Date.now());
+              }, `sync`);
+            }
+          }
+
           if (params.site_id !== e.site_id || params.page_id !== e.page_id) {
             p.site.id = e.site_id;
             p.page.cur.id = e.page_id;

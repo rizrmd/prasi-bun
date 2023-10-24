@@ -10,6 +10,7 @@ export const yjs_sv_local: SAction["yjs"]["sv_local"] = async function (
   bin
 ) {
   if (!docs[mode][id]) {
+    console.log(`sv_local not found`, mode, id);
     return;
   }
   const doc = docs[mode][id].doc as Y.Doc;

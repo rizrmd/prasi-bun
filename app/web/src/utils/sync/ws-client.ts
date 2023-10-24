@@ -15,7 +15,9 @@ import { w } from "../types/general";
 import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });
 
-const WS_DEBUG = true;
+/** CONSTANT */
+const WS_DEBUG = false;
+const RECONNECT_TIMEOUT = 1000;
 
 const conf = {
   ws: null as null | WebSocket,
@@ -134,7 +136,7 @@ const connect = (
               setTimeout(async () => {
                 reconnect++;
                 retry();
-              }, reconnect * 5000);
+              }, reconnect * RECONNECT_TIMEOUT);
             } else {
               reject();
             }
