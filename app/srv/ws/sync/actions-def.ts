@@ -5,38 +5,32 @@ export const SyncActionDefinition = {
     "load": "2"
   },
   "comp": {
-    "undo": "3",
-    "redo": "4",
-    "list": "5",
-    "group": "6",
-    "load": "7"
+    "list": "3",
+    "group": "4",
+    "load": "5"
   },
   "page": {
-    "undo": "8",
-    "redo": "9",
-    "list": "10",
-    "load": "11"
+    "list": "6",
+    "load": "7"
   },
   "yjs": {
-    "sv_local": "12",
-    "diff_local": "13",
-    "sv_remote": "14"
+    "um": "8",
+    "sv_local": "9",
+    "diff_local": "10",
+    "sv_remote": "11"
   }
 };
 export const SyncActionPaths = {
   "0": "site.list",
   "1": "site.group",
   "2": "site.load",
-  "3": "comp.undo",
-  "4": "comp.redo",
-  "5": "comp.list",
-  "6": "comp.group",
-  "7": "comp.load",
-  "8": "page.undo",
-  "9": "page.redo",
-  "10": "page.list",
-  "11": "page.load",
-  "12": "yjs.sv_local",
-  "13": "yjs.diff_local",
-  "14": "yjs.sv_remote"
+  "3": "comp.list",
+  "4": "comp.group",
+  "5": "comp.load",
+  "6": "page.list",
+  "7": "page.load",
+  "8": "yjs.um",
+  "9": "yjs.sv_local",
+  "10": "yjs.diff_local",
+  "11": "yjs.sv_remote"
 };

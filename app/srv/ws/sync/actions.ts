@@ -22,29 +22,33 @@ export const SyncActions = {
     load: async (id: string) => ({}) as ESite | void,
   },
   comp: {
-    undo: async (id_comp: string) => {},
-    redo: async (id_comp: string) => {},
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
     group: () => ({}) as Record<string, string[]>,
     load: async (id: string) => ({}) as EComp | void,
   },
   page: {
-    undo: async (id_page: string) => {},
-    redo: async (id_page: string) => {},
     list: (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
     load: async (id: string) => ({}) as EPage | void,
   },
   yjs: {
-    sv_local: async (mode: "page" | "comp", id: string, bin: Uint8Array) =>
-      ({}) as { diff: Uint8Array; sv: Uint8Array } | void,
+    um: async (
+      mode: "page" | "comp" | "site",
+      action: "undo" | "redo",
+      id: string
+    ) => {},
+    sv_local: async (
+      mode: "page" | "comp" | "site",
+      id: string,
+      bin: Uint8Array
+    ) => ({}) as { diff: Uint8Array; sv: Uint8Array } | void,
     diff_local: async (
-      mode: "page" | "comp",
+      mode: "page" | "comp" | "site",
       id: string,
       bin: Uint8Array
     ) => {},
     sv_remote: async (
-      mode: "page" | "comp",
+      mode: "page" | "comp" | "site",
       id: string,
       sv: Uint8Array,
       diff: Uint8Array

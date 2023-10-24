@@ -19,7 +19,4 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
   const um = docs[mode][id].um;
   um.addTrackedOrigin(this.client_id);
   Y.applyUpdate(doc, diff, this.client_id);
-
-  const save = Y.encodeStateAsUpdate(doc);
-  snapshot.set(mode, id, "bin", save);
 };
