@@ -28,7 +28,21 @@ export const EdTreeBody = () => {
     tree = p.page.tree;
   }
 
-  if (p.page.tree.length === 0) return <div>No Item </div>;
+  if (p.page.tree.length === 0)
+    return (
+      <div className="flex py-[100px] select-none justify-center flex-1">
+        <div className="flex flex-col">
+          <img
+            draggable={false}
+            src="/img/empty.png"
+            className={css`
+              width: 50px;
+            `}
+          />
+          <div className="mt-[20px]">No Item</div>
+        </div>
+      </div>
+    );
   return (
     <TypedTree
       tree={tree}
@@ -54,7 +68,7 @@ export const EdTreeBody = () => {
 };
 
 const treeClasses = {
-  container: "flex flex-col",
+  container: "flex flex-col flex-1",
   dropTarget: "drop-target",
   placeholder: "placeholder",
   draggingSource: css`
