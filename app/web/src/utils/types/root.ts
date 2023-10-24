@@ -14,5 +14,9 @@ export type MRoot = TypedMap<{
   childs: TypedArray<ISection>;
 }>;
 
-export type DPage = TypedDoc<{ map: TypedMap<{ id: string; root: MRoot }> }>;
-export type DComp = TypedDoc<{ map: TypedMap<{ id: string; root: MItem }> }>;
+export type DPage = TypedDoc<{
+  map: TypedMap<{ id: string; root: MRoot; ts?: number }>;
+}>;
+export type DComp = TypedDoc<{
+  map: TypedMap<{ id: string; root: MItem; ts?: number }>;
+}>;

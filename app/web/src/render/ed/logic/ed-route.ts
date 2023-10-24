@@ -31,8 +31,9 @@ export const edRoute = async (p: PG) => {
         const doc = new Y.Doc();
         Y.applyUpdate(doc, decompress(page.snapshot));
         doc.on("update", async (bin: Uint8Array, origin: any) => {
-          if (origin === "sv_remote") return;
+          if (origin === "sv_remote" || origin === "local") return;
 
+          console.log(origin);
           const res = await p.sync.yjs.sv_local(
             "page",
             p.page.cur.id,
@@ -45,11 +46,15 @@ export const edRoute = async (p: PG) => {
               decompress(res.sv)
             );
             Y.applyUpdate(doc as any, decompress(res.diff), "local");
+            await treeRebuild(p);
+
             await p.sync.yjs.diff_local(
               "page",
               p.page.cur.id,
               Buffer.from(compress(diff_local))
             );
+            p.ui.syncing = false;
+            p.render();
           }
         });
 

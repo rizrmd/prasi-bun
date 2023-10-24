@@ -10,6 +10,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
   bin
 ) {
   if (!docs[mode][id]) {
+    console.log(`diff_local not found`, mode, id);
     return;
   }
   const doc = docs[mode][id].doc as Y.Doc;

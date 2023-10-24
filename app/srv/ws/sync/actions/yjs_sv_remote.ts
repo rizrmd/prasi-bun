@@ -11,6 +11,7 @@ export const yjs_sv_remote: SAction["yjs"]["sv_remote"] = async function (
   diff
 ) {
   if (!docs[mode][id]) {
+    console.log(`sv_remote not found`, mode, id);
     return;
   }
   const doc = docs[mode][id].doc;

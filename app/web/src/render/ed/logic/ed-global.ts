@@ -87,6 +87,7 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
+    syncing: false,
     tree: {
       item_loading: [] as string[],
       search: "",
