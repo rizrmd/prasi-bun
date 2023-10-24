@@ -148,7 +148,7 @@ export const mergeScopeUpwards = (
       scope = { ...cur.scope, ...indexedScope, ...cur.comp?.propval };
 
       for (const [k, v] of Object.entries(scope)) {
-        finalScope[k] = v;
+        if (typeof finalScope[k] === "undefined") finalScope[k] = v;
       }
       if (opt?.each) {
         if (!opt.each(cur, scope)) {
@@ -158,6 +158,10 @@ export const mergeScopeUpwards = (
     }
 
     cur = p.treeMeta[cur.parent_id];
+  }
+
+  if (meta.item.name === "item" && meta.item.type === "item") {
+    console.log(finalScope);
   }
 
   return finalScope;
@@ -207,7 +211,7 @@ const createPassProp = (
         if (k === "children") continue;
         meta.scope[k] = v;
       }
-      
+
       return modifyChildIndex(arg.children, scopeIndex);
     }
 
