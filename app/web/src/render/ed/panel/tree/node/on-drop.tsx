@@ -29,6 +29,16 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
       const from = dragSource.data.item.type;
       const to = dropTarget.data.item.type;
 
+      if (from === "section" || from === "item") {
+        let parent = dropTarget.data;
+        while (parent) {
+          if (parent.item.id === dragSource.data.item.id) {
+            return false;
+          }
+          parent = p.page.meta[parent.parent_item.id];
+        }
+      }
+
       if (from === "section" || to === "text") {
         return false;
       } else if (from === "item") {
