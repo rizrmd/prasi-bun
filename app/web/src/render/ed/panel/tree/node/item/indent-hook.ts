@@ -12,7 +12,8 @@ export const indentHook = (
 
     let shouldOpen = open[p.page.cur.id] || [];
 
-    let meta = p.page.meta[active.item_id];
+    const cur = p.page.meta[active.item_id];
+    let meta = p.page.meta[cur.parent_item.id];
     while (meta) {
       if (meta.item.id) shouldOpen.push(meta.item.id);
       meta = p.page.meta[meta.parent_item.id];

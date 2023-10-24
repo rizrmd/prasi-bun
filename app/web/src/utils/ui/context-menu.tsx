@@ -52,7 +52,7 @@ export const MenuItem = forwardRef<
 interface Props {
   label?: string;
   nested?: boolean;
-  mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>;
+  mouseEvent: React.MouseEvent<HTMLElement, MouseEvent>;
   onClose: () => void;
 }
 

@@ -15,7 +15,10 @@ export const page_load: SAction["page"]["load"] = async function (
   let snap = snapshot.get("page", id);
   let ydoc = docs.page[id];
 
-  if (this.conf) this.conf.page_id = id;
+  const conf = this.conf;
+  if (!conf) return undefined;
+
+  conf.page_id = id;
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {

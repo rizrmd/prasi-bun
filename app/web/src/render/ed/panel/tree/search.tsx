@@ -66,7 +66,7 @@ export const EdTreeSearch = () => {
       {(local.focus || local.hover || p.ui.tree.search) && (
         <div className="p-1 bg-white text-xs border-t flex space-x-1 justify-between">
           <div className="flex space-x-1">
-            {Object.entries(p.ui.tree.searchMode).map(([name, active]) => {
+            {Object.entries(p.ui.tree.search_mode).map(([name, active]) => {
               return (
                 <div
                   className={cx(
@@ -74,7 +74,7 @@ export const EdTreeSearch = () => {
                     active ? "bg-blue-500 text-white" : "hover:bg-blue-100"
                   )}
                   onClick={() => {
-                    (p.ui.tree.searchMode as any)[name] = !active;
+                    (p.ui.tree.search_mode as any)[name] = !active;
                     local.render();
                     local.sref?.focus();
                   }}
@@ -94,7 +94,7 @@ export const EdTreeSearch = () => {
 export const doTreeSearch = (p: PG) => {
   let tree: Record<string, { idx: number; node: NodeModel<EdMeta> }> = {};
 
-  if (p.ui.tree.searchMode.Name) {
+  if (p.ui.tree.search_mode.Name) {
     const [idxs, info] = uf.search(
       p.page.tree.map((e) => e.text),
       p.ui.tree.search
@@ -162,7 +162,7 @@ export const doTreeSearch = (p: PG) => {
     if (item) {
       const js = item.adv?.js;
       if (js) {
-        if (p.ui.tree.searchMode.JS) {
+        if (p.ui.tree.search_mode.JS) {
           if ((js as string).toLowerCase().includes(search)) {
             tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
           }
@@ -170,7 +170,7 @@ export const doTreeSearch = (p: PG) => {
       }
       const css = item.adv?.css;
       if (css) {
-        if (p.ui.tree.searchMode.CSS) {
+        if (p.ui.tree.search_mode.CSS) {
           if (css.toString().toLowerCase().includes(search)) {
             tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
           }
@@ -179,7 +179,7 @@ export const doTreeSearch = (p: PG) => {
 
       const html = item.adv?.html;
       if (html) {
-        if (p.ui.tree.searchMode.HTML) {
+        if (p.ui.tree.search_mode.HTML) {
           if (html.toString().toLowerCase().includes(search)) {
             tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
           }

@@ -6,6 +6,7 @@ import { edRoute } from "./logic/ed-route";
 import { EdMain } from "./panel/main/main";
 import { EdTree } from "./panel/tree/tree";
 import { edUndoManager } from "./logic/ed-undo";
+import { EdPopCompGroup } from "./panel/popup/comp-group";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -35,6 +36,10 @@ export const EdBase = () => {
         <EdTree />
         <EdMain />
       </div>
+
+      <>
+        <EdPopCompGroup />
+      </>
     </div>
   );
 };

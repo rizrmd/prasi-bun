@@ -5,6 +5,7 @@ import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
+import { SAction } from "../../../../../srv/ws/sync/actions";
 
 const EmptySite = {
   id: "",
@@ -83,11 +84,12 @@ export const EDGlobal = {
     doc: null as null | DComp,
     item: null as null | IItem,
     list: {} as Record<string, { cur: EComp; doc: DComp }>,
+    group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
     tree: {
       search: "",
-      searchMode: {
+      search_mode: {
         Name: true,
         JS: false,
         HTML: false,
@@ -96,14 +98,12 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
-      comp: null as null | true | ((comp_id: string) => void | Promise<void>),
-      compGroup: null as
-        | null
-        | true
-        | {
-            event: React.MouseEvent<HTMLElement, MouseEvent>;
-            pick: (group_id: string) => void | Promise<void>;
-          },
+      comp: null as null | ((comp_id: string) => void | Promise<void>),
+      comp_group: null as null | {
+        mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;
+        on_pick?: (group_id: string) => void | Promise<void>;
+        on_close?: () => void | Promise<void>;
+      },
     },
   },
 };

@@ -142,6 +142,7 @@ export const _ = {
               id: newcomp.id,
               name: "",
               props: {},
+              ref_ids: {},
             },
           } as IItem
         );
