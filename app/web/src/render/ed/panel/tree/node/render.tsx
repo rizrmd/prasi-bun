@@ -5,6 +5,7 @@ import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
+import { Loading } from "../../../../../utils/ui/loading";
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -14,6 +15,14 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   if (!node || !node.data) return <></>;
   const item = node.data?.item;
   const isComponent = item.type === "item" && item.component?.id;
+
+  if (p.ui.tree.item_loading.includes(item.id)) {
+    return (
+      <div className={"relative border-b flex items-stretch  min-h-[26px]"}>
+        <Loading backdrop={false} />
+      </div>
+    );
+  }
 
   return (
     <div

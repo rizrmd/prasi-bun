@@ -23,7 +23,13 @@ export const SyncActions = {
     load: async (id: string) => ({}) as ESite | void,
   },
   comp: {
-    new: async (arg: { group_id: string; item: IItem }) => {},
+    new: async (arg: {
+      group_id: string;
+      page_id?: string;
+      comp_id?: string;
+      item_id: string;
+      item: IItem;
+    }) => {},
     list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>
       ({}) as Record<string, { id: string; name: string; comps: string[] }>,

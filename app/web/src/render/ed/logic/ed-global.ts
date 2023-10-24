@@ -88,6 +88,7 @@ export const EDGlobal = {
   },
   ui: {
     tree: {
+      item_loading: [] as string[],
       search: "",
       search_mode: {
         Name: true,

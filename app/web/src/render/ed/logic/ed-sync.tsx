@@ -22,7 +22,9 @@ export const edInitSync = (p: PG) => {
       page_id: params.page_id,
       events: {
         connected() {
-          if (w.offline) console.log("connected");
+          if (w.offline) {
+            console.log("reconnected, syncing...");
+          }
           w.offline = false;
           p.render();
         },
