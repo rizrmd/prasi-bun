@@ -220,7 +220,7 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
           return;
         }
 
-        if (e.key.length === 1) {
+        if (e.key.length === 1 && !e.altKey && !e.metaKey && !e.shiftKey) {
           p.ui.tree.search_ref?.focus();
         }
       }}

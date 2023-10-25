@@ -4,7 +4,7 @@ import { EDGlobal } from "./logic/ed-global";
 import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { EdMain } from "./panel/main/main";
-import { EdTree } from "./panel/tree/tree";
+import { EdLeft } from "./ed-left";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdPopCompGroup } from "./panel/popup/comp-group";
 import { EdPaneResize } from "./panel/main/pane-resize";
@@ -34,19 +34,16 @@ export const EdBase = () => {
     <div className="flex flex-col flex-1">
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
-        <EdTree />
+        <EdLeft />
         <EdPaneResize
+          minSize={200}
           size={p.ui.layout.left}
           onResize={(size) => {
-            if (size > 100) {
-              p.ui.layout.left = size;
-              p.render();
-            }
+            p.ui.layout.left = size;
+            p.render();
           }}
           onDone={(size) => {
-            if (size > 100) {
-              localStorage.setItem("prasi-layout-left", size.toString());
-            }
+            localStorage.setItem("prasi-layout-left", size.toString());
           }}
         />
         <EdMain />
