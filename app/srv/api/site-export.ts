@@ -5,6 +5,8 @@ import fs from "fs";
 import { exists } from "fs-jetpack";
 import { gzipSync } from "zlib";
 import path from "path";
+import { g } from "utils/global";
+import { buildNpm } from "../util/build-npm";
 
 export const _ = {
   url: "/site-export/:site_id",
@@ -19,7 +21,7 @@ export const _ = {
         is_deleted: false,
         name: { not: { startsWith: "layout:" } },
       },
-    }); 
+    });
 
     if (site) {
       const layout = await db.page.findFirst({
@@ -67,12 +69,39 @@ export const _ = {
       site: {} as Record<string, string>,
       pages: {} as Record<string, Record<string, string>>,
     };
-    npm.site = readDirectoryRecursively(dir.path(`../npm/site/${site_id}`));
+    const page_ids = await db.page.findMany({
+      where: { id_site: site_id, is_deleted: false },
+      select: { id: true },
+    });
+    const npm_page = await db.npm_page.findMany({
+      where: { id_page: { in: page_ids.map((e) => e.id) } },
+    });
+
+    if (!exists(dir.path(`${g.datadir}/npm/site/${site_id}`))) {
+      await buildNpm({ id: site_id, mode: "site" });
+    }
+    const npm_page_ids = {} as Record<string, any[]>;
+    for (const np of npm_page) {
+      if (!npm_page_ids[np.id_page]) {
+        npm_page_ids[np.id_page] = [];
+      }
+      npm_page_ids[np.id_page].push(np);
+    }
+
+    for (const [k, v] of Object.entries(npm_page_ids)) {
+      if (!exists(dir.path(`${g.datadir}/npm/page/${k}`))) {
+        await buildNpm({ id: k, mode: "page", _items: v });
+      }
+    }
+
+    npm.site = readDirectoryRecursively(
+      dir.path(`${g.datadir}/npm/site/${site_id}`)
+    );
 
     for (const page of pages) {
-      if (exists(dir.path(`../npm/page/${page.id}`))) {
+      if (exists(dir.path(`${g.datadir}/npm/page/${page.id}`))) {
         npm.pages[page.id] = readDirectoryRecursively(
-          dir.path(`../npm/page/${page.id}`)
+          dir.path(`${g.datadir}/npm/page/${page.id}`)
         );
       }
     }
@@ -99,6 +128,7 @@ function readDirectoryRecursively(
       result[[...(baseDir || []), item].join("/")] = content;
     } else if (stats.isDirectory()) {
       if (item !== "node_modules") {
+        console.log(itemPath);
         const subdirResult = readDirectoryRecursively(itemPath, [
           ...(baseDir || []),
           item,

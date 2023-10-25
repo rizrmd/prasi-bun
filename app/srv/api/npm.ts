@@ -48,7 +48,7 @@ export const _ = {
       }
     }
 
-    if (path.length > dir.path(`../npm/${mode}/${id}`).length) {
+    if (path.length > dir.path(`${g.datadir}/npm/${mode}/${id}`).length) {
       const file = await readAsync(path, "buffer");
 
       if (file) {
