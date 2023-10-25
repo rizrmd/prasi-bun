@@ -13,44 +13,49 @@ import { DefaultScript, FBuild, ScriptMonacoElement } from "./monaco/monaco-el";
 export const jscript = {
   editor: null as typeof MonacoEditor | null,
   build: null as null | FBuild,
-  _init: false,
+  _init: false as false | Promise<void>,
+  ready: false,
   _editor: false,
-  async init() {
+  async init(render: () => void) {
+    if (this._init) await this._init;
     if (!this._init) {
-      this._init = true;
-      const { sendIPC } = await import("./esbuild/ipc");
-      await initJS();
+      this._init = new Promise<void>(async (resolve) => {
+        const { sendIPC } = await import("./esbuild/ipc");
+        await initJS();
 
-      if (!this._editor) {
-        this._editor = true;
-        const e = await import("@monaco-editor/react");
-        jscript.editor = e.Editor;
-        e.loader.config({ paths: { vs: "/min/vs" } });
-      }
-
-      this.build = async (entry, src, files, verbose?: boolean) => {
-        const options: BuildOptions = {
-          entryPoints: [entry],
-          jsx: "transform",
-          bundle: true,
-          format: "cjs",
-          minify: true,
-        };
-        const res = await sendIPC({
-          command_: "build",
-          input_: { ...files, [entry]: src },
-          options_: options,
-        });
-
-        if (verbose && res.stderr_) {
-          console.log(res.stderr_);
+        if (!this._editor) {
+          this._editor = true;
+          const e = await import("@monaco-editor/react");
+          jscript.editor = e.Editor;
+          e.loader.config({ paths: { vs: "/min/vs" } });
         }
-        if (res.outputFiles_) return res.outputFiles_[0].text;
 
-        return "";
-      };
+        this.build = async (entry, src, files, verbose?: boolean) => {
+          const options: BuildOptions = {
+            entryPoints: [entry],
+            jsx: "transform",
+            bundle: true,
+            format: "cjs",
+            minify: true,
+          };
+          const res = await sendIPC({
+            command_: "build",
+            input_: { ...files, [entry]: src },
+            options_: options,
+          });
 
-      await this.build("el.tsx", `return ""`);
+          if (verbose && res.stderr_) {
+            console.log(res.stderr_);
+          }
+          if (res.outputFiles_) return res.outputFiles_[0].text;
+
+          return "";
+        };
+
+        await this.build("el.tsx", `return ""`);
+        render();
+        resolve();
+      });
     }
   },
 };
@@ -59,9 +64,7 @@ export const EScriptElement: FC<{}> = ({}) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
 
   if (!jscript.editor) {
-    jscript.init().then(() => {
-      p.render();
-    });
+    jscript.init(p.render);
   }
 
   if (!p.script.active) {

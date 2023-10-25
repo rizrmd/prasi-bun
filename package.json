@@ -22,5 +22,9 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "brotli-wasm": "^2.0.1",
+    "fdir": "^6.1.0"
   }
 }

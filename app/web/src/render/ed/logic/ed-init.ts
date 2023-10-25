@@ -4,7 +4,7 @@ import { jscript } from "../../editor/panel/script/script-element";
 
 export const edInit = async (p: PG) => {
   await init();
-  jscript.init();
+  jscript.init(p.render);
   p.status = "ready";
   p.render();
 };

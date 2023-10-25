@@ -12,6 +12,7 @@ export const cache = {
     {
       type: string;
       content: ArrayBuffer;
+      br?: ArrayBuffer;
     }
   >,
 };
@@ -97,7 +98,7 @@ export const createServer = async () => {
           const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
           if (
             (await file.exists()) &&
-            file.type !== "application/octet-stream"
+            file.type !== "application/octet-stream" // is not directory
           ) {
             if (g.mode === "dev") {
               return new Response(file as any);
@@ -109,6 +110,15 @@ export const createServer = async () => {
                 content: await file.arrayBuffer(),
               };
             }
+
+            const filebr = Bun.file(dir.path(`${webPath}-br${url.pathname}`));
+            if (
+              (await filebr.exists()) &&
+              filebr.type !== "application/octet-stream" // is not directory
+            ) {
+              cache.static[url.pathname].br = await filebr.arrayBuffer();
+            }
+
             const found = cache.static[url.pathname];
             if (found) {
               return responseCached(req, found);
@@ -141,7 +151,14 @@ export const createServer = async () => {
 };
 
 const responseCached = (req: Request, found: (typeof cache.static)[string]) => {
+  if (req.headers.get("accept-encoding")?.includes("br") && found.br) {
+    const res = new Response(found.br);
+    res.headers.set("content-type", found.type);
+    res.headers.set("content-encoding", "br");
+    return res;
+  }
   const res = new Response(found.content);
   res.headers.set("content-type", found.type);
+
   return res;
 };

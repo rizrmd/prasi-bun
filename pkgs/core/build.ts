@@ -1,8 +1,12 @@
+import brotliPromise from "brotli-wasm";
 import { spawn } from "bun";
 import { dir } from "dir";
 import { Plugin, context } from "esbuild";
 import { $ } from "execa";
-import { listAsync, removeAsync, writeAsync } from "fs-jetpack";
+import { fdir } from "fdir";
+import { statSync } from "fs";
+import { listAsync, removeAsync, writeAsync, inspectTree } from "fs-jetpack";
+const brotli = await brotliPromise;
 
 await removeAsync(dir.path("app/web/.parcel-cache"));
 await removeAsync(dir.path("app/static"));
@@ -25,29 +29,25 @@ const parcel = spawn({
 });
 await parcel.exited;
 
-// listAsync(dir.path("app/static")).then(async (files) => {
-//   if (files) {
-//     await removeAsync(dir.path("app/static-br"));
-//     await Promise.all(
-//       files
-//         .filter((e) => statSync(dir.path(`app/static/${e}`)).isFile())
-//         .map(async (file) => {
-//           const br = brotli.compress(
-//             new Uint8Array(
-//               await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
-//             )
-//           );
-//           if (br) {
-//             console.log(`Compressing ${file}`);
-//             await writeAsync(
-//               dir.path(`app/static-br/${file}`),
-//               Buffer.from(br)
-//             );
-//           }
-//         })
-//     );
-//   }
-// });
+const api = new fdir().withRelativePaths().crawl(dir.path("app/static"));
+const files = api.sync();
+if (files) {
+  await removeAsync(dir.path("app/static-br"));
+  await Promise.all(
+    files.map(async (file) => {
+      const br = brotli.compress(
+        new Uint8Array(
+          await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
+        ),
+        { quality: 11 }
+      );
+      if (br) {
+        console.log(`Compressing ${file}`);
+        await writeAsync(dir.path(`app/static-br/${file}`), Buffer.from(br));
+      }
+    })
+  );
+}
 
 const buildSite = async () => {
   await removeAsync(dir.path("app/srv/site"));
