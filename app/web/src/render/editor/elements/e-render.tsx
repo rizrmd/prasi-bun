@@ -12,12 +12,12 @@ import {
   mergeScopeUpwards,
   treeScopeEval,
 } from "../logic/tree-scope";
-import { jscript } from "../panel/script/script-element";
 import { fillID } from "../tools/fill-id";
 import { newMap } from "../tools/yjs-tools";
 import { ComponentOver, ElProp, createElProp } from "./e-relprop";
 import { ETextInternal } from "./e-text";
 import { DefaultScript } from "../panel/script/monaco/monaco-el";
+import { jscript } from "../../../utils/script/jscript";
 
 export const ERender: FC<{
   id: string;
@@ -185,9 +185,7 @@ export const ERender: FC<{
     meta.mitem
   ) {
     if (!jscript.build) {
-      jscript.init().then(() => {
-        p.render();
-      });
+      jscript.init(p.render);
       return null;
     }
     jscript

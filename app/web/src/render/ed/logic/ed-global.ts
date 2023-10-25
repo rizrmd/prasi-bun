@@ -69,6 +69,7 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: EmptySite,
+  script: { siteTypes: {} as Record<string, string> },
   page: {
     cur: EmptyPage,
     doc: null as null | DPage,
@@ -86,6 +87,9 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
+    script: {
+      site: false,
+    },
     layout: {
       left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),
       right: parseInt(localStorage.getItem("prasi-layout-right") || "250"),

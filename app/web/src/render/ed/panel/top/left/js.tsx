@@ -1,8 +1,18 @@
+import { useGlobal } from "web-utils";
 import { TopBtn } from "../top-btn";
+import { EDGlobal } from "../../../logic/ed-global";
 
 export const EdSiteJS = () => {
+  const p = useGlobal(EDGlobal, "EDITOR");
   return (
-    <TopBtn style="slim" className="font-bold font-mono">
+    <TopBtn
+      style="slim"
+      className="font-bold font-mono"
+      onClick={() => {
+        p.ui.script.site = true;
+        p.render();
+      }}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"

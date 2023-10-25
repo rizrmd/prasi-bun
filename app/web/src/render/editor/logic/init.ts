@@ -7,10 +7,10 @@ import {
 } from "../../../utils/script/init-api";
 import { LSite } from "../../live/logic/global";
 import { validateLayout } from "../../live/logic/layout";
-import { jscript } from "../panel/script/script-element";
 import importModule from "../tools/dynamic-import";
 import { PG } from "./global";
 import { devLoader } from "../../live/dev-loader";
+import { jscript } from "../../../utils/script/jscript";
 
 export const w = window as unknown as {
   basepath: string;
@@ -45,6 +45,10 @@ export const initEditor = async (p: PG, site_id: string) => {
     if (_href.startsWith("/ed")) return _href;
     return "";
   };
+
+  if (!jscript.pending) {
+    jscript.init(p.render);
+  }
 
   if (!p.item) return;
 
@@ -147,10 +151,6 @@ export const initEditor = async (p: PG, site_id: string) => {
 
   p.status = "ready";
   p.render();
-
-  if (!jscript.build) {
-    jscript.init();
-  }
 };
 
 export const execSiteJS = (p: PG) => {

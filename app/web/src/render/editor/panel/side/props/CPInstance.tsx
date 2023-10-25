@@ -11,12 +11,12 @@ import { editComp, loadComponent } from "../../../logic/comp";
 import { EditorGlobal, PG } from "../../../logic/global";
 import { rebuildTree } from "../../../logic/tree-logic";
 import { newMap } from "../../../tools/yjs-tools";
-import { jscript } from "../../script/script-element";
 import { CPJsx } from "./CPJsx";
 import { CPOption } from "./CPOption";
 import { CPText } from "./CPText";
 import { mergeScopeUpwards } from "../../../logic/tree-scope";
 import { treePropEval } from "../../../logic/tree-prop";
+import { jscript } from "../../../../../utils/script/jscript";
 
 export const CPInstance: FC<{ mitem: MItem }> = ({ mitem }) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
@@ -65,10 +65,7 @@ export const CPInstance: FC<{ mitem: MItem }> = ({ mitem }) => {
       }
 
       if (!jscript.build) {
-        jscript.init().then(() => {
-          local.status = "ready";
-          local.render();
-        });
+        jscript.init(p.render);
       } else {
         local.status = "ready";
         local.render();

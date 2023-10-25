@@ -7,18 +7,19 @@ import strDelta from "textdiff-create";
 import { useGlobal, useLocal } from "web-utils";
 import * as Y from "yjs";
 import { TypedMap } from "yjs-types";
+import { FBuild } from "../../../../../utils/script/jscript";
 import { FMCompDef, FNAdv } from "../../../../../utils/types/meta-fn";
+import { Button } from "../../../../../utils/ui/form/Button";
 import { Loading } from "../../../../../utils/ui/loading";
+import { Popover } from "../../../../../utils/ui/popover";
 import { EditorGlobal } from "../../../logic/global";
 import { mergeScopeUpwards } from "../../../logic/tree-scope";
 import { newMap } from "../../../tools/yjs-tools";
+import { MonacoElHistory } from "./monaco-el-history";
+import { MonacoElSnippet } from "./monaco-el-snippet";
 import { jsMount } from "./mount";
 import { MonacoScopeBar } from "./scope-bar";
 import { monacoTypings } from "./typings";
-import { MonacoElSnippet } from "./monaco-el-snippet";
-import { Button } from "../../../../../utils/ui/form/Button";
-import { Popover } from "../../../../../utils/ui/popover";
-import { MonacoElHistory } from "./monaco-el-history";
 
 export type MonacoEditor = Parameters<OnMount>[0];
 export const DefaultScript = {
@@ -41,13 +42,6 @@ const w = window as unknown as {
     prettier_estree: any;
   };
 };
-
-export type FBuild = (
-  entryFileName: string,
-  src: string,
-  files?: Record<string, string>,
-  verbose?: boolean
-) => Promise<string>;
 
 const monacoViewState = {} as Record<string, any>;
 

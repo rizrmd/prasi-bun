@@ -1,70 +1,18 @@
-import type { Editor as MonacoEditor } from "@monaco-editor/react";
-import type { BuildOptions } from "esbuild-wasm";
 import { FC } from "react";
 import { useGlobal } from "web-utils";
 import * as Y from "yjs";
+import { jscript } from "../../../../utils/script/jscript";
 import { Loading } from "../../../../utils/ui/loading";
 import { Modal } from "../../../../utils/ui/modal";
 import { EditorGlobal } from "../../logic/global";
 import { rebuildTree } from "../../logic/tree-logic";
-import { initJS } from "./monaco/init";
-import { DefaultScript, FBuild, ScriptMonacoElement } from "./monaco/monaco-el";
-
-export const jscript = {
-  editor: null as typeof MonacoEditor | null,
-  build: null as null | FBuild,
-  _init: false as false | Promise<void>,
-  ready: false,
-  _editor: false,
-  async init(render: () => void) {
-    if (this._init) await this._init;
-    if (!this._init) {
-      this._init = new Promise<void>(async (resolve) => {
-        const { sendIPC } = await import("./esbuild/ipc");
-        await initJS();
-
-        if (!this._editor) {
-          this._editor = true;
-          const e = await import("@monaco-editor/react");
-          jscript.editor = e.Editor;
-          e.loader.config({ paths: { vs: "/min/vs" } });
-        }
-
-        this.build = async (entry, src, files, verbose?: boolean) => {
-          const options: BuildOptions = {
-            entryPoints: [entry],
-            jsx: "transform",
-            bundle: true,
-            format: "cjs",
-            minify: true,
-          };
-          const res = await sendIPC({
-            command_: "build",
-            input_: { ...files, [entry]: src },
-            options_: options,
-          });
-
-          if (verbose && res.stderr_) {
-            console.log(res.stderr_);
-          }
-          if (res.outputFiles_) return res.outputFiles_[0].text;
-
-          return "";
-        };
-
-        await this.build("el.tsx", `return ""`);
-        render();
-        resolve();
-      });
-    }
-  },
-};
+import { DefaultScript, ScriptMonacoElement } from "./monaco/monaco-el";
 
 export const EScriptElement: FC<{}> = ({}) => {
   const p = useGlobal(EditorGlobal, "EDITOR");
 
-  if (!jscript.editor) {
-    jscript.init(p.render);
+  if (!jscript.editor && jscript.pending) {
+    jscript.pending.then(() => p.render());
   }
 
   if (!p.script.active) {

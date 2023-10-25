@@ -15,9 +15,9 @@ import { EditorGlobal, NodeMeta } from "../../../logic/global";
 import { fillID } from "../../../tools/fill-id";
 import { flatTree } from "../../../tools/flat-tree";
 import { newMap } from "../../../tools/yjs-tools";
-import { jscript } from "../../script/script-element";
 import { detachComp } from "./action/detach";
 import { rebuildTree } from "../../../logic/tree-logic";
+import { jscript } from "../../../../../utils/script/jscript";
 
 export const ETreeRightClick: FC<{
   node: NodeModel<NodeMeta>;
@@ -304,7 +304,7 @@ export const ETreeRightClick: FC<{
           label="Detach"
           onClick={async () => {
             if (!jscript.build) {
-              await jscript.init();
+              await jscript.init(p.render);
             }
             if (jscript.build && p.treeMeta[item.id]) {
               detachComp(
@@ -344,7 +344,7 @@ export const ETreeRightClick: FC<{
                         comp_id: rootComp ? rootComp.id : undefined,
                         group_id,
                       })
-                      .then(async (e) => {
+                      .then(async (e: any) => {
                         if (e) {
                           await loadComponent(p, e.id);
                           delete p.compLoading[item.id];
