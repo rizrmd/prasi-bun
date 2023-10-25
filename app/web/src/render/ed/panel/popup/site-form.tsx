@@ -56,32 +56,36 @@ export const EdFormSite: FC<{
             if (form.name && p.user.id) {
               local.saving = true;
               local.render();
-              if (!form.id) {
-                try {
-                  await db.site.create({
+              try {
+                if (!form.id) {
+                  try {
+                    await db.site.create({
+                      data: {
+                        name: form.name,
+                        favicon: "",
+                        domain: form.domain || "",
+                        id_user: p.user.id,
+                        id_org: group_id,
+                        responsive: form.responsive,
+                      },
+                    });
+                  } catch (e) {
+                    alert(e);
+                  }
+                } else {
+                  await db.site.update({
                     data: {
                       name: form.name,
-                      favicon: "",
-                      domain: form.domain || "",
-                      id_user: p.user.id,
-                      id_org: group_id,
+                      domain: form.domain,
                       responsive: form.responsive,
                     },
+                    where: { id: form.id },
                   });
-                } catch (e) {
-                  alert(e);
                 }
-              } else {
-                await db.site.update({
-                  data: {
-                    name: form.name,
-                    domain: form.domain,
-                    responsive: form.responsive,
-                  },
-                  where: { id: form.id },
-                });
+                onSave();
+              } catch (e) {
+                alert(e);
               }
-              onSave();
             }
 
             local.saving = false;

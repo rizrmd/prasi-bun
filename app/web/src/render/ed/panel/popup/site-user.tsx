@@ -101,7 +101,7 @@ export const EdPopUser = ({
                 <div
                   key={user.id}
                   className={
-                    " bg-blue-50 hover:bg-blue-100 border-b pl-2 flex justify-between items-center"
+                    " bg-lime-50 hover:bg-lime-100 border-b pl-2 flex justify-between items-center"
                   }
                 >
                   <div className="flex-1">{user.username}</div>
