@@ -16,7 +16,7 @@ import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
-const WS_DEBUG = true;
+const WS_DEBUG = false;
 const RECONNECT_TIMEOUT = 1000;
 
 const conf = {

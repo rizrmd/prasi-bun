@@ -17,7 +17,9 @@ type GItem = {
 } & (
   | {
       type: "group";
+      site_len: number;
       users: { id: string; username: string }[];
+      renaming?: boolean;
     }
   | { type: "site"; domain: string }
 );
@@ -34,88 +36,105 @@ export const EdPopSite = () => {
       p.render();
     }
   );
+
+  const reload = async () => {
+    local.status = "loading";
+    local.render();
+
+    const res = await p.sync.site.group();
+
+    const group: NodeModel<GItem>[] = [];
+    for (const item of res) {
+      group.push({
+        id: item.id,
+        parent: "site-root",
+        text: item.name,
+        data: {
+          id: item.id,
+          type: "group",
+          name: item.name,
+          site_len: item.site.length,
+          users: item.org_user.map((e) => ({
+            id: e.user.id,
+            username: e.user.username,
+          })),
+        },
+      });
+
+      for (const site of item.site) {
+        group.push({
+          id: site.id,
+          parent: item.id,
+          text: site.name,
+          droppable: false,
+          data: {
+            id: site.id,
+            type: "site",
+            name: site.name,
+            domain: site.domain,
+          },
+        });
+      }
+
+      group.push({
+        id: `new-${item.id}`,
+        parent: item.id,
+        text: "new",
+        droppable: false,
+      });
+    }
+    local.group = group;
+
+    local.status = "ready";
+    local.render();
+  };
   useEffect(() => {
     if (p.ui.popup.site && local.status !== "loading") {
-      (async () => {
-        local.status = "loading";
-        local.render();
-
-        const res = await p.sync.site.group();
-
-        const group: NodeModel<GItem>[] = [];
-        for (const item of res) {
-          group.push({
-            id: item.id,
-            parent: "site-root",
-            text: item.name,
-            data: {
-              id: item.id,
-              type: "group",
-              name: item.name,
-              users: item.org_user.map((e) => ({
-                id: e.user.id,
-                username: e.user.username,
-              })),
-            },
-          });
-
-          for (const site of item.site) {
-            group.push({
-              id: site.id,
-              parent: item.id,
-              text: site.name,
-              droppable: false,
-              data: {
-                id: site.id,
-                type: "site",
-                name: site.name,
-                domain: site.domain,
-              },
-            });
-          }
-
-          group.push({
-            id: `new-${item.id}`,
-            parent: item.id,
-            text: "new",
-            droppable: false,
-          });
-        }
-        local.group = group;
-
-        local.status = "ready";
-        local.render();
-      })();
+      reload();
     }
   }, [p.ui.popup.site]);
 
   if (!p.ui.popup.site) return null;
 
   return (
-    <Modal
-      open
-      onOpenChange={(open) => {
-        if (!open) {
-          p.ui.popup.site = null;
-          p.render();
-        }
-      }}
-    >
-      <div className="absolute inset-[5%] bg-white flex">
-        <div className="relative flex flex-1">
-          {local.status === "loading" ? (
-            <Loading backdrop={false} note="listing-site" />
-          ) : (
-            <SitePicker group={local.group} />
-          )}
+    <>
+      {local.status === "loading" && <Loading note="listing-site" />}
+      <Modal
+        open
+        onOpenChange={(open) => {
+          if (!open) {
+            p.ui.popup.site = null;
+            p.render();
+          }
+        }}
+      >
+        <div className="absolute inset-[5%] bg-white flex">
+          <div className="relative flex flex-1">
+            {(local.status === "ready" || local.group.length > 0) && (
+              <SitePicker
+                status={local.status}
+                group={local.group}
+                reload={reload}
+              />
+            )}
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 
-const SitePicker = ({ group }: { group: NodeModel<GItem>[] }) => {
+const SitePicker = ({
+  group,
+  reload,
+  status,
+}: {
+  status: any;
+  group: NodeModel<GItem>[];
+  reload: () => void;
+}) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({});
   const TypedTree = Tree<GItem>;
   const orglen = group.filter((e) => e.parent === "site-root").length;
   return (
@@ -137,7 +156,7 @@ const SitePicker = ({ group }: { group: NodeModel<GItem>[] }) => {
                   },
                 },
               });
-              console.log(res);
+              reload();
             }
           }}
         >
@@ -154,7 +173,28 @@ const SitePicker = ({ group }: { group: NodeModel<GItem>[] }) => {
         <TypedTree
           tree={group}
           rootId={"site-root"}
-          onDrop={() => {}}
+          onDrop={async (_, { dragSource, dropTarget }) => {
+            const target = dropTarget?.data;
+            const from = dragSource?.data;
+            if (target && from) {
+              if (target.type === "group") {
+                await db.site.update({
+                  where: {
+                    id: from.id,
+                  },
+                  data: {
+                    org: {
+                      connect: {
+                        id: target.id,
+                      },
+                    },
+                  },
+                  select: { id: true },
+                });
+                reload();
+              }
+            }
+          }}
           initialOpen={true}
           canDrag={(node) => {
             if (node && node?.data?.type === "site") return true;
@@ -206,22 +246,89 @@ const SitePicker = ({ group }: { group: NodeModel<GItem>[] }) => {
             }
 
             if (!item) return <></>;
+
             if (item.type === "group") {
               return (
                 <div
                   className={cx(
-                    "flex items-center px-2 border-b mb-2 pb-2 pt-10 ",
+                    "flex items-center px-2 border-b mb-2 pb-2 pt-10 space-x-1 ",
                     isDropTarget && "bg-blue-100"
                   )}
                 >
-                  <div>{node.text}</div>
-                  <div className="text-[12px] bg-white border rounded mx-2 px-2 hover:bg-blue-100 cursor-pointer ">
+                  {item.renaming ? (
+                    <input
+                      className="border-2 border-blue-500 outline-none"
+                      value={item.name}
+                      autoFocus
+                      spellCheck={false}
+                      onChange={(e) => {
+                        item.name = e.currentTarget.value;
+                        local.render();
+                      }}
+                      onBlur={() => {
+                        item.name = node.text;
+                        item.renaming = false;
+                        local.render();
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === "Enter") {
+                          await db.org.update({
+                            where: { id: item.id },
+                            data: { name: item.name },
+                          });
+                          reload();
+                        }
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <div>{node.text}</div>
+                      <div
+                        className="text-[12px] bg-white border border-transparent rounded  px-2 hover:bg-blue-100 cursor-pointer min-h-[20px] flex items-center "
+                        onClick={() => {
+                          item.renaming = true;
+                          local.render();
+                        }}
+                      >
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 1C6.22386 1 6 1.22386 6 1.5C6 1.77614 6.22386 2 6.5 2C7.12671 2 7.45718 2.20028 7.65563 2.47812C7.8781 2.78957 8 3.28837 8 4V11C8 11.7116 7.8781 12.2104 7.65563 12.5219C7.45718 12.7997 7.12671 13 6.5 13C6.22386 13 6 13.2239 6 13.5C6 13.7761 6.22386 14 6.5 14C7.37329 14 8.04282 13.7003 8.46937 13.1031C8.47976 13.0886 8.48997 13.0739 8.5 13.0591C8.51003 13.0739 8.52024 13.0886 8.53063 13.1031C8.95718 13.7003 9.62671 14 10.5 14C10.7761 14 11 13.7761 11 13.5C11 13.2239 10.7761 13 10.5 13C9.87329 13 9.54282 12.7997 9.34437 12.5219C9.1219 12.2104 9 11.7116 9 11V4C9 3.28837 9.1219 2.78957 9.34437 2.47812C9.54282 2.20028 9.87329 2 10.5 2C10.7761 2 11 1.77614 11 1.5C11 1.22386 10.7761 1 10.5 1C9.62671 1 8.95718 1.29972 8.53063 1.89688C8.52024 1.91143 8.51003 1.92611 8.5 1.9409C8.48997 1.92611 8.47976 1.91143 8.46937 1.89688C8.04282 1.29972 7.37329 1 6.5 1ZM14 5H11V4H14C14.5523 4 15 4.44772 15 5V10C15 10.5523 14.5523 11 14 11H11V10H14V5ZM6 4V5H1L1 10H6V11H1C0.447715 11 0 10.5523 0 10V5C0 4.44772 0.447715 4 1 4H6Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+                          }}
+                        ></div>
+                      </div>
+                    </>
+                  )}
+                  <div className="text-[12px] bg-white border rounded  px-2 hover:bg-blue-100 cursor-pointer min-h-[20px] flex items-center ">
                     Team: {item.users.length} user
                     {item.users.length > 1 ? "s" : ""}
                   </div>
                   {isDropTarget && (
-                    <div className="px-2 text-slate-400 text-[12px]">
-                      Drop to move here...
+                    <div className="px-2 text-slate-500 text-[13px]">
+                      Drop here...
+                    </div>
+                  )}
+                  {item.site_len === 0 && (
+                    <div
+                      className="text-[12px] bg-white border rounded px-2 hover:bg-red-100 text-red-600 cursor-pointer min-h-[20px] flex items-center"
+                      onClick={async () => {
+                        if (confirm("Remove this organization ?")) {
+                          await db.org_user.deleteMany({
+                            where: { id_org: item.id },
+                          });
+                          await db.org.delete({
+                            where: {
+                              id: item.id,
+                            },
+                          });
+                          reload();
+                        }
+                      }}
+                    >
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: `<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 1C5.22386 1 5 1.22386 5 1.5C5 1.77614 5.22386 2 5.5 2H9.5C9.77614 2 10 1.77614 10 1.5C10 1.22386 9.77614 1 9.5 1H5.5ZM3 3.5C3 3.22386 3.22386 3 3.5 3H5H10H11.5C11.7761 3 12 3.22386 12 3.5C12 3.77614 11.7761 4 11.5 4H11V12C11 12.5523 10.5523 13 10 13H5C4.44772 13 4 12.5523 4 12V4L3.5 4C3.22386 4 3 3.77614 3 3.5ZM5 4H10V12H5V4Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+                        }}
+                      ></div>
                     </div>
                   )}
                 </div>
