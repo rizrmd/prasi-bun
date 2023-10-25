@@ -7,7 +7,9 @@ export const EdSitePicker = () => {
   return (
     <TopBtn
       onClick={(e) => {
-        p.ui.popup.site = () => {};
+        p.ui.popup.site = (id) => {
+          navigate(`/ed/${id}`);
+        };
         p.render();
       }}
     >

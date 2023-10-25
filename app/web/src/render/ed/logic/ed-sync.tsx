@@ -18,6 +18,19 @@ export const edInitSync = (p: PG) => {
   p.user.username = session.data.user.username;
 
   if (p.sync) {
+    if (params.site_id !== p.site.id) {
+      p.sync.site.load(params.site_id).then((site) => {
+        if (site) {
+          p.site = site;
+          p.render();
+        } else {
+          alert("Site not found. redirecting...");
+          navigate(`/ed/`);
+        }
+      });
+      return false;
+    }
+
     if (!params.page_id && params.site_id) {
       db.page
         .findFirst({

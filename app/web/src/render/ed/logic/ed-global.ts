@@ -109,6 +109,13 @@ export const EDGlobal = {
     },
     popup: {
       site: null as null | ((site_id: string) => void | Promise<void>),
+      site_form: null as null | {
+        group_id: string;
+        id: string;
+        name?: string;
+        domain?: string;
+        responsive?: string;
+      },
       comp: null as null | ((comp_id: string) => void | Promise<void>),
       comp_group: null as null | {
         mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;
