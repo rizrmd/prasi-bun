@@ -1,6 +1,25 @@
-import { useLocal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
+import { EDGlobal } from "../../logic/ed-global";
 
-export const EdPaneResize = (arg: {
+export const EdPane = ({ type }: { type: "left" | "right" }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
+  return (
+    <EdPaneResize
+      minSize={200}
+      size={p.ui.layout[type]}
+      onResize={(size) => {
+        p.ui.layout.left = size;
+        p.render();
+      }}
+      onDone={(size) => {
+        localStorage.setItem("prasi-layout-" + type, size.toString());
+      }}
+    />
+  );
+};
+
+const EdPaneResize = (arg: {
   minSize: number;
   size: number;
   onResize: (size: number) => void;

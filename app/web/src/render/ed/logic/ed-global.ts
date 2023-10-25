@@ -12,10 +12,8 @@ const EmptySite = {
   name: "",
   domain: "",
   config: { api_url: "" },
-  snapshot: null as null | Uint8Array,
-
-  // js: "",
-  // js_compiled: "",
+  js: "",
+  js_compiled: "",
 };
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
