@@ -8,6 +8,7 @@ import { EdSitePicker } from "./panel/top/left/site";
 import { EdApiConfig } from "./panel/top/left/api";
 import { EdExport } from "./panel/top/left/export";
 import { EdNpmConfig } from "./panel/top/left/npm";
+import { EdSiteJS } from "./panel/top/left/js";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -28,6 +29,7 @@ export const EdLeft = () => {
         >
           <EdSitePicker />
           <div className="flex items-stretch space-x-1 pl-2">
+            <EdSiteJS />
             <EdNpmConfig />
             <EdApiConfig />
             <EdExport />

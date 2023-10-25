@@ -107,6 +107,7 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
+      site: null as null | ((site_id: string) => void | Promise<void>),
       comp: null as null | ((comp_id: string) => void | Promise<void>),
       comp_group: null as null | {
         mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;
