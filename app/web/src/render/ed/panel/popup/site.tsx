@@ -272,7 +272,7 @@ const SitePicker = ({
                 >
                   {item.renaming ? (
                     <input
-                      className="border-2 border-blue-500 outline-none"
+                      className="border-2 h-[24px] border-blue-500 outline-none"
                       value={item.name}
                       autoFocus
                       spellCheck={false}
@@ -281,13 +281,18 @@ const SitePicker = ({
                         local.render();
                       }}
                       onBlur={async () => {
-                        if (item.renaming) {
+                        if (item.renaming && item.name !== node.text) {
+                          node.text = item.name;
+                          item.renaming = false;
+                          local.render();
                           await db.org.update({
                             where: { id: item.id },
                             data: { name: item.name },
                           });
-                          item.renaming = false;
                           reload();
+                        } else {
+                          item.renaming = false;
+                          local.render();
                         }
                       }}
                       onKeyDown={async (e) => {
