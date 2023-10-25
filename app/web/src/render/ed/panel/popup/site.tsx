@@ -517,27 +517,29 @@ const SitePicker = ({
                     )}
                   </div>
                 </div>
-                <div
-                  className="edit 
+                {orglen > 1 && (
+                  <div
+                    className="edit 
                   absolute top-0 right-0 mr-1 text-[9px] text-slate-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
 
-                    if (typeof node.parent === "string") {
-                      p.ui.popup.site_form = {
-                        group_id: node.parent,
-                        id: item.id,
-                        domain: item.domain,
-                        name: item.name,
-                        responsive: item.responsive,
-                      };
-                      p.render();
-                    }
-                  }}
-                >
-                  Drag me
-                </div>
+                      if (typeof node.parent === "string") {
+                        p.ui.popup.site_form = {
+                          group_id: node.parent,
+                          id: item.id,
+                          domain: item.domain,
+                          name: item.name,
+                          responsive: item.responsive,
+                        };
+                        p.render();
+                      }
+                    }}
+                  >
+                    Drag me
+                  </div>
+                )}
                 <div
                   className="edit px-1 bg-blue-50  border-l-4 border-blue-300 text-blue-400 hover:bg-blue-500 hover:text-white absolute inset-0 top-auto"
                   onClick={(e) => {
