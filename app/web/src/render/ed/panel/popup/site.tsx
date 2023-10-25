@@ -10,6 +10,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { Modal } from "../../../../utils/ui/modal";
 import { EDGlobal } from "../../logic/ed-global";
+import { EdPopUser } from "./site-user";
 
 type GItem = {
   id: string;
@@ -23,13 +24,14 @@ type GItem = {
     }
   | { type: "site"; domain: string }
 );
+const conf = { group: null as any };
 
 export const EdPopSite = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal(
     {
       status: "init" as "init" | "loading" | "ready",
-      group: [] as NodeModel<GItem>[],
+      group: (conf.group || []) as NodeModel<GItem>[],
     },
     () => {
       p.ui.popup.site = () => {};
@@ -84,12 +86,13 @@ export const EdPopSite = () => {
       });
     }
     local.group = group;
+    conf.group = group;
 
     local.status = "ready";
     local.render();
   };
   useEffect(() => {
-    if (p.ui.popup.site && local.status !== "loading") {
+    if (p.ui.popup.site && local.status !== "loading" && !conf.group) {
       reload();
     }
   }, [p.ui.popup.site]);
@@ -139,12 +142,12 @@ const SitePicker = ({
   const orglen = group.filter((e) => e.parent === "site-root").length;
   return (
     <div className="flex flex-1 flex-col">
-      <div className="border-b text-[20px] pt-[15px] pb-[5px] pl-1 flex space-x-3 items-center">
+      <div className="border-b text-[20px] pt-[15px] pb-[5px] pl-1 flex  items-center">
         <div>
           {orglen} Organization{orglen > 1 ? "s" : ""}
         </div>
         <div
-          className="text-[12px] bg-white border rounded mx-2 px-2 hover:bg-blue-100 cursor-pointer flex items-center space-x-1 "
+          className="text-[12px] bg-white border rounded ml-2 px-2 hover:bg-blue-100 cursor-pointer flex items-center space-x-1 "
           onClick={async () => {
             const neworg = prompt("New Organization Name");
             if (neworg) {
@@ -166,6 +169,18 @@ const SitePicker = ({
             }}
           ></div>
           <div>New</div>
+        </div>
+
+        <div
+          className={cx(
+            "text-[12px] bg-white border rounded px-2 hover:bg-blue-100 cursor-pointer flex items-center ml-1 space-x-1 "
+          )}
+          onClick={() => {
+            conf.group = null;
+            reload();
+          }}
+        >
+          Refresh
         </div>
       </div>
 
@@ -265,18 +280,23 @@ const SitePicker = ({
                         item.name = e.currentTarget.value;
                         local.render();
                       }}
-                      onBlur={() => {
-                        item.name = node.text;
-                        item.renaming = false;
-                        local.render();
-                      }}
-                      onKeyDown={async (e) => {
-                        if (e.key === "Enter") {
+                      onBlur={async () => {
+                        if (item.renaming) {
                           await db.org.update({
                             where: { id: item.id },
                             data: { name: item.name },
                           });
+                          item.renaming = false;
                           reload();
+                        }
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === "Escape") {
+                          item.name = node.text;
+                          item.renaming = false;
+                          local.render();
+                        } else if (e.key === "Enter") {
+                          e.currentTarget.blur();
                         }
                       }}
                     />
@@ -298,10 +318,28 @@ const SitePicker = ({
                       </div>
                     </>
                   )}
-                  <div className="text-[12px] bg-white border rounded  px-2 hover:bg-blue-100 cursor-pointer min-h-[20px] flex items-center ">
-                    Team: {item.users.length} user
-                    {item.users.length > 1 ? "s" : ""}
-                  </div>
+                  <EdPopUser
+                    users={item.users}
+                    onDel={async (u) => {
+                      await db.org_user.deleteMany({
+                        where: { id_org: item.id, id_user: u.id },
+                      });
+                      item.users = item.users.filter((e) => e.id !== u.id);
+                      local.render();
+                    }}
+                    onAdd={async (u) => {
+                      await db.org_user.create({
+                        data: { id_org: item.id, id_user: u.id },
+                      });
+                      item.users = [...item.users, u];
+                      local.render();
+                    }}
+                  >
+                    <div className="text-[12px] bg-white border rounded  px-2 hover:bg-blue-100 cursor-pointer min-h-[20px] flex items-center ">
+                      Team: {item.users.length} user
+                      {item.users.length > 1 ? "s" : ""}
+                    </div>
+                  </EdPopUser>
                   {isDropTarget && (
                     <div className="px-2 text-slate-500 text-[13px]">
                       Drop here...
@@ -336,7 +374,13 @@ const SitePicker = ({
             }
 
             return (
-              <div
+              <a
+                href={`/ed/${item.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/ed/${item.id}`);
+                }}
                 className={cx(
                   "flex flex-col ml-2 mt-1 mb-1 w-[150px] text-[14px] border bg-white hover:bg-blue-100 cursor-pointer",
                   css`
@@ -361,10 +405,10 @@ const SitePicker = ({
                   </div>
                 </div>
 
-                <div className="edit px-1 bg-white  border-l-4 border-blue-400 text-blue-400 hover:bg-blue-500 hover:text-white">
+                <div className="edit px-1 bg-blue-50  border-l-4 border-blue-300 text-blue-400 hover:bg-blue-500 hover:text-white">
                   EDIT
                 </div>
-              </div>
+              </a>
             );
           }}
         />
