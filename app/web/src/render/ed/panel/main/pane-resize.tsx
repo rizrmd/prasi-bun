@@ -1,6 +1,7 @@
 import { useLocal } from "web-utils";
 
 export const EdPaneResize = (arg: {
+  minSize: number;
   size: number;
   onResize: (size: number) => void;
   onDone: (size: number) => void;
@@ -29,7 +30,10 @@ export const EdPaneResize = (arg: {
             local.inzone = true;
           }}
           onPointerMove={(e) => {
-            local.result = Math.max(0, local.size + e.clientX - local.sx);
+            local.result = Math.max(
+              arg.minSize,
+              local.size + e.clientX - local.sx
+            );
             arg.onResize(local.result);
           }}
           onPointerUp={stopDrag}

@@ -77,13 +77,13 @@ export const EDGlobal = {
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
     meta: {} as Record<string, EdMeta>,
-    list: {} as Record<string, EPage>,
+    list: {} as Record<string, { page: EPage; doc: DPage }>,
   },
   comp: {
     cur: EmptyComp,
     doc: null as null | DComp,
     item: null as null | IItem,
-    list: {} as Record<string, { cur: EComp; doc: DComp }>,
+    list: {} as Record<string, { comp: EComp; doc: DComp }>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {

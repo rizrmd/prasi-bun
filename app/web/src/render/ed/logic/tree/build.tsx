@@ -306,7 +306,7 @@ const loadComponent = async (p: PG, item_comp: FNComponent) => {
     const doc = new Y.Doc() as DComp;
     if (cur.snapshot) {
       Y.applyUpdate(doc as any, decompress(cur.snapshot));
-      p.comp.list[item_comp.id] = { cur, doc };
+      p.comp.list[item_comp.id] = { comp: cur, doc };
       return true;
     }
   }
