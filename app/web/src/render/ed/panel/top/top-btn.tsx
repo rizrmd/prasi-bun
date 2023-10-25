@@ -5,25 +5,35 @@ export const TopBtn = ({
   className,
   disabled,
   underlight,
+  onClick,
+  style = "normal",
 }: {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
   underlight?: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  style?: "slim" | "normal";
 }) => {
   return (
     <div
       className={cx(
-        "px-2 flex items-center cursor-pointer space-x-1 select-none relative",
-        !disabled &&
-          "border border-slate-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all duration-200 rounded-[2px]",
-        disabled && "text-slate-400 border border-slate-100",
+        "flex items-center cursor-pointer space-x-1 select-none relative transition-all duration-200 ",
+        style === "normal"
+          ? [
+              "px-2 ",
+              !disabled &&
+                "border border-slate-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white rounded-[2px]",
+              disabled && "text-slate-400 border border-slate-100",
+            ]
+          : "px-1 rounded-[3px] hover:bg-blue-500 hover:text-white",
         underlight &&
           css`
             border-bottom-color: ${underlight};
           `,
         className
       )}
+      onClick={onClick}
     >
       {underlight && (
         <div

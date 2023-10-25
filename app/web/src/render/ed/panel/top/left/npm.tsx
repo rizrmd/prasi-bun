@@ -2,7 +2,7 @@ import { TopBtn } from "../top-btn";
 
 export const EdNpmConfig = () => {
   return (
-    <TopBtn>
+    <TopBtn style="slim">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="26"

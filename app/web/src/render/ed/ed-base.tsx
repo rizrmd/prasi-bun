@@ -8,6 +8,7 @@ import { EdLeft } from "./ed-left";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdPopCompGroup } from "./panel/popup/comp-group";
 import { EdPaneResize } from "./panel/main/pane-resize";
+import { EdPopSite } from "./panel/popup/site";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -50,6 +51,7 @@ export const EdBase = () => {
       </div>
 
       <>
+        <EdPopSite />
         <EdPopCompGroup />
       </>
     </div>
