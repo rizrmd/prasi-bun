@@ -1,13 +1,13 @@
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
+import { EdLeft } from "./ed-left";
 import { EDGlobal } from "./logic/ed-global";
 import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
-import { EdMain } from "./panel/main/main";
-import { EdLeft } from "./ed-left";
 import { edUndoManager } from "./logic/ed-undo";
+import { EdMain } from "./panel/main/main";
+import { EdPane } from "./panel/main/pane-resize";
 import { EdPopCompGroup } from "./panel/popup/comp-group";
-import { EdPaneResize } from "./panel/main/pane-resize";
 import { EdPopSite } from "./panel/popup/site";
 
 export const EdBase = () => {
@@ -36,17 +36,7 @@ export const EdBase = () => {
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
         <EdLeft />
-        <EdPaneResize
-          minSize={200}
-          size={p.ui.layout.left}
-          onResize={(size) => {
-            p.ui.layout.left = size;
-            p.render();
-          }}
-          onDone={(size) => {
-            localStorage.setItem("prasi-layout-left", size.toString());
-          }}
-        />
+        <EdPane type="left" />
         <EdMain />
       </div>
 
