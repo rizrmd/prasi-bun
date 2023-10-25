@@ -57,6 +57,7 @@ export const EdTreeBody = () => {
       render={nodeRender}
       onDrop={nodeOnDrop}
       canDrop={(_, args) => {
+        if (!args.dragSource?.data?.item) return false;
         return canDrop(p, args);
       }}
       dragPreviewRender={DragPreview}

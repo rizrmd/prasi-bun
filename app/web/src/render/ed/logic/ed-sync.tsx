@@ -9,11 +9,13 @@ import { w } from "../../../utils/types/general";
 export const edInitSync = (p: PG) => {
   const session = JSON.parse(
     localStorage.getItem("prasi-session") || "null"
-  ) as { data: { user: { id: string } } };
+  ) as { data: { user: { id: string; username: string } } };
   if (!session) {
     navigate("/login");
     return <Loading note="logging in" />;
   }
+  p.user.id = session.data.user.id;
+  p.user.username = session.data.user.username;
 
   if (!p.sync) {
     clientStartSync({

@@ -5,6 +5,7 @@ import {
   ESite,
 } from "../../../web/src/render/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
+import { site_group } from "./actions/site_group";
 
 /* 
    WARNING:
@@ -19,7 +20,7 @@ export const SyncActions = {
   site: {
     list: async () =>
       ({}) as Record<string, { id: string; name: string; domain: string }>,
-    group: async () => ({}) as Record<string, string[]>,
+    group: async () => ({}) as ReturnType<typeof site_group>,
     load: async (id: string) => ({}) as ESite | void,
   },
   comp: {
