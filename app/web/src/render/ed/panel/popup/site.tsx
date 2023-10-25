@@ -410,7 +410,13 @@ const SitePicker = ({
                   </div>
                 </div>
 
-                <div className="edit px-1 bg-blue-50  border-l-4 border-blue-300 text-blue-400 hover:bg-blue-500 hover:text-white">
+                <div
+                  className="edit px-1 bg-blue-50  border-l-4 border-blue-300 text-blue-400 hover:bg-blue-500 hover:text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                >
                   EDIT
                 </div>
               </a>
