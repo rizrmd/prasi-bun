@@ -6,6 +6,7 @@ import { rebuildTree } from "./tree-logic";
 
 export const routeLive = (p: PG, pathname: string) => {
   if (p.status !== "loading" && p.status !== "not-found") {
+    if (!w.params) w.params = {};
     let page_id = w.params.page_id;
 
     if (!page_id) {
@@ -13,7 +14,6 @@ export const routeLive = (p: PG, pathname: string) => {
       if (!found) {
         p.status = "not-found";
       } else {
-        if (!w.params) w.params = {};
         if (found.params) {
           for (const [k, v] of Object.entries(found.params)) {
             w.params[k] = v;
