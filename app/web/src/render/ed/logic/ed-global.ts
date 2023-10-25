@@ -87,6 +87,10 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
+    layout: {
+      left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),
+      right: parseInt(localStorage.getItem("prasi-layout-right") || "250"),
+    },
     prevent_indent_hook: false,
     syncing: false,
     tree: {

@@ -7,6 +7,7 @@ import { EdMain } from "./panel/main/main";
 import { EdTree } from "./panel/tree/tree";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdPopCompGroup } from "./panel/popup/comp-group";
+import { EdPaneResize } from "./panel/main/pane-resize";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -34,6 +35,20 @@ export const EdBase = () => {
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
         <EdTree />
+        <EdPaneResize
+          size={p.ui.layout.left}
+          onResize={(size) => {
+            if (size > 100) {
+              p.ui.layout.left = size;
+              p.render();
+            }
+          }}
+          onDone={(size) => {
+            if (size > 100) {
+              localStorage.setItem("prasi-layout-left", size.toString());
+            }
+          }}
+        />
         <EdMain />
       </div>
 

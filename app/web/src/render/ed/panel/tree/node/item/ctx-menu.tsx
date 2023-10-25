@@ -100,7 +100,7 @@ export const EdTreeCtxMenu = ({
       )}
       <MenuItem
         label="Cut"
-        hotKey={<HotKey shortcut={"X"} />}
+        // hotKey={<HotKey shortcut={"X"} />}
         onClick={() => edActionCut(p, item)}
       />
       <MenuItem
