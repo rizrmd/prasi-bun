@@ -15,6 +15,9 @@ export const site_group = async function (this: SyncConnection) {
           name: true,
           domain: true,
         },
+        where: {
+          is_deleted: false,
+        },
       },
     },
   });

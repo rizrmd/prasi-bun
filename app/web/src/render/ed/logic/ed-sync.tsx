@@ -17,6 +17,23 @@ export const edInitSync = (p: PG) => {
   p.user.id = session.data.user.id;
   p.user.username = session.data.user.username;
 
+  if (p.sync) {
+    if (!params.page_id && params.site_id) {
+      db.page
+        .findFirst({
+          where: {
+            is_deleted: false,
+            is_default_layout: false,
+            id_site: params.site_id,
+          },
+          select: { id: true },
+        })
+        .then((e) => {
+          if (e) navigate(`/ed/${params.site_id}/${e.id}`);
+        });
+      return false;
+    }
+  }
   if (!p.sync) {
     clientStartSync({
       user_id: session.data.user.id,

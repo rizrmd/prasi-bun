@@ -21,9 +21,16 @@ export const edRoute = async (p: PG) => {
       !p.page.cur.snapshot ||
       !p.page.list[p.page.cur.id]
     ) {
-      if (p.page.cur.snapshot && p.page.list[p.page.cur.id]) {
-        console.log("loading page from cache");
-      } else {
+      let loadFromServer = true;
+      if (p.page.list[params.page_id]) {
+        const cur = p.page.list[params.page_id];
+        p.page.cur = cur.page;
+        p.page.doc = cur.doc;
+        loadFromServer = false;
+        treeRebuild(p);
+      }
+
+      if (loadFromServer) {
         p.status = "loading";
         const page = await p.sync.page.load(params.page_id);
 
