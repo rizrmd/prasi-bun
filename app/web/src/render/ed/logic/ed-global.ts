@@ -62,6 +62,7 @@ export type EdMeta = {
 };
 
 export const EDGlobal = {
+  user: { id: "", username: "" },
   status: "init" as
     | "init"
     | "loading"

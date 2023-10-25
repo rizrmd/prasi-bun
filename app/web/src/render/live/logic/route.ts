@@ -6,7 +6,7 @@ import { rebuildTree } from "./tree-logic";
 
 export const routeLive = (p: PG, pathname: string) => {
   if (p.status !== "loading" && p.status !== "not-found") {
-    let page_id = params.page_id;
+    let page_id = w.params.page_id;
 
     if (!page_id) {
       const found = p.route.lookup(pathname);
