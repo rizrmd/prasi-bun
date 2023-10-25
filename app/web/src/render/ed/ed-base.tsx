@@ -9,6 +9,7 @@ import { EdMain } from "./panel/main/main";
 import { EdPane } from "./panel/main/pane-resize";
 import { EdPopCompGroup } from "./panel/popup/comp-group";
 import { EdPopSite } from "./panel/popup/site";
+import { jscript } from "../editor/panel/script/script-element";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -31,6 +32,8 @@ export const EdBase = () => {
       </div>
     );
   }
+
+  const Editor = jscript.editor;
   return (
     <div className="flex flex-col flex-1">
       <div className="flex justify-between"></div>
@@ -43,6 +46,16 @@ export const EdBase = () => {
       <>
         <EdPopSite />
         <EdPopCompGroup />
+        {Editor && !jscript.ready && (
+          <div className="hidden">
+            <Editor
+              onMount={() => {
+                jscript.ready = true;
+                p.render();
+              }}
+            />
+          </div>
+        )}
       </>
     </div>
   );
