@@ -1,6 +1,6 @@
 import init from "wasm-gzip";
 import { PG } from "./ed-global";
-import { jscript } from "../../editor/panel/script/script-element";
+import { jscript } from "../../../utils/script/jscript";
 
 export const edInit = async (p: PG) => {
   await init();

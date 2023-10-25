@@ -1,41 +1,49 @@
-import type { Monaco } from "@monaco-editor/react";
-import { FC } from "react";
-import { useGlobal } from "web-utils";
-import { Loading } from "../../../../utils/ui/loading";
-import { EditorGlobal } from "../../logic/global";
-import { ScriptMonacoCustom } from "./monaco/monaco-custom";
-import { MonacoEditor } from "./monaco/typings";
-import { jscript } from "../../../../utils/script/jscript";
+import { ReactNode } from "react";
+import { useLocal } from "web-utils";
+import { jscript } from "../../../../../utils/script/jscript";
+import { Loading } from "../../../../../utils/ui/loading";
 
-export const EScriptCustom: FC<{
-  monaco_id: string;
-  item_id?: string;
-  props?: Record<string, any>;
-  propTypes?: Record<string, string>;
-  wrap?: (src: string) => string;
-  onLoad?: (editor: MonacoEditor, monaco: Monaco) => void;
-  src: string;
-  onChange: (src: string, built: string) => void;
-}> = ({
-  monaco_id: monaco_id,
-  src,
-  onChange,
-  onLoad,
-  item_id,
-  props,
-  propTypes,
-  wrap,
+export const EdScriptInit = () => {
+  const Editor = jscript.editor;
+  const local = useLocal({ editorLoaded: false }, () => {});
+
+  jscript.events.editorLoaded = () => {
+    local.editorLoaded = true;
+    local.render();
+  };
+
+  return (
+    <>
+      {Editor && local.editorLoaded && (
+        <div className="hidden">
+          <Editor
+            onMount={() => {
+              jscript.events.pendingDone();
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
+export const EdMonacoWrap = ({
+  children,
+}: {
+  children: (Editor: Exclude<typeof jscript.editor, null>) => ReactNode;
 }) => {
-  const p = useGlobal(EditorGlobal);
+  const local = useLocal({});
 
-  if (!jscript.editor && jscript.pending) {
-    jscript.pending.then(() => p.render());
+  if (jscript.pending && (!jscript.editor || !jscript.build)) {
+    jscript.pending.then(() => {
+      local.render();
+    });
   }
 
   return (
     <div
       className={cx(
-        "flex flex-1",
+        "flex flex-1 absolute inset-[80px]",
         css`
           .monaco-editor {
             .mtk9 {
@@ -87,18 +95,7 @@ export const EScriptCustom: FC<{
       {!jscript.editor || !jscript.build ? (
         <Loading note="script-cst" backdrop={false} />
       ) : (
-        <ScriptMonacoCustom
-          monaco_id={monaco_id}
-          Editor={jscript.editor}
-          build={jscript.build}
-          src={src}
-          onLoad={onLoad}
-          onChange={onChange}
-          props={props}
-          propTypes={propTypes}
-          wrap={wrap}
-          item_id={item_id}
-        />
+        children(jscript.editor)
       )}
     </div>
   );

@@ -5,16 +5,11 @@ import type {
 } from "@monaco-editor/react";
 import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
+import { FBuild } from "../../../../../utils/script/jscript";
 import { EditorGlobal } from "../../../logic/global";
 import { jsMount } from "./mount";
 import { monacoTypings } from "./typings";
 export type MonacoEditor = Parameters<OnMount>[0];
-
-export type FBuild = (
-  entryFileName: string,
-  src: string,
-  files?: Record<string, string>
-) => Promise<string>;
 
 export const customMonacoState: Record<string, any> = {};
 

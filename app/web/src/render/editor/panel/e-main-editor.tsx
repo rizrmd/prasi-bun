@@ -5,6 +5,7 @@ import { mobileCSS } from "../elements/e-page";
 import { editorStyle } from "../elements/style";
 import { EditorGlobal } from "../logic/global";
 import { Toolbar } from "./toolbar/Toolbar";
+import { EdScriptInit } from "../../ed/panel/script/monaco/init";
 
 const ETree = lazy(async () => ({
   default: (await import("./tree/tree")).ETree,
@@ -61,6 +62,7 @@ export const EMainEditor = () => {
       </div>
       {p.status === "ready" && (
         <Suspense fallback={<Loading note={`toolbar`} />}>
+          <EdScriptInit />
           {p.manager.site && <SiteManager />}
           {p.manager.page && <PageManager />}
           {p.manager.comp && <CompManager />}
