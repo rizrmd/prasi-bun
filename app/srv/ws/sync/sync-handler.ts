@@ -21,6 +21,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
     const client_id = createId();
     conns.set(client_id, {
       user_id: "",
+      user: null,
       client_id,
       ws,
       msg: { pending: {}, resolve: {} },
@@ -58,7 +59,9 @@ export const syncHandler: WebSocketHandler<WSData> = {
         const msg = packr.unpack(Buffer.from(raw));
         if (msg.type === SyncType.UserID) {
           const { user_id, page_id, site_id } = msg;
+          
           conn.user_id = user_id;
+          conn.user = await db.user.findFirst({ where: { id: user_id } });
 
           let conf = await user.conf.getOrCreate(user_id);
           if (site_id) {

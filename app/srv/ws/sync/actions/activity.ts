@@ -1,7 +1,7 @@
 import { validate } from "uuid";
 import { SAction } from "../actions";
-import { SyncConnection } from "../type";
 import { actstore, broadcastActivity } from "../entity/actstore";
+import { SyncConnection } from "../type";
 
 export const activity: SAction["activity"] = async function (
   this: SyncConnection,

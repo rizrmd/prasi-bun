@@ -1,6 +1,7 @@
 import { ServerWebSocket } from "bun";
 import { UserConf } from "./entity/user";
 import { WSData } from "../../../../pkgs/core/server/create";
+import { user } from "../../../db/db";
 
 export enum SyncType {
   ClientID,
@@ -12,6 +13,7 @@ export enum SyncType {
 
 export type SyncConnection = {
   user_id: string;
+  user: null | user;
   client_id: string;
   conf?: UserConf & { toJSON: () => UserConf };
   ws: ServerWebSocket<WSData>;
