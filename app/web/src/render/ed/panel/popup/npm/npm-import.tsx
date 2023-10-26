@@ -11,8 +11,11 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
   const local = useLocal({
     search: {
       text: "",
+      timeout: null as any,
+      loading: false,
       result: [] as AlgoliaResult[],
       options: [] as { label: string; value: string }[],
+      el: null as null | HTMLInputElement,
     },
     status: "init" as "init" | "ready",
     size: 0,
@@ -43,37 +46,50 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
   }, [mode === "page" ? p.page.cur.id : p.site.id]);
 
   return (
-    <div className="flex flex-1 flex-col items-stretch text-[14px]">
+    <div className={cx("flex flex-1 flex-col items-stretch text-[14px]", mode)}>
       <div className="border-b h-[30px] relative">
         <div className="absolute inset-0 z-10 flex justify-between flex  items-stretch">
           <div className="uppercase px-2 flex items-center font-mono text-[11px]">
             {mode}
           </div>
           <Select
-            noOptionsMessage={() => "No packages found"}
+            noOptionsMessage={() =>
+              local.search.loading ? "Loading..." : "No packages found..."
+            }
             className={selectStyle}
             unstyled
             classNamePrefix={"sel"}
             placeholder="Search Packages"
+            value={null}
             inputValue={local.search.text}
             openMenuOnClick={false}
             openMenuOnFocus={false}
             onInputChange={async (text) => {
               local.search.text = text;
-              local.search.result = await searchPackage(text);
-              local.search.options = [];
-              for (const r of local.search.result) {
-                local.search.options.push({
-                  label: `${r.name} (${r.version})`,
-                  value: `${r.name}-><-${r.version}`,
-                });
-              }
+              local.search.loading = true;
               local.render();
+              clearTimeout(local.search.timeout);
+              local.search.timeout = setTimeout(async () => {
+                local.search.result = await searchPackage(text);
+                local.search.options = [];
+                for (const r of local.search.result) {
+                  local.search.options.push({
+                    label: `${r.name} (${r.version})`,
+                    value: `${r.name}-><-${r.version}`,
+                  });
+                }
+                local.search.loading = false;
+                local.render();
+              }, 500);
             }}
             options={local.search.options}
             onChange={async (e) => {
+              local.search.text = "";
+              local.render();
+
               if (e) {
                 const [name, version] = e.value.split("-><-");
+
                 if (mode === "page") {
                   await db.npm_page.create({
                     data: { id_page: p.page.cur.id, module: name, version },
@@ -85,6 +101,16 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                 }
                 reload();
               }
+
+              setTimeout(() => {
+                const el = document.querySelector(
+                  `.${mode} .sel__input`
+                ) as HTMLInputElement;
+                if (el) {
+                  el.focus();
+                  el.select();
+                }
+              });
             }}
           />
           <div className="w-[100px] flex items-center justify-center">
@@ -133,9 +159,6 @@ const selectStyle = css`
     border-left: 1px solid #ececeb;
     border-right: 1px solid #ececeb;
   }
-  .sel__control--is-focused {
-    box-shadow: none !important;
-  }
   .sel__menu {
     border-radius: 0px;
     background: white;
@@ -147,9 +170,10 @@ const selectStyle = css`
   .sel__option {
     padding: 2px 5px;
     border-bottom: 1px solid #ececeb;
-    &:hover {
-      background: #e0e9fa;
-    }
+  }
+  .sel__option--is-selected,
+  .sel__option--is-focused {
+    background: #e0e9fa;
   }
   .sel__indicator {
     width: 15px;
