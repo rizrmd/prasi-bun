@@ -1,6 +1,6 @@
 import { validate } from "uuid";
 import { SAction } from "../actions";
-import { actstore, broadcastActivity } from "../entity/actstore";
+import { Activity, actstore, broadcastActivity } from "../entity/actstore";
 import { SyncConnection } from "../type";
 
 export const activity: SAction["activity"] = async function (
@@ -24,7 +24,7 @@ export const activity: SAction["activity"] = async function (
 
     const obj = actstore.page[target.page_id][target.item_id][kind];
     if (obj) {
-      if (act === "-") delete obj[this.client_id];
+      if (act === Activity.Null) delete obj[this.client_id];
       else obj[this.client_id] = act;
     }
 
@@ -46,7 +46,7 @@ export const activity: SAction["activity"] = async function (
 
     const obj = actstore.comp[target.comp_id][target.item_id][kind];
     if (obj) {
-      if (act === "-") delete obj[this.client_id];
+      if (act === Activity.Null) delete obj[this.client_id];
       else obj[this.client_id] = act;
     }
 

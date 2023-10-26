@@ -1,4 +1,5 @@
 export * from "./activity";
+export * from "./client_info";
 export * from "./site_js";
 export * from "./site_load";
 export * from "./site_group";

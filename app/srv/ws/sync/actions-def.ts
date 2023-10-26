@@ -21,7 +21,10 @@ export const SyncActionDefinition = {
     "diff_local": "12",
     "sv_remote": "13"
   },
-  "activity": "14"
+  "activity": "14",
+  "client": {
+    "info": "15"
+  }
 };
 export const SyncActionPaths = {
   "0": "site.list",
@@ -38,5 +41,6 @@ export const SyncActionPaths = {
   "11": "yjs.sv_local",
   "12": "yjs.diff_local",
   "13": "yjs.sv_remote",
-  "14": "activity"
+  "14": "activity",
+  "15": "client.info"
 };
