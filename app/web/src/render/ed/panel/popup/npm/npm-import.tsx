@@ -4,11 +4,16 @@ import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 import { npm_page, npm_site } from "../../../../../../../db/db";
 import { EdNpmItems } from "./npm-items";
+import { AlgoliaResult, searchPackage } from "./npm-algolia";
 
 export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
-    search: "",
+    search: {
+      text: "",
+      result: [] as AlgoliaResult[],
+      options: [] as { label: string; value: string }[],
+    },
     status: "init" as "init" | "ready",
     size: 0,
     list: [] as (npm_page | npm_site)[],
@@ -50,14 +55,37 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
             unstyled
             classNamePrefix={"sel"}
             placeholder="Search Packages"
-            inputValue={local.search}
+            inputValue={local.search.text}
             openMenuOnClick={false}
             openMenuOnFocus={false}
-            onInputChange={(text) => {
-              local.search = text;
+            onInputChange={async (text) => {
+              local.search.text = text;
+              local.search.result = await searchPackage(text);
+              local.search.options = [];
+              for (const r of local.search.result) {
+                local.search.options.push({
+                  label: `${r.name} (${r.version})`,
+                  value: `${r.name}-><-${r.version}`,
+                });
+              }
               local.render();
             }}
-            onChange={() => {}}
+            options={local.search.options}
+            onChange={async (e) => {
+              if (e) {
+                const [name, version] = e.value.split("-><-");
+                if (mode === "page") {
+                  await db.npm_page.create({
+                    data: { id_page: p.page.cur.id, module: name, version },
+                  });
+                } else {
+                  await db.npm_site.create({
+                    data: { id_site: p.site.id, module: name, version },
+                  });
+                }
+                reload();
+              }
+            }}
           />
           <div className="w-[100px] flex items-center justify-center">
             {local.status === "init" && <>Loading...</>}
