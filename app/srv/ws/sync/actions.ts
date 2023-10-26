@@ -6,7 +6,7 @@ import {
 } from "../../../web/src/render/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
-import { Activity } from "./entity/actstore";
+import { Activity } from "./type";
 
 /* 
    WARNING:

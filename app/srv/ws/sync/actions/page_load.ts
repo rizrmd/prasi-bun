@@ -6,8 +6,8 @@ import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
-import { SyncConnection, SyncType } from "../type";
-import { Activity, actstore, broadcastActivity } from "../entity/actstore";
+import { Activity, SyncConnection, SyncType } from "../type";
+import { actstore, broadcastActivity } from "../entity/actstore";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
@@ -34,12 +34,6 @@ export const page_load: SAction["page"]["load"] = async function (
       load.root[this.client_id] = Activity.Open;
     }
   }
-  broadcastActivity(
-    {
-      page_id: id,
-    },
-    [this.client_id]
-  );
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
@@ -112,6 +106,10 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
+      broadcastActivity({
+        page_id: id,
+      });
+
       return {
         id: id,
         url: page.url,
@@ -142,6 +140,10 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
+    broadcastActivity({
+      page_id: id,
+    });
+
     return {
       id: id,
       url: snap.url,
@@ -157,6 +159,10 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
+    broadcastActivity({
+      page_id: id,
+    });
+    
     return {
       id: snap.id,
       url: snap.url,

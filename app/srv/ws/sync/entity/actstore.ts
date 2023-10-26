@@ -1,7 +1,7 @@
 import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import { sendWS } from "../sync-handler";
-import { SyncType } from "../type";
+import { Activity, SyncType } from "../type";
 import { conns } from "./conn";
 import { user } from "./user";
 
@@ -10,10 +10,6 @@ type COMP_ID = string;
 type ITEM_ID = string;
 type CLIENT_ID = string;
 
-export enum Activity {
-  Open,
-  Null,
-}
 export type ActivityKind = "root" | "js" | "css" | "html" | "text";
 export type ActivityList = Record<
   ITEM_ID,

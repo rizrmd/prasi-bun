@@ -1,7 +1,7 @@
 import { useGlobal } from "web-utils";
 import { TopBtn } from "../top-btn";
 import { EDGlobal, active } from "../../../logic/ed-global";
-import { Activity } from "../../../../../../../srv/ws/sync/entity/actstore";
+import { Activity } from "../../../../../../../srv/ws/sync/type";
 
 export const EdSiteJS = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
