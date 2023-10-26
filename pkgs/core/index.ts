@@ -11,6 +11,7 @@ import { preparePrisma } from "./utils/prisma";
 import { syncActionDefinition } from "utils/sync-def";
 import { user } from "../../app/srv/ws/sync/entity/user";
 import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
+import { initSrv } from "../../app/srv/init";
 
 g.status = "init";
 
@@ -38,6 +39,7 @@ if (g.db) {
   });
 }
 
+await initSrv();
 await syncActionDefinition();
 await generateAPIFrm();
 await prepareApiRoutes();
