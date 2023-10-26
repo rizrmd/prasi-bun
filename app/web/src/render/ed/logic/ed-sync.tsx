@@ -6,6 +6,8 @@ import { Y } from "../../../../../srv/ws/sync/entity/docs";
 import { treeRebuild } from "./tree/build";
 import { w } from "../../../utils/types/general";
 
+const decoder = new TextDecoder();
+
 export const edInitSync = (p: PG) => {
   const session = JSON.parse(
     localStorage.getItem("prasi-session") || "null"
@@ -55,7 +57,7 @@ export const edInitSync = (p: PG) => {
       events: {
         async connected() {
           if (w.offline) {
-            console.log("reconnected, syncing...");
+            console.log("reconnected!");
             w.offline = false;
             p.ui.syncing = true;
             p.render();
@@ -71,6 +73,9 @@ export const edInitSync = (p: PG) => {
           return {
             reconnect: true,
           };
+        },
+        activity(e) {
+          console.log(JSON.stringify(e, null, 2));
         },
         async editor_start(e) {
           if (p.ui.syncing) {
@@ -94,6 +99,14 @@ export const edInitSync = (p: PG) => {
         },
         site_loaded({ site }) {
           p.site = site;
+          p.render();
+        },
+        site_js_updated(arg) {
+          const js = decoder.decode(decompress(arg.js));
+          const jsc = decoder.decode(decompress(arg.jsc));
+
+          p.site.js = js;
+          p.site.js_compiled = jsc;
           p.render();
         },
         async remote_svlocal(data) {

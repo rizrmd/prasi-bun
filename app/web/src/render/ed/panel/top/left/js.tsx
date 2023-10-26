@@ -1,6 +1,6 @@
 import { useGlobal } from "web-utils";
 import { TopBtn } from "../top-btn";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 
 export const EdSiteJS = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -9,6 +9,11 @@ export const EdSiteJS = () => {
       style="slim"
       className="font-bold font-mono"
       onClick={() => {
+        p.sync.activity(
+          { page_id: p.page.cur.id, item_id: "site" },
+          "js",
+          "open"
+        );
         p.ui.script.site = true;
         p.render();
       }}

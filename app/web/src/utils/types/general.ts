@@ -34,6 +34,10 @@ export const w = window as unknown as {
   api: any;
   db: any;
   offline: boolean;
+  debug: {
+    on: any;
+    off: any;
+  };
 };
 
 export type Page = {

@@ -6,6 +6,7 @@ import {
 } from "../../../web/src/render/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
+import { Activity } from "./entity/actstore";
 
 /* 
    WARNING:
@@ -22,6 +23,11 @@ export const SyncActions = {
       ({}) as Record<string, { id: string; name: string; domain: string }>,
     group: async () => ({}) as ReturnType<typeof site_group>,
     load: async (id: string) => ({}) as ESite | void,
+    js: async (
+      id: string,
+      js_compressed: Uint8Array,
+      built_compressed: Uint8Array
+    ) => {},
   },
   comp: {
     new: async (arg: {
@@ -64,4 +70,9 @@ export const SyncActions = {
       diff: Uint8Array
     ) => ({}) as { diff: Uint8Array } | void,
   },
+  activity: (
+    target: { comp_id?: string; page_id?: string; item_id: string },
+    kind: "js" | "css" | "html" | "text",
+    activity: Activity
+  ) => {},
 };

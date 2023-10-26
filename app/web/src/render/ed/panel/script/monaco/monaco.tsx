@@ -12,8 +12,8 @@ export const EdMonaco = (arg: {
   monaco: Parameters<typeof Editor>[0];
   onClose: () => void;
   prop?: {
-    val: Record<string, any>;
-    types: Record<string, string>;
+    val?: Record<string, any>;
+    types?: Record<string, string>;
   };
 }) => {
   const filename = arg.filename;
@@ -76,8 +76,8 @@ export const EdMonaco = (arg: {
           },
           monaco,
           {
-            values: arg.prop.val,
-            types: arg.prop.types,
+            values: arg.prop.val || {},
+            types: arg.prop.types || {},
           }
         );
 
