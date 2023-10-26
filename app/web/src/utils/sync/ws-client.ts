@@ -153,7 +153,6 @@ const connect = (
           const ws = new WebSocket(url.toString());
 
           ws.onopen = () => {
-            console.clear();
             sendWs(ws, { type: SyncType.UserID, user_id, site_id, page_id });
             conf.ws = ws;
             event.connected();

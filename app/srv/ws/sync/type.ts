@@ -3,6 +3,11 @@ import { UserConf } from "./entity/user";
 import { WSData } from "../../../../pkgs/core/server/create";
 import { user } from "../../../db/db";
 
+export enum Activity {
+  Open,
+  Null,
+}
+
 export enum SyncType {
   ClientID,
   UserID,
