@@ -10,6 +10,7 @@ import { loadSitePage } from "./editor/load-sitepage";
 import { conns, wconns } from "./entity/conn";
 import { UserConf, user } from "./entity/user";
 import { SyncType } from "./type";
+import { actstore, broadcastActivity } from "./entity/actstore";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
@@ -27,11 +28,26 @@ export const syncHandler: WebSocketHandler<WSData> = {
     wconns.set(ws, client_id);
     sendWS(ws, { type: SyncType.ClientID, client_id });
   },
-  close(ws, code, reason) {
-    const conn_id = wconns.get(ws);
-    if (conn_id) {
-      conns.delete(conn_id);
+  close(ws) {
+    const client_id = wconns.get(ws);
+    if (client_id) {
+      conns.delete(client_id);
       wconns.delete(ws);
+
+      for (const p of Object.values(actstore)) {
+        for (const q of Object.values(p)) {
+          for (const r of Object.values(q)) {
+            for (const s of Object.values(r)) {
+              delete s[client_id];
+            }
+          }
+        }
+      }
+      const u = user.active.find(client_id);
+      if (u) {
+        user.active.del(client_id);
+        broadcastActivity({ page_id: u.page_id, comp_id: u.comp_id });
+      }
     }
   },
   async message(ws, raw) {

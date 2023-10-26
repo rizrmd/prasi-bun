@@ -1,13 +1,16 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { EdMonaco } from "./monaco/monaco";
-import { EDGlobal } from "../../logic/ed-global";
+import { EDGlobal, active } from "../../logic/ed-global";
+import { compress } from "wasm-gzip";
+import { jscript } from "../../../../utils/script/jscript";
 
 export const EdScriptSite = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-
+  const local = useLocal({ timeout: null as any });
   if (!p.ui.script.site) {
     return null;
   }
+
   return (
     <EdMonaco
       id="script-site"
@@ -15,12 +18,27 @@ export const EdScriptSite = () => {
       filename="site.tsx"
       monaco={{
         value: p.site.js,
-        onChange: (v) => {
-          console.log(v);
+        onChange: async (v) => {
+          if (jscript.build) {
+            const src = v || "";
+            const built = await jscript.build("site.tsx", src);
+
+            p.site.js = src;
+            p.site.js_compiled = built;
+            // todo: re-run site js
+
+            clearTimeout(local.timeout);
+            local.timeout = setTimeout(async () => {
+              await p.sync.site.js(
+                p.site.id,
+                Buffer.from(compress(src)),
+                Buffer.from(compress(built))
+              );
+            }, 1000);
+          }
         },
       }}
       prop={{
-        val: {},
         types: {
           exports: "any",
           types: "any",
@@ -29,6 +47,7 @@ export const EdScriptSite = () => {
       }}
       onClose={() => {
         p.ui.script.site = false;
+        p.sync.activity({ page_id: p.page.cur.id, item_id: "site" }, "js", "-");
         p.render();
       }}
     />

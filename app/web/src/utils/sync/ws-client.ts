@@ -13,11 +13,34 @@ import { SyncType } from "../../../../srv/ws/sync/type";
 import { ESite } from "../../render/ed/logic/ed-global";
 import { w } from "../types/general";
 import { initIDB } from "./idb";
+import { ActivityList } from "../../../../srv/ws/sync/entity/actstore";
 const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
-const WS_DEBUG = false;
-const RECONNECT_TIMEOUT = 1000;
+const WS_CONFIG = {
+  debug: !!localStorage.getItem("prasi-ws-debug"),
+  reconnectTimeout: 1000,
+};
+
+w.debug = new Proxy(
+  {},
+  {
+    get(target, p, receiver) {
+      if (p === "off") {
+        WS_CONFIG.debug = false;
+        localStorage.removeItem("prasi-ws-debug");
+        console.clear();
+        return ["WS DEBUG: Deactivated"];
+      }
+      if (p === "on") {
+        WS_CONFIG.debug = true;
+        localStorage.setItem("prasi-ws-debug", "1");
+        console.clear();
+        return ["WS DEBUG: Activated"];
+      }
+    },
+  }
+) as any;
 
 const conf = {
   ws: null as null | WebSocket,
@@ -44,7 +67,7 @@ export type ClientEventObject = Parameters<typeof clientStartSync>[0]["events"];
 export type ClientEvent = keyof ClientEventObject;
 
 const sendWs = (ws: WebSocket, msg: any) => {
-  if (WS_DEBUG) console.log(`%c⬆`, "color:blue", msg);
+  if (WS_CONFIG.debug) console.log(`%c⬆`, "color:blue", msg);
   ws.send(packr.pack(msg));
 };
 
@@ -59,6 +82,11 @@ export const clientStartSync = async (arg: {
       type: "page" | "comp";
       id: string;
       sv_local: Uint8Array;
+    }) => void;
+    site_js_updated: (arg: { js: Uint8Array; jsc: Uint8Array }) => void;
+    activity: (arg: {
+      page: Record<string, ActivityList>;
+      comp: Record<string, ActivityList>;
     }) => void;
     disconnected: () => { reconnect: boolean };
     connected: () => void;
@@ -136,7 +164,7 @@ const connect = (
               setTimeout(async () => {
                 reconnect++;
                 retry();
-              }, reconnect * RECONNECT_TIMEOUT);
+              }, reconnect * WS_CONFIG.reconnectTimeout);
             } else {
               reject();
             }
@@ -144,7 +172,7 @@ const connect = (
           ws.onmessage = async (e) => {
             const raw = e.data as Blob;
             const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
-            if (WS_DEBUG) console.log(`%c⬇`, `color:red`, msg);
+            if (WS_CONFIG.debug) console.log(`%c⬇`, `color:red`, msg);
 
             if (msg.type === SyncType.ClientID) {
               conf.client_id = msg.client_id;
