@@ -8,6 +8,17 @@ export enum Activity {
   Null,
 }
 
+export type PAGE_ID = string;
+export type COMP_ID = string;
+export type ITEM_ID = string;
+export type CLIENT_ID = string;
+
+export type ActivityKind = "root" | "js" | "css" | "html" | "text";
+export type ActivityList = Record<
+  ITEM_ID,
+  Partial<Record<ActivityKind, Record<CLIENT_ID, Activity>>>
+>;
+
 export enum SyncType {
   ClientID,
   UserID,

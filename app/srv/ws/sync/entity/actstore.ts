@@ -1,20 +1,10 @@
 import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import { sendWS } from "../sync-handler";
-import { Activity, SyncType } from "../type";
+import { ActivityList, CLIENT_ID, COMP_ID, PAGE_ID, SyncType } from "../type";
 import { conns } from "./conn";
 import { user } from "./user";
 
-type PAGE_ID = string;
-type COMP_ID = string;
-type ITEM_ID = string;
-type CLIENT_ID = string;
-
-export type ActivityKind = "root" | "js" | "css" | "html" | "text";
-export type ActivityList = Record<
-  ITEM_ID,
-  Partial<Record<ActivityKind, Record<CLIENT_ID, Activity>>>
->;
 export const actstore = {
   page: {} as Record<PAGE_ID, ActivityList>,
   comp: {} as Record<COMP_ID, ActivityList>,

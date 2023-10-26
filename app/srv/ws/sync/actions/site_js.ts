@@ -25,13 +25,15 @@ export const site_js: SAction["site"]["js"] = async function (
     });
 
     user.active.findAll({ site_id: id }).map((e) => {
-      const ws = conns.get(e.client_id)?.ws;
-      if (ws)
-        sendWS(ws, {
-          type: SyncType.Event,
-          event: "site_js_updated",
-          data: { js: js_compressed, jsc: built_compressed },
-        });
+      if (e.client_id !== this.client_id) {
+        const ws = conns.get(e.client_id)?.ws;
+        if (ws)
+          sendWS(ws, {
+            type: SyncType.Event,
+            event: "site_js_updated",
+            data: { js: js_compressed, jsc: built_compressed },
+          });
+      }
     });
   }
 };

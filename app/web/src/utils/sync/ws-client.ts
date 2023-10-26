@@ -14,6 +14,7 @@ import { ESite } from "../../render/ed/logic/ed-global";
 import { w } from "../types/general";
 import { initIDB } from "./idb";
 import { ActivityList } from "../../../../srv/ws/sync/entity/actstore";
+import { wconns } from "../../../../srv/ws/sync/entity/conn";
 const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
@@ -89,7 +90,8 @@ export const clientStartSync = async (arg: {
       comp: Record<string, ActivityList>;
     }) => void;
     disconnected: () => { reconnect: boolean };
-    connected: () => void;
+    opened: () => void;
+    shakehand: (client_id: string) => void;
   };
 }) => {
   const { user_id, site_id, page_id, events } = arg;
@@ -155,7 +157,7 @@ const connect = (
           ws.onopen = () => {
             sendWs(ws, { type: SyncType.UserID, user_id, site_id, page_id });
             conf.ws = ws;
-            event.connected();
+            event.opened();
           };
           ws.onclose = async () => {
             const res = event.disconnected();
@@ -175,6 +177,8 @@ const connect = (
 
             if (msg.type === SyncType.ClientID) {
               conf.client_id = msg.client_id;
+              event.shakehand(msg.client_id);
+
               resolve();
             } else if (msg.type === SyncType.Event) {
               const eventName = msg.event as ClientEvent;

@@ -28,7 +28,7 @@ export const activity: SAction["activity"] = async function (
       else obj[this.client_id] = act;
     }
 
-    broadcastActivity({ page_id: target.page_id }, [this.client_id]);
+    broadcastActivity({ page_id: target.page_id });
   }
 
   if (target.comp_id && validate(target.comp_id)) {
@@ -50,6 +50,6 @@ export const activity: SAction["activity"] = async function (
       else obj[this.client_id] = act;
     }
 
-    broadcastActivity({ comp_id: target.comp_id }, [this.client_id]);
+    broadcastActivity({ comp_id: target.comp_id });
   }
 };
