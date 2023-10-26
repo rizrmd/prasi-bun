@@ -69,6 +69,10 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: EmptySite,
+  activity: {
+    page: {},
+    comp: {},
+  },
   script: { siteTypes: {} as Record<string, string> },
   page: {
     cur: EmptyPage,

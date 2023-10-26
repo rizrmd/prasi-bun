@@ -1,6 +1,7 @@
 import { useGlobal } from "web-utils";
 import { TopBtn } from "../top-btn";
 import { EDGlobal, active } from "../../../logic/ed-global";
+import { Activity } from "../../../../../../../srv/ws/sync/entity/actstore";
 
 export const EdSiteJS = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -12,7 +13,7 @@ export const EdSiteJS = () => {
         p.sync.activity(
           { page_id: p.page.cur.id, item_id: "site" },
           "js",
-          "open"
+          Activity.Open
         );
         p.ui.script.site = true;
         p.render();

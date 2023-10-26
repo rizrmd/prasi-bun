@@ -10,8 +10,11 @@ type COMP_ID = string;
 type ITEM_ID = string;
 type CLIENT_ID = string;
 
-export type Activity = "open" | "-";
-export type ActivityKind = "js" | "css" | "html" | "text";
+export enum Activity {
+  Open,
+  Null,
+}
+export type ActivityKind = "root" | "js" | "css" | "html" | "text";
 export type ActivityList = Record<
   ITEM_ID,
   Partial<Record<ActivityKind, Record<CLIENT_ID, Activity>>>
@@ -28,7 +31,7 @@ export const broadcastActivity = (
   const wss = new Set<ServerWebSocket<WSData>>();
   const data = {} as any;
   if (arg.page_id) {
-    data.page = actstore.page[arg.page_id];
+    data.page = actstore.page[arg.page_id] || {};
     user.active.findAll({ page_id: arg.page_id }).forEach((u) => {
       if (u.client_id && (!exclude || !exclude.includes(u.client_id))) {
         const ws = conns.get(u.client_id)?.ws;
@@ -37,7 +40,7 @@ export const broadcastActivity = (
     });
   }
   if (arg.comp_id) {
-    data.comp = actstore.page[arg.comp_id];
+    data.comp = actstore.page[arg.comp_id] || {};
     user.active.findAll({ comp_id: arg.comp_id }).forEach((u) => {
       if (u.client_id && (!exclude || !exclude.includes(u.client_id))) {
         const ws = conns.get(u.client_id)?.ws;

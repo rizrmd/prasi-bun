@@ -3,6 +3,7 @@ import { EdMonaco } from "./monaco/monaco";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { compress } from "wasm-gzip";
 import { jscript } from "../../../../utils/script/jscript";
+import { Activity } from "../../../../../../srv/ws/sync/entity/actstore";
 
 export const EdScriptSite = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -47,7 +48,11 @@ export const EdScriptSite = () => {
       }}
       onClose={() => {
         p.ui.script.site = false;
-        p.sync.activity({ page_id: p.page.cur.id, item_id: "site" }, "js", "-");
+        p.sync.activity(
+          { page_id: p.page.cur.id, item_id: "site" },
+          "js",
+          Activity.Null
+        );
         p.render();
       }}
     />

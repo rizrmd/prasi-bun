@@ -7,6 +7,7 @@ import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
 import { SyncConnection, SyncType } from "../type";
+import { Activity, actstore, broadcastActivity } from "../entity/actstore";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
@@ -19,6 +20,26 @@ export const page_load: SAction["page"]["load"] = async function (
   if (!conf) return undefined;
 
   conf.page_id = id;
+  if (!actstore.page[id]) {
+    actstore.page[id] = {
+      load: {
+        root: {
+          [this.client_id]: Activity.Open,
+        },
+      },
+    };
+  } else {
+    const load = actstore.page[id]["load"];
+    if (load && load.root) {
+      load.root[this.client_id] = Activity.Open;
+    }
+  }
+  broadcastActivity(
+    {
+      page_id: id,
+    },
+    [this.client_id]
+  );
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
