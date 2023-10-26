@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
+import { Popover } from "../../../../utils/ui/popover";
 
 export const TopBtn = ({
   children,
@@ -7,6 +8,7 @@ export const TopBtn = ({
   underlight,
   onClick,
   style = "normal",
+  popover,
 }: {
   children: ReactNode;
   className?: string;
@@ -14,8 +16,9 @@ export const TopBtn = ({
   underlight?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   style?: "slim" | "normal";
+  popover?: ReactElement;
 }) => {
-  return (
+  const result = (
     <div
       className={cx(
         "flex items-center cursor-pointer space-x-1 select-none relative transition-all duration-200 ",
@@ -48,4 +51,14 @@ export const TopBtn = ({
       {children}
     </div>
   );
+
+  if (popover) {
+    return (
+      <Popover autoFocus={false} content={popover} placement="bottom">
+        {result}
+      </Popover>
+    );
+  }
+
+  return result;
 };

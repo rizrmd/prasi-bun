@@ -1,8 +1,8 @@
 import { useGlobal } from "web-utils";
-import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
-import { EDGlobal } from "../../logic/ed-global";
+import { Menu, MenuItem } from "../../../../../utils/ui/context-menu";
+import { EDGlobal } from "../../../logic/ed-global";
 import { useEffect } from "react";
-import { Loading } from "../../../../utils/ui/loading";
+import { Loading } from "../../../../../utils/ui/loading";
 
 export const EdPopCompGroup = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

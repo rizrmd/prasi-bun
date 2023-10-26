@@ -7,8 +7,8 @@ import { edRoute } from "./logic/ed-route";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdMain } from "./panel/main/main";
 import { EdPane } from "./panel/main/pane-resize";
-import { EdPopCompGroup } from "./panel/popup/comp-group";
-import { EdPopSite } from "./panel/popup/site";
+import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
+import { EdPopSite } from "./panel/popup/site/site";
 import { EdScriptInit } from "./panel/script/monaco/init";
 import { EdScriptSite } from "./panel/script/site";
 

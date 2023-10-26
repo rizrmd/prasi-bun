@@ -1,9 +1,9 @@
 import { site } from "dbgen";
 import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal } from "../../logic/ed-global";
-import { formStyle } from "../../../../utils/ui/form.style";
-import { Input } from "../../../../utils/ui/form/input";
+import { EDGlobal } from "../../../logic/ed-global";
+import { formStyle } from "../../../../../utils/ui/form.style";
+import { Input } from "../../../../../utils/ui/form/input";
 
 export const EdFormSite: FC<{
   site: Partial<site>;
