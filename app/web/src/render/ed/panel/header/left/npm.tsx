@@ -1,8 +1,9 @@
+import { EdNpmPopup } from "../../popup/npm/npm-popup";
 import { TopBtn } from "../top-btn";
 
-export const EdNpmConfig = () => {
+export const EdNpm = () => {
   return (
-    <TopBtn style="slim">
+    <TopBtn style="slim" popover={<EdNpmPopup />}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="26"

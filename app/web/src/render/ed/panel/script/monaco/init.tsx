@@ -47,7 +47,7 @@ export const EdMonacoWrap = ({
   return (
     <div
       className={cx(
-        "flex flex-1 flex-col absolute inset-[80px] bg-white",
+        "flex flex-1 flex-col h-[90vh] w-[90vw] bg-white",
         css`
           .monaco-editor {
             .mtk9 {
@@ -98,11 +98,13 @@ export const EdMonacoWrap = ({
     >
       {header}
       <div className="relative flex-1">
-        {!jscript.editor || !jscript.build ? (
-          <Loading note="script-cst" backdrop={false} />
-        ) : (
-          children(jscript.editor)
-        )}
+        <div className="absolute inset-0">
+          {!jscript.editor || !jscript.build ? (
+            <Loading note="script-cst" backdrop={false} />
+          ) : (
+            children(jscript.editor)
+          )}
+        </div>
       </div>
       {footer}
     </div>

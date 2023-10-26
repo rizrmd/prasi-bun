@@ -1,435 +1,52 @@
-import algoliasearch from "algoliasearch";
-import { npm_page, npm_site } from "dbgen";
-import { useGlobal, useLocal } from "web-utils";
-import { EditorGlobal } from "../../../logic/global";
-import { Loading } from "../../../../../utils/ui/loading";
 import { FC, useCallback, useEffect } from "react";
+import { useLocal } from "web-utils";
+import { npm_page, npm_site } from "../../../../../../../db/db";
 import { Popover } from "../../../../../utils/ui/popover";
-import { NPMImportAs } from "./api/npm-type";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 
-import { loadComponent } from "../../../logic/comp";
-import importModule from "../../../tools/dynamic-import";
-const algolia = algoliasearch("OFCNCOG2CU", "f54e21fa3a2a0160595bb058179bfb1e");
-const npm = algolia.initIndex("npm-search");
-type NPMResultSingle = {
-  name: string;
-  objectID: string;
-  version: string;
-  _highlightResult: { name: { value: string } };
-};
-type NPMResult = NPMResultSingle[];
-
-const w = window as unknown as {
-  npmImport: {
-    init: boolean;
-    loading: false | Promise<any>;
-    site: npm_site[];
-    page: Record<string, npm_page[]>;
-  };
+export type NPMImportAs = {
+  main: { mode: "default" | "*"; name: string };
+  names: string[];
+  custom?: string;
 };
 
-if (!w.npmImport) {
-  w.npmImport = {
-    init: false,
-    loading: false,
-    site: [],
-    page: {},
-  };
-}
-
-export const NPMImport = () => {
-  const local = useLocal({});
-  const p = useGlobal(EditorGlobal, "EDITOR");
-  //   p.softRender.page();
-  // const p = useGlobal(EditorGlobal, "EDITOR");
-  if (!p.page) return <></>;
-  if (!w.npmImport.init) {
-    w.npmImport.init = true;
-    w.npmImport.loading = Promise.all([
-      db.npm_site
-        .findMany({
-          where: {
-            id_site: p.site.id,
-          },
-        })
-        .then((e) => {
-          w.npmImport.site = e;
-        }),
-      db.npm_page
-        .findMany({
-          where: {
-            id_page: p.page.id,
-          },
-        })
-        .then((e) => {
-          if (p.page) w.npmImport.page[p.page.id] = e;
-        }),
-    ]);
-  }
-
-  if (w.npmImport.loading) {
-    w.npmImport.loading.then(() => {
-      w.npmImport.loading = false;
-      local.render();
-    });
-  }
-
-  return (
-    <div
-      className={cx("text-sm w-[1000px] h-[400px] relative flex items-stretch")}
-    >
-      {w.npmImport.loading ? (
-        <Loading note="npm-import" backdrop={false} />
-      ) : (
-        <>
-          <NPMModule
-            mode="site"
-            onChange={async (e) => {
-              try {
-                const f = await fetch(
-                  `https://data.jsdelivr.com/v1/packages/npm/${e.name}`
-                );
-                const j = await f.json();
-                const version = j.versions[0].version;
-                const res = await db.npm_site.create({
-                  data: {
-                    id_site: p.site?.id || "",
-                    module: e.name,
-                    version: version,
-                  },
-                });
-
-                w.npmImport.site.push(res);
-                local.render();
-              } catch (e: any) {
-                alert("Failed!");
-                console.log(e);
-              }
-            }}
-          />
-          <div className="border-r border-slate-300"></div>
-          <NPMModule
-            mode="page"
-            onChange={async (e) => {
-              if (p.page) {
-                const res = await db.npm_page.create({
-                  data: {
-                    id_page: p.page.id || "",
-                    module: e.name,
-                    version: e.version,
-                  },
-                });
-
-                w.npmImport.page[p.page.id].push(res);
-                local.render();
-              }
-            }}
-          />
-        </>
-      )}
-    </div>
-  );
-};
-
-const NPMModule: FC<{
+export const EdNpmItems = ({
+  list,
+  mode,
+  update,
+  bundled,
+}: {
+  list: (npm_site | npm_page)[];
   mode: "site" | "page";
-  onChange: (e: NPMResultSingle) => any;
-}> = ({ mode, onChange }) => {
-  const p = useGlobal(EditorGlobal, "EDITOR");
-  const local = useLocal({
-    loading: false,
-    search: { value: "", timeout: null as any, result: [] as NPMResult },
-    searchRef: null as any,
-    bundling: false,
-    bundleError: "",
-    size: 0,
-  });
-  if (!p.page) return <></>;
-  useEffect(() => {
-    if (p.page)
-      api
-        .npm_size(mode, mode === "site" ? p.site.id || "" : p.page.id)
-        .then((e: string) => {
-          local.size = parseInt(e) || 0;
-          local.render();
-        });
-  }, []);
-
-  const focus = useCallback(() => {
-    local.searchRef.focus();
-  }, [local.searchRef]);
-
-  let list = [] as npm_page[] | npm_site[];
-  if (mode === "site") {
-    list = w.npmImport.site;
-  } else if (mode === "page") {
-    if (w.npmImport.page[p.page.id]) {
-      list = w.npmImport.page[p.page.id];
-    } else {
-      local.loading = true;
-      db.npm_page
-        .findMany({
-          where: {
-            id_page: p.page.id,
-          },
-        })
-        .then((e) => {
-          if (p.page) {
-            w.npmImport.page[p.page.id] = e;
-            local.loading = false;
-            local.render();
-          }
-        });
-    }
-  }
-
-  if (local.loading) {
-    return <Loading note="npm-import2" backdrop={false} />;
-  }
-
+  update: (list: (npm_site | npm_page)[]) => void;
+  bundled: boolean;
+}) => {
   return (
-    <div
-      className={cx("flex flex-col", mode === "site" ? "flex-1" : "w-[53%]")}
-    >
-      <div
-        className={cx(
-          "border-b border-slate-300 p-2 flex justify-between select-none",
-          css`
-            &:hover {
-              .bundle {
-                opacity: 1;
-              }
-            }
-          `
-        )}
-      >
-        <div className="text-slate-600">
-          <span className="capitalize">{mode}</span> Module
-        </div>
-        {local.bundling ? (
-          <div className="flex relative flex-1">
-            <Loading note="npm-import3" backdrop={false} />
-            Bundling...
-          </div>
-        ) : (
-          <>
-            <Popover
-              autoFocus={false}
-              backdrop={false}
-              content={
-                <pre className="font-mono select-text relative w-[800px] h-[300px] overflow-auto whitespace-pre-wrap text-red-500 relative">
-                  <div
-                    className="absolute bg-red-500 top-0 right-0 z-10 text-white px-2 cursor-pointer"
-                    onClick={() => {
-                      local.bundleError = "";
-                      local.render();
-                    }}
-                  >
-                    Close
-                  </div>
-                  <div className="absolute inset-0">
-                    ERROR:
-                    <hr className=" border-red-500 my-1" />
-                    {local.bundleError}
-                  </div>
-                </pre>
-              }
-              open={!!local.bundleError}
-            >
-              <div
-                className="bg-slate-600 text-white hover:bg-blue-500 px-2  cursor-pointer bundle opacity-20 transition-all"
-                onClick={async () => {
-                  local.bundling = true;
-                  local.bundleError = "";
-                  local.render();
-                  const res = (await api.npm_bundle(
-                    mode,
-                    mode === "site" ? p.site.id || "" : p.page ? p.page.id : ""
-                  )) as any;
-
-                  local.bundleError = "";
-                  if (typeof res === "object") {
-                    if (res && res.errors && Array.isArray(res.errors)) {
-                      const errors: string[] = [];
-                      res.errors.forEach((e: any) => {
-                        errors.push(`${e.text}\n${e.location?.lineText || ""}`);
-                      });
-                      local.bundleError = errors.join("\n\n");
-                    }
-                  } else {
-                    local.size = parseInt(res) || 0;
-                  }
-
-                  local.bundling = false;
-                  list.forEach((e) => {
-                    e.bundled = true;
+    <div className="flex-1 flex flex-col relative overflow-auto">
+      <div className="absolute  inset-0 flex flex-col items-stretch">
+        {list.map((e) => {
+          if (!e.id) return null;
+          return (
+            <ImportItem
+              key={e.id.toString()}
+              item={e}
+              mode={mode}
+              bundled={bundled}
+              remove={async (e) => {
+                if (mode === "site") {
+                  await db.npm_site.delete({
+                    where: { id: BigInt(e.id) },
                   });
-                  local.render();
-                  p.manager.compCallback = async (e) => {
-                    if (!p.comps.doc[e.id]) {
-                      await loadComponent(p, e.id);
-                      if (p.page) {
-                        await importModule(
-                          `${serverurl}/npm/site/${p.site?.id}/site.js`
-                        );
-                        await importModule(
-                          `${serverurl}/npm/page/${p.page.id}/page.js`
-                        );
-                      }
-                    }
-                  };
-                  p.render();
-                }}
-              >
-                Bundle
-              </div>
-            </Popover>
-            <div className="font-mono text-[12px]">
-              {formatBytes(local.size)}
-            </div>
-          </>
-        )}
-      </div>
-      <Popover
-        open={local.search.result.length > 0}
-        onOpenChange={(open) => {
-          if (!open) {
-            local.search.result = [];
-            local.render();
-          }
-        }}
-        className="border-b flex items-stretch"
-        arrow={false}
-        popoverClassName="bg-white border max-h-[200px] overflow-auto text-xs -mt-[5px] w-[300px]"
-        content={
-          <div className="text-sm flex flex-col items-stretch">
-            {local.search.result.map((e) => {
-              return (
-                <div
-                  key={e.objectID}
-                  className={cx(
-                    "p-1 hover:bg-blue-100 cursor-pointer flex flex-col",
-                    css`
-                      em {
-                        font-weight: bold;
-                        text-decoration: underline;
-                        font-style: normal;
-                      }
-                    `
-                  )}
-                  onClick={() => {
-                    onChange(e);
-                    local.search.value = "";
-                    local.search.result = [];
-                    local.render();
-                    focus();
-                  }}
-                >
-                  <div className="flex space-x-1">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: e._highlightResult.name.value,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        }
-        autoFocus={false}
-      >
-        <input
-          type="search"
-          placeholder="+ Add Module"
-          value={local.search.value}
-          spellCheck={false}
-          ref={(e) => {
-            if (e && e.tagName === "INPUT") {
-              local.searchRef = e;
-            }
-          }}
-          className="flex flex-1 p-1 outline-none "
-          onChange={async (e) => {
-            local.search.value = e.currentTarget.value;
-            if (!local.search.value) {
-              local.search.result = [];
-              local.render();
-            } else {
-              local.render();
-              clearTimeout(local.search.timeout);
-              local.search.timeout = setTimeout(async () => {
-                const res = await npm.search(local.search.value);
-                local.search.result = res.hits as any;
-                local.render();
-              }, 300);
-            }
-          }}
-          onKeyDown={async (e) => {
-            if (e.key === "Enter") {
-              const val = local.search.value;
-              local.search.value = "";
-              local.render();
-              try {
-                const f = await fetch(
-                  `https://data.jsdelivr.com/v1/packages/npm/${val}`
-                );
-                const j = await f.json();
-                const version = j.versions[0].version;
-                const res = await db.npm_site.create({
-                  data: {
-                    id_site: p.site?.id || "",
-                    module: val,
-                    version: version,
-                  },
-                });
-
-                w.npmImport.site.push(res);
-                local.render();
-              } catch (e: any) {
-                alert("Failed!");
-                console.log(e);
-              }
-            }
-          }}
-        />
-      </Popover>
-      <div className="flex-1 flex flex-col relative overflow-auto">
-        <div className="absolute  inset-0 flex flex-col items-stretch">
-          {list.map((e) => {
-            if (!e.id) return null;
-            return (
-              <ImportItem
-                key={e.id.toString()}
-                item={e}
-                mode={mode}
-                remove={async (e) => {
-                  if (mode === "site") {
-                    await db.npm_site.delete({
-                      where: { id: BigInt(e.id) },
-                    });
-                    w.npmImport.site = w.npmImport.site.filter(
-                      (item) => e.id !== item.id
-                    );
-                  } else {
-                    if (p.page) {
-                      await db.npm_page.delete({
-                        where: { id: BigInt(e.id) },
-                      });
-
-                      w.npmImport.page[p.page.id] = w.npmImport.page[
-                        p.page.id
-                      ].filter((item) => e.id !== item.id);
-                    }
-                  }
-
-                  local.render();
-                }}
-              />
-            );
-          })}
-        </div>
+                } else {
+                  await db.npm_page.delete({
+                    where: { id: BigInt(e.id) },
+                  });
+                }
+                update(list.filter((item) => e.id !== item.id));
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -439,7 +56,8 @@ const ImportItem: FC<{
   item: npm_site | npm_page;
   mode: "site" | "page";
   remove: (e: npm_site | npm_page) => Promise<void>;
-}> = ({ item, mode, remove }) => {
+  bundled: boolean;
+}> = ({ item, mode, remove, bundled }) => {
   const local = useLocal({ show: false });
   const import_as = item.import_as as NPMImportAs;
   return (
@@ -449,19 +67,21 @@ const ImportItem: FC<{
         <div
           className={cx(
             "px-1",
-            item.bundled
+            item.bundled && bundled
               ? "bg-green-700 my-1 text-white font-bold"
               : "-mx-1  text-black"
           )}
         >
-          {item.bundled ? "Already bundled" : "Not bundled yet"}
+          {item.bundled && bundled ? "Already bundled" : "Not bundled yet"}
         </div>
       }
       delay={0}
       placement={mode === "site" ? "left" : "right"}
       className={cx(
         "flex border-b select-none ",
-        item.bundled ? "bg-green-50 border-l-4 border-l-green-700" : ""
+        item.bundled && bundled
+          ? "bg-green-50 border-l-4 border-l-green-700"
+          : ""
       )}
     >
       <div
@@ -533,7 +153,7 @@ const ImportItem: FC<{
                 "flex items-center hover:text-blue-500 hover:underline cursor-pointer"
               )}
             >
-              <div className="break-words max-w-[140px] overflow-hidden text-right">
+              <div className="break-words max-w-[250px] overflow-hidden text-right">
                 {item.module}
               </div>
               <svg
@@ -935,12 +555,3 @@ const Trash = () => (
     ></path>
   </svg>
 );
-
-function formatBytes(bytes: number, decimals?: number) {
-  if (bytes == 0) return "0 Bytes";
-  var k = 1024,
-    dm = decimals || 2,
-    sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-    i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-}
