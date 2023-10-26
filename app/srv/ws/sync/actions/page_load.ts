@@ -19,7 +19,6 @@ export const page_load: SAction["page"]["load"] = async function (
   const conf = this.conf;
   if (!conf) return undefined;
 
-  conf.page_id = id;
   if (!actstore.page[id]) {
     actstore.page[id] = {
       load: {
@@ -34,6 +33,21 @@ export const page_load: SAction["page"]["load"] = async function (
       load.root[this.client_id] = Activity.Open;
     }
   }
+  if (conf.page_id !== id && actstore.page[conf.page_id]) {
+    const load = actstore.page[conf.page_id]["load"];
+    if (load && load.root) {
+      delete load.root[this.client_id];
+    }
+
+    broadcastActivity(
+      {
+        page_id: conf.page_id,
+      },
+      [this.client_id]
+    );
+  }
+
+  conf.page_id = id;
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
@@ -162,7 +176,7 @@ export const page_load: SAction["page"]["load"] = async function (
     broadcastActivity({
       page_id: id,
     });
-    
+
     return {
       id: snap.id,
       url: snap.url,

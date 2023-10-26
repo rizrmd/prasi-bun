@@ -34,7 +34,7 @@ export const EdUserConn = ({ client_ids }: { client_ids: string[] }) => {
               `
             )}
             key={e}
-            content={<div>Connetion ID: {e.substring(19).toUpperCase()}</div>}
+            content={<div>Connection ID: {e.substring(19).toUpperCase()}</div>}
           >
             <div className="flex space-x-[2px] items-center">
               <div

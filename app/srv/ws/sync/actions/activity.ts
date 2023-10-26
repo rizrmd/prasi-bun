@@ -9,47 +9,33 @@ export const activity: SAction["activity"] = async function (
   kind,
   act
 ) {
-  if (target.page_id && validate(target.page_id)) {
-    if (!actstore.page[target.page_id]) {
-      actstore.page[target.page_id] = {};
-    }
+  const key = (target.page_id ? "page_id" : "comp_id") as "page_id" | "comp_id";
+  const type = (target.page_id ? "page" : "comp") as "page" | "comp";
+  const tkey = target[key];
+  if (!tkey) return;
+  if (validate(tkey)) {
+    if (!actstore[type][tkey]) actstore[type][tkey] = {};
 
-    if (!actstore.page[target.page_id][target.item_id]) {
-      actstore.page[target.page_id][target.item_id] = {};
-    }
+    if (!actstore[type][tkey][target.item_id])
+      actstore[type][tkey][target.item_id] = {};
 
-    if (!actstore.page[target.page_id][target.item_id][kind]) {
-      actstore.page[target.page_id][target.item_id][kind] = {};
-    }
+    if (!actstore[type][tkey][target.item_id][kind])
+      actstore[type][tkey][target.item_id][kind] = {};
 
-    const obj = actstore.page[target.page_id][target.item_id][kind];
+    const obj = actstore[type][tkey][target.item_id][kind];
     if (obj) {
-      if (act === Activity.Null) delete obj[this.client_id];
-      else obj[this.client_id] = act;
+      if (act === Activity.Null) {
+        delete obj[this.client_id];
+        if (Object.keys(obj).length === 0) {
+          delete actstore[type][tkey][target.item_id][kind];
+
+          if (Object.keys(actstore[type][tkey][target.item_id]).length === 0) {
+            delete actstore[type][tkey][target.item_id];
+          }
+        }
+      } else obj[this.client_id] = act;
     }
 
-    broadcastActivity({ page_id: target.page_id });
-  }
-
-  if (target.comp_id && validate(target.comp_id)) {
-    if (!actstore.comp[target.comp_id]) {
-      actstore.comp[target.comp_id] = {};
-    }
-
-    if (!actstore.comp[target.comp_id][target.item_id]) {
-      actstore.comp[target.comp_id][target.item_id] = {};
-    }
-
-    if (!actstore.comp[target.comp_id][target.item_id][kind]) {
-      actstore.comp[target.comp_id][target.item_id][kind] = {};
-    }
-
-    const obj = actstore.comp[target.comp_id][target.item_id][kind];
-    if (obj) {
-      if (act === Activity.Null) delete obj[this.client_id];
-      else obj[this.client_id] = act;
-    }
-
-    broadcastActivity({ comp_id: target.comp_id });
+    broadcastActivity({ [key]: tkey });
   }
 };
