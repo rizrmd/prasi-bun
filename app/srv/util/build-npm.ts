@@ -189,6 +189,7 @@ packages:
 
     return s.size.toString();
   } catch (e) {
+    console.error(e);
     return "-";
   }
 };

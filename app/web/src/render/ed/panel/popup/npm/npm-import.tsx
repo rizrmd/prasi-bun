@@ -5,10 +5,12 @@ import { EDGlobal } from "../../../logic/ed-global";
 import { npm_page, npm_site } from "../../../../../../../db/db";
 import { EdNpmItems } from "./npm-items";
 import { AlgoliaResult, searchPackage } from "./npm-algolia";
+import { Popover } from "../../../../../utils/ui/popover";
 
 export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
+    bundling: false,
     search: {
       text: "",
       timeout: null as any,
@@ -17,6 +19,7 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
       options: [] as { label: string; value: string }[],
       el: null as null | HTMLInputElement,
     },
+    bundleError: "",
     status: "init" as "init" | "ready",
     size: 0,
     list: [] as (npm_page | npm_site)[],
@@ -82,6 +85,36 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                 local.render();
               }, 500);
             }}
+            onKeyDown={async (e) => {
+              if (e.key === "Enter" && local.search.options.length === 0) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const name = local.search.text;
+                local.search.text = "";
+                local.render();
+
+                if (mode === "page") {
+                  await db.npm_page.create({
+                    data: {
+                      id_page: p.page.cur.id,
+                      module: name,
+                      version: "1.0.0",
+                    },
+                  });
+                } else {
+                  await db.npm_site.create({
+                    data: {
+                      id_site: p.site.id,
+                      module: name,
+                      version: "1.0.0",
+                    },
+                  });
+                }
+
+                reload();
+              }
+            }}
             options={local.search.options}
             onChange={async (e) => {
               local.search.text = "";
@@ -116,9 +149,72 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
           <div className="w-[100px] flex items-center justify-center">
             {local.status === "init" && <>Loading...</>}
             {local.status === "ready" && (
-              <div className="bg-green-800 cursor-pointer hover:bg-green-600 m-1 flex items-center text-white justify-center flex-1">
-                Bundle
-              </div>
+              <Popover
+                autoFocus={false}
+                backdrop={false}
+                content={
+                  <pre className="font-mono select-text relative w-[800px] h-[300px] overflow-auto whitespace-pre-wrap text-red-500 relative">
+                    <div
+                      className="absolute bg-red-500 top-0 right-0 z-10 text-white px-2 cursor-pointer"
+                      onClick={() => {
+                        local.bundleError = "";
+                        local.render();
+                      }}
+                    >
+                      Close
+                    </div>
+                    <div className="absolute inset-0">
+                      ERROR:
+                      <hr className=" border-red-500 my-1" />
+                      {local.bundleError}
+                    </div>
+                  </pre>
+                }
+                open={!!local.bundleError}
+                className={cx(
+                  " cursor-pointer m-1 flex items-center text-white justify-center flex-1",
+                  local.bundling
+                    ? "bg-slate-500"
+                    : "bg-green-800 hover:bg-green-600"
+                )}
+              >
+                <div
+                  onClick={async () => {
+                    if (local.bundling) return;
+                    local.bundling = true;
+                    local.render();
+
+                    const res = (await api.npm_bundle(
+                      mode,
+                      mode === "site"
+                        ? p.site.id || ""
+                        : p.page
+                        ? p.page.cur.id
+                        : ""
+                    )) as any;
+
+                    local.bundleError = "";
+                    if (typeof res === "object") {
+                      if (res && res.errors && Array.isArray(res.errors)) {
+                        const errors: string[] = [];
+                        res.errors.forEach((e: any) => {
+                          errors.push(
+                            `${e.text}\n${e.location?.lineText || ""}`
+                          );
+                        });
+                        local.bundleError = errors.join("\n\n");
+                      }
+                    } else {
+                      local.size = parseInt(res) || 0;
+                    }
+
+                    local.bundling = false;
+                    local.render();
+                  }}
+                >
+                  {local.bundling ? "Bundling..." : "Bundle"}
+                </div>
+              </Popover>
             )}
           </div>
           <div className="px-2 flex items-center font-mono border-l text-[10px]">
@@ -158,6 +254,10 @@ const selectStyle = css`
     min-height: 29px;
     border-left: 1px solid #ececeb;
     border-right: 1px solid #ececeb;
+  }
+  .sel__control--is-focused {
+    box-shadow: none !important;
+    border-bottom: 1px solid blue;
   }
   .sel__menu {
     border-radius: 0px;
