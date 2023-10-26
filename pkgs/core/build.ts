@@ -5,7 +5,14 @@ import { Plugin, context } from "esbuild";
 import { $ } from "execa";
 import { fdir } from "fdir";
 import { statSync } from "fs";
-import { listAsync, removeAsync, writeAsync, inspectTree } from "fs-jetpack";
+import {
+  listAsync,
+  removeAsync,
+  writeAsync,
+  inspectTree,
+  existsAsync,
+  copyAsync,
+} from "fs-jetpack";
 const brotli = await brotliPromise;
 
 await removeAsync(dir.path("app/web/.parcel-cache"));
@@ -29,24 +36,64 @@ const parcel = spawn({
 });
 await parcel.exited;
 
-const api = new fdir().withRelativePaths().crawl(dir.path("app/static"));
-const files = api.sync();
+const public_br = dir.path("app/web/public-br");
+if (!(await existsAsync(public_br))) {
+  const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
+  const files = api.sync();
+  if (files) {
+    await Promise.all(
+      files.map(async (file) => {
+        const br = brotli.compress(
+          new Uint8Array(
+            await Bun.file(dir.path(`app/web/public/${file}`)).arrayBuffer()
+          ),
+          { quality: 11 }
+        );
+        if (br) {
+          console.log(`Compressing ${file}`);
+          await writeAsync(
+            dir.path(`app/web/public-br/${file}`),
+            Buffer.from(br)
+          );
+        }
+      })
+    );
+  }
+}
+
+const static_br = dir.path("app/static-br");
+await removeAsync(static_br);
+const files = await listAsync(dir.path("app/static"));
 if (files) {
-  await removeAsync(dir.path("app/static-br"));
   await Promise.all(
-    files.map(async (file) => {
-      const br = brotli.compress(
-        new Uint8Array(
-          await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
-        ),
-        { quality: 11 }
-      );
-      if (br) {
-        console.log(`Compressing ${file}`);
-        await writeAsync(dir.path(`app/static-br/${file}`), Buffer.from(br));
-      }
-    })
+    files
+      .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
+      .map(async (file) => {
+        const br = brotli.compress(
+          new Uint8Array(
+            await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
+          ),
+          { quality: 11 }
+        );
+        if (br) {
+          console.log(`Compressing ${file}`);
+          await writeAsync(dir.path(`app/static-br/${file}`), Buffer.from(br));
+        }
+      })
   );
+
+  const pub = await listAsync(dir.path("app/web/public-br"));
+  if (pub) {
+    await Promise.all(
+      pub.map((file) =>
+        copyAsync(
+          dir.path(`app/web/public-br/${file}`),
+          dir.path(`app/static-br/${file}`),
+          { overwrite: true }
+        )
+      )
+    );
+  }
 }
 
 const buildSite = async () => {
