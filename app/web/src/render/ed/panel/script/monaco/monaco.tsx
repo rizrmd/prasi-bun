@@ -1,8 +1,9 @@
+import type { Editor } from "@monaco-editor/react";
+import { ReactElement } from "react";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EdMonacoWrap } from "./init";
-import type { Editor } from "@monaco-editor/react";
 
 const monacoState = {} as Record<string, any>;
 export const EdMonaco = (arg: {
@@ -11,6 +12,8 @@ export const EdMonaco = (arg: {
   filename: string;
   monaco: Parameters<typeof Editor>[0];
   onClose: () => void;
+  header?: ReactElement;
+  footer?: ReactElement;
   prop?: {
     val?: Record<string, any>;
     types?: Record<string, string>;
@@ -92,7 +95,9 @@ export const EdMonaco = (arg: {
         arg.onClose();
       }}
     >
-      <EdMonacoWrap>{(Editor) => <Editor {...prop} />}</EdMonacoWrap>
+      <EdMonacoWrap header={arg.header} footer={arg.footer}>
+        {(Editor) => <Editor {...prop} />}
+      </EdMonacoWrap>
     </Modal>
   );
 };

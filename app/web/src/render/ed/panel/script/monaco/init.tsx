@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
@@ -29,7 +29,11 @@ export const EdScriptInit = () => {
 
 export const EdMonacoWrap = ({
   children,
+  header,
+  footer,
 }: {
+  header?: ReactElement;
+  footer?: ReactElement;
   children: (Editor: Exclude<typeof jscript.editor, null>) => ReactNode;
 }) => {
   const local = useLocal({});
@@ -43,7 +47,7 @@ export const EdMonacoWrap = ({
   return (
     <div
       className={cx(
-        "flex flex-1 absolute inset-[80px]",
+        "flex flex-1 flex-col absolute inset-[80px] bg-white",
         css`
           .monaco-editor {
             .mtk9 {
@@ -92,11 +96,15 @@ export const EdMonacoWrap = ({
         `
       )}
     >
-      {!jscript.editor || !jscript.build ? (
-        <Loading note="script-cst" backdrop={false} />
-      ) : (
-        children(jscript.editor)
-      )}
+      {header}
+      <div className="relative flex-1">
+        {!jscript.editor || !jscript.build ? (
+          <Loading note="script-cst" backdrop={false} />
+        ) : (
+          children(jscript.editor)
+        )}
+      </div>
+      {footer}
     </div>
   );
 };

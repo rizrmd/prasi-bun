@@ -1,13 +1,16 @@
-import { useGlobal, useLocal } from "web-utils";
-import { EdMonaco } from "./monaco/monaco";
-import { EDGlobal, active } from "../../logic/ed-global";
 import { compress } from "wasm-gzip";
-import { jscript } from "../../../../utils/script/jscript";
+import { useGlobal, useLocal } from "web-utils";
 import { Activity } from "../../../../../../srv/ws/sync/type";
+import { jscript } from "../../../../utils/script/jscript";
+import { EDGlobal } from "../../logic/ed-global";
+import { EdUserConn } from "../activity/user-conn";
+import { EdMonaco } from "./monaco/monaco";
 
 export const EdScriptSite = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ timeout: null as any });
+  const userOpened = Object.keys(p.activity.page.site?.js || {});
+
   if (!p.ui.script.site) {
     return null;
   }
@@ -17,6 +20,17 @@ export const EdScriptSite = () => {
       id="script-site"
       type="js"
       filename="site.tsx"
+      header={
+        userOpened.length > 1 ? (
+          <div className="border-b px-2 min-h-[35px] flex items-center text-sm bg-orange-600 text-white">
+            WARNING:
+            <EdUserConn
+              client_ids={userOpened.filter((e) => e !== p.user.client_id)}
+            />
+            also open this script. Editing may cause conflicts.
+          </div>
+        ) : undefined
+      }
       monaco={{
         value: p.site.js,
         onChange: async (v) => {

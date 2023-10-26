@@ -6,8 +6,9 @@ import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
 import { SAction } from "../../../../../srv/ws/sync/actions";
+import { ActivityList } from "../../../../../srv/ws/sync/type";
 
-const EmptySite = {
+export const EmptySite = {
   id: "",
   name: "",
   domain: "",
@@ -60,7 +61,8 @@ export type EdMeta = {
 };
 
 export const EDGlobal = {
-  user: { id: "", username: "" },
+  user: { id: "", username: "", client_id: "" },
+  clients: {} as Record<string, { id: string; username: string }>,
   status: "init" as
     | "init"
     | "loading"
@@ -68,10 +70,10 @@ export const EDGlobal = {
     | "page-not-found"
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
-  site: EmptySite,
+  site: structuredClone(EmptySite),
   activity: {
-    page: {},
-    comp: {},
+    page: {} as Record<string, ActivityList>,
+    comp: {} as Record<string, ActivityList>,
   },
   script: { siteTypes: {} as Record<string, string> },
   page: {

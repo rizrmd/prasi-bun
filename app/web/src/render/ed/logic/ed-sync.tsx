@@ -1,7 +1,7 @@
 import { compress, decompress } from "wasm-gzip";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { Loading } from "../../../utils/ui/loading";
-import { PG } from "./ed-global";
+import { EmptySite, PG } from "./ed-global";
 import { Y } from "../../../../../srv/ws/sync/entity/docs";
 import { treeRebuild } from "./tree/build";
 import { w } from "../../../utils/types/general";
@@ -20,7 +20,10 @@ export const edInitSync = (p: PG) => {
   p.user.username = session.data.user.username;
 
   if (p.sync) {
+    if (p.site.id === "--loading--") return false;
     if (params.site_id !== p.site.id) {
+      p.site = structuredClone(EmptySite);
+      p.site.id = "--loading--";
       p.sync.site.load(params.site_id).then((site) => {
         if (site) {
           p.site = site;
@@ -55,7 +58,7 @@ export const edInitSync = (p: PG) => {
       site_id: params.site_id,
       page_id: params.page_id,
       events: {
-        async connected() {
+        opened() {
           if (w.offline) {
             console.log("reconnected!");
             w.offline = false;
@@ -66,6 +69,9 @@ export const edInitSync = (p: PG) => {
             p.render();
           }
         },
+        shakehand(client_id) {
+          p.user.client_id = client_id;
+        },
         disconnected() {
           console.log("offline, reconnecting...");
           w.offline = true;
@@ -75,7 +81,8 @@ export const edInitSync = (p: PG) => {
           };
         },
         activity(e) {
-          console.log(JSON.stringify(e, null, 2));
+          p.activity = e;
+          p.render();
         },
         async editor_start(e) {
           if (p.ui.syncing) {

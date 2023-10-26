@@ -1,6 +1,7 @@
 import { compress, decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
+import { Activity } from "../../../../../srv/ws/sync/type";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {
@@ -27,6 +28,8 @@ export const edRoute = async (p: PG) => {
         p.page.cur = cur.page;
         p.page.doc = cur.doc;
         loadFromServer = false;
+
+        p.sync.page.load(params.page_id);
         treeRebuild(p);
       }
 
