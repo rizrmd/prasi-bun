@@ -1,5 +1,6 @@
 import { ReactElement, ReactNode } from "react";
 import { Popover } from "../../../../utils/ui/popover";
+import { Placement } from "@floating-ui/react";
 
 export const TopBtn = ({
   children,
@@ -9,6 +10,7 @@ export const TopBtn = ({
   onClick,
   style = "normal",
   popover,
+  placement,
 }: {
   children: ReactNode;
   className?: string;
@@ -17,6 +19,7 @@ export const TopBtn = ({
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   style?: "slim" | "normal";
   popover?: ReactElement;
+  placement?: Placement;
 }) => {
   const result = (
     <div
@@ -54,7 +57,11 @@ export const TopBtn = ({
 
   if (popover) {
     return (
-      <Popover autoFocus={false} content={popover} placement="bottom">
+      <Popover
+        autoFocus={false}
+        content={popover}
+        placement={placement}
+      >
         {result}
       </Popover>
     );

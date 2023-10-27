@@ -5,7 +5,7 @@ import { EDGlobal } from "./logic/ed-global";
 import { EdTreeBody } from "./panel/tree/body";
 import { EdTreeSearch } from "./panel/tree/search";
 import { EdSitePicker } from "./panel/header/left/site";
-import { EdApiConfig } from "./panel/header/left/api";
+import { EdApi } from "./panel/header/left/api";
 import { EdExport } from "./panel/header/left/export";
 import { EdNpm } from "./panel/header/left/npm";
 import { EdSiteJS } from "./panel/header/left/js";
@@ -31,7 +31,7 @@ export const EdLeft = () => {
           <div className="flex items-stretch space-x-1 pl-2">
             <EdSiteJS />
             <EdNpm />
-            <EdApiConfig />
+            <EdApi />
             <EdExport />
           </div>
         </div>

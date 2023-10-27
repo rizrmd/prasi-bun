@@ -58,7 +58,7 @@ export function usePopover({
       offset(typeof popoverOffset === "number" ? popoverOffset : 5),
       flip({
         fallbackAxisSideDirection: "end",
-        padding: 5,
+        padding: 0,
       }),
       shift({ padding: 5 }),
       arrow({ element: arrowRef }),

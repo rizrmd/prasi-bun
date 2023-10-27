@@ -23,7 +23,6 @@ export const ExternalAPI = ({
           <div className="text-blue-600">Checking...</div>
         )}
         {status === "started" && <div className="text-green-600">Saved</div>}
-
         {status === "stopped" && (
           <div className="text-red-600">Invalid Server</div>
         )}
