@@ -86,7 +86,7 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
 
             if (up) {
               let next = up.nextElementSibling;
-              while (next) {
+              while (next && next.children[0]) {
                 if (next.children[0].classList.contains("has-child")) {
                   const c = next.children[0] as HTMLInputElement;
                   if (c) {

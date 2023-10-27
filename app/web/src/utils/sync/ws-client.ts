@@ -9,12 +9,10 @@ import {
   SyncActionPaths,
 } from "../../../../srv/ws/sync/actions-def";
 import { UserConf } from "../../../../srv/ws/sync/entity/user";
-import { SyncType } from "../../../../srv/ws/sync/type";
+import { ActivityList, SyncType } from "../../../../srv/ws/sync/type";
 import { ESite } from "../../render/ed/logic/ed-global";
 import { w } from "../types/general";
 import { initIDB } from "./idb";
-import { ActivityList } from "../../../../srv/ws/sync/entity/actstore";
-import { wconns } from "../../../../srv/ws/sync/entity/conn";
 const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
