@@ -1,6 +1,6 @@
 import { createStore, get, set } from "idb-keyval";
 import trim from "lodash.trim";
-import { apiClient, dbClient } from "web-utils";
+import { apiClient, dbClient, waitUntil } from "web-utils";
 import { createFrameCors } from "web-utils";
 export const w = window as unknown as {
   prasiApi: Record<string, any>;
@@ -103,13 +103,14 @@ export const reloadDBAPI = async (
     if (ver === "v2") {
       await new Promise<void>((done) => {
         const d = document;
-        const script = d.body.appendChild(d.createElement("script"));
-        script.onload = () => {
+        const script = d.createElement("script");
+        script.onload = async () => {
           done();
         };
         script.src = `${base}/_prasi/load.js?url=${url}${
           mode === "dev" ? "&dev=1" : ""
         }`;
+        d.body.appendChild(script);
       });
     } else {
       const apiTypes = await fetch(base + "/_prasi/api-types");
@@ -137,7 +138,7 @@ export const reloadDBAPI = async (
     const found = await get(url, cache);
     if (found) {
       w.prasiApi[url] = JSON.parse(found);
-      forceReload();
+      await forceReload();
     } else {
       await forceReload();
     }

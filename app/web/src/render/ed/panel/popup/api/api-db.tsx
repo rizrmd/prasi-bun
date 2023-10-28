@@ -18,7 +18,7 @@ export const EdApiDB = ({
     <div className="flex border-b py-2 px-2 border-slate-300 boxed  flex flex-col items-stretch">
       <AutoHeightTextarea
         value={db.url}
-        className="text-[12px] border p-2 mb-2 "
+        className="text-[13px] border p-2 mb-2 "
         onChange={(e) => {
           db.url = e.currentTarget.value;
           p.render();

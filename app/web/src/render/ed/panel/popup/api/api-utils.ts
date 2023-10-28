@@ -32,7 +32,7 @@ export const apiUrl = function (p: PG): string {
       const url = new URL(p.site.config.api_url);
       if (url && url.hostname && url.protocol.startsWith("http")) {
         dev.lastURL.valid = true;
-        return url.toString();
+        return p.site.config.api_url;
       }
       dev.lastURL.valid = false;
     } catch (e) {
@@ -60,10 +60,15 @@ export const checkAPI = async (p: PG) => {
       id_site: p.site.id,
     });
     if (!res) {
-      return { deployable: false, db: "", hasDB: false };
+      return { deployable: false, db: "", hasDB: false, domains: [] };
     } else {
       if (res.db && res.now) {
-        return { deployable: false, db: res.db, hasDB: true };
+        return {
+          deployable: true,
+          db: res.db,
+          hasDB: true,
+          domains: res.domains as string[],
+        };
       }
     }
   } catch (e) {
@@ -71,5 +76,5 @@ export const checkAPI = async (p: PG) => {
     return "error";
   }
 
-  return { deployable: false, db: "", hasDB: false };
+  return { deployable: false, db: "", hasDB: false, domains: [] };
 };
