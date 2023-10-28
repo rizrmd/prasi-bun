@@ -4,6 +4,7 @@ import { EDGlobal } from "../../../logic/ed-global";
 import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
 import { EdApiDB } from "./api-db";
 import { EdApiDomain } from "./api-domain";
+import { EdApiDeploy } from "./api-deploy";
 
 export const EdApiServer = forwardRef<
   HTMLDivElement,
@@ -21,6 +22,11 @@ export const EdApiServer = forwardRef<
       oldDB: { url: "" },
       domains: [] as string[],
       hasDB: false,
+      deploy: {
+        now: 0,
+        current: 0,
+        deploys: [] as number[],
+      },
     },
     () => {
       try {
@@ -47,6 +53,9 @@ export const EdApiServer = forwardRef<
       local.oldDB = structuredClone(res.db);
       local.hasDB = res.hasDB;
       local.status = "online";
+      if (res.deploy) {
+        local.deploy = res.deploy;
+      }
       local.deployable = res.deployable;
       local.render();
     } else {
@@ -56,6 +65,11 @@ export const EdApiServer = forwardRef<
       local.hasDB = false;
       local.status = res;
       local.deployable = false;
+      local.deploy = {
+        now: 0,
+        current: 0,
+        deploys: [],
+      };
       local.render();
     }
   };
@@ -209,6 +223,7 @@ export const EdApiServer = forwardRef<
       {local.deployable && (
         <>
           <EdApiDomain domains={local.domains} />
+          <EdApiDeploy deploy={local.deploy} />
         </>
       )}
     </div>
