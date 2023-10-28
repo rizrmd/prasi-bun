@@ -9,9 +9,10 @@ export const EdPane = ({ type }: { type: "left" | "right" }) => {
       minSize={200}
       size={p.ui.layout[type]}
       onResize={(size) => {
-        p.ui.layout.left = size;
+        p.ui.layout[type] = size;
         p.render();
       }}
+      position={type}
       onDone={(size) => {
         localStorage.setItem("prasi-layout-" + type, size.toString());
       }}
@@ -24,6 +25,7 @@ const EdPaneResize = (arg: {
   size: number;
   onResize: (size: number) => void;
   onDone: (size: number) => void;
+  position: "left" | "right";
 }) => {
   const local = useLocal({
     default: arg.size,
@@ -51,7 +53,10 @@ const EdPaneResize = (arg: {
           onPointerMove={(e) => {
             local.result = Math.max(
               arg.minSize,
-              local.size + e.clientX - local.sx
+              local.size +
+                (arg.position === "left"
+                  ? e.clientX - local.sx
+                  : local.sx - e.clientX)
             );
             arg.onResize(local.result);
           }}
