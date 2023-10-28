@@ -40,15 +40,13 @@ export const EdScriptSite = () => {
 
             p.site.js = src;
             p.site.js_compiled = built;
-            // todo: re-run site js
 
             clearTimeout(local.timeout);
             local.timeout = setTimeout(async () => {
-              await p.sync.site.js(
-                p.site.id,
-                Buffer.from(compress(src)),
-                Buffer.from(compress(built))
-              );
+              await p.sync.site.update(p.site.id, {
+                js: Buffer.from(compress(src)),
+                js_compiled: Buffer.from(compress(built)),
+              });
             }, 1000);
           }
         },

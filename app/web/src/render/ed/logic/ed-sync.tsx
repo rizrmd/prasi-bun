@@ -108,12 +108,14 @@ export const edInitSync = (p: PG) => {
           p.site = site;
           p.render();
         },
-        site_js_updated(arg) {
-          const js = decoder.decode(decompress(arg.js));
-          const jsc = decoder.decode(decompress(arg.jsc));
-
-          p.site.js = js;
-          p.site.js_compiled = jsc;
+        site_js_updated(site) {
+          for (const [k, v] of Object.entries(site)) {
+            if (k === "js" || k === "js_compiled") {
+              p.site[k] = decoder.decode(decompress(v as any));
+            } else {
+              (p.site as any)[k] = v;
+            }
+          }
           p.render();
         },
         async remote_svlocal(data) {

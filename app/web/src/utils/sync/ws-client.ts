@@ -82,7 +82,14 @@ export const clientStartSync = async (arg: {
       id: string;
       sv_local: Uint8Array;
     }) => void;
-    site_js_updated: (arg: { js: Uint8Array; jsc: Uint8Array }) => void;
+    site_js_updated: (
+      arg: Partial<
+        Omit<ESite, "js" | "js_compiled"> & {
+          js: Uint8Array;
+          js_compiled: Uint8Array;
+        }
+      >
+    ) => void;
     activity: (arg: {
       page: Record<string, ActivityList>;
       comp: Record<string, ActivityList>;
