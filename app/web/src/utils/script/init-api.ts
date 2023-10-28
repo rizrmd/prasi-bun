@@ -22,6 +22,7 @@ export const createAPI = (url: string) => {
   if (!url) {
     throw new Error("No URL provided");
   }
+
   return w.apiClient(w.prasiApi[url]?.apiEntry, url);
 };
 
