@@ -23,10 +23,14 @@ export const SyncActions = {
       ({}) as Record<string, { id: string; name: string; domain: string }>,
     group: async () => ({}) as ReturnType<typeof site_group>,
     load: async (id: string) => ({}) as ESite | void,
-    js: async (
+    update: async (
       id: string,
-      js_compressed: Uint8Array,
-      built_compressed: Uint8Array
+      site: Partial<
+        Omit<ESite, "js" | "js_compiled"> & {
+          js: Buffer;
+          js_compiled: Buffer;
+        }
+      >
     ) => {},
   },
   comp: {

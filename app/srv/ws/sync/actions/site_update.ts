@@ -7,21 +7,24 @@ import { conns } from "../entity/conn";
 import { sendWS } from "../sync-handler";
 
 const decoder = new TextDecoder();
-export const site_js: SAction["site"]["js"] = async function (
+export const site_update: SAction["site"]["update"] = async function (
   this: SyncConnection,
   id: string,
-  js_compressed,
-  built_compressed
+  site
 ) {
   if (validate(id)) {
-    const js = decoder.decode(await gunzipAsync(js_compressed));
-    const js_compiled = decoder.decode(await gunzipAsync(built_compressed));
+    const updated = {} as any;
+    for (const [key, value] of Object.entries(site)) {
+      if (key === "js" || key === "js_compiled") {
+        updated[key] = decoder.decode(await gunzipAsync(value as any));
+      } else {
+        updated[key] = value;
+      }
+    }
+
     await db.site.update({
       where: { id },
-      data: {
-        js,
-        js_compiled,
-      },
+      data: updated,
     });
 
     user.active.findAll({ site_id: id }).map((e) => {
@@ -31,7 +34,7 @@ export const site_js: SAction["site"]["js"] = async function (
           sendWS(ws, {
             type: SyncType.Event,
             event: "site_js_updated",
-            data: { js: js_compressed, jsc: built_compressed },
+            data: site,
           });
       }
     });
