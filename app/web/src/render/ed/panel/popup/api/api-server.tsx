@@ -1,9 +1,14 @@
 import { forwardRef } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, PG } from "../../../logic/ed-global";
-import { checkAPI, dev } from "./api-utils";
+import { EDGlobal } from "../../../logic/ed-global";
+import { apiUrl, checkAPI, dev } from "./api-utils";
 
-export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
+export const EdApiServer = forwardRef<
+  HTMLDivElement,
+  {
+    popover: { onClose: () => void };
+  }
+>(({ popover }, ref) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal(
     {
@@ -26,6 +31,8 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
     }
   );
 
+  const url = apiUrl(p);
+
   const check = () => {
     local.status = "checking";
     local.render();
@@ -42,6 +49,15 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
       local.render();
     }
   };
+  const update = async () => {
+    p.site.config.api_url = local.api_url;
+    await p.sync.site.update(p.site.id, {
+      config: { api_url: local.api_url },
+    });
+    check();
+  };
+  popover.onClose = update;
+
   return (
     <div
       ref={ref}
@@ -49,21 +65,27 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
     >
       <div className="flex justify-between items-center pr-1">
         <div className="p-1">Server URL:</div>
-        <div className="text-[12px]">
-          {local.status === "online" && (
-            <div className="bg-green-700 px-2 text-white">ONLINE</div>
-          )}
-          {local.status === "offline" && (
-            <div className="text-white px-2 bg-slate-500">OFFLINE</div>
-          )}
-          {local.status === "checking" && (
-            <div className="text-blue-500">Checking...</div>
-          )}
-        </div>
+        {url && (
+          <div className="text-[12px]">
+            {local.status === "online" && (
+              <div className="bg-green-700 px-2 text-white">ONLINE</div>
+            )}
+            {local.status === "offline" && (
+              <div className="text-white px-2 bg-slate-500">OFFLINE</div>
+            )}
+            {local.status === "checking" && (
+              <div className="text-blue-500">Checking...</div>
+            )}
+          </div>
+        )}
+        {!url && (
+          <div className="text-[12px] text-slate-500">INVALID SERVER</div>
+        )}
       </div>
       <div className="flex border-y">
         <div className="flex flex-1 p-1 ">
           <input
+            spellCheck={false}
             value={local.api_url}
             onChange={(e) => {
               local.api_url = e.currentTarget.value;
@@ -85,7 +107,7 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
                 e.currentTarget.blur();
               }
             }}
-            onBlur={check}
+            onBlur={update}
             placeholder="https://..."
           />
         </div>
@@ -107,6 +129,7 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
             dev.enabled = !dev.enabled;
             localStorage.setItem("prasi-dev", JSON.stringify(dev));
             local.render();
+            check();
           }}
         >
           <span>DEV</span>{" "}
@@ -116,6 +139,7 @@ export const EdApiServer = forwardRef<HTMLDivElement>((arg, ref) => {
 
         <input
           type="text"
+          spellCheck={false}
           className={cx(
             "px-1 m-1 border flex-1 font-mono text-[11px] outline-none focus:border-blue-500",
             dev.enabled && "border-green-700"

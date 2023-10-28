@@ -82,7 +82,7 @@ export const clientStartSync = async (arg: {
       id: string;
       sv_local: Uint8Array;
     }) => void;
-    site_js_updated: (
+    site_updated: (
       arg: Partial<
         Omit<ESite, "js" | "js_compiled"> & {
           js: Uint8Array;

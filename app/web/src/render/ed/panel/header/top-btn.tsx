@@ -1,6 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import { Popover } from "../../../../utils/ui/popover";
 import { Placement } from "@floating-ui/react";
+import { useLocal } from "web-utils";
 
 export const TopBtn = ({
   children,
@@ -18,9 +19,10 @@ export const TopBtn = ({
   underlight?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   style?: "slim" | "normal";
-  popover?: ReactElement;
+  popover?: ReactElement | ((popover: { onClose: () => void }) => ReactElement);
   placement?: Placement;
 }) => {
+  const local = useLocal({ open: false, onClose: () => {} });
   const result = (
     <div
       className={cx(
@@ -39,7 +41,15 @@ export const TopBtn = ({
           `,
         className
       )}
-      onClick={onClick}
+      onClick={(e) => {
+        if (popover) {
+          local.open = true;
+          local.render();
+        }
+        if (onClick) {
+          onClick(e);
+        }
+      }}
     >
       {underlight && (
         <div
@@ -59,7 +69,13 @@ export const TopBtn = ({
     return (
       <Popover
         autoFocus={false}
-        content={popover}
+        content={typeof popover === "function" ? popover(local) : popover}
+        open={local.open}
+        onOpenChange={(open) => {
+          if (!open) local.onClose();
+          local.open = open;
+          local.render();
+        }}
         placement={placement}
       >
         {result}
