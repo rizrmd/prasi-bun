@@ -161,7 +161,9 @@ const SitePicker = ({
   update: (val: NodeModel<SiteGroupItem>[]) => void;
   reload: (id?: string) => Promise<void>;
 }) => {
-  const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({
+    search: "",
+  });
   const orglen = group.filter((e) => e.parent === "site-root").length;
   return (
     <div className="flex flex-1 flex-col">
@@ -171,6 +173,7 @@ const SitePicker = ({
         reload={reload}
         orglen={orglen}
         conf={conf}
+        local={local}
       />
       <EdSiteTree
         group={group}
