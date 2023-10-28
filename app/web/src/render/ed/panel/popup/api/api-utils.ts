@@ -1,3 +1,4 @@
+import { createAPI, initApi } from "../../../../../utils/script/init-api";
 import { PG } from "../../../logic/ed-global";
 
 export const dev = JSON.parse(localStorage.getItem("prasi-dev") || "{}") as {
@@ -33,9 +34,33 @@ export const apiUrl = function (p: PG): string {
   return "";
 };
 
-export const checkAPI = (p: PG) => {
-  const url = apiUrl(p);
-  if (!url) return null;
+const apiDef = {} as any;
 
-  return { deployable: false, hasDB: false };
+export const checkAPI = async (p: PG) => {
+  const url = apiUrl(p);
+  if (!url) return "offline";
+
+  try {
+    if (!apiDef[url]) {
+      await initApi({ api_url: url }, "dev");
+      apiDef[url] = createAPI(url);
+    }
+    const capi = apiDef[url];
+    let res = await capi._deploy({
+      type: "check",
+      id_site: p.site.id,
+    });
+    if (!res) {
+      return { deployable: false, db: "", hasDB: false };
+    } else {
+      if (res.db && res.now) {
+        return { deployable: false, db: res.db, hasDB: true };
+      }
+    }
+  } catch (e) {
+    console.error(e);
+    return "error";
+  }
+
+  return { deployable: false, db: "", hasDB: false };
 };

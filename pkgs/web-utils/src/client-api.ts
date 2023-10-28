@@ -17,11 +17,17 @@ export const apiClient = (
                   _apiURL = this.apiUrl;
                 }
 
-                if (!api || !api[actionName]) {
-                  resolve(null);
-                  console.error(
+                if (!api) {
+                  reject(
+                    new Error(`API Definition for ${_apiURL} is not loaded.`)
+                  );
+                  return;
+                }
+
+                if (api && !api[actionName]) {
+                  reject(
                     `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
-                      api
+                      api || {}
                     ).join("\n   - ")}`
                   );
                   return;

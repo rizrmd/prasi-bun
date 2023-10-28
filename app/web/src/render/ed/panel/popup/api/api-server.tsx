@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 import { apiUrl, checkAPI, dev } from "./api-utils";
+import { EdApiDB } from "./api-db";
 
 export const EdApiServer = forwardRef<
   HTMLDivElement,
@@ -13,8 +14,9 @@ export const EdApiServer = forwardRef<
   const local = useLocal(
     {
       api_url: p.site.config.api_url,
-      status: "offline" as "online" | "offline" | "checking",
+      status: "checking" as "online" | "error" | "offline" | "checking",
       deployable: false,
+      db: "",
       hasDB: false,
     },
     () => {
@@ -33,18 +35,19 @@ export const EdApiServer = forwardRef<
 
   const url = apiUrl(p);
 
-  const check = () => {
-    local.status = "checking";
+  const check = async () => {
     local.render();
-    const res = checkAPI(p);
-    if (res) {
+    const res = await checkAPI(p);
+    if (typeof res === "object") {
+      local.db = res.db;
       local.hasDB = res.hasDB;
       local.status = "online";
       local.deployable = res.deployable;
       local.render();
     } else {
+      local.db = "";
       local.hasDB = false;
-      local.status = "offline";
+      local.status = res;
       local.deployable = false;
       local.render();
     }
@@ -72,6 +75,9 @@ export const EdApiServer = forwardRef<
             )}
             {local.status === "offline" && (
               <div className="text-white px-2 bg-slate-500">OFFLINE</div>
+            )}
+            {local.status === "error" && (
+              <div className="text-white px-2 bg-red-500">SERVER ERROR</div>
             )}
             {local.status === "checking" && (
               <div className="text-blue-500">Checking...</div>
@@ -160,7 +166,7 @@ export const EdApiServer = forwardRef<
       </div>
       {local.status === "online" && (
         <>
-          {!local.deployable && !local.hasDB && (
+          {!local.deployable && !local.db && (
             <div className="h-[50px] flex items-center justify-center text-slate-400 text-center">
               This server is not deployable <br />
               and do not have DB
@@ -168,6 +174,7 @@ export const EdApiServer = forwardRef<
           )}
         </>
       )}
+      {local.hasDB && <EdApiDB db={local.db} />}
     </div>
   );
 });
