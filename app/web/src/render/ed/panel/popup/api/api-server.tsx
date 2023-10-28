@@ -151,7 +151,7 @@ export const EdApiServer = forwardRef<
       >
         <div
           className={cx(
-            "border cursor-pointer m-1 flex items-center px-2 space-x-1 w-[70px] justify-center",
+            "border cursor-pointer m-1 mr-0 flex items-center px-2 space-x-1 w-[70px] justify-center",
             !dev.enabled
               ? "hover:bg-green-50 hover:border-green-700 hover:text-green-700 text-slate-500 "
               : "bg-green-700 text-white border-green-700"
