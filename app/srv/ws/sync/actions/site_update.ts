@@ -33,7 +33,7 @@ export const site_update: SAction["site"]["update"] = async function (
         if (ws)
           sendWS(ws, {
             type: SyncType.Event,
-            event: "site_js_updated",
+            event: "site_updated",
             data: site,
           });
       }

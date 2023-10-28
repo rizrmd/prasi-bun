@@ -108,7 +108,7 @@ export const edInitSync = (p: PG) => {
           p.site = site;
           p.render();
         },
-        site_js_updated(site) {
+        site_updated(site) {
           for (const [k, v] of Object.entries(site)) {
             if (k === "js" || k === "js_compiled") {
               p.site[k] = decoder.decode(decompress(v as any));
