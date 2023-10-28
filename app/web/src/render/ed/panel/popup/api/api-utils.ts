@@ -68,6 +68,11 @@ export const checkAPI = async (p: PG) => {
           db: res.db,
           hasDB: true,
           domains: res.domains as string[],
+          deploy: {
+            now: res.now,
+            current: res.current,
+            deploys: res.deploys,
+          },
         };
       }
     }
