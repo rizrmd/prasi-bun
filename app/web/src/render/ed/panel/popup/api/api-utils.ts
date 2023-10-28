@@ -7,6 +7,17 @@ export const dev = JSON.parse(localStorage.getItem("prasi-dev") || "{}") as {
   lastURL: { valid: boolean; url: string };
 };
 
+export const server = {
+  status: "ready" as
+    | "ready"
+    | "deploying"
+    | "saving"
+    | "pulling"
+    | "restarting",
+};
+
+export const apiRef = {} as any;
+
 export const apiUrl = function (p: PG): string {
   if (dev.enabled) {
     return dev.url;
@@ -34,18 +45,16 @@ export const apiUrl = function (p: PG): string {
   return "";
 };
 
-const apiDef = {} as any;
-
 export const checkAPI = async (p: PG) => {
   const url = apiUrl(p);
   if (!url) return "offline";
 
   try {
-    if (!apiDef[url]) {
+    if (!apiRef[url]) {
       await initApi({ api_url: url }, "dev");
-      apiDef[url] = createAPI(url);
+      apiRef[url] = createAPI(url);
     }
-    const capi = apiDef[url];
+    const capi = apiRef[url];
     let res = await capi._deploy({
       type: "check",
       id_site: p.site.id,

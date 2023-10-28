@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
-import { apiUrl, checkAPI, dev } from "./api-utils";
+import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
 import { EdApiDB } from "./api-db";
 
 export const EdApiServer = forwardRef<
@@ -16,7 +16,8 @@ export const EdApiServer = forwardRef<
       api_url: p.site.config.api_url,
       status: "checking" as "online" | "error" | "offline" | "checking",
       deployable: false,
-      db: "",
+      db: { url: "" },
+      oldDB: { url: "" },
       hasDB: false,
     },
     () => {
@@ -40,12 +41,14 @@ export const EdApiServer = forwardRef<
     const res = await checkAPI(p);
     if (typeof res === "object") {
       local.db = res.db;
+      local.oldDB = structuredClone(res.db);
       local.hasDB = res.hasDB;
       local.status = "online";
       local.deployable = res.deployable;
       local.render();
     } else {
-      local.db = "";
+      local.db = { url: "" };
+      local.oldDB = { url: "" };
       local.hasDB = false;
       local.status = res;
       local.deployable = false;
@@ -53,11 +56,33 @@ export const EdApiServer = forwardRef<
     }
   };
   const update = async () => {
-    p.site.config.api_url = local.api_url;
-    await p.sync.site.update(p.site.id, {
-      config: { api_url: local.api_url },
-    });
-    check();
+    if (local.api_url !== p.site.config.api_url) {
+      server.status = "saving";
+      p.render();
+      p.site.config.api_url = local.api_url;
+      await p.sync.site.update(p.site.id, {
+        config: { api_url: local.api_url },
+      });
+    }
+
+    if (local.hasDB && local.oldDB.url !== local.db.url) {
+      server.status = "saving";
+      p.render();
+
+      await apiRef[apiUrl(p)]._deploy({
+        type: "db-update",
+        id_site: p.site.id,
+        url: local.db.url,
+      });
+      local.oldDB.url = local.db.url;
+      p.render();
+    }
+
+    if (server.status === "saving") {
+      await check();
+      server.status = "ready";
+      p.render();
+    }
   };
   popover.onClose = update;
 
@@ -174,7 +199,9 @@ export const EdApiServer = forwardRef<
           )}
         </>
       )}
-      {local.hasDB && <EdApiDB db={local.db} />}
+      {local.hasDB && (
+        <EdApiDB db={local.db} render={local.render} update={update} />
+      )}
     </div>
   );
 });
