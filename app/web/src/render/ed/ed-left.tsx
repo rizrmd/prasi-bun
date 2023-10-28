@@ -32,7 +32,7 @@ export const EdLeft = () => {
             <EdSiteJS />
             <EdNpm />
             <EdApi />
-            <EdExport />
+            {/* <EdExport /> */}
           </div>
         </div>
 
