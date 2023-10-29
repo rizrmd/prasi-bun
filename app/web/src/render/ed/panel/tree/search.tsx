@@ -1,10 +1,8 @@
-import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta, PG, active } from "../../logic/ed-global";
 import { NodeModel } from "@minoru/react-dnd-treeview";
-
-import uFuzzy from "@leeoniya/ufuzzy";
-import { useEffect, useState } from "react";
-const uf = new uFuzzy({});
+import { useEffect } from "react";
+import { useGlobal, useLocal } from "web-utils";
+import { EDGlobal, EdMeta, PG } from "../../logic/ed-global";
+import { fuzzy } from "../../../../utils/ui/fuzzy";
 
 export const EdTreeSearch = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -105,61 +103,12 @@ export const doTreeSearch = (p: PG) => {
   let tree: Record<string, { idx: number; node: NodeModel<EdMeta> }> = {};
 
   if (p.ui.tree.search_mode.Name) {
-    const [idxs, info] = uf.search(
-      p.page.tree.map((e) => e.text),
-      p.ui.tree.search
-    );
-    if (idxs && info) {
-      let i = 0;
-      for (const idx of idxs) {
-        const item = p.page.tree[idx];
-        const range = info.ranges[i];
-        let text = "";
+    const found = fuzzy(p.page.tree, "text", p.ui.tree.search);
 
-        let cur = range.shift();
-        let open = true;
-        for (let i = 0; i < item.text.length; i++) {
-          if (typeof cur === "number") {
-            if (i === cur) {
-              if (open) {
-                text += `<b>`;
-                open = false;
-              } else {
-                text += `</b>`;
-                open = true;
-              }
-              cur = range.shift();
-            }
-            text += item.text[i];
-          } else {
-            text += item.text[i];
-          }
-        }
-        const el = (
-          <div
-            className={css`
-              b {
-                background: #4c71f6;
-                color: white;
-              }
-            `}
-            dangerouslySetInnerHTML={{ __html: text }}
-          />
-        );
-        tree[item.id] = {
-          idx: i,
-          node: {
-            ...item,
-            parent: "root",
-            data: item.data
-              ? {
-                  ...item.data,
-                  el,
-                }
-              : undefined,
-          },
-        };
-        i++;
+    let i = 0;
+    for (const row of found) {
+      if (row.data) {
+        tree[row.id] = { idx: i++, node: { ...row, parent: "root" } };
       }
     }
   }

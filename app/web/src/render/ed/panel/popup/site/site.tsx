@@ -8,6 +8,10 @@ import { EdFormSite } from "./site-form";
 import { EdSiteHead } from "./site-head";
 import { EdSiteTree, SiteGroupItem } from "./site-tree";
 
+import uFuzzy, { Info } from "@leeoniya/ufuzzy";
+import { fuzzy } from "../../../../../utils/ui/fuzzy";
+const uf = new uFuzzy({});
+
 const conf = { group: null as any };
 
 export const EdPopSite = () => {
@@ -162,24 +166,54 @@ const SitePicker = ({
   reload: (id?: string) => Promise<void>;
 }) => {
   const local = useLocal({
-    search: "",
+    search: {
+      text: "",
+      ref: null as null | HTMLInputElement,
+    },
   });
+
+  let result = group;
+  if (local.search.text) {
+    const found = fuzzy(group, "text", local.search.text);
+    result = found.map((e) => ({ ...e, parent: "site-root" }));
+  }
+
+  useEffect(() => {
+    const keydown = (e: KeyboardEvent) => {
+      const el = document.activeElement as HTMLDivElement;
+      if (el.classList.contains("modal")) {
+        local.search.ref?.focus();
+      }
+    };
+    addEventListener("keydown", keydown);
+    return () => {
+      removeEventListener("keydown", keydown);
+    };
+  }, []);
+
   const orglen = group.filter((e) => e.parent === "site-root").length;
   return (
     <div className="flex flex-1 flex-col">
       <EdSiteHead
-        group={group}
+        group={result}
         update={update}
         reload={reload}
         orglen={orglen}
         conf={conf}
         local={local}
       />
+
+      {result.length === 0 && local.search.text && (
+        <div className="flex-1 flex items-center justify-center">
+          No search results found.
+        </div>
+      )}
       <EdSiteTree
-        group={group}
+        group={result}
         update={update}
         reload={reload}
         orglen={orglen}
+        search={local.search.text}
       />
     </div>
   );

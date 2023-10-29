@@ -64,7 +64,7 @@ export const EdTreeName = ({
         />
       ) : (
         <div className="flex flex-col">
-          {node.data?.el || item.name}
+          {node.text}
           {/* <div className={"text-[11px] text-gray-500 -mt-1"}>{item.id}</div> */}
         </div>
       )}
