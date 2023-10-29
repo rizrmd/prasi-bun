@@ -370,8 +370,11 @@ export const EdSiteTree = ({
         dragPreviewRender={() => <></>}
         classes={{
           root: cx(
-            "flex flex-1 items-stretch overflow-auto",
-            search ? "flex-row" : "flex-col",
+            "flex overflow-auto",
+            search
+              ? "flex-row items-start flex-wrap"
+              : "flex-col items-stretch flex-1 ",
+
             !search &&
               css`
                 flex-wrap: nowrap;
@@ -386,7 +389,7 @@ export const EdSiteTree = ({
                 }
               `
           ),
-          container: "flex flex-row flex-wrap pb-2",
+          container: cx(!search && "flex flex-row flex-wrap pb-2"),
         }}
         render={render}
       />

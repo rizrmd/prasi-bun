@@ -13,10 +13,10 @@ export const fuzzy = <T extends object>(
 
   if (idxs && info) {
     const result = [] as T[];
-    let i = 0;
+    let ri = 0;
     for (const idx of idxs) {
       const item = array[idx];
-      const range = [...info.ranges[i]];
+      const range = [...info.ranges[ri++]];
       const val = item[field] as string;
 
       let cur = range.shift();
