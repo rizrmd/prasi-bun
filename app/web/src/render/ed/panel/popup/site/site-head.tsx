@@ -1,6 +1,6 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { SiteGroupItem } from "./site-tree";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 
 export const EdSiteHead = ({
@@ -16,7 +16,10 @@ export const EdSiteHead = ({
   update: (val: NodeModel<SiteGroupItem>[]) => void;
   reload: (id?: string) => Promise<void>;
   conf: { group: any };
-  local: { search: string; render: () => void };
+  local: {
+    search: { text: string; ref: null | HTMLInputElement };
+    render: () => void;
+  };
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -70,11 +73,14 @@ export const EdSiteHead = ({
       </div>
       <input
         type="search"
-        value={local.search}
+        value={local.search.text}
         placeholder="Search..."
-        className="outline-none mr-2 border focus:border-blue-500 "
+        ref={(e) => {
+          local.search.ref = e;
+        }}
+        className="outline-none mr-2 text-[14px] w-[150px] focus:w-[250px] transition-all px-1 border focus:border-blue-500"
         onChange={(e) => {
-          local.search = e.currentTarget.value;
+          local.search.text = e.currentTarget.value;
           local.render();
         }}
       />
