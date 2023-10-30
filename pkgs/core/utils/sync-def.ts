@@ -22,7 +22,7 @@ export const syncActionDefinition = async () => {
   };
   walk(SyncActions, def, []);
 
-  const index_js = []; 
+  const index_js = [];
   for (const [k, v] of Object.entries(paths)) {
     const arr = v.split(".");
     const name = arr.join("_");
@@ -44,6 +44,11 @@ export const ${name}: SAction${saction} = async function (
     }
     index_js.push(`export * from "./${name}";`);
   }
+
+  await writeAsync(
+    dir.path(`app/srv/ws/sync/actions/index.ts`),
+    index_js.join("\n")
+  );
 
   const content = `\
 export const SyncActionDefinition = ${JSON.stringify(def, null, 2)};
