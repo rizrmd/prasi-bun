@@ -59,7 +59,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
         const msg = packr.unpack(Buffer.from(raw));
         if (msg.type === SyncType.UserID) {
           const { user_id, page_id, site_id } = msg;
-          
+
           conn.user_id = user_id;
           conn.user = await db.user.findFirst({ where: { id: user_id } });
 
@@ -94,7 +94,9 @@ export const syncHandler: WebSocketHandler<WSData> = {
           if (actionName) {
             const baseAction = (actions as any)[actionName];
             if (!baseAction) {
-              console.log(`app/ws/edit/sync/${actionName}.ts not found`);
+              console.log(
+                `app/srv/ws/sync/actions/${actionName}.ts not found`
+              );
             }
             if (baseAction) {
               const action = baseAction.bind(conn);
