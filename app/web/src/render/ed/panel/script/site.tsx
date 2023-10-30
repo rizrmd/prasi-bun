@@ -1,6 +1,5 @@
 import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
-import { Activity } from "../../../../../../srv/ws/sync/type";
 import { jscript } from "../../../../utils/script/jscript";
 import { EDGlobal } from "../../logic/ed-global";
 import { EdUserConn } from "../activity/user-conn";

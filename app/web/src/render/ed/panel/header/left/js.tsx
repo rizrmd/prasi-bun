@@ -9,11 +9,8 @@ export const EdSiteJS = () => {
       style="slim"
       className="font-bold font-mono"
       onClick={() => {
-        // p.sync.activity(
-        //   { page_id: p.page.cur.id, item_id: "site" },
-        //   "js",
-        //   Activity.Open
-        // );
+        p.ui.popup.code.open = true;
+        p.render();
       }}
     >
       <svg

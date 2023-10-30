@@ -2,7 +2,7 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { ReactElement } from "react";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem, MItem } from "../../../utils/types/item";
-import { DComp, DPage, IRoot } from "../../../utils/types/root";
+import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
 import { SAction } from "../../../../../srv/ws/sync/actions";
@@ -17,23 +17,6 @@ export const EmptySite = {
   js_compiled: "",
 };
 
-type CODE_MODULE_NAME = string;
-type CODE_FILE_PATH = string;
-export const EmptyCode = {
-  id: "",
-  name: "",
-  use_as_main: false,
-  npm: {} as Record<
-    CODE_MODULE_NAME,
-    { id: string; module: string; version: string }
-  >,
-  files: {} as Record<
-    CODE_FILE_PATH,
-    { id: string; name: string; type: "f" | "d" }
-  >,
-};
-
-export type ECode = typeof EmptyCode;
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
@@ -110,10 +93,10 @@ export const EDGlobal = {
     list: {} as Record<string, { comp: EComp; doc: DComp }>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
+  code: {
+    doc: null as null | DCode,
+  },
   ui: {
-    code: {
-      loaded: {} as Record<string, ECode>,
-    },
     layout: {
       left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),
       right: parseInt(localStorage.getItem("prasi-layout-right") || "250"),
@@ -134,6 +117,11 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
+      code: {
+        open: false,
+        id: "",
+        file: "",
+      },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {
         group_id: string;
