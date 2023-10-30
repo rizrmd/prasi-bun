@@ -18,6 +18,9 @@ import { Activity, ActivityKind } from "./type";
 export type SAction = typeof SyncActions;
 
 export const SyncActions = {
+  code: {
+    create: async (id_site: string, name: string) => ({}),
+  },
   site: {
     list: async () =>
       ({}) as Record<string, { id: string; name: string; domain: string }>,
@@ -41,13 +44,14 @@ export const SyncActions = {
       item_id: string;
       item: IItem;
     }) => {},
-    list: () => ({}) as Record<string, Exclude<component, "content_tree">>,
+    list: async () =>
+      ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>
       ({}) as Record<string, { id: string; name: string; comps: string[] }>,
     load: async (id: string) => ({}) as EComp | void,
   },
   page: {
-    list: (id_site: string) =>
+    list: async (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
     load: async (id: string) => ({}) as EPage | void,
   },
@@ -74,7 +78,7 @@ export const SyncActions = {
       diff: Uint8Array
     ) => ({}) as { diff: Uint8Array } | void,
   },
-  activity: (
+  activity: async (
     target: { comp_id?: string; page_id?: string; item_id: string },
     kind: ActivityKind,
     activity: Activity
