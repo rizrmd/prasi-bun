@@ -19,7 +19,8 @@ export type SAction = typeof SyncActions;
 
 export const SyncActions = {
   code: {
-    create: async (id_site: string, name: string) => ({}),
+    create: async (id_site: string, name: string) => ({}) as { id: string },
+    load: async (id: string) => ({}) as {},
   },
   site: {
     list: async () =>

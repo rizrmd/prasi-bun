@@ -10,7 +10,6 @@ import { EdPane } from "./panel/main/pane-resize";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
 import { EdPopSite } from "./panel/popup/site/site";
 import { EdScriptInit } from "./panel/script/monaco/init";
-import { EdScriptSite } from "./panel/script/site";
 import { EdRight } from "./ed-right";
 
 export const EdBase = () => {
@@ -49,7 +48,6 @@ export const EdBase = () => {
         <EdPopSite />
         <EdPopCompGroup />
         <EdScriptInit />
-        <EdScriptSite />
       </>
     </div>
   );

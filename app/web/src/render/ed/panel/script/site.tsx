@@ -11,9 +11,9 @@ export const EdScriptSite = () => {
   const local = useLocal({ timeout: null as any });
   const userOpened = Object.keys(p.activity.page.site?.js || {});
 
-  if (!p.ui.script.site) {
-    return null;
-  }
+  // if (!p.ui.script.site) {
+  //   return null;
+  // }
 
   return (
     <EdMonaco
@@ -59,13 +59,13 @@ export const EdScriptSite = () => {
         },
       }}
       onClose={() => {
-        p.ui.script.site = false;
-        p.sync.activity(
-          { page_id: p.page.cur.id, item_id: "site" },
-          "js",
-          Activity.Null
-        );
-        p.render();
+        // p.ui.script.site = false;
+        // p.sync.activity(
+        //   { page_id: p.page.cur.id, item_id: "site" },
+        //   "js",
+        //   Activity.Null
+        // );
+        // p.render();
       }}
     />
   );
