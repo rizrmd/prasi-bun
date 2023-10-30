@@ -1,50 +1,52 @@
 export const SyncActionDefinition = {
   "code": {
-    "create": "0"
+    "create": "0",
+    "load": "1"
   },
   "site": {
-    "list": "1",
-    "group": "2",
-    "load": "3",
-    "update": "4"
+    "list": "2",
+    "group": "3",
+    "load": "4",
+    "update": "5"
   },
   "comp": {
-    "new": "5",
-    "list": "6",
-    "group": "7",
-    "load": "8"
+    "new": "6",
+    "list": "7",
+    "group": "8",
+    "load": "9"
   },
   "page": {
-    "list": "9",
-    "load": "10"
+    "list": "10",
+    "load": "11"
   },
   "yjs": {
-    "um": "11",
-    "sv_local": "12",
-    "diff_local": "13",
-    "sv_remote": "14"
+    "um": "12",
+    "sv_local": "13",
+    "diff_local": "14",
+    "sv_remote": "15"
   },
-  "activity": "15",
+  "activity": "16",
   "client": {
-    "info": "16"
+    "info": "17"
   }
 };
 export const SyncActionPaths = {
   "0": "code.create",
-  "1": "site.list",
-  "2": "site.group",
-  "3": "site.load",
-  "4": "site.update",
-  "5": "comp.new",
-  "6": "comp.list",
-  "7": "comp.group",
-  "8": "comp.load",
-  "9": "page.list",
-  "10": "page.load",
-  "11": "yjs.um",
-  "12": "yjs.sv_local",
-  "13": "yjs.diff_local",
-  "14": "yjs.sv_remote",
-  "15": "activity",
-  "16": "client.info"
+  "1": "code.load",
+  "2": "site.list",
+  "3": "site.group",
+  "4": "site.load",
+  "5": "site.update",
+  "6": "comp.new",
+  "7": "comp.list",
+  "8": "comp.group",
+  "9": "comp.load",
+  "10": "page.list",
+  "11": "page.load",
+  "12": "yjs.um",
+  "13": "yjs.sv_local",
+  "14": "yjs.diff_local",
+  "15": "yjs.sv_remote",
+  "16": "activity",
+  "17": "client.info"
 };

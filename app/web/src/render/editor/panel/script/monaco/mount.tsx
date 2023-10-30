@@ -4,7 +4,6 @@ import {
   MonacoJsxSyntaxHighlight,
   getWorker,
 } from "monaco-jsx-syntax-highlight-v2";
-import { rebuildTree } from "../../../logic/tree-logic";
 import { PG } from "../../../logic/global";
 
 export type MonacoEditor = Parameters<OnMount>[0];

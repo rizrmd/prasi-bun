@@ -224,7 +224,7 @@ model site {
   is_deleted     Boolean          @default(false)
   responsive     String           @default("all")
   npm_cache      String           @default(" ") @db.VarChar
-  code_site      code_site[]
+  code           code[]
   component_site component_site[]
   npm_site       npm_site[]
   page           page[]
@@ -279,12 +279,14 @@ model user {
 }
 
 model code {
-  id        String      @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String      @db.Uuid
-  code_comp code_comp[]
-  code_file code_file[]
-  code_npm  code_npm[]
-  code_site code_site[]
+  id          String      @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String      @db.Uuid
+  id_site     String      @db.Uuid
+  use_in_site Boolean
+  site        site        @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  code_comp   code_comp[]
+  code_file   code_file[]
+  code_npm    code_npm[]
 }
 
 model code_comp {
@@ -304,16 +306,6 @@ model code_npm {
   import_as Json    @default("{\"main\": {\"mode\": \"default\", \"name\": \"\"}, \"names\": []}")
   id_code   String  @db.Uuid
   code      code    @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model code_site {
-  id_code String  @db.Uuid
-  id_site String  @db.Uuid
-  is_main Boolean @default(true)
-  code    code    @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  site    site    @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([id_code, id_site], map: "code_site_id_code_id_site")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

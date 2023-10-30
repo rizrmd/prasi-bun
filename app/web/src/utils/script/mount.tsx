@@ -32,15 +32,6 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco) => {
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
   };
 
-  const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
-  const { highlighter } = jsxHgController.highlighterBuilder({
-    editor: editor,
-  });
-  highlighter();
-  editor.onDidChangeModelContent(() => {
-    highlighter();
-  });
-
   monaco.languages.registerDocumentFormattingEditProvider("typescript", {
     async provideDocumentFormattingEdits(model, options, token) {
       const prettier = jscript.prettier.standalone;
@@ -147,6 +138,17 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco) => {
   );
 
   setTimeout(() => {
+    if (editor.getModel()) {
+      const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
+      const { highlighter } = jsxHgController.highlighterBuilder({
+        editor: editor,
+      });
+      highlighter();
+      editor.onDidChangeModelContent(() => {
+        highlighter();
+      });
+    }
+
     editor.getAction("editor.action.formatDocument")?.run();
   }, 100);
 };

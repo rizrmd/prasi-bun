@@ -33,6 +33,7 @@ export const edInitSync = (p: PG) => {
           navigate(`/ed/`);
         }
       });
+      console.log("site not equal");
       return false;
     }
 
@@ -49,6 +50,7 @@ export const edInitSync = (p: PG) => {
         .then((e) => {
           if (e) navigate(`/ed/${params.site_id}/${e.id}`);
         });
+      console.log("page not found");
       return false;
     }
   }
@@ -145,7 +147,9 @@ export const edInitSync = (p: PG) => {
           }
         },
       },
-    }).then((e) => (p.sync = e));
+    }).then((e) => {
+      p.sync = e;
+    });
 
     return false;
   }

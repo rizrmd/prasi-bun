@@ -28,7 +28,9 @@ export const syncActionDefinition = async () => {
     const name = arr.join("_");
     const path = dir.path(`app/srv/ws/sync/actions/${name}.ts`);
     const saction = arr.map((e) => `["${e}"]`).join("");
-    if (!(await existsAsync(path))) {
+
+    const file = Bun.file(path);
+    if (!(await file.exists())) {
       const code = `
 import { SAction } from "../actions"; 
 import { SyncConnection } from "../type";

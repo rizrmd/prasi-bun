@@ -16,6 +16,24 @@ export const EmptySite = {
   js: "",
   js_compiled: "",
 };
+
+type CODE_MODULE_NAME = string;
+type CODE_FILE_PATH = string;
+export const EmptyCode = {
+  id: "",
+  name: "",
+  use_as_main: false,
+  npm: {} as Record<
+    CODE_MODULE_NAME,
+    { id: string; module: string; version: string }
+  >,
+  files: {} as Record<
+    CODE_FILE_PATH,
+    { id: string; name: string; type: "f" | "d" }
+  >,
+};
+
+export type ECode = typeof EmptyCode;
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
@@ -93,8 +111,8 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
-    script: {
-      site: false,
+    code: {
+      loaded: {} as Record<string, ECode>,
     },
     layout: {
       left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),
