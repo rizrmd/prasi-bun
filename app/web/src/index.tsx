@@ -17,10 +17,10 @@ const start = async () => {
     const sw = await registerServiceWorker();
 
     const cacheCurrentPage = () => {
-      const swc = navigator.serviceWorker.controller;
-      if (swc) {
+      const swController = navigator.serviceWorker.controller;
+      if (swController) {
         [location.href, "", "/", "/ed", "/ed/_/_", "/login"].forEach((url) => {
-          swc.postMessage({
+          swController.postMessage({
             type: "add-cache",
             url: url,
           });

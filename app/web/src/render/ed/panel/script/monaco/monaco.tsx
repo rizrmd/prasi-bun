@@ -18,6 +18,7 @@ export const EdMonaco = (arg: {
     val?: Record<string, any>;
     types?: Record<string, string>;
   };
+  modal?: boolean;
 }) => {
   const filename = arg.filename;
   const m = arg.monaco;
@@ -86,6 +87,14 @@ export const EdMonaco = (arg: {
 
       if (m.onMount) m.onMount(editor, monaco);
     };
+  }
+
+  if (arg.modal === false) {
+    return (
+      <EdMonacoWrap header={arg.header} footer={arg.footer}>
+        {(Editor) => <Editor {...prop} />}
+      </EdMonacoWrap>
+    );
   }
 
   return (
