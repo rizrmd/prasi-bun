@@ -40,9 +40,14 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
       mode,
       mode === "site" ? p.site.id || "" : p.page.cur.id
     );
-    local.size = parseInt(size) || 0;
-    local.status = "ready";
-    local.render();
+    if (size === "bundling") {
+      local.bundling = true;
+      local.render();
+    } else {
+      local.size = parseInt(size) || 0;
+      local.status = "ready";
+      local.render();
+    }
   };
   useEffect(() => {
     reload();
@@ -179,8 +184,13 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                 )}
               >
                 <div
-                  onClick={async () => {
-                    if (local.bundling) return;
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (local.bundling) {
+                      console.log("Already bundling");
+                      return;
+                    }
                     local.bundling = true;
                     local.render();
 
@@ -217,9 +227,11 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
               </Popover>
             )}
           </div>
-          <div className="px-2 flex items-center font-mono border-l text-[10px]">
-            {formatBytes(local.size)}
-          </div>
+          {!local.bundling && (
+            <div className="px-2 flex items-center font-mono border-l text-[10px]">
+              {formatBytes(local.size)}
+            </div>
+          )}
         </div>
       </div>
       {local.list.length > 0 && (
