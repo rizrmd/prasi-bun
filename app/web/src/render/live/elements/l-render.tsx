@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect, useState } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { FNAdv, FNCompDef, FNLinkTag } from "../../../utils/types/meta-fn";
@@ -94,22 +94,11 @@ export const LRenderInternal: FC<{
 
     let props = {} as Record<string, FNCompDef>;
     let cprops = {} as [string, FNCompDef][];
-
-    if (meta.comp.mcomp) {
-      props = meta.comp.mcomp
-        .get("component")
-        ?.get("props")
-        ?.toJSON() as Record<string, FNCompDef>;
-
-      cprops = Object.entries(props).sort((a, b) => {
-        return a[1].idx - b[1].idx;
-      });
-    } else {
-      props = structuredClone(
-        p.comps.all[meta.comp.id]?.content_tree.component?.props || {}
-      );
-      cprops = Object.entries(props);
-    }
+    
+    props = deepClone(
+      p.comps.all[meta.comp.id]?.content_tree.component?.props || {}
+    );
+    cprops = Object.entries(props);
 
     comp.propval = treePropEval(p, id, cprops, _scopeIndex);
   }

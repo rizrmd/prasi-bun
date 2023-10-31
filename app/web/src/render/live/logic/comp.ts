@@ -7,6 +7,7 @@ import { IRoot } from "../../../utils/types/root";
 import { fillID } from "../../editor/tools/fill-id";
 import { PG } from "./global";
 import { PRASI_COMPONENT } from "../../../utils/types/render";
+import { deepClone } from "web-utils";
 
 export const scanComponent = (
   item: IRoot | IContent,
@@ -97,7 +98,7 @@ export const instantiateComp = (
     }
     target = mitem.toJSON();
   } else {
-    target = structuredClone(mcomp.item.content_tree);
+    target = deepClone(mcomp.item.content_tree);
     mprops = target.component.props || {};
   }
 
