@@ -26,9 +26,11 @@ if (g.mode === "dev") {
   await startDevWatcher();
 }
 
+
 /** init lmdb */
 user.conf.init();
 snapshot.init();
+
 
 await preparePrisma();
 await ensureNotRunning();
@@ -39,12 +41,17 @@ if (g.db) {
   });
 }
 
+
 await initSrv();
 await syncActionDefinition();
+
 await generateAPIFrm();
 await prepareApiRoutes();
-await prepareAPITypes();
-await parcelBuild();
-await createServer();
 
-g.status = "ready";
+await prepareAPITypes();
+
+await parcelBuild();
+
+// await createServer();
+
+// g.status = "ready";

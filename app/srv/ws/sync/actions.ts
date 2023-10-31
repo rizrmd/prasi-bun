@@ -14,14 +14,12 @@ import { Activity, ActivityKind } from "./type";
    WILL *BREAK* OFFLINE STORAGE --
    ONLY ADDITION IS ALLOWED 
 */
-
 export type SAction = typeof SyncActions;
 
 export const SyncActions = {
   code: {
-    create: async (id_site: string, name: string) => ({}) as { id: string },
-    list: async (id_site: string) => ({}) as { ids: string[] },
-    load: async (id: string) => ({}) as { bin: Uint8Array } | void,
+    open: async (id_site: string) => ({}) as { id: string },
+    close: async (id_site: string) => ({}) as { id: string },
   },
   site: {
     list: async () =>
