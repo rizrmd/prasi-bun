@@ -36,7 +36,6 @@ model component_group {
   id             String           @id(map: "site_comp_group_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name           String
   shared         Boolean          @default(false)
-  code_comp      code_comp[]
   component      component[]
   component_site component_site[]
 }
@@ -224,7 +223,6 @@ model site {
   is_deleted     Boolean          @default(false)
   responsive     String           @default("all")
   npm_cache      String           @default(" ") @db.VarChar
-  code           code[]
   component_site component_site[]
   npm_site       npm_site[]
   page           page[]
@@ -276,44 +274,4 @@ model user {
   org                          org[]
   org_user                     org_user[]
   site                         site[]
-}
-
-model code {
-  id          String      @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String      @db.Uuid
-  id_site     String      @db.Uuid
-  use_in_site Boolean
-  site        site        @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  code_comp   code_comp[]
-  code_file   code_file[]
-  code_npm    code_npm[]
-}
-
-model code_comp {
-  id_code         String          @db.Uuid
-  id_comp_group   String          @db.Uuid
-  code            code            @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  component_group component_group @relation(fields: [id_comp_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([id_code, id_comp_group], map: "code_comp_id_code_id_comp_group")
-}
-
-model code_npm {
-  id        String  @id(map: "code_npm_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  module    String
-  version   String
-  bundled   Boolean
-  import_as Json    @default("{\"main\": {\"mode\": \"default\", \"name\": \"\"}, \"names\": []}")
-  id_code   String  @db.Uuid
-  code      code    @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model code_file {
-  id      String @id(map: "code_src_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name    String
-  src     String
-  id_code String @db.Uuid
-  type    String @default("f") @db.Char(1)
-  code    code   @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "code_src_id_code_fkey")
 }

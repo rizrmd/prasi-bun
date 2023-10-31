@@ -24,6 +24,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@types/ungap__structured-clone": "^0.3.1",
+    "@ungap/structured-clone": "^1.2.0",
     "brotli-wasm": "^2.0.1",
     "fdir": "^6.1.0"
   }
