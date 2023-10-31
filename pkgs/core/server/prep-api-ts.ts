@@ -35,6 +35,7 @@ export const ${name} = {
   const targetFile = dir.path("app/srv/exports.d.ts");
 
   const args = [
+    process.execPath,
     dir.path("node_modules/.bin/tsc"),
     dir.path("app/srv/exports.ts"),
     "--declaration",
@@ -43,19 +44,10 @@ export const ${name} = {
     targetFile,
   ];
   if (g.mode === "dev") {
-    const tsc = spawn(
-      [
-        dir.path("node_modules/.bin/tsc"),
-        dir.path("app/srv/exports.ts"),
-        "--declaration",
-        "--emitDeclarationOnly",
-        "--outFile",
-        targetFile,
-      ],
-      {
-        cwd: dir.path(`node_modules/.bin`),
-      }
-    );
+    const tsc = spawn(args, {
+      cwd: dir.path(`node_modules/.bin`),
+    });
+
     await tsc.exited;
   }
 

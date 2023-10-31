@@ -6,6 +6,7 @@ import { g } from "./global";
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
   await dirAsync("app/static");
+
   const args = [
     "node",
     dir.path("node_modules/.bin/parcel"),
