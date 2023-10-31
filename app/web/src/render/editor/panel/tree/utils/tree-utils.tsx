@@ -11,6 +11,7 @@ import get from "lodash.get";
 import set from "lodash.set";
 import uniqBy from "lodash.uniqby";
 import { FC } from "react";
+import { deepClone } from "web-utils";
 import { IContent, MContent } from "../../../../../utils/types/general";
 import { NodeMeta, PG } from "../../../logic/global";
 import { fillID } from "../../../tools/fill-id";
@@ -216,7 +217,7 @@ export const selectMultiple = (p: PG, node: NodeModel<NodeMeta>) => {
 
 export const flatTree = (item: Array<IContent>) => {
   const children = item as Array<IContent>;
-  let ls = structuredClone(item);
+  let ls = deepClone(item);
   let sitem: any = ls.map((v: IContent) => {
     if (v.type !== "text") {
       v.childs = [];

@@ -80,22 +80,22 @@ export const useGlobal = <T extends object>(
 
   return res as any;
 };
-export const deepClone = (object: any): any => {
+export const deepClone = <T extends object>(object: T): T => {
   if (null == object || typeof object != "object") return object;
   // Handle Date
   if (object instanceof Date) {
     var copy = new Date();
     copy.setTime(object.getTime());
-    return copy;
+    return copy as T;
   }
   if (object instanceof Array) {
-    return object.map((item) => deepClone(item));
+    return object.map((item) => deepClone(item)) as T;
   }
 
   var newObject: any = {};
   for (var key in object) {
     if (typeof object[key] === "object") {
-      newObject[key] = deepClone(object[key]);
+      newObject[key] = deepClone((object as any)[key]);
     } else {
       newObject[key] = object[key];
     }
