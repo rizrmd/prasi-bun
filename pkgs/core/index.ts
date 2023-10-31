@@ -44,14 +44,10 @@ if (g.db) {
 
 await initSrv();
 await syncActionDefinition();
-
 await generateAPIFrm();
 await prepareApiRoutes();
-
 await prepareAPITypes();
-
 await parcelBuild();
+await createServer();
 
-// await createServer();
-
-// g.status = "ready";
+g.status = "ready";
