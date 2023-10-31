@@ -1,7 +1,12 @@
+import structuredClone from "@ungap/structured-clone";
 import { FC, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { GlobalContext, defineReact, defineWindow } from "web-utils";
 import { siteLoader } from "./site-loader";
+
+if (!("structuredClone" in (window as any))) {
+  (window as any).structuredClone = structuredClone;
+}
 
 const w = window as unknown as {
   prasiContext: any;

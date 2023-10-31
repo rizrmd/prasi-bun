@@ -93,9 +93,6 @@ export const EDGlobal = {
     list: {} as Record<string, { comp: EComp; doc: DComp }>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
-  code: {
-    doc: null as null | DCode,
-  },
   ui: {
     layout: {
       left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),
