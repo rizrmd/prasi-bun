@@ -1,12 +1,13 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { ReactElement } from "react";
-import { clientStartSync } from "../../../utils/sync/ws-client";
-import { IItem, MItem } from "../../../utils/types/item";
-import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
-import { ISection } from "../../../utils/types/section";
-import { IText, MText } from "../../../utils/types/text";
+import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
 import { ActivityList } from "../../../../../srv/ws/sync/type";
+import { clientStartSync } from "../../../utils/sync/ws-client";
+import { IItem, MItem } from "../../../utils/types/item";
+import { DComp, DPage, IRoot } from "../../../utils/types/root";
+import { ISection } from "../../../utils/types/section";
+import { IText, MText } from "../../../utils/types/text";
 
 export const EmptySite = {
   id: "",
@@ -71,7 +72,7 @@ export const EDGlobal = {
     | "page-not-found"
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
-  site: structuredClone(EmptySite),
+  site: deepClone(EmptySite),
   activity: {
     page: {} as Record<string, ActivityList>,
     comp: {} as Record<string, ActivityList>,

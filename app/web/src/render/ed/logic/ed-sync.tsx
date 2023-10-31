@@ -1,10 +1,11 @@
 import { compress, decompress } from "wasm-gzip";
+import { deepClone } from "web-utils";
+import { Y } from "../../../../../srv/ws/sync/entity/docs";
 import { clientStartSync } from "../../../utils/sync/ws-client";
+import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";
 import { EmptySite, PG } from "./ed-global";
-import { Y } from "../../../../../srv/ws/sync/entity/docs";
 import { treeRebuild } from "./tree/build";
-import { w } from "../../../utils/types/general";
 
 const decoder = new TextDecoder();
 
@@ -22,7 +23,7 @@ export const edInitSync = (p: PG) => {
   if (p.sync) {
     if (p.site.id === "--loading--") return false;
     if (params.site_id !== p.site.id) {
-      p.site = structuredClone(EmptySite);
+      p.site = deepClone(EmptySite);
       p.site.id = "--loading--";
       p.sync.site.load(params.site_id).then((site) => {
         if (site) {

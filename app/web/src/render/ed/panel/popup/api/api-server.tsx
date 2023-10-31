@@ -1,10 +1,10 @@
 import { forwardRef } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
-import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
 import { EdApiDB } from "./api-db";
-import { EdApiDomain } from "./api-domain";
 import { EdApiDeploy } from "./api-deploy";
+import { EdApiDomain } from "./api-domain";
+import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
 
 export const EdApiServer = forwardRef<
   HTMLDivElement,
@@ -50,7 +50,7 @@ export const EdApiServer = forwardRef<
     if (typeof res === "object") {
       local.db = res.db;
       local.domains = res.domains;
-      local.oldDB = structuredClone(res.db);
+      local.oldDB = deepClone(res.db);
       local.hasDB = res.hasDB;
       local.status = "online";
       if (res.deploy) {

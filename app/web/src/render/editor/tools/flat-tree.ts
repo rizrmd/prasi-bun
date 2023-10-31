@@ -1,11 +1,12 @@
 import find from "lodash.find";
 import get from "lodash.get";
 import set from "lodash.set";
+import { deepClone } from "web-utils";
 import { IContent } from "../../../utils/types/general";
 
 export const flatTree = (item: Array<IContent>) => {
   const children = item as Array<IContent>;
-  let ls = structuredClone(item);
+  let ls = deepClone(item);
   let sitem: any = ls.map((v: IContent) => {
     if (v.type !== "text") {
       v.childs = [];

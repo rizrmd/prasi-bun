@@ -1,11 +1,11 @@
-import { useGlobal, useLocal } from "web-utils";
-import { createAPI } from "../../../../../../utils/script/init-api";
-import { EditorGlobal, PG } from "../../../../logic/global";
-import { AutoHeightTextarea } from "../../../../../../utils/ui/auto-textarea";
-import { useEffect } from "react";
-import trim from "lodash.trim";
-import { formatDistance } from "date-fns/esm";
 import { format } from "date-fns";
+import { formatDistance } from "date-fns/esm";
+import trim from "lodash.trim";
+import { useEffect } from "react";
+import { deepClone, useGlobal, useLocal } from "web-utils";
+import { createAPI } from "../../../../../../utils/script/init-api";
+import { AutoHeightTextarea } from "../../../../../../utils/ui/auto-textarea";
+import { EditorGlobal } from "../../../../logic/global";
 
 const server = {
   status: "ready" as
@@ -27,11 +27,11 @@ const DefaultLocal = {
 
 export const ExternalDeploy = () => {
   const p = useGlobal(EditorGlobal, "EDITOR");
-  const local = useLocal(structuredClone(DefaultLocal));
+  const local = useLocal(deepClone(DefaultLocal));
 
   useEffect(() => {
     (async () => {
-      const newlocal = structuredClone(DefaultLocal);
+      const newlocal = deepClone(DefaultLocal);
       for (const [k, v] of Object.entries(newlocal)) {
         (local as any)[k] = v;
       }
