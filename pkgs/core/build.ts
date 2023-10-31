@@ -69,15 +69,20 @@ if (files) {
     files
       .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
       .map(async (file) => {
-        const br = brotli.compress(
-          new Uint8Array(
-            await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
-          ),
-          { quality: 11 }
-        );
-        if (br) {
-          console.log(`Compressing ${file}`);
-          await writeAsync(dir.path(`app/static-br/${file}`), Buffer.from(br));
+        if (!(await Bun.file(dir.path(`app/static-br/${file}`)).exists())) {
+          const br = brotli.compress(
+            new Uint8Array(
+              await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
+            ),
+            { quality: 11 }
+          );
+          if (br) {
+            console.log(`Compressing ${file}`);
+            await writeAsync(
+              dir.path(`app/static-br/${file}`),
+              Buffer.from(br)
+            );
+          }
         }
       })
   );
