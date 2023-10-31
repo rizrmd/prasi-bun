@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import { useGlobal, deepClone } from "web-utils";
+import { useGlobal, deepClone, waitUntil } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { EMainEditor } from "./panel/e-main-editor";
 import { EditorGlobal } from "./logic/global";
@@ -126,6 +126,9 @@ export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
       return p.ui.error;
     }
     if (!p.site.id) {
+      waitUntil(() => p.site?.id).then(() => {
+        p.render();
+      });
       return <Loading note="editor-prepare" />;
     }
   }

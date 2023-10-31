@@ -8,9 +8,10 @@ import {
 import { LSite } from "../../live/logic/global";
 import { validateLayout } from "../../live/logic/layout";
 import importModule from "../tools/dynamic-import";
-import { PG } from "./global";
+import { EditorGlobal, PG } from "./global";
 import { devLoader } from "../../live/dev-loader";
 import { jscript } from "../../../utils/script/jscript";
+import { deepClone } from "web-utils";
 
 export const w = window as unknown as {
   basepath: string;
@@ -29,6 +30,7 @@ export const w = window as unknown as {
     devUrl: string;
     prodUrl: string;
   };
+  blankGlobal: typeof EditorGlobal;
 };
 
 export const initEditor = async (p: PG, site_id: string) => {
@@ -50,7 +52,10 @@ export const initEditor = async (p: PG, site_id: string) => {
     jscript.init(p.render);
   }
 
-  if (!p.item) return;
+  if (!p.item) {
+    location.reload();
+    return;
+  }
 
   p.item.active = localStorage.getItem("prasi-item-active-id") || "";
   p.item.activeOriginalId = localStorage.getItem("prasi-item-active-oid") || "";
@@ -84,6 +89,7 @@ export const initEditor = async (p: PG, site_id: string) => {
     localStorage.setItem(`prasi-site-${site_id}`, JSON.stringify(site));
     return site;
   };
+
   const processSite = async (site: LSite) => {
     if (!site || (site && !site.id)) return;
     if (!w.exports) {
