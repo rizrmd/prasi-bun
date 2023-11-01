@@ -35,6 +35,11 @@ export const FieldColor: FC<{
     local.render();
   };
 
+  if (typeof local.val === "string" && local.val.length > 10) {
+    update("");
+    return null;
+  }
+
   return (
     <FieldColorPicker
       value={local.val}
