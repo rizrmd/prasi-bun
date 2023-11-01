@@ -30,6 +30,15 @@ export class Room<T extends Record<string, true | Record<string, any>>> {
     return clients;
   }
 
+  do(
+    where: Partial<T>,
+    action: (ws: ServerWebSocket<WSData>, data: Partial<T>) => void
+  ) {
+    for (const [ws, data] of this.findAll(where)) {
+      action(ws, data);
+    }
+  }
+
   private identify(client: { ws?: ServerWebSocket<WSData>; id?: string }) {
     let ws = null as ServerWebSocket<WSData> | null;
     if (client.ws) {
