@@ -26,27 +26,32 @@ if (g.mode === "dev") {
   await startDevWatcher();
 }
 
-
 /** init lmdb */
 user.conf.init();
 snapshot.init();
-
 
 await preparePrisma();
 await ensureNotRunning();
 
 if (g.db) {
-  g.db.$connect().catch((e: any) => {
-    g.log.error(`[DB ERROR]\n${e.message}`);
-  });
+  g.db
+    .$connect()
+    .catch((e: any) => {
+      g.log.error(`[DB ERROR]\n${e.message}`);
+    })
+    .then(() => {
+      g.log.info("Database connected");
+    });
 }
-
 
 await initSrv();
 await syncActionDefinition();
+g.log.info("WS Action defined");
 await generateAPIFrm();
 await prepareApiRoutes();
 await prepareAPITypes();
+g.log.info("API Prepared");
+
 await parcelBuild();
 await createServer();
 
