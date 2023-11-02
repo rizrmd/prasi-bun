@@ -5,6 +5,7 @@ import { LPage } from "./elements/l-page";
 import { LiveGlobal, Loader } from "./logic/global";
 import { initLive, w } from "./logic/init";
 import { preload, routeLive } from "./logic/route";
+import { Loading } from "../../utils/ui/loading";
 
 export const Live: FC<{
   domain_or_siteid: string;
@@ -34,6 +35,7 @@ export const Live: FC<{
       }
     }
   }
+
   const onResize = useCallback(() => {
     let newmode = p.mode;
     if (window.innerWidth < 600) newmode = "mobile";
@@ -61,6 +63,12 @@ export const Live: FC<{
 
   if (p.site.id) {
     routeLive(p, pathname);
+  }
+
+  if (!p.mode) return <Loading note="init mode" />;
+  else {
+    w.isMobile = p.mode === "mobile";
+    w.isDesktop = p.mode === "desktop";
   }
 
   if (p.status === "not-found")

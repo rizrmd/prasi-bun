@@ -10,7 +10,6 @@ import { loadSitePage } from "./editor/load-sitepage";
 import { conns, wconns } from "./entity/conn";
 import { UserConf, user } from "./entity/user";
 import { SyncType } from "./type";
-import { actstore, broadcastActivity } from "./entity/actstore";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
@@ -34,21 +33,6 @@ export const syncHandler: WebSocketHandler<WSData> = {
     if (client_id) {
       conns.delete(client_id);
       wconns.delete(ws);
-
-      for (const p of Object.values(actstore)) {
-        for (const q of Object.values(p)) {
-          for (const r of Object.values(q)) {
-            for (const s of Object.values(r)) {
-              delete s[client_id];
-            }
-          }
-        }
-      }
-      const u = user.active.find(client_id);
-      if (u) {
-        user.active.del(client_id);
-        broadcastActivity({ page_id: u.page_id, comp_id: u.comp_id });
-      }
     }
   },
   async message(ws, raw) {
@@ -94,9 +78,7 @@ export const syncHandler: WebSocketHandler<WSData> = {
           if (actionName) {
             const baseAction = (actions as any)[actionName];
             if (!baseAction) {
-              console.log(
-                `app/srv/ws/sync/actions/${actionName}.ts not found`
-              );
+              console.log(`app/srv/ws/sync/actions/${actionName}.ts not found`);
             }
             if (baseAction) {
               const action = baseAction.bind(conn);
