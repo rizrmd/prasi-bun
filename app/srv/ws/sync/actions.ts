@@ -6,7 +6,6 @@ import {
 } from "../../../web/src/render/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
-import { Activity, ActivityKind } from "./type";
 
 /* 
    WARNING:
@@ -78,11 +77,7 @@ export const SyncActions = {
       diff: Uint8Array
     ) => ({}) as { diff: Uint8Array } | void,
   },
-  activity: async (
-    target: { comp_id?: string; page_id?: string; item_id: string },
-    kind: ActivityKind,
-    activity: Activity
-  ) => {},
+  activity: async () => {},
   client: {
     info: async (client_ids: string[]) =>
       ({}) as Record<string, { id: string; username: string }>,
