@@ -66,8 +66,7 @@ export const edInitSync = (p: PG) => {
             console.log("reconnected!");
             w.offline = false;
             p.ui.syncing = true;
-
-            p.sync.activity("site", "join", params.id);
+            p.sync.activity("site", { type: "join", id: params.id });
             p.render();
           } else {
             w.offline = false;
