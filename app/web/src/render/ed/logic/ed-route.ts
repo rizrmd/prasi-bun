@@ -17,8 +17,6 @@ export const edRoute = async (p: PG) => {
       p.site = site;
     }
 
-    console.log(w.offline)
-
     if (
       p.page.cur.id !== params.page_id ||
       !p.page.cur.snapshot ||
