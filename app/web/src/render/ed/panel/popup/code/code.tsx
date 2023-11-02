@@ -11,6 +11,7 @@ export const EdPopCode = () => {
       action: p.ui.popup.code.open ? "open" : "close",
       id: p.site.id,
       type: "code",
+      name: "main",
     });
   }, [p.ui.popup.code.open]);
 
