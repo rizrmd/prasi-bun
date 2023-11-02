@@ -4,9 +4,18 @@ import { activity as a } from "../entity/activity";
 export const activity: SAction["activity"] = async function (
   this: SyncConnection,
   name,
-  type,
-  id
+  act
 ) {
-  if (type === "join") a.site.room(id).join({ ws: this.ws });
-  if (type === "leave") a.site.room(id).leave({ ws: this.ws });
+  const me = { ws: this.ws };
+  if (act.type === "join") a.site.room(act.id).join(me);
+  if (act.type === "code") {
+    a.site.room(act.id).set(me, (ws, data) => {
+      if (act.action === "open") {
+        data.code = { name: act.name };
+      } else {
+        delete data.code;
+      }
+      return data;
+    });
+  }
 };
