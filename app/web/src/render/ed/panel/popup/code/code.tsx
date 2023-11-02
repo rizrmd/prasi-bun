@@ -1,12 +1,22 @@
 import { useGlobal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 import { Modal } from "../../../../../utils/ui/modal";
+import { useEffect } from "react";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
+  useEffect(() => {
+    p.sync.activity("site", {
+      action: p.ui.popup.code.open ? "open" : "close",
+      id: p.site.id,
+      type: "code",
+    });
+  }, [p.ui.popup.code.open]);
+
   return (
     <Modal
+      fade={false}
       open={p.ui.popup.code.open}
       onOpenChange={(open) => {
         if (!open) {
@@ -15,7 +25,11 @@ export const EdPopCode = () => {
         }
       }}
     >
-      <div className={cx("bg-white fixed inset-[50px] bottom-0 flex flex-col inset-0")}>
+      <div
+        className={cx(
+          "bg-white fixed inset-[50px] bottom-0 flex flex-col inset-0"
+        )}
+      >
         <div className="border-b flex h-[40px] items-stretch">
           <div
             className={cx(

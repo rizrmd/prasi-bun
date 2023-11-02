@@ -18,6 +18,7 @@ interface ModalOptions {
   initialOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  fade?: boolean;
 }
 
 export function useModal({
@@ -97,7 +98,7 @@ export function Modal({
   const dialog = useModal(options);
   return (
     <ModalContext.Provider value={dialog}>
-      <ModalContent className={cx("modal", "outline-none")}>
+      <ModalContent fade={options.fade} className={cx("modal", "outline-none")}>
         {children}
       </ModalContent>
     </ModalContext.Provider>
@@ -143,15 +144,19 @@ export const ModalTrigger = React.forwardRef<
 
 export const ModalContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLProps<HTMLDivElement>
+  React.HTMLProps<HTMLDivElement> & { fade?: boolean }
 >(function ModalContent(props, propRef) {
   const local = useLocal({ preview: false, timeout: null as any });
   const { context: floatingContext, ...context } = useModalContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
   if (!floatingContext.open) return null;
+  const _props = { ...props };
+  if (typeof _props.fade !== "undefined") {
+    delete _props.fade;
+  }
 
-  const floatingDivProps = context.getFloatingProps(props as any);
+  const floatingDivProps = context.getFloatingProps(_props);
   return (
     <FloatingPortal>
       <FloatingOverlay
@@ -171,10 +176,12 @@ export const ModalContent = React.forwardRef<
           <div
             ref={ref}
             onPointerMove={() => {
-              clearTimeout(local.timeout);
-              if (local.preview) {
-                local.preview = false;
-                local.render();
+              if (props.fade !== false) {
+                clearTimeout(local.timeout);
+                if (local.preview) {
+                  local.preview = false;
+                  local.render();
+                }
               }
             }}
             onPointerLeave={(e) => {
@@ -182,11 +189,13 @@ export const ModalContent = React.forwardRef<
               //   return;
               // }
 
-              clearTimeout(local.timeout);
-              local.timeout = setTimeout(() => {
-                local.preview = true;
-                local.render();
-              }, 1000);
+              if (props.fade !== false) {
+                clearTimeout(local.timeout);
+                local.timeout = setTimeout(() => {
+                  local.preview = true;
+                  local.render();
+                }, 1000);
+              }
             }}
             aria-labelledby={context.labelId}
             aria-describedby={context.descriptionId}
