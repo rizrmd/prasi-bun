@@ -37,8 +37,6 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
 
     w.isEditor = false;
     w.isLayout = true;
-    w.isMobile = p.mode === "mobile";
-    w.isDesktop = p.mode === "desktop";
     w.apiHeaders = {};
 
     w.navigateOverride = (_href) => {

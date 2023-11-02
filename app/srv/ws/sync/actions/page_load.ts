@@ -7,7 +7,6 @@ import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
 import { Activity, SyncConnection, SyncType } from "../type";
-import { actstore, broadcastActivity } from "../entity/actstore";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
@@ -18,34 +17,6 @@ export const page_load: SAction["page"]["load"] = async function (
 
   const conf = this.conf;
   if (!conf) return undefined;
-
-  if (!actstore.page[id]) {
-    actstore.page[id] = {
-      load: {
-        root: {
-          [this.client_id]: Activity.Open,
-        },
-      },
-    };
-  } else {
-    const load = actstore.page[id]["load"];
-    if (load && load.root) {
-      load.root[this.client_id] = Activity.Open;
-    }
-  }
-  if (conf.page_id !== id && actstore.page[conf.page_id]) {
-    const load = actstore.page[conf.page_id]["load"];
-    if (load && load.root) {
-      delete load.root[this.client_id];
-    }
-
-    broadcastActivity(
-      {
-        page_id: conf.page_id,
-      },
-      [this.client_id]
-    );
-  }
 
   conf.page_id = id;
 
@@ -120,10 +91,6 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
-      broadcastActivity({
-        page_id: id,
-      });
-
       return {
         id: id,
         url: page.url,
@@ -154,10 +121,6 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    broadcastActivity({
-      page_id: id,
-    });
-
     return {
       id: id,
       url: snap.url,
@@ -171,10 +134,6 @@ export const page_load: SAction["page"]["load"] = async function (
       user_id: this.user_id,
       site_id: snap.id_site,
       page_id: snap.id,
-    });
-
-    broadcastActivity({
-      page_id: id,
     });
 
     return {

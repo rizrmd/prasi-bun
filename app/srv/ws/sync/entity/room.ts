@@ -2,6 +2,13 @@ import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import { conns } from "./conn";
 
+export const RoomList = class<
+  T extends Record<string, true | Record<string, any>>,
+> {
+  rooms = new Map<string, Room<T>>();
+  constructor() {}
+};
+
 export class Room<T extends Record<string, true | Record<string, any>>> {
   name = "";
   clients = new Map<ServerWebSocket<WSData>, Partial<T>>();
@@ -30,12 +37,17 @@ export class Room<T extends Record<string, true | Record<string, any>>> {
     return clients;
   }
 
-  do(
-    where: Partial<T>,
-    action: (ws: ServerWebSocket<WSData>, data: Partial<T>) => void
+  set(
+    client: { ws?: ServerWebSocket<WSData>; id?: string },
+    action: (ws: ServerWebSocket<WSData>, data: Partial<T>) => Partial<T>
   ) {
-    for (const [ws, data] of this.findAll(where)) {
-      action(ws, data);
+    const ws = this.identify(client);
+    if (ws) {
+      const data = this.clients.get(ws);
+      if (data) {
+        const newdata = action(ws, data);
+        this.clients.set(ws, newdata);
+      }
     }
   }
 

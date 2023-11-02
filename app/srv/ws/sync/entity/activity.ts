@@ -1,5 +1,5 @@
-import { Room } from "./room";
+import { Room, RoomList } from "./room";
 
 export const activity = {
-  site: {} as Record<string, Room<{ code: { name: string } }>>,
+  site: new RoomList<{ code: { name: string } }>(),
 };
