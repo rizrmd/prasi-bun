@@ -6,6 +6,7 @@ import {
 } from "../../../web/src/render/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
+import { activity } from "./entity/activity";
 
 /* 
    WARNING:
@@ -77,7 +78,7 @@ export const SyncActions = {
       diff: Uint8Array
     ) => ({}) as { diff: Uint8Array } | void,
   },
-  activity: async () => {},
+  activity: async (name: "site", type: "join" | "leave", id: string) => {},
   client: {
     info: async (client_ids: string[]) =>
       ({}) as Record<string, { id: string; username: string }>,

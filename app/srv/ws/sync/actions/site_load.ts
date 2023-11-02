@@ -2,6 +2,7 @@ import { validate } from "uuid";
 import { ESite } from "../../../../web/src/render/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { SyncConnection } from "../type";
+import { activity } from "../entity/activity";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -16,6 +17,8 @@ export const site_load: SAction["site"]["load"] = async function (
         typeof site.config === "object" && site.config
           ? { api_url: (site.config as any).api_url || "" }
           : { api_url: "" };
+
+      activity.site.room(site.id).join({ ws: this.ws });
 
       return {
         id: site.id,

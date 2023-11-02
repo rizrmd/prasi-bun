@@ -1,7 +1,7 @@
 import { compress, decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
-import { Activity } from "../../../../../srv/ws/sync/type";
+import { w } from "../../../utils/types/general";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {
@@ -16,6 +16,8 @@ export const edRoute = async (p: PG) => {
 
       p.site = site;
     }
+
+    console.log(w.offline)
 
     if (
       p.page.cur.id !== params.page_id ||

@@ -10,6 +10,7 @@ import { loadSitePage } from "./editor/load-sitepage";
 import { conns, wconns } from "./entity/conn";
 import { UserConf, user } from "./entity/user";
 import { SyncType } from "./type";
+import { activity } from "./entity/activity";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
@@ -33,6 +34,8 @@ export const syncHandler: WebSocketHandler<WSData> = {
     if (client_id) {
       conns.delete(client_id);
       wconns.delete(ws);
+
+      activity.site.disconnect(ws);
     }
   },
   async message(ws, raw) {
