@@ -1,19 +1,54 @@
 import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../pkgs/core/server/create";
-import { conns } from "./conn";
+import { conns, wconns } from "./conn";
+import { sendWS } from "../sync-handler";
+import { SyncType } from "../type";
 
-export const RoomList = class<
-  T extends Record<string, true | Record<string, any>>,
-> {
+export const RoomList = class<T extends Record<string, any>> {
   rooms = new Map<string, Room<T>>();
-  constructor() {}
+  name = "";
+  constructor(name: string) {
+    this.name = name;
+  }
+  joined(ws: ServerWebSocket<WSData>) {
+    const rooms = new Set<Room<T>>();
+    this.rooms.forEach((room) => {
+      room.clients.forEach((_, roomws) => {
+        if (roomws === ws) {
+          rooms.add(room);
+        }
+      });
+    });
+    return rooms;
+  }
+  disconnect(ws: ServerWebSocket<WSData>) {
+    this.rooms.forEach((room) => {
+      room.clients.forEach((_, roomws) => {
+        if (roomws === ws) {
+          room.clients.delete(ws);
+          room.broadcastState("leave");
+        }
+      });
+    });
+  }
+  room(id: string) {
+    let room = this.rooms.get(id);
+    if (!room) {
+      this.rooms.set(id, new Room<T>(this.name));
+      room = this.rooms.get(id);
+    }
+
+    return room as Room<T>;
+  }
 };
 
-export class Room<T extends Record<string, true | Record<string, any>>> {
+export class Room<T extends Record<string, any>> {
   name = "";
   clients = new Map<ServerWebSocket<WSData>, Partial<T>>();
 
-  constructor() {}
+  constructor(name: string) {
+    this.name = name;
+  }
 
   findAll(where: Partial<T>) {
     const clients = new Map<ServerWebSocket<WSData>, Partial<T>>();
@@ -67,12 +102,45 @@ export class Room<T extends Record<string, true | Record<string, any>>> {
     if (ws) {
       this.clients.set(ws, {});
     }
+
+    this.broadcastState("join", ws);
   }
+
+  broadcastState = (
+    event_name: string,
+    triggeredBy?: ServerWebSocket<WSData> | null
+  ) => {
+    const clients: any = [];
+    this.clients.forEach((data, ws) => {
+      const client_id = wconns.get(ws);
+      if (client_id) {
+        const client = conns.get(client_id);
+        if (client)
+          clients.push({
+            user: {
+              client_id,
+              user_id: client.user?.id,
+              username: client.user?.username,
+            },
+            data,
+          });
+      }
+    });
+
+    this.clients.forEach((data, ws) => {
+      sendWS(ws, {
+        type: SyncType.Event,
+        event: `${this.name}_${event_name}`,
+        data: { clients },
+      });
+    });
+  };
 
   leave(client: { ws?: ServerWebSocket<WSData>; id?: string }) {
     const ws = this.identify(client);
     if (ws) {
       this.clients.delete(ws);
     }
+    this.broadcastState("leave", ws);
   }
 }

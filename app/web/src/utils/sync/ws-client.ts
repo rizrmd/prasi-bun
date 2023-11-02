@@ -9,7 +9,7 @@ import {
   SyncActionPaths,
 } from "../../../../srv/ws/sync/actions-def";
 import { UserConf } from "../../../../srv/ws/sync/entity/user";
-import { ActivityList, SyncType } from "../../../../srv/ws/sync/type";
+import { SyncType } from "../../../../srv/ws/sync/type";
 import { ESite } from "../../render/ed/logic/ed-global";
 import { w } from "../types/general";
 import { initIDB } from "./idb";
@@ -76,7 +76,6 @@ export const clientStartSync = async (arg: {
   page_id?: string;
   events: {
     editor_start: (arg: UserConf) => void;
-    site_loaded: (arg: { site: ESite }) => void;
     remote_svlocal: (arg: {
       type: "page" | "comp";
       id: string;
@@ -90,10 +89,6 @@ export const clientStartSync = async (arg: {
         }
       >
     ) => void;
-    activity: (arg: {
-      page: Record<string, ActivityList>;
-      comp: Record<string, ActivityList>;
-    }) => void;
     disconnected: () => { reconnect: boolean };
     opened: () => void;
     shakehand: (client_id: string) => void;

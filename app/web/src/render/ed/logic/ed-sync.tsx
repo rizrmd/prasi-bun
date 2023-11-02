@@ -66,6 +66,8 @@ export const edInitSync = (p: PG) => {
             console.log("reconnected!");
             w.offline = false;
             p.ui.syncing = true;
+
+            p.sync.activity("site", "join", params.id);
             p.render();
           } else {
             w.offline = false;
@@ -82,10 +84,6 @@ export const edInitSync = (p: PG) => {
           return {
             reconnect: true,
           };
-        },
-        activity(e) {
-          p.activity = e;
-          p.render();
         },
         async editor_start(e) {
           if (p.ui.syncing) {
@@ -106,10 +104,6 @@ export const edInitSync = (p: PG) => {
             p.page.cur.id = e.page_id;
             p.render();
           }
-        },
-        site_loaded({ site }) {
-          p.site = site;
-          p.render();
         },
         site_updated(site) {
           for (const [k, v] of Object.entries(site)) {
