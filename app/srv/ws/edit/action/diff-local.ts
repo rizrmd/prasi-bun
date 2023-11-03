@@ -1,4 +1,3 @@
-import * as Y from "yjs";
 import { eg } from "../edit-global";
 
 export const diffLocal = (ws: any, msg: any) => {

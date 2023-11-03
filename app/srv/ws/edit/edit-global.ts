@@ -1,6 +1,5 @@
 import { ServerWebSocket } from "bun";
 import { component } from "dbgen";
-import { UndoManager } from "yjs";
 import { TypedArray, TypedDoc, TypedMap } from "yjs-types";
 import type { WSData } from "../../../../pkgs/core/server/create";
 
@@ -18,7 +17,7 @@ export type SingleComp = {
   doc: TypedDoc<{
     map: TypedMap<component & { content_tree: TypedMap<IItem> }>;
   }>;
-  undoManager: UndoManager;
+  undoManager: Y.UndoManager;
   saveTimeout?: ReturnType<typeof setTimeout>;
   ws: Set<ServerWebSocket<WSData>>;
 };
@@ -49,7 +48,7 @@ export const eg = global as unknown as {
             Site & { page: TypedArray<ArrayElement<Site["page"]>> }
           >;
         }>;
-        undoManager: UndoManager;
+        undoManager: Y.UndoManager;
         saveTimeout?: ReturnType<typeof setTimeout>;
         ws: Set<ServerWebSocket<WSData>>;
       }
@@ -60,7 +59,7 @@ export const eg = global as unknown as {
       {
         id: string;
         doc: MPage;
-        undoManager: UndoManager;
+        undoManager: Y.UndoManager;
         saveTimeout?: ReturnType<typeof setTimeout>;
         ws: Set<ServerWebSocket<WSData>>;
       }

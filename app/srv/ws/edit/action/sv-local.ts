@@ -1,4 +1,3 @@
-import * as Y from "yjs";
 import {
   WS_MSG_SVDIFF_REMOTE,
   WS_MSG_SV_LOCAL,

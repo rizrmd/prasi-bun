@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --silent --watch ./pkgs/core/index.ts dev",
+    "dev": "bun run --hot --silent ./pkgs/core/index.ts dev",
     "clean": "rm -rf data && rm -rf app/static && rm -rf app/web/.parcel-cache",
     "build": "bun run --silent ./pkgs/core/build.ts",
     "db-pull": "bun run ./pkgs/core/db-pull.ts",

@@ -1,6 +1,5 @@
 import { page, site } from "dbgen";
 import { validate as isValidUUID } from "uuid";
-import * as Y from "yjs";
 
 export type SiteConfig = {
   api_url?: string;

@@ -11,7 +11,6 @@ import { redo, undo } from "./edit/action/undo-redo";
 import { eg } from "./edit/edit-global";
 import { sendWS } from "./edit/send";
 import { syncHandler } from "./sync/sync-handler";
-import * as Y from "yjs";
 
 (globalThis as any).Y = Y;
 eg.edit = {

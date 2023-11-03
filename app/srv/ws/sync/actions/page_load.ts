@@ -6,14 +6,14 @@ import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
-import { Activity, SyncConnection, SyncType } from "../type";
+import { SyncConnection, SyncType } from "../type";
 
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
   id: string
 ) {
   let snap = snapshot.get("page", id);
-  let ydoc = docs.page[id];
+  let ydoc = docs.page[id]; 
 
   const conf = this.conf;
   if (!conf) return undefined;
