@@ -102,7 +102,6 @@ export class Room<T extends Record<string, any>> {
     const ws = this.identify(client);
     if (ws) {
       this.clients.set(ws, {});
-      console.log("join", this.name, this.id, wconns.get(ws));
       this.broadcastState("join", ws);
     }
   }
@@ -111,7 +110,6 @@ export class Room<T extends Record<string, any>> {
     const ws = this.identify(client);
     if (ws) {
       this.clients.delete(ws);
-      console.log("leave", this.name, this.id, wconns.get(ws));
       this.broadcastState("leave", ws);
     }
   }

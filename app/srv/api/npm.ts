@@ -12,7 +12,6 @@ export const _ = {
     const { req, res, mode: _mode } = apiContext(this);
     let path = dir.path(`${g.datadir}/npm/${mode}/${id}/${req.params._}`);
 
-
     const contentType = mime.lookup(path);
     if (contentType) res.setHeader("content-type", contentType);
 
