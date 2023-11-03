@@ -2,8 +2,9 @@ import { Server, Subprocess } from "bun";
 import { Logger } from "pino";
 import { RadixRouter } from "radix3";
 import { PrismaClient } from "../../../app/db/db";
+import type * as Y from "yjs";
 
-type SingleRoute = {
+type SingleRoute = { 
   url: string;
   args: string[];
   fn: (...arg: any[]) => Promise<any>;
@@ -27,4 +28,6 @@ export const g = global as unknown as {
     etag: string;
   };
   parcel: Subprocess;
+  apiPrepared: boolean;
+  Y: typeof Y;
 };

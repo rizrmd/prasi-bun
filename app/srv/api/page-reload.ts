@@ -1,5 +1,4 @@
 import { syncronize } from "y-pojo";
-import * as Y from "yjs";
 import { MPage } from "../../web/src/utils/types/general";
 import { WS_MSG_SET_PAGE, WS_MSG_SV_LOCAL } from "../../web/src/utils/types/ws";
 import { eg } from "../ws/edit/edit-global";

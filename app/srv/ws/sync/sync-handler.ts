@@ -32,10 +32,9 @@ export const syncHandler: WebSocketHandler<WSData> = {
   close(ws) {
     const client_id = wconns.get(ws);
     if (client_id) {
+      activity.site.disconnect(ws);
       conns.delete(client_id);
       wconns.delete(ws);
-
-      activity.site.disconnect(ws);
     }
   },
   async message(ws, raw) {

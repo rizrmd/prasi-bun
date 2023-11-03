@@ -1,10 +1,10 @@
-import { WebSocketHandler, gzipSync } from "bun";
+import { WebSocketHandler } from "bun";
+import { lookup } from "mime-types";
 import { createRouter } from "radix3";
 import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
-import { lookup } from "mime-types";
 
 export const cache = {
   static: {} as Record<
@@ -64,7 +64,6 @@ export const createServer = async () => {
     } as WebSocketHandler<WSData>,
     async fetch(req, server) {
       const url = new URL(req.url);
-
       const response = async () => {
         if (wsHandler[url.pathname]) {
           if (

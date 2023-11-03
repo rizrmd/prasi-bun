@@ -20,13 +20,12 @@ export const RoomList = class<T extends Record<string, any>> {
       });
     });
     return rooms;
-  }
+  } 
   disconnect(ws: ServerWebSocket<WSData>) {
     this.rooms.forEach((room) => {
       room.clients.forEach((_, roomws) => {
         if (roomws === ws) {
-          room.clients.delete(ws);
-          room.broadcastState("leave");
+          room.leave({ ws });
         }
       });
     });
@@ -34,7 +33,7 @@ export const RoomList = class<T extends Record<string, any>> {
   room(id: string) {
     let room = this.rooms.get(id);
     if (!room) {
-      this.rooms.set(id, new Room<T>(this.name));
+      this.rooms.set(id, new Room<T>(this.name, id));
       room = this.rooms.get(id);
     }
 
@@ -44,10 +43,12 @@ export const RoomList = class<T extends Record<string, any>> {
 
 export class Room<T extends Record<string, any>> {
   name = "";
+  id = "";
   clients = new Map<ServerWebSocket<WSData>, Partial<T>>();
 
-  constructor(name: string) {
+  constructor(name: string, id: string) {
     this.name = name;
+    this.id = id;
   }
 
   findAll(where: Partial<T>) {
@@ -101,9 +102,18 @@ export class Room<T extends Record<string, any>> {
     const ws = this.identify(client);
     if (ws) {
       this.clients.set(ws, {});
+      console.log("join", this.name, this.id, wconns.get(ws));
+      this.broadcastState("join", ws);
     }
+  }
 
-    this.broadcastState("join", ws);
+  leave(client: { ws?: ServerWebSocket<WSData>; id?: string }) {
+    const ws = this.identify(client);
+    if (ws) {
+      this.clients.delete(ws);
+      console.log("leave", this.name, this.id, wconns.get(ws));
+      this.broadcastState("leave", ws);
+    }
   }
 
   broadcastState = (
@@ -130,17 +140,9 @@ export class Room<T extends Record<string, any>> {
     this.clients.forEach((data, ws) => {
       sendWS(ws, {
         type: SyncType.Event,
-        event: `${this.name}_${event_name}`,
+        event: `${this.id}_${event_name}`,
         data: { clients },
       });
     });
   };
-
-  leave(client: { ws?: ServerWebSocket<WSData>; id?: string }) {
-    const ws = this.identify(client);
-    if (ws) {
-      this.clients.delete(ws);
-    }
-    this.broadcastState("leave", ws);
-  }
 }

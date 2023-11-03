@@ -1,7 +1,6 @@
 import { ServerWebSocket } from "bun";
 import { validate } from "uuid";
 import { syncronize } from "y-pojo";
-import * as Y from "yjs";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import { MPage } from "../../../../web/src/utils/types/general";
 import {
@@ -10,8 +9,8 @@ import {
   WS_MSG_SV_LOCAL,
 } from "../../../../web/src/utils/types/ws";
 import { eg } from "../edit-global";
-import { loadPage } from "../tools/load-page";
 import { sendWS } from "../send";
+import { loadPage } from "../tools/load-page";
 
 export const getPage = async (
   ws: ServerWebSocket<WSData>,

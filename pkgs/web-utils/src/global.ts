@@ -1,6 +1,6 @@
 import goober from "goober";
 import type { PrismaClient } from "../../../app/db/db";
-import * as Yjs from "yjs";
+
 declare global {
   const navigate: (path: string) => void;
   const params: any;
@@ -10,6 +10,5 @@ declare global {
   const db: PrismaClient;
   const prasiContext: any;
   const serverurl: string;
-  const Y: typeof Yjs;
 }
 export {};

@@ -1,6 +1,6 @@
 import { dir } from "dir";
+import { readAsync, writeAsync } from "fs-jetpack";
 import { SyncActions } from "../../../app/srv/ws/sync/actions";
-import { existsAsync, readAsync, writeAsync } from "fs-jetpack";
 
 export const syncActionDefinition = async () => {
   const def: any = {};

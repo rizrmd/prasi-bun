@@ -1,6 +1,10 @@
 import { site, user } from "dbgen";
 import { ExecaChildProcess } from "execa";
 
+declare global {
+  const Y: typeof Y;
+}
+
 export const glb = global as unknown as {
   lastUpdate: Record<string, number>;
   prasiSrv: {
