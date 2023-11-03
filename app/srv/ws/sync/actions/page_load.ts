@@ -1,7 +1,6 @@
-import { syncronize } from "y-pojo";
 import { SAction } from "../actions";
 import { conns } from "../entity/conn";
-import { Y, docs } from "../entity/docs";
+import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
@@ -13,7 +12,7 @@ export const page_load: SAction["page"]["load"] = async function (
   id: string
 ) {
   let snap = snapshot.get("page", id);
-  let ydoc = docs.page[id]; 
+  let ydoc = docs.page[id];
 
   const conf = this.conf;
   if (!conf) return undefined;

@@ -1,6 +1,5 @@
 import { ServerWebSocket } from "bun";
 import { validate } from "uuid";
-import { syncronize } from "y-pojo";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import { MPage } from "../../../../web/src/utils/types/general";
 import {
@@ -56,5 +55,5 @@ export const getPage = async (
     type: "set_page",
     changes: Y.encodeStateAsUpdate(page.doc as any).toString(),
   };
-  sendWS(ws,JSON.stringify(sent));
+  sendWS(ws, JSON.stringify(sent));
 };

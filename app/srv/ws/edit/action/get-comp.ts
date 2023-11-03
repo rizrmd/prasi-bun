@@ -1,6 +1,5 @@
 import { ServerWebSocket } from "bun";
 import { validate } from "uuid";
-import { syncronize } from "y-pojo";
 import { WSData } from "../../../../../pkgs/core/server/create";
 import {
   WS_MSG_GET_COMP,

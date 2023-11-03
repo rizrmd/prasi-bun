@@ -1,7 +1,6 @@
-import { syncronize } from "y-pojo";
 import { SAction } from "../actions";
 import { conns } from "../entity/conn";
-import { Y, docs } from "../entity/docs";
+import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";

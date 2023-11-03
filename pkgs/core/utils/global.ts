@@ -1,10 +1,11 @@
 import { Server, Subprocess } from "bun";
 import { Logger } from "pino";
 import { RadixRouter } from "radix3";
-import { PrismaClient } from "../../../app/db/db";
+import { syncronize } from "y-pojo";
 import type * as Y from "yjs";
+import { PrismaClient } from "../../../app/db/db";
 
-type SingleRoute = { 
+type SingleRoute = {
   url: string;
   args: string[];
   fn: (...arg: any[]) => Promise<any>;
@@ -30,4 +31,5 @@ export const g = global as unknown as {
   parcel: Subprocess;
   apiPrepared: boolean;
   Y: typeof Y;
+  syncronize: typeof syncronize;
 };
