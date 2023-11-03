@@ -3,6 +3,7 @@ import { ExecaChildProcess } from "execa";
 
 declare global {
   const Y: typeof Y;
+  const syncronize: typeof Y.syncronize;
 }
 
 export const glb = global as unknown as {

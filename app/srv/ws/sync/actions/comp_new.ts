@@ -1,15 +1,13 @@
 import { TypedArray } from "yjs-types";
-import { MContent } from "../../../../web/src/utils/types/general";
-import { IItem, MItem } from "../../../../web/src/utils/types/item";
-import { SAction } from "../actions";
-import { docs } from "../entity/docs";
-import { SyncConnection } from "../type";
-import { syncronize } from "y-pojo";
+import { MItem } from "../../../../web/src/utils/types/item";
 import {
   FMComponent,
   FNComponent,
 } from "../../../../web/src/utils/types/meta-fn";
 import { MText } from "../../../../web/src/utils/types/text";
+import { SAction } from "../actions";
+import { docs } from "../entity/docs";
+import { SyncConnection } from "../type";
 
 export const comp_new: SAction["comp"]["new"] = async function (
   this: SyncConnection,

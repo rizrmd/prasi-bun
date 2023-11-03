@@ -1,4 +1,3 @@
-import { syncronize } from "y-pojo";
 import { IItem, MItem } from "../../web/src/utils/types/item";
 import { eg } from "../ws/edit/edit-global";
 

@@ -1,7 +1,6 @@
 import { WebSocketHandler } from "bun";
 import { lookup } from "mime-types";
 import { createRouter } from "radix3";
-import { wsHandler } from "../../../app/srv/ws/handler";
 import { dir } from "../utils/dir";
 import { g } from "../utils/global";
 import { serveAPI } from "./serve-api";
@@ -26,6 +25,7 @@ export const createServer = async () => {
     g.router.insert(route.url.replace(/\*/gi, "**"), route);
   }
 
+  const { wsHandler } = await import("../../../app/srv/ws/handler");
   g.server = Bun.serve({
     port: g.port,
     websocket: {

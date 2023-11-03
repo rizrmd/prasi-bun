@@ -1,7 +1,6 @@
 import { parcelBuild } from "utils/parcel";
 import { generateAPIFrm } from "./server/api-frm";
 import { prepareApiRoutes } from "./server/api-scan";
-import { createServer } from "./server/create";
 import { prepareAPITypes } from "./server/prep-api-ts";
 import { startDevWatcher } from "./utils/dev-watcher";
 import { ensureNotRunning } from "./utils/ensure";
@@ -17,6 +16,7 @@ g.status = "init";
 
 if (!g.Y) {
   g.Y = await import("yjs");
+  g.syncronize = (await import("y-pojo")).syncronize;
 
   await createLogger();
   g.api = {};
@@ -65,7 +65,7 @@ if (!g.apiPrepared) {
 if (!g.parcel) {
   await parcelBuild();
 }
- 
+
+const { createServer } = await import("./server/create");
 await createServer();
 g.status = "ready";
- 
