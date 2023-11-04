@@ -11,9 +11,9 @@ export const activity: SAction["activity"] = async function (
   if (act.type === "code") {
     a.site.room(act.id).set(me, (ws, data) => {
       if (act.action === "open") {
-        data.code = { name: act.name };
+        data.site_js = act.name;
       } else {
-        delete data.code;
+        delete data.site_js;
       }
       return data;
     });

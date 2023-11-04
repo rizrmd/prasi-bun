@@ -1,6 +1,6 @@
 import { compress, decompress } from "wasm-gzip";
 import { deepClone } from "web-utils";
-import { Y } from "../../../../../srv/ws/sync/entity/docs";
+import * as Y from "yjs";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";

@@ -4,7 +4,7 @@ import { conns, wconns } from "./conn";
 import { sendWS } from "../sync-handler";
 import { SyncType } from "../type";
 
-export const RoomList = class<T extends Record<string, any>> {
+export const RoomList = class<T extends Record<string, string>> {
   rooms = new Map<string, Room<T>>();
   name = "";
   constructor(name: string) {
@@ -20,7 +20,7 @@ export const RoomList = class<T extends Record<string, any>> {
       });
     });
     return rooms;
-  } 
+  }
   disconnect(ws: ServerWebSocket<WSData>) {
     this.rooms.forEach((room) => {
       room.clients.forEach((_, roomws) => {
@@ -30,6 +30,20 @@ export const RoomList = class<T extends Record<string, any>> {
       });
     });
   }
+
+  set(
+    id: string,
+    ws: ServerWebSocket<WSData>,
+    fn: (data: Partial<T>) => Partial<T>
+  ) {
+    const room = this.room(id);
+    if (room) {
+      room.set({ ws }, (ws, data) => {
+        return fn(data);
+      });
+    }
+  }
+
   room(id: string) {
     let room = this.rooms.get(id);
     if (!room) {
@@ -56,16 +70,9 @@ export class Room<T extends Record<string, any>> {
     for (const [ws, data] of this.clients) {
       let match = true;
       for (const key in where) {
-        if (where[key] === true) {
-          if (!data[key]) {
-            match = false;
-            break;
-          }
-        } else {
-          if (data[key] !== where[key]) {
-            match = false;
-            break;
-          }
+        if (data[key] !== where[key]) {
+          match = false;
+          break;
         }
       }
       if (match) clients.set(ws, data);
@@ -122,6 +129,8 @@ export class Room<T extends Record<string, any>> {
     this.clients.forEach((data, ws) => {
       const client_id = wconns.get(ws);
       if (client_id) {
+        console.log(event_name, client_id, data);
+
         const client = conns.get(client_id);
         if (client)
           clients.push({
@@ -135,7 +144,7 @@ export class Room<T extends Record<string, any>> {
       }
     });
 
-    this.clients.forEach((data, ws) => {
+    this.clients.forEach((_, ws) => {
       sendWS(ws, {
         type: SyncType.Event,
         event: `${this.id}_${event_name}`,
