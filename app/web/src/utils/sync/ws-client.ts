@@ -75,6 +75,18 @@ export const clientStartSync = async (arg: {
   site_id?: string;
   page_id?: string;
   events: {
+    activity: (arg: {
+      activity: string;
+      room_id: string;
+      clients: {
+        user: {
+          client_id: string;
+          user_id: string;
+          username: string;
+        };
+        data: any;
+      }[];
+    }) => void;
     editor_start: (arg: UserConf) => void;
     remote_svlocal: (arg: {
       type: "page" | "comp";
