@@ -61,6 +61,9 @@ export const edInitSync = (p: PG) => {
       site_id: params.site_id,
       page_id: params.page_id,
       events: {
+        activity(arg) {
+          console.log(arg);
+        },
         opened() {
           if (w.offline) {
             console.log("reconnected!");

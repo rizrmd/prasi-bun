@@ -41,6 +41,8 @@ export const RoomList = class<T extends Record<string, string>> {
       room.set({ ws }, (ws, data) => {
         return fn(data);
       });
+
+      room.broadcastState("set", ws);
     }
   }
 
@@ -147,8 +149,8 @@ export class Room<T extends Record<string, any>> {
     this.clients.forEach((_, ws) => {
       sendWS(ws, {
         type: SyncType.Event,
-        event: `${this.id}_${event_name}`,
-        data: { clients },
+        event: `activity`,
+        data: { activity: event_name, room_id: this.id, clients },
       });
     });
   };
