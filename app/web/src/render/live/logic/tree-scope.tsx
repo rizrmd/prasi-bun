@@ -1,9 +1,10 @@
-import { FC, ReactNode, Suspense, useEffect } from "react";
+import { FC, ReactNode, Suspense, useEffect, useState } from "react";
 import { deepClone } from "web-utils";
 import { createAPI, createDB } from "../../../utils/script/init-api";
 import { ErrorBox } from "../../editor/elements/e-error";
 import { ItemMeta, PG } from "./global";
 import { extractNavigate, preload } from "./route";
+import hash_sum from "hash-sum";
 
 export const JS_DEBUG = false;
 
@@ -23,8 +24,12 @@ export const treeScopeEval = (
   let args = {};
   try {
     if (!meta.memoize) {
-      meta.memoize = {
-        Local: createLocal(p, id),
+      meta.memoize = {};
+    }
+    const memoizeKey = hash_sum(_scopeIndex) || "default";
+    if (!meta.memoize[memoizeKey]) {
+      meta.memoize[memoizeKey] = {
+        Local: createLocal(p, id, _scopeIndex),
         PassProp: createPassProp(p, id, _scopeIndex),
       };
     }
@@ -59,20 +64,11 @@ export const treeScopeEval = (
       }
     }
 
-    if (
-      meta.item.name === "label" &&
-      p.treeMeta[meta.parent_id].item.name === "tree_lv_2" &&
-      !finalScope.lv2_item
-    ) {
-      const parent = p.treeMeta[meta.parent_id];
-      console.log("final_scope", meta, p.treeMeta[parent.parent_id]);
-    }
-
     const output = { jsx: null as any };
     args = {
       ...w.exports,
       ...finalScope,
-      ...meta.memoize,
+      ...meta.memoize[memoizeKey],
       db: p.script.db,
       api: p.script.api,
       children,
@@ -137,8 +133,10 @@ export const mergeScopeUpwards = (
     let scope = null;
 
     let indexedScope = null;
+
     if (cur.indexedScope && opt?._scopeIndex) {
       const idx = opt._scopeIndex[cur.item.id];
+
       if (typeof idx !== "undefined" && cur.indexedScope[idx]) {
         indexedScope = cur.indexedScope[idx];
       }
@@ -159,7 +157,6 @@ export const mergeScopeUpwards = (
 
     cur = p.treeMeta[cur.parent_id];
   }
-
 
   return finalScope;
 };
@@ -226,9 +223,14 @@ const createPassProp = (
 const cachedLocal = {} as Record<string, Record<string, any>>;
 const cachedPath = {} as Record<string, Record<string, any>>;
 const cachedLayout = {} as Record<string, true>;
-const createLocal = (p: PG, id: string) => {
+const createLocal = (
+  p: PG,
+  id: string,
+  _existingScopeIndex?: Record<string, any>
+) => {
   const Local = ({
     name,
+    idx: local_id,
     value,
     effect,
     children,
@@ -238,6 +240,7 @@ const createLocal = (p: PG, id: string) => {
   }: {
     name: string;
     value: any;
+    idx?: string;
     effect?: (value: any) => void | Promise<void>;
     children: ReactNode;
     hook?: (value: any) => void;
@@ -245,27 +248,45 @@ const createLocal = (p: PG, id: string) => {
     cache?: boolean;
   }) => {
     const meta = p.treeMeta[id];
+    const [_, set] = useState({});
 
-    if (!meta.scope) {
-      meta.scope = {};
+    let scope = null as any;
+    if (!local_id) {
+      if (!meta.scope) {
+        meta.scope = {};
+      }
+      scope = meta.scope;
+    } else {
+      if (!meta.indexedScope) {
+        meta.indexedScope = {};
+      }
+      if (!meta.indexedScope[local_id]) meta.indexedScope[local_id] = {};
+      scope = meta.indexedScope[local_id];
     }
+
+    const render = () => {
+      if (!local_id) {
+        if (meta.render) meta.render();
+        else p.render();
+      } else {
+        set({});
+      }
+    };
+
     const genScope = () => {
       try {
         const nval = deepClone(value);
-        const render = () => {
-          if (meta.render) meta.render();
-          else p.render();
-        };
-        if (!meta.scope[name]) {
-          meta.scope[name] = {
+
+        if (!scope[name]) {
+          scope[name] = {
             ...nval,
             render,
           };
         } else {
           for (const [k, v] of Object.entries(nval)) {
-            meta.scope[name][k] = v;
+            scope[name][k] = v;
           }
-          meta.scope[name].render = render;
+          scope[name].render = render;
         }
       } catch (e) {
         console.warn(e);
@@ -273,16 +294,13 @@ const createLocal = (p: PG, id: string) => {
     };
 
     let page_id = p.page?.id || "";
-    const itemid = meta.item.id;
+    const itemid = meta.item.id + (local_id ? `_${local_id}` : "");
 
     if (meta.isLayout) {
       page_id = "layout";
       if (cachedLayout[meta.item.id]) {
-        meta.scope[name] = cachedLocal[page_id][itemid];
-        meta.scope[name].render = () => {
-          if (meta.render) meta.render();
-          else p.render();
-        };
+        scope[name] = cachedLocal[page_id][itemid];
+        scope[name].render = render;
       }
     }
 
@@ -301,31 +319,25 @@ const createLocal = (p: PG, id: string) => {
           if (cachedPath[page_id][itemid] !== location.href) {
             cachedPath[page_id][itemid] = location.href;
             genScope();
-            cachedLocal[page_id][itemid] = meta.scope[name];
+            cachedLocal[page_id][itemid] = scope[name];
           } else {
-            meta.scope[name] = cachedLocal[page_id][itemid];
-            meta.scope[name].render = () => {
-              if (meta.render) meta.render();
-              else p.render();
-            };
+            scope[name] = cachedLocal[page_id][itemid];
+            scope[name].render = render;
           }
         } else {
-          meta.scope[name] = cachedLocal[page_id][itemid];
-          meta.scope[name].render = () => {
-            if (meta.render) meta.render();
-            else p.render();
-          };
+          scope[name] = cachedLocal[page_id][itemid];
+          scope[name].render = render;
         }
       } else {
         genScope();
-        cachedLocal[page_id][itemid] = meta.scope[name];
+        cachedLocal[page_id][itemid] = scope[name];
         cachedPath[page_id][itemid] = location.href;
       }
     }
 
     if (typeof hook === "function") {
       try {
-        hook(meta.scope[name]);
+        hook(scope[name]);
       } catch (e) {
         console.warn(e);
       }
@@ -340,13 +352,17 @@ const createLocal = (p: PG, id: string) => {
           cachedLayout[meta.item.id] = true;
         }
         try {
-          effect(meta.scope[name]);
+          effect(scope[name]);
         } catch (e) {
           console.warn(e);
         }
       }
     }, [...(deps || []), location.href]);
 
+    if (local_id) {
+      const scopeIndex = { ..._existingScopeIndex, [meta.item.id]: local_id };
+      return modifyChildIndex(children, scopeIndex);
+    }
     return children;
   };
 

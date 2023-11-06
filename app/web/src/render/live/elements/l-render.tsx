@@ -94,7 +94,7 @@ export const LRenderInternal: FC<{
 
     let props = {} as Record<string, FNCompDef>;
     let cprops = {} as [string, FNCompDef][];
-    
+
     props = deepClone(
       p.comps.all[meta.comp.id]?.content_tree.component?.props || {}
     );
@@ -207,10 +207,11 @@ export const LRenderInternal: FC<{
 
   return (
     <div className={className}>
-      {/* <pre className={"text-[9px] font-mono text-black"}>
-        {item.id}-{item.name}
-        {item.name === "coba" && JSON.stringify(item.childs)}
-      </pre> */}
+      {/* {isComponent && (
+        <pre className={"text-[9px] font-mono text-black"}>
+          {item.id}-{item.name}
+        </pre>
+      )} */}
       {_children}
     </div>
   );

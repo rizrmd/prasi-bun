@@ -21,10 +21,10 @@ export type ItemMeta = {
   className?: string;
   parent_id: string;
   parent_comp?: WithRequired<ItemMeta, "comp"> & { item: IItem };
-  memoize?: {
+  memoize?: Record<string, {
     Local: FC<any>;
     PassProp: FC<any>;
-  };
+  }>;
   isLayout: boolean;
   render?: () => void;
   mounted?: boolean;
