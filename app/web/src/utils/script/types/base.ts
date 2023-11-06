@@ -59,6 +59,7 @@ type ITEM = {
 const newElement: (gen?: (item: ITEM) => ITEM | ITEM[]) => React.ReactNode;
 const Local: <T extends Record<string, any>>(arg: {
   name: string;
+  idx?: any;
   value: T;
   children: ((local: T & { render: () => void }) => any);
   deps?: any[];

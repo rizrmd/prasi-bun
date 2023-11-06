@@ -16,6 +16,7 @@ export const treePropEval = (
   _scopeIndex?: Record<string, string>
 ) => {
   const meta = p.treeMeta[id];
+
   if (meta.item.type === "item" && meta.item.component) {
     if (p.site.api_url) {
       if (!p.script.db) p.script.db = createDB(p.site.api_url);

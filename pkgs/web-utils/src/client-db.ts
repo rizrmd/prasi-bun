@@ -78,8 +78,10 @@ export const dbClient = (name: string, dburl?: string) => {
   );
 };
 
-const cachedQueryResult: Record<string, { timestamp: number; result: any }> =
-  {};
+const cachedQueryResult: Record<
+  string,
+  { timestamp: number; result: any; promise: Promise<any> }
+> = {};
 
 export const fetchSendDb = async (
   name: string,
@@ -119,13 +121,14 @@ export const fetchSendDb = async (
   if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
     cachedQueryResult[hsum] = {
       timestamp: Date.now(),
+      promise: frm.send(url, params, w.apiHeaders),
       result: null,
     };
 
-    const result = await frm.send(url, params, w.apiHeaders);
+    const result = await cachedQueryResult[hsum].promise;
     cachedQueryResult[hsum].result = result;
     return result;
   }
 
-  return cached.result;
+  return await cached.promise;
 };

@@ -60,6 +60,7 @@ const newElement: (gen?: (item: ITEM) => ITEM | ITEM[]) => React.ReactNode;
 const Local: <T extends Record<string, any>>(arg: {
   name: string;
   value: T;
+  idx?: any;
   children: ((local: T & { render: () => void }) => any);
   deps?: any[];
   effect?: (
