@@ -25,6 +25,7 @@ export const edInitSync = (p: PG) => {
     if (params.site_id !== p.site.id) {
       p.site = deepClone(EmptySite);
       p.site.id = "--loading--";
+      p.ui.popup.code.init = false;
       p.sync.site.load(params.site_id).then((site) => {
         if (site) {
           p.site = site;
@@ -62,14 +63,13 @@ export const edInitSync = (p: PG) => {
       page_id: params.page_id,
       events: {
         activity(arg) {
-          console.log(arg);
         },
         opened() {
           if (w.offline) {
             console.log("reconnected!");
             w.offline = false;
             p.ui.syncing = true;
-            p.sync.activity("site", { type: "join", id: params.id });
+            p.sync.activity("site", { type: "join", id: params.site_id });
             p.render();
           } else {
             w.offline = false;
