@@ -31,15 +31,15 @@ export const RoomList = class<T extends Record<string, string>> {
     });
   }
 
-  set(
+  async set(
     id: string,
     ws: ServerWebSocket<WSData>,
-    fn: (data: Partial<T>) => Partial<T>
+    fn: (data: Partial<T>) => Promise<Partial<T>>
   ) {
     const room = this.room(id);
     if (room) {
-      room.set({ ws }, (ws, data) => {
-        return fn(data);
+      await room.set({ ws }, async (ws, data) => {
+        return await fn(data);
       });
 
       room.broadcastState("set", ws);
@@ -85,15 +85,18 @@ export class Room<T extends Record<string, any>> {
     return clients;
   }
 
-  set(
+  async set(
     client: { ws?: ServerWebSocket<WSData>; id?: string },
-    action: (ws: ServerWebSocket<WSData>, data: Partial<T>) => Partial<T>
+    action: (
+      ws: ServerWebSocket<WSData>,
+      data: Partial<T>
+    ) => Promise<Partial<T>>
   ) {
     const ws = this.identify(client);
     if (ws) {
       const data = this.clients.get(ws);
       if (data) {
-        const newdata = action(ws, data);
+        const newdata = await action(ws, data);
         this.clients.set(ws, newdata);
       }
     }
