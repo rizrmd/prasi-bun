@@ -7,12 +7,15 @@ export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
   useEffect(() => {
-    p.sync.activity("site", {
-      action: p.ui.popup.code.open ? "open" : "close",
-      id: p.site.id,
-      type: "code",
-      name: "main",
-    });
+    if (p.ui.popup.code.init) {
+      p.sync.activity("site", {
+        action: p.ui.popup.code.open ? "open" : "close",
+        id: p.site.id,
+        type: "code",
+        name: "main",
+      });
+    }
+    p.ui.popup.code.init = true;
   }, [p.ui.popup.code.open]);
 
   return (

@@ -47,6 +47,9 @@ export const RoomList = class<T extends Record<string, string>> {
   }
 
   room(id: string) {
+    if (!id) {
+      throw new Error("room id is empty");
+    }
     let room = this.rooms.get(id);
     if (!room) {
       this.rooms.set(id, new Room<T>(this.name, id));
@@ -128,11 +131,11 @@ export class Room<T extends Record<string, any>> {
     triggeredBy?: ServerWebSocket<WSData> | null
   ) => {
     const clients: any = [];
+
     this.clients.forEach((data, ws) => {
       const client_id = wconns.get(ws);
-      if (client_id) {
-        console.log(event_name, client_id, data);
 
+      if (client_id) {
         const client = conns.get(client_id);
         if (client)
           clients.push({

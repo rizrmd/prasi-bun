@@ -2,7 +2,6 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { ReactElement } from "react";
 import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
-import { ActivityList } from "../../../../../srv/ws/sync/type";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
@@ -73,10 +72,6 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),
-  activity: {
-    page: {} as Record<string, ActivityList>,
-    comp: {} as Record<string, ActivityList>,
-  },
   script: { siteTypes: {} as Record<string, string> },
   page: {
     cur: EmptyPage,
@@ -116,9 +111,10 @@ export const EDGlobal = {
     },
     popup: {
       code: {
+        init: false,
         open: false,
         id: "",
-        file: "",
+        name: "",
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {

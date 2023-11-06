@@ -9,7 +9,7 @@ export const activity: SAction["activity"] = async function (
   const me = { ws: this.ws };
   if (act.type === "join") a.site.room(act.id).join(me);
   if (act.type === "code") {
-    a.site.room(act.id).set(me, (ws, data) => {
+    a.site.set(act.id, this.ws, (data) => {
       if (act.action === "open") {
         data.site_js = act.name;
       } else {
