@@ -55,8 +55,8 @@ export const page_load: SAction["page"]["load"] = async function (
     select: "" as "" | "comp" | "item" | "section" | "text",
   };
 
-  const setActivityPage = (id_site: string, id_page: string) => {
-    activity.site.set(id_site, this.ws, (data) => {
+  const setActivityPage = async (id_site: string, id_page: string) => {
+    await activity.site.set(id_site, this.ws, async (data) => {
       data.page_id = id_page;
       return data;
     });
@@ -66,7 +66,7 @@ export const page_load: SAction["page"]["load"] = async function (
     const page = await db.page.findFirst({ where: { id } });
 
     if (page) {
-      setActivityPage(page.id_site, page.id);
+      await setActivityPage(page.id_site, page.id);
 
       const doc = new Y.Doc();
       let root = doc.getMap("map");
@@ -111,7 +111,7 @@ export const page_load: SAction["page"]["load"] = async function (
   } else if (snap && !ydoc) {
     const doc = new Y.Doc();
     snapshot.set("page", id, "id_doc", doc.clientID);
-    setActivityPage(snap.id_site, id);
+    await setActivityPage(snap.id_site, id);
 
     Y.applyUpdate(doc, snap.bin);
     let root = doc.getMap("map");
@@ -140,7 +140,7 @@ export const page_load: SAction["page"]["load"] = async function (
       snapshot: await gzipAsync(snap.bin),
     };
   } else if (snap && ydoc) {
-    setActivityPage(snap.id_site, id);
+    await setActivityPage(snap.id_site, id);
 
     user.active.add({
       ...defaultActive,
