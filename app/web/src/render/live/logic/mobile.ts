@@ -21,11 +21,10 @@ export const registerMobile = () => {
           token: string;
         };
 
-        console.log("mobile receive", data);
-
         switch (data.type) {
           case "notification-token":
             config.notif_token = data.token;
+            console.log(config);
             break;
         }
       }
