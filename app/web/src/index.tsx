@@ -5,6 +5,7 @@ import "./index.css";
 import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
 import * as Y from "yjs";
+import { registerMobile } from "./render/live/logic/mobile";
 
 (window as any).Y = Y;
 
@@ -13,7 +14,13 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
-  if (!["localhost", "127.0.0.1"].includes(location.hostname)) {
+  (window as any).mobile = registerMobile();
+
+  if (
+    !["localhost", "127.0.0.1", "trycloudflare.com", "ngrok"].find((e) =>
+      location.hostname.includes(e)
+    )
+  ) {
     const sw = await registerServiceWorker();
 
     const cacheCurrentPage = () => {
