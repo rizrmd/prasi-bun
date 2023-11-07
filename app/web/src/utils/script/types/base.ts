@@ -66,7 +66,13 @@ const mobile: {
       body: string,
       data: any
     }) => void;
-    onTap: (data: {
+    onTap: (data: null |{
+      user_id: string,
+      title: string,
+      body: string,
+      data: any
+    }) => void | Promise<void>;
+    onReceive: (data: {
       user_id: string,
       title: string,
       body: string,

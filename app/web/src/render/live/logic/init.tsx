@@ -33,6 +33,7 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
     p.status = "loading";
 
     if (w.mobile && w.mobile.send) {
+      w.mobile.bind(p);
       w.mobile.send({ type: "ready" });
     }
 
@@ -48,6 +49,7 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
         if (
           location.hostname === "prasi.app" ||
           location.hostname === "prasi.web.andromedia.co.id" ||
+          location.hostname.includes("ngrok") ||
           location.hostname === "localhost" ||
           location.hostname === "127.0.0.1" ||
           location.hostname === "10.0.2.2" // android localhost

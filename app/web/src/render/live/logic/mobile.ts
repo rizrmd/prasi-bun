@@ -1,5 +1,9 @@
+import { apiClient } from "web-utils";
+import { PG } from "./global";
+import { w } from "../../../utils/script/init-api";
+
 type NOTIF_ARG = {
-  user_id: string;
+  user_id: any;
   body: string;
   title: string;
   data?: any;
@@ -10,37 +14,94 @@ export const registerMobile = () => {
       register: (user_id: string) => {},
       send: (data: NOTIF_ARG) => {},
       onTap: (data: NOTIF_ARG) => {},
+      onReceive: (data: NOTIF_ARG) => {},
     },
   };
   if (window.parent) {
-    let config = { notif_token: "" };
+    let config = { notif_token: "", p: null as null | PG };
     window.addEventListener("message", ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
-        const data = raw as unknown as {
-          type: "notification-token";
-          token: string;
-        };
+        const data = raw as unknown as
+          | {
+              type: "notification-token";
+              token: string;
+            }
+          | { type: "notification-tap"; notif: NOTIF_ARG }
+          | { type: "notification-receive"; notif: NOTIF_ARG };
 
         switch (data.type) {
           case "notification-token":
             config.notif_token = data.token;
-            console.log(config);
+            break;
+          case "notification-tap":
+            notifObject.notif.onTap(data.notif);
+            break;
+          case "notification-receive":
+            notifObject.notif.onReceive(data.notif);
             break;
         }
       }
     });
 
-    return {
+    const getP = () => {
+      const p = config.p;
+      if (p && p.site && p.site.api_url) {
+        const api = w.prasiApi[p.site.api_url];
+        if (
+          api &&
+          api.apiEntry &&
+          api.apiEntry._notif &&
+          p.script &&
+          p.script.api
+        ) {
+          return p;
+        }
+      }
+    };
+
+    const notifObject = {
       send: (msg: { type: "ready" }) => {
         window.parent.postMessage({ mobile: true, ...msg }, "*");
       },
+      bind(p: PG) {
+        config.p = p;
+      },
       config,
       notif: {
-        register: (user_id: string) => {},
-        send: (data: NOTIF_ARG) => {},
-        onTap: (data: NOTIF_ARG) => {},
+        register: async (user_id: any) => {
+          const p = getP();
+          if (p) {
+            return await p.script.api._notif("register", {
+              type: "register",
+              id: typeof user_id === "string" ? user_id : user_id.toString(),
+              token: config.notif_token,
+            });
+          }
+        },
+        send: async (data: NOTIF_ARG) => {
+          const p = getP();
+          if (p) {
+            return await p.script.api._notif("send", {
+              type: "send",
+              id:
+                typeof data.user_id === "string"
+                  ? data.user_id
+                  : data.user_id.toString(),
+              body: data.body,
+              title: data.title,
+              data: data.data,
+            });
+          }
+        },
+        onTap: (data: null | NOTIF_ARG) => {
+          console.log("ontap", data);
+        },
+        onReceive: (data: NOTIF_ARG) => {
+          console.log("onreceive", data);
+        },
       },
     };
+    return notifObject;
   }
   return {
     ...default_mobile,
