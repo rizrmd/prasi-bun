@@ -1,14 +1,11 @@
 import { createRouter } from "radix3";
 import { validate } from "uuid";
 import { type apiClient } from "web-utils";
-import {
-  createAPI,
-  createDB,
-  initApi
-} from "../../../utils/script/init-api";
+import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
 import importModule from "../../editor/tools/dynamic-import";
 import { LSite, PG } from "./global";
 import { validateLayout } from "./layout";
+import { registerMobile } from "./mobile";
 
 export const w = window as unknown as {
   basepath: string;
@@ -23,7 +20,7 @@ export const w = window as unknown as {
   apiClient: typeof apiClient;
   apiurl: string;
   preload: (path: string) => void;
-
+  mobile?: ReturnType<typeof registerMobile>;
   externalAPI: {
     mode: "dev" | "prod";
     devUrl: string;
@@ -34,6 +31,10 @@ export const w = window as unknown as {
 export const initLive = async (p: PG, domain_or_siteid: string) => {
   if (p.status === "init") {
     p.status = "loading";
+
+    if (w.mobile && w.mobile.send) {
+      w.mobile.send({ type: "ready" });
+    }
 
     w.isEditor = false;
     w.isLayout = true;

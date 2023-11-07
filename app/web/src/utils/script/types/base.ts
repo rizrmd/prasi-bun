@@ -57,6 +57,23 @@ type ITEM = {
   childs: ITEM[]
 }
 const newElement: (gen?: (item: ITEM) => ITEM | ITEM[]) => React.ReactNode;
+const mobile: {
+  notif: {
+    register: (user_id: string) => void;
+    send: (data: {
+      user_id: string,
+      title: string,
+      body: string,
+      data: any
+    }) => void;
+    onTap: (data: {
+      user_id: string,
+      title: string,
+      body: string,
+      data: any
+    }) => void | Promise<void>
+  }
+};
 const Local: <T extends Record<string, any>>(arg: {
   name: string;
   idx?: any;
