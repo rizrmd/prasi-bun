@@ -14,6 +14,7 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
+  (window as any).mobile = registerMobile();
 
   if (
     !["localhost", "127.0.0.1", "trycloudflare.com", "ngrok"].find((e) =>
