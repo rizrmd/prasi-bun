@@ -10,15 +10,48 @@ type NOTIF_ARG = {
 };
 export const registerMobile = () => {
   const default_mobile = {
+    send: () => {},
+    bind: (p: PG) => {},
     notif: {
       register: (user_id: string) => {},
-      send: (data: NOTIF_ARG) => {},
+      send: async (data: NOTIF_ARG) => {
+        const p = getP();
+        if (p) {
+          return await p.script.api._notif("send", {
+            type: "send",
+            id:
+              typeof data.user_id === "string"
+                ? data.user_id
+                : data.user_id.toString(),
+            body: data.body,
+            title: data.title,
+            data: data.data,
+          });
+        }
+      },
       onTap: (data: NOTIF_ARG) => {},
       onReceive: (data: NOTIF_ARG) => {},
     },
   };
+
+  let config = { notif_token: "", p: null as null | PG };
+  const getP = () => {
+    const p = config.p;
+    if (p && p.site && p.site.api_url) {
+      const api = w.prasiApi[p.site.api_url];
+      if (
+        api &&
+        api.apiEntry &&
+        api.apiEntry._notif &&
+        p.script &&
+        p.script.api
+      ) {
+        return p;
+      }
+    }
+  };
+
   if (window.parent) {
-    let config = { notif_token: "", p: null as null | PG };
     window.addEventListener("message", async ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
         const data = raw as unknown as
@@ -85,22 +118,6 @@ export const registerMobile = () => {
         }
       }
     });
-
-    const getP = () => {
-      const p = config.p;
-      if (p && p.site && p.site.api_url) {
-        const api = w.prasiApi[p.site.api_url];
-        if (
-          api &&
-          api.apiEntry &&
-          api.apiEntry._notif &&
-          p.script &&
-          p.script.api
-        ) {
-          return p;
-        }
-      }
-    };
 
     const notifObject = {
       send: (msg: { type: "ready" }) => {
