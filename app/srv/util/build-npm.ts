@@ -6,7 +6,6 @@ import { build } from "esbuild";
 import { $ } from "execa";
 import { dirAsync, writeAsync } from "fs-jetpack";
 import { stat } from "fs/promises";
-import { apiContext } from "service-srv";
 import { g } from "utils/global";
 import { validate } from "uuid";
 import { glb } from "../global";
