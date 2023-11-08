@@ -65,7 +65,7 @@ export const Live: FC<{
     routeLive(p, pathname);
   }
 
-  if (!p.mode) return <Loading note="init mode" />;
+  if (!p.mode) return <Loading />;
   else {
     w.isMobile = p.mode === "mobile";
     w.isDesktop = p.mode === "desktop";
