@@ -2,11 +2,17 @@ import { FC, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { GlobalContext, defineReact, defineWindow } from "web-utils";
 import { siteLoader } from "./site-loader";
+import { registerMobile } from "../live/logic/mobile";
 
 const w = window as unknown as {
   prasiContext: any;
   rootRender: any;
+  mobile: any;
 };
+
+if (!w.mobile) {
+  w.mobile = registerMobile();
+}
 
 w.prasiContext = {
   global: {},

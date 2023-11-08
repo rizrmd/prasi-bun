@@ -32,9 +32,10 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
   if (p.status === "init") {
     p.status = "loading";
 
-    w.mobile = registerMobile();
-    w.mobile.bind(p);
-    w.mobile.send({ type: "ready" });
+    if (w.mobile) {
+      w.mobile.bind(p);
+      w.mobile.send({ type: "ready" });
+    }
 
     w.isEditor = false;
     w.isLayout = true;
