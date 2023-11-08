@@ -19,7 +19,7 @@ export const registerMobile = () => {
   };
   if (window.parent) {
     let config = { notif_token: "", p: null as null | PG };
-    window.addEventListener("message", ({ data: raw }) => {
+    window.addEventListener("message", async ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
         const data = raw as unknown as
           | {
@@ -29,15 +29,58 @@ export const registerMobile = () => {
           | { type: "notification-tap"; notif: NOTIF_ARG }
           | { type: "notification-receive"; notif: NOTIF_ARG };
 
+        const waitUntil = async (fn: () => boolean) => {
+          if (!notifObject.notif.onTap) {
+            let ival = null as any;
+            let i = 0;
+            await new Promise(() => {
+              ival = setInterval(() => {
+                i++;
+                if (i > 20) {
+                  clearInterval(ival);
+                }
+                if (fn()) {
+                  clearInterval(ival);
+                }
+              }, 500);
+            });
+            return;
+          }
+        };
+
         switch (data.type) {
           case "notification-token":
             config.notif_token = data.token;
             break;
           case "notification-tap":
-            notifObject.notif.onTap(data.notif);
+            if (!notifObject.notif.onTap) {
+              waitUntil(() => {
+                if (notifObject.notif.onTap) {
+                  notifObject.notif.onTap(data.notif);
+                  return true;
+                }
+                return false;
+              });
+              return;
+            }
+
+            if (notifObject.notif.onTap) {
+              notifObject.notif.onTap(data.notif);
+            }
             break;
           case "notification-receive":
-            notifObject.notif.onReceive(data.notif);
+            if (!notifObject.notif.onReceive) {
+              waitUntil(() => {
+                if (notifObject.notif.onReceive) {
+                  notifObject.notif.onReceive(data.notif);
+                  return true;
+                }
+                return false;
+              });
+            }
+            if (notifObject.notif.onReceive) {
+              notifObject.notif.onReceive(data.notif);
+            }
             break;
         }
       }
@@ -93,12 +136,8 @@ export const registerMobile = () => {
             });
           }
         },
-        onTap: (data: null | NOTIF_ARG) => {
-          console.log("ontap", data);
-        },
-        onReceive: (data: NOTIF_ARG) => {
-          console.log("onreceive", data);
-        },
+        onTap: null as null | typeof default_mobile.notif.onTap,
+        onReceive: null as null | typeof default_mobile.notif.onReceive,
       },
     };
     return notifObject;
