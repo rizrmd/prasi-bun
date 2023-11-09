@@ -1,22 +1,36 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 import { Modal } from "../../../../../utils/ui/modal";
 import { useEffect } from "react";
+import { isLocalhost } from "../../../../../utils/ui/is-localhost";
+import { Loading } from "../../../../../utils/ui/loading";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({ id_code: "" });
 
   useEffect(() => {
-    if (p.ui.popup.code.init) {
-      p.sync.activity("site", {
-        action: p.ui.popup.code.open ? "open" : "close",
-        id: p.site.id,
-        type: "code",
-        name: "main",
-      });
-    }
-    p.ui.popup.code.init = true;
+    (async () => {
+      if (p.ui.popup.code.init) {
+        const id_code = await p.sync.activity("site", {
+          action: p.ui.popup.code.open ? "open" : "close",
+          id: p.site.id,
+          type: "code",
+          name: "main",
+        });
+
+        if (id_code) {
+          local.id_code = id_code;
+          local.render();
+        }
+      }
+      p.ui.popup.code.init = true;
+    })();
   }, [p.ui.popup.code.open]);
+
+  const vscode_url = isLocalhost()
+    ? "http://localhost:3000?"
+    : "https://code.web.andromedia.co.id?tkn=prasi&";
 
   return (
     <Modal
@@ -24,6 +38,7 @@ export const EdPopCode = () => {
       open={p.ui.popup.code.open}
       onOpenChange={(open) => {
         if (!open) {
+          console.clear();
           p.ui.popup.code.open = false;
           p.render();
         }
@@ -50,10 +65,16 @@ export const EdPopCode = () => {
             <div>Site</div>
           </div>
         </div>
-        <iframe
-          className="flex flex-1"
-          src="http://localhost:3000/?folder=/site"
-        ></iframe>
+        {!local.id_code ? (
+          <div className="flex flex-1 relative">
+            <Loading backdrop={false} />
+          </div>
+        ) : (
+          <iframe
+            className="flex flex-1"
+            src={`${vscode_url}folder=/site/code/${local.id_code}`}
+          ></iframe>
+        )}
       </div>
     </Modal>
   );
