@@ -36,7 +36,7 @@ export const hello_world = () => {
   });
 
   code = await getCode(site_id);
-  return code;
+  return code as DBCode;
 };
 
 const getCode = async (site_id: string) => {
