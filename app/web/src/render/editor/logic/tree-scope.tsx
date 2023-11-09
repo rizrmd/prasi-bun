@@ -266,7 +266,9 @@ const createLocal = (p: PG, id: string) => {
             }
           },
         };
-      } catch (e) {}
+      } catch (e) {
+        console.log("scope", e);
+      }
     }
 
     if (typeof hook === "function") {
