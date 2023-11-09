@@ -14,9 +14,9 @@ export const Code = {
 };
 
 export const startCodeWatcher = async (code: DBCode) => {
-  // if (Code.watchers[code.id]) {
-  //   return;
-  // }
+  if (Code.watchers[code.id]) {
+    return;
+  }
 
   for (const c of code.code_file) {
     const path = Code.path(c.id_code, c.path);
@@ -42,4 +42,11 @@ export const startCodeWatcher = async (code: DBCode) => {
       console.log(event, path);
     }
   );
+};
+
+export const stopCodeWatcher = async (id_code: string) => {
+  if (Code.watchers[id_code]) {
+    Code.watchers[id_code].close();
+    delete Code.watchers[id_code];
+  }
 };
