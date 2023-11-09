@@ -1,7 +1,27 @@
+import { dir } from "dir";
+import { g } from "utils/global";
+import { dirAsync } from "fs-jetpack";
 export type DBCode = Exclude<Awaited<ReturnType<typeof getCode>>, null>;
 
 export const prepCode = async (site_id: string, name: string) => {
   let code = await getCode(site_id);
+
+  const pkgfile = Bun.file(dir.path(`${g.datadir}/site/code/package.json`));
+  if (!(await pkgfile.exists())) {
+    await dirAsync(dir.path(`${g.datadir}/site/code`));
+    await Bun.write(
+      pkgfile,
+      JSON.stringify(
+        {
+          name: "code",
+          workspaces: ["./*"],
+        },
+        null,
+        2
+      )
+    );
+  }
+
   if (code) return code;
   let new_code = await db.code.create({
     data: {
