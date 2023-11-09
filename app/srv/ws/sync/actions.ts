@@ -17,10 +17,6 @@ import { activity } from "./entity/activity";
 export type SAction = typeof SyncActions;
 
 export const SyncActions = {
-  code: {
-    open: async (id_site: string) => ({}) as { id: string },
-    close: async (id_site: string) => ({}) as { id: string },
-  },
   site: {
     list: async () =>
       ({}) as Record<string, { id: string; name: string; domain: string }>,
