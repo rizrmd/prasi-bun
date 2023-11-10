@@ -10,6 +10,7 @@ eg.edit = {
   page: {},
   ws: new WeakMap(),
 };
+
 export const wsHandler: Record<string, WebSocketHandler<WSData>> = {
   "/sync": syncHandler,
   "/edit": editHandler,

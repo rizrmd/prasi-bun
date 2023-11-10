@@ -16,6 +16,7 @@ const packr = new Packr({ structuredClone: true });
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
   ws.sendBinary(packr.pack(msg));
 };
+
 export const syncHandler: WebSocketHandler<WSData> = {
   open(ws) {
     const client_id = createId();

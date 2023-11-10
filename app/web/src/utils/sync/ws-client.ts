@@ -75,6 +75,12 @@ export const clientStartSync = async (arg: {
   site_id?: string;
   page_id?: string;
   events: {
+    code: (arg: {
+      name: string;
+      id: string;
+      event: "pkg-install-start" | "pkg-isntall-end";
+      content?: string;
+    }) => void;
     activity: (arg: {
       activity: string;
       room_id: string;

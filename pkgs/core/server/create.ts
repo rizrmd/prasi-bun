@@ -17,7 +17,7 @@ export const cache = {
 };
 
 export type WSData = { url: URL };
-
+ 
 export const createServer = async () => {
   g.router = createRouter({ strictTrailingSlash: false });
 

@@ -5,8 +5,12 @@ import { g } from "utils/global";
 import { dirAsync } from "fs-jetpack";
 import { dirname } from "path";
 import { spawn } from "bun";
+import { activity } from "../../entity/activity";
+import { sendWS } from "../../sync-handler";
+import { SyncType } from "../../type";
 
 export const Code = {
+  pkginstall: {} as Record<string, true>,
   watchers: {} as Record<
     string,
     { id: string; watcher: ReturnType<typeof watch> }
@@ -16,6 +20,7 @@ export const Code = {
   },
 };
 
+const decoder = new TextDecoder();
 export const startCodeWatcher = async (code: DBCode) => {
   if (Code.watchers[code.id]) {
     return;
@@ -55,19 +60,63 @@ export const startCodeWatcher = async (code: DBCode) => {
       async (event, path) => {
         if (path) {
           const file = Bun.file(Code.path(code.id, path));
-
           const item = indexes[path];
-
           if (event === "change") {
             if (item) {
-              console.log(path, await file.text());
+              let content = await file.text();
+              if (path === "package.json") {
+                try {
+                  activity.site
+                    .room(code.id_site)
+                    .findAll({ site_js: code.name })
+                    .forEach((item, ws) => {
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        evant: "code",
+                        data: {
+                          name: code.name,
+                          id: code.id,
+                          event: "pkg-install-start",
+                        },
+                      });
+                    });
+
+                  const proc = spawn({
+                    cmd: ["bun", "i"],
+                    cwd: Code.path(code.id),
+                    stderr: "pipe",
+                    stdout: "pipe",
+                  });
+                  const stdout = await Bun.readableStreamToText(proc.stdout);
+                  const stderr = await Bun.readableStreamToText(proc.stderr);
+                  await proc.exited;
+
+                  activity.site
+                    .room(code.id_site)
+                    .findAll({ site_js: code.name })
+                    .forEach((item, ws) => {
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        evant: "code",
+                        data: {
+                          name: code.name,
+                          id: code.id,
+                          event: "pkg-install-end",
+                          content: `${stdout}${
+                            !!stderr ? `\n\nERROR:\n ${stderr}` : ""
+                          }`,
+                        },
+                      });
+                    });
+                } catch (e) {}
+              }
 
               await db.code_file.update({
                 where: {
                   path_id_code: { id_code: item.id_code, path: item.path },
                 },
                 data: {
-                  content: await file.text(),
+                  content,
                 },
               });
             }
