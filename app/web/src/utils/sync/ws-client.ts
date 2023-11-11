@@ -78,7 +78,7 @@ export const clientStartSync = async (arg: {
     code: (arg: {
       name: string;
       id: string;
-      event: "pkg-install-start" | "pkg-isntall-end";
+      event: "pkg-install-start" | "pkg-install-end";
       content?: string;
     }) => void;
     activity: (arg: {
@@ -200,7 +200,6 @@ const connect = (
               resolve();
             } else if (msg.type === SyncType.Event) {
               const eventName = msg.event as ClientEvent;
-
               if (event[eventName]) {
                 if (offlineEvents.includes(eventName)) {
                   saveEventOffline(eventName, msg.data);
@@ -210,12 +209,12 @@ const connect = (
             } else if (msg.type === SyncType.ActionResult) {
               const pending = runtime.action.pending[msg.argid];
               if (pending) {
+                pending.resolve(msg.val);
                 delete runtime.action.pending[msg.argid];
                 const idb = conf.idb;
                 if (idb) {
                   await set(msg.argid, msg.val, idb);
                 }
-                pending.resolve(msg.val);
               }
             }
           };

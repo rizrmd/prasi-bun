@@ -72,7 +72,7 @@ export const startCodeWatcher = async (code: DBCode) => {
                     .forEach((item, ws) => {
                       sendWS(ws, {
                         type: SyncType.Event,
-                        evant: "code",
+                        event: "code",
                         data: {
                           name: code.name,
                           id: code.id,
@@ -97,7 +97,7 @@ export const startCodeWatcher = async (code: DBCode) => {
                     .forEach((item, ws) => {
                       sendWS(ws, {
                         type: SyncType.Event,
-                        evant: "code",
+                        event: "code",
                         data: {
                           name: code.name,
                           id: code.id,
