@@ -112,9 +112,12 @@ export const EDGlobal = {
     popup: {
       code: {
         init: false,
-        open: false,
+        open: true,
         id: "",
-        name: "",
+        name: "site",
+        log: "",
+        loading: false,
+        show_log: false,
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {

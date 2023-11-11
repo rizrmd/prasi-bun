@@ -1,6 +1,5 @@
-import { apiClient } from "web-utils";
-import { PG } from "./global";
 import { w } from "../../../utils/script/init-api";
+import { PG } from "./global";
 
 type NOTIF_ARG = {
   user_id: any;

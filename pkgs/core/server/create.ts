@@ -133,7 +133,6 @@ export const createServer = async () => {
           );
         } catch (e) {
           g.log.error(e);
-
           return new Response("Loading...");
         }
       };

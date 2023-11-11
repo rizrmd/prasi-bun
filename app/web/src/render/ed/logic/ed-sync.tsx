@@ -63,6 +63,15 @@ export const edInitSync = (p: PG) => {
       page_id: params.page_id,
       events: {
         code(arg) {
+          if (arg.event === "pkg-install-start") {
+            p.ui.popup.code.loading = true;
+            p.render();
+          } else if (arg.event === "pkg-install-end") {
+            if (typeof arg.content === "string")
+              p.ui.popup.code.log = arg.content;
+            p.ui.popup.code.loading = false;
+            p.render();
+          }
           console.log(arg);
         },
         activity(arg) {},
