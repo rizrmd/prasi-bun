@@ -16,6 +16,7 @@ export const siteLoader: Loader = {
     cache.pages = res.pages;
     cache.api = res.api;
 
+    if (typeof w.basepath === "undefined") w.basepath = "";
     w.serverurl = res.site.config.api_url;
     w.apiurl = res.site.config.api_url;
 
@@ -48,7 +49,7 @@ export const siteLoader: Loader = {
 };
 
 const load = async (url: string) => {
-  const res = await fetch(`${base}${url}`);
+  const res = await fetch(`${w.basepath}${base}${url}`);
   const text = await res.text();
   const json = JSON.parse(text);
   return json;
