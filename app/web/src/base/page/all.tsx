@@ -3,6 +3,7 @@ import { page, useGlobal } from "web-utils";
 import { EDGlobal } from "../../render/ed/logic/ed-global";
 import { edInitSync } from "../../render/ed/logic/ed-sync";
 import { Loading } from "../../utils/ui/loading";
+import { isLocalhost } from "../../utils/ui/is-localhost";
 
 export default page({
   url: "**",
@@ -23,7 +24,11 @@ export default page({
             navigate(location.pathname + "/");
           }
         } else {
-          navigate("/editor/_/_");
+          if (isLocalhost()) {
+            navigate("/ed");
+          } else {
+            navigate("/editor/_/_");
+          }
         }
       } else {
         navigate("/login");

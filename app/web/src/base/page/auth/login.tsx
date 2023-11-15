@@ -47,11 +47,21 @@ export default page({
               form.render();
               alert(s.reason);
             } else {
-              const rto = (window as any).redirectTo;
+              let rto = (window as any).redirectTo;
               if (rto) {
+                if (
+                  location.href.includes("localhost") &&
+                  rto.includes("/editor")
+                ) {
+                  rto = rto.replace("/editor", "/ed");
+                }
                 navigate(rto);
               } else {
-                navigate("/editor");
+                if (location.href.includes("localhost")) {
+                  navigate("/ed");
+                } else {
+                  navigate("/editor");
+                }
               }
             }
           }}

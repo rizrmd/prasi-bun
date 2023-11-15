@@ -17,6 +17,7 @@ export const codeBuild = async (code: DBCode) => {
         absWorkingDir: dir.path(`${g.datadir}/site/code/${id_code}`),
         entryPoints: ["index.tsx"],
         bundle: true,
+        format: "cjs",
         outfile: dir.path(`${g.datadir}/build/code/${id_code}/index.js`),
         minify: true,
         treeShaking: true,
@@ -52,7 +53,6 @@ export const codeBuild = async (code: DBCode) => {
         });
       });
     const result = await Code.build.ctx[id_code].rebuild();
-    console.log("rebuilt");
     activity.site
       .room(code.id_site)
       .findAll({ site_js: code.name })

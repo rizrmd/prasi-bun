@@ -15,10 +15,12 @@ export default page({
     }
     (window as any).pathname = pathname;
 
-    navigator.serviceWorker.controller?.postMessage({
-      type: "add-cache",
-      url: location.href,
-    });
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.controller?.postMessage({
+        type: "add-cache",
+        url: location.href,
+      });
+    }
 
     return (
       <Live
