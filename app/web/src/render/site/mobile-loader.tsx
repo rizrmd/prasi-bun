@@ -5,7 +5,7 @@ const base = `/_web/${(window as any).id_site}`;
 
 const cache = { site: null as any, pages: [] as any, api: null };
 
-export const siteLoader: Loader = {
+export const mobileLoader: Loader = {
   async site(p, id) {
     const res = (await load(`/site?prod=1`)) as {
       site: any;

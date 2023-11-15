@@ -38,7 +38,9 @@ export const defineWindow = async (awaitServerUrl = true) => {
 
   const port = location.port;
   w.baseurl = scheme + "://" + host + (port ? ":" + port : "") + "/";
-  w.basepath = "/";
+  if (!w.basepath) {
+    w.basepath = "/";
+  }
   w.css = css;
   w.extractCss = extractCss;
   w.pathname = location.pathname;
