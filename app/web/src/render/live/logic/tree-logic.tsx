@@ -1,7 +1,6 @@
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
-import { IItem, MItem } from "../../../utils/types/item";
-import { FNCompDef } from "../../../utils/types/meta-fn";
+import { IItem } from "../../../utils/types/item";
 import { instantiateComp, loadComponent } from "./comp";
 import { ItemMeta, LiveGlobal, PG } from "./global";
 

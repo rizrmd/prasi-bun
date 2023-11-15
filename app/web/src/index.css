@@ -1,6 +1,6 @@
   @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&display=swap');
 
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=block');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
   @tailwind base;
   @tailwind components;
@@ -16,7 +16,6 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
   }

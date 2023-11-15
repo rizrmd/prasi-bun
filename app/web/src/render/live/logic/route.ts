@@ -99,7 +99,10 @@ const loadNpmPage = async (p: PG, id: string) => {
       if (typeof window.exports === "undefined") {
         window.exports = {};
       }
-      await importModule(p.loader.npm(p, "page", id));
+      const npmurl = p.loader.npm(p, "page", id);
+      if (npmurl) {
+        await importModule(npmurl);
+      }
     }
   } catch (e) {
     console.error(e);
