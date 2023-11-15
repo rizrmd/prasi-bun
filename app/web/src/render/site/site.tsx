@@ -25,6 +25,7 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
     render({});
   };
 
+  console.log(siteLoader)
   const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
   return (
     <Provider value={w.prasiContext}>
