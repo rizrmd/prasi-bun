@@ -8,6 +8,7 @@ const w = window as unknown as {
   prasiContext: any;
   rootRender: any;
   mobile: any;
+  mobilepath?: any;
 };
 
 if (!w.mobile) {
@@ -25,7 +26,6 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
     render({});
   };
 
-  console.log(siteLoader)
   const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
   return (
     <Provider value={w.prasiContext}>
