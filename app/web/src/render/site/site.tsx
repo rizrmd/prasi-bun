@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { GlobalContext, defineReact, defineWindow } from "web-utils";
 import { siteLoader } from "./site-loader";
 import { registerMobile } from "../live/logic/mobile";
+import { mobileLoader } from "./mobile-loader";
 
 const w = window as unknown as {
   prasiContext: any;
@@ -32,7 +33,7 @@ const Root: FC<{ url: URL; Live: any }> = ({ url, Live }) => {
       <Live
         domain={url.host}
         pathname={location.pathname}
-        loader={siteLoader}
+        loader={w.mobilepath ? mobileLoader : siteLoader}
       />
     </Provider>
   );

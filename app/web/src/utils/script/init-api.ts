@@ -9,6 +9,7 @@ export const w = window as unknown as {
   dbClient: typeof dbClient;
   serverurl: string;
   apiurl: string;
+  mobilepath: string;
 };
 
 export const createAPI = (url: string) => {

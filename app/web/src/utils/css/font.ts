@@ -21,7 +21,7 @@ export const cssFont = (
     if (glbFont.loadedFonts.indexOf(font.family) < 0) {
       glbFont.loadedFonts.push(font.family);
       const doc = document;
-      const _href = `https://fonts.googleapis.com/css2?family=${fontName}${weight}&display=block`;
+      const _href = `https://fonts.googleapis.com/css2?family=${fontName}${weight}`;
       if (!doc.querySelector(`link[href="${_href}]`)) {
         const link = doc.createElement("link");
         link.type = "text/css";
