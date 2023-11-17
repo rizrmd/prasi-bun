@@ -1,12 +1,11 @@
 import { SAction } from "../actions";
-import { SyncConnection } from "../type";
-import { activity as a } from "../entity/activity";
 import { prepCode } from "../editor/code/prep-code";
 import {
-  Code,
   startCodeWatcher,
-  stopCodeWatcher,
+  stopCodeWatcher
 } from "../editor/code/watcher";
+import { activity as a } from "../entity/activity";
+import { SyncConnection } from "../type";
 export const activity: SAction["activity"] = async function (
   this: SyncConnection,
   name,
@@ -24,7 +23,6 @@ export const activity: SAction["activity"] = async function (
       }
       return data;
     });
-
     if (act.action === "open") {
       await startCodeWatcher(code);
     } else {
