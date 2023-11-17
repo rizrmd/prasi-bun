@@ -81,7 +81,12 @@ export const SyncActions = {
           type: "join";
           id: string;
         }
-      | { type: "code"; id: string; name: string; action: "open" | "close" }
+      | {
+          type: "code";
+          id: string;
+          name: string;
+          action: "open" | "close";
+        }
   ) => ({}) as any,
   client: {
     info: async (client_ids: string[]) =>

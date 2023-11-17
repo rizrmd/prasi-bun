@@ -3,11 +3,18 @@ import { useGlobal, useLocal } from "web-utils";
 import { isLocalhost } from "../../../../../utils/ui/is-localhost";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
+import { Popover } from "../../../../../utils/ui/popover";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
-import { Popover } from "../../../../../utils/ui/popover";
-import { iconChevronDown, iconGear, iconLoading, iconLog } from "./icons";
-import { CodeNameItem, CodeNameList, NameIcon } from "./name-list";
+import { CodeAssign } from "./assign";
+import {
+  iconChevronDown,
+  iconGear,
+  iconLoading,
+  iconLog,
+  iconTrash,
+} from "./icons";
+import { CodeNameItem, CodeNameList, codeName } from "./name-list";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -57,11 +64,24 @@ export const EdPopCode = () => {
               backdrop={false}
               content={
                 <CodeNameList
-                  onPick={(e) => {
-                    p.ui.popup.code.name = e.name;
-                    p.ui.popup.code.id = e.id;
+                  onPick={async (e) => {
                     local.namePicker = false;
-                    local.render();
+                    p.ui.popup.code.name = e.name;
+                    p.ui.popup.code.id = "";
+                    p.render();
+
+                    const id_code = await p.sync.activity("site", {
+                      action: "open",
+                      id: p.site.id,
+                      type: "code",
+                      name: p.ui.popup.code.name,
+                    });
+
+                    console.log(id_code);
+                    if (id_code) {
+                      p.ui.popup.code.id = id_code;
+                      p.render();
+                    }
                   }}
                 />
               }
@@ -88,19 +108,48 @@ export const EdPopCode = () => {
 
             {p.ui.popup.code.name !== "site" &&
               p.ui.popup.code.name !== "SSR" && (
-                <Tooltip
-                  content="Assign Code Module"
-                  delay={0}
-                  placement="bottom"
-                  className="flex items-center border-l relative border-l hover:bg-blue-50 cursor-pointer px-2 transition-all"
-                  onClick={() => {}}
-                >
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: iconGear,
+                <>
+                  <Tooltip
+                    content={"Delete Code Module"}
+                    className="flex items-center border-l relative border-l hover:bg-red-50 cursor-pointer px-2 transition-all text-red-500"
+                    placement="bottom"
+                    onClick={async () => {
+                      if (
+                        prompt(
+                          "Are you sure want to delete this code?\n type 'yes' to confirm:"
+                        ) === "yes"
+                      ) {
+                        await db.code.delete({
+                          where: { id: p.ui.popup.code.id },
+                        });
+
+                        codeName.list = codeName.list.filter(
+                          (e) => e.id !== p.ui.popup.code.id
+                        );
+
+                        p.ui.popup.code.name = codeName.list[0].name;
+                        p.ui.popup.code.id = codeName.list[0].id;
+                        p.render();
+                      }
                     }}
-                  ></div>
-                </Tooltip>
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: iconTrash,
+                      }}
+                    ></div>
+                  </Tooltip>
+                  <Popover
+                    content={<CodeAssign id_code={p.ui.popup.code.name} />}
+                    className="flex items-center border-l relative border-l hover:bg-blue-50 cursor-pointer px-2 transition-all"
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: iconGear,
+                      }}
+                    ></div>
+                  </Popover>
+                </>
               )}
             <Tooltip
               content="STDOUT Log"
@@ -144,7 +193,7 @@ export const EdPopCode = () => {
                   src={`${vscode_url}folder=/site/code/${p.ui.popup.code.id}`}
                 ></iframe>
                 <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
-                  Loading...
+                  Loading VS Code...
                 </div>
               </>
             )}
