@@ -7,7 +7,7 @@ import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import { Popover } from "../../../../../utils/ui/popover";
 import { iconChevronDown, iconGear, iconLoading, iconLog } from "./icons";
-import { CodeNameList } from "./name-list";
+import { CodeNameList, NameIcon } from "./name-list";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -67,8 +67,9 @@ export const EdPopCode = () => {
                 local.render();
               }}
             >
-              <div className="capitalize overflow-ellipsis flex-1 flex items-center">
-                {p.ui.popup.code.name}
+              <div className="capitalize overflow-ellipsis flex-1 flex items-center space-x-1">
+                <NameIcon name={p.ui.popup.code.name} />
+                <div>{p.ui.popup.code.name}</div>
               </div>
               <div
                 dangerouslySetInnerHTML={{
