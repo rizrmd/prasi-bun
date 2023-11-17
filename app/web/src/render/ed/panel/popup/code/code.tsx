@@ -7,7 +7,7 @@ import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import { Popover } from "../../../../../utils/ui/popover";
 import { iconChevronDown, iconGear, iconLoading, iconLog } from "./icons";
-import { CodeNameList, NameIcon } from "./name-list";
+import { CodeNameItem, CodeNameList, NameIcon } from "./name-list";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -55,7 +55,16 @@ export const EdPopCode = () => {
               offset={0}
               arrow={false}
               backdrop={false}
-              content={<CodeNameList />}
+              content={
+                <CodeNameList
+                  onPick={(e) => {
+                    p.ui.popup.code.name = e.name;
+                    p.ui.popup.code.id = e.id;
+                    local.namePicker = false;
+                    local.render();
+                  }}
+                />
+              }
               popoverClassName="bg-white shadow-md"
               className={cx(
                 "flex items-center px-2 w-[200px] hover:bg-blue-50  space-x-1",
@@ -67,9 +76,8 @@ export const EdPopCode = () => {
                 local.render();
               }}
             >
-              <div className="capitalize overflow-ellipsis flex-1 flex items-center space-x-1">
-                <NameIcon name={p.ui.popup.code.name} />
-                <div>{p.ui.popup.code.name}</div>
+              <div className="capitalize overflow-ellipsis flex-1 flex items-center space-x-2">
+                <CodeNameItem name={p.ui.popup.code.name} />
               </div>
               <div
                 dangerouslySetInnerHTML={{
@@ -78,17 +86,24 @@ export const EdPopCode = () => {
               ></div>
             </Popover>
 
-            {p.ui.popup.code.name !== "site" && (
-              <div className="hover:bg-blue-100 flex items-center justify-center border w-[20px] h-[20px] flex">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: iconGear,
-                  }}
-                ></div>
-              </div>
-            )}
+            {p.ui.popup.code.name !== "site" &&
+              p.ui.popup.code.name !== "SSR" && (
+                <Tooltip
+                  content="Assign Code Module"
+                  delay={0}
+                  placement="bottom"
+                  className="flex items-center border-l relative border-l hover:bg-blue-50 cursor-pointer px-2 transition-all"
+                  onClick={() => {}}
+                >
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: iconGear,
+                    }}
+                  ></div>
+                </Tooltip>
+              )}
             <Tooltip
-              content="stdout log"
+              content="STDOUT Log"
               delay={0}
               placement="bottom"
               className="flex items-stretch relative border-l"
@@ -119,16 +134,22 @@ export const EdPopCode = () => {
             </div>
           )}
 
-          {!p.ui.popup.code.open || !p.ui.popup.code.id ? (
-            <div className="flex flex-1 relative">
+          <div className="flex flex-1 relative">
+            {!p.ui.popup.code.open || !p.ui.popup.code.id ? (
               <Loading backdrop={false} />
-            </div>
-          ) : (
-            <iframe
-              className="flex flex-1"
-              src={`${vscode_url}folder=/site/code/${p.ui.popup.code.id}`}
-            ></iframe>
-          )}
+            ) : (
+              <>
+                <iframe
+                  className="flex flex-1 absolute inset-0 w-full h-full z-10"
+                  src={`${vscode_url}folder=/site/code/${p.ui.popup.code.id}`}
+                ></iframe>
+                <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
+                  Loading...
+                </div>
+              </>
+            )}
+          </div>
+
           {local.namePicker && (
             <div
               className="absolute inset-0"
