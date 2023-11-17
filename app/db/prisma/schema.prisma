@@ -36,6 +36,7 @@ model component_group {
   id             String           @id(map: "site_comp_group_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name           String
   shared         Boolean          @default(false)
+  code_assign    code_assign[]
   component      component[]
   component_site component_site[]
 }
@@ -145,23 +146,24 @@ model org_user {
 }
 
 model page {
-  id                String       @id(map: "page_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                String        @id(map: "page_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String
   url               String
   content_tree      Json
-  id_site           String       @db.Uuid
-  created_at        DateTime?    @default(now()) @db.Timestamp(6)
+  id_site           String        @db.Uuid
+  created_at        DateTime?     @default(now()) @db.Timestamp(6)
   js_compiled       String?
   js                String?
-  updated_at        DateTime?    @default(now()) @db.Timestamp(6)
-  id_folder         String?      @db.Uuid
-  is_deleted        Boolean      @default(false)
-  id_layout         String?      @db.Uuid
-  is_default_layout Boolean      @default(false)
-  page_folder       page_folder? @relation(fields: [id_folder], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  page              page?        @relation("pageTopage", fields: [id_layout], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_page        page[]       @relation("pageTopage")
-  site              site         @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updated_at        DateTime?     @default(now()) @db.Timestamp(6)
+  id_folder         String?       @db.Uuid
+  is_deleted        Boolean       @default(false)
+  id_layout         String?       @db.Uuid
+  is_default_layout Boolean       @default(false)
+  code_assign       code_assign[]
+  page_folder       page_folder?  @relation(fields: [id_folder], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  page              page?         @relation("pageTopage", fields: [id_layout], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_page        page[]        @relation("pageTopage")
+  site              site          @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model page_folder {
@@ -278,11 +280,12 @@ model user {
 }
 
 model code {
-  id        String      @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_site   String      @db.Uuid
-  name      String      @default("site")
-  site      site        @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  code_file code_file[]
+  id          String        @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_site     String        @db.Uuid
+  name        String        @default("site")
+  site        site          @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  code_assign code_assign[]
+  code_file   code_file[]
 }
 
 model code_file {
@@ -292,4 +295,14 @@ model code_file {
   code    code   @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([path, id_code], map: "id_code_file")
+}
+
+model code_assign {
+  id_code            String          @db.Uuid
+  id_component_group String          @db.Uuid
+  id_page            String          @db.Uuid
+  id                 String          @id(map: "code_assign_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code               code            @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  component_group    component_group @relation(fields: [id_component_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  page               page            @relation(fields: [id_page], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

@@ -4,7 +4,7 @@ import { dirAsync } from "fs-jetpack";
 export type DBCode = Exclude<Awaited<ReturnType<typeof getCode>>, null>;
 
 export const prepCode = async (site_id: string, name: string) => {
-  let code = await getCode(site_id);
+  let code = await getCode(site_id, name);
 
   const pkgfile = Bun.file(dir.path(`${g.datadir}/site/code/package.json`));
   if (!(await pkgfile.exists())) {
@@ -22,7 +22,10 @@ export const prepCode = async (site_id: string, name: string) => {
     );
   }
 
-  if (code) return code;
+  if (code) {
+    await dirAsync(dir.path(`${g.datadir}/site/code/${code.id}`));
+    return code;
+  }
   let new_code = await db.code.create({
     data: {
       id_site: site_id,
@@ -59,11 +62,13 @@ export const hello_world = () => {
   return code as DBCode;
 };
 
-const getCode = async (site_id: string) => {
+const getCode = async (site_id: string, name?: string) => {
   return await db.code.findFirst({
-    where: {
-      id_site: site_id,
-    },
+    where: name
+      ? { id_site: site_id, name }
+      : {
+          id_site: site_id,
+        },
     select: {
       id: true,
       id_site: true,

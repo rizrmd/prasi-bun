@@ -26,12 +26,25 @@ export const Code = {
 };
 
 export const startCodeWatcher = async (code: DBCode) => {
-  if (Code.watchers[code.id]) {
+  console.log(code)
+  if (code.id && Code.watchers[code.id]) {
     return;
   }
 
   let delay = false;
   const indexes = {} as Record<string, (typeof code)["code_file"][0]>;
+
+  if (code.code_file.length === 0) {
+    code.code_file.push(
+      await db.code_file.create({
+        data: {
+          id_code: code.id,
+          path: "package.json",
+          content: JSON.stringify({ name: code.id, dependencies: {} }),
+        },
+      })
+    );
+  }
 
   for (const c of code.code_file) {
     const path = Code.path(c.id_code, c.path);
@@ -81,7 +94,7 @@ export const startCodeWatcher = async (code: DBCode) => {
                   codePkgInstall(code);
                 }, 1000);
               }
- 
+
               await db.code_file.update({
                 where: {
                   path_id_code: { id_code: item.id_code, path: item.path },
