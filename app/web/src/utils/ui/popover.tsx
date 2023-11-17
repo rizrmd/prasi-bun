@@ -26,7 +26,8 @@ interface PopoverOptions {
   offset?: number;
   onOpenChange?: (open: boolean) => void;
   autoFocus?: boolean;
-  backdrop?: boolean;
+  backdrop?: boolean | "self";
+  root?: HTMLElement;
 }
 
 export function usePopover({
@@ -36,8 +37,9 @@ export function usePopover({
   open: controlledOpen,
   offset: popoverOffset,
   onOpenChange: setControlledOpen,
-  autoFocus = true,
+  autoFocus = false,
   backdrop = true,
+  root,
 }: PopoverOptions = {}) {
   const arrowRef = React.useRef(null);
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
@@ -89,6 +91,7 @@ export function usePopover({
       setDescriptionId,
       backdrop,
       autoFocus,
+      root,
     }),
     [
       open,
@@ -100,6 +103,7 @@ export function usePopover({
       descriptionId,
       backdrop,
       autoFocus,
+      root,
     ]
   );
 }
@@ -178,6 +182,7 @@ export function Popover({
   ...restOptions
 }: {
   className?: string;
+  root?: HTMLElement;
   popoverClassName?: string;
   children: React.ReactNode;
   content?: React.ReactNode;
@@ -190,7 +195,18 @@ export function Popover({
 
   return (
     <PopoverContext.Provider value={popover}>
-      <PopoverTrigger className={className}>{children}</PopoverTrigger>
+      <PopoverTrigger
+        className={className}
+        onClick={
+          typeof restOptions.open !== "undefined"
+            ? () => {
+                popover.setOpen(!popover.open);
+              }
+            : undefined
+        }
+      >
+        {children}
+      </PopoverTrigger>
       <PopoverContent
         className={cx(
           popoverClassName
@@ -281,7 +297,7 @@ export const PopoverContent = React.forwardRef<
   );
 
   return (
-    <FloatingPortal>
+    <FloatingPortal root={context.root}>
       {context.backdrop ? (
         <FloatingOverlay lockScroll>{content}</FloatingOverlay>
       ) : (

@@ -12,7 +12,6 @@ import {
 } from "@floating-ui/react";
 import * as React from "react";
 import { useLocal } from "web-utils";
-import { w } from "../types/general";
 
 interface ModalOptions {
   initialOpen?: boolean;

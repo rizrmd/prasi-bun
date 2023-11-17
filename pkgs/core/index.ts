@@ -56,11 +56,12 @@ if (!g.apiPrepared) {
   g.log.info("WS Action defined");
 
   await generateAPIFrm();
-  await prepareApiRoutes();
   await prepareAPITypes();
   g.log.info("API Prepared");
   g.apiPrepared = true;
 }
+
+await prepareApiRoutes();
 
 if (!g.parcel) {
   await parcelBuild();

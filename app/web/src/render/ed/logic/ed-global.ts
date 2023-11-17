@@ -118,6 +118,7 @@ export const EDGlobal = {
         log: "",
         loading: false,
         show_log: false,
+        list: {} as Record<string, string>,
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {
