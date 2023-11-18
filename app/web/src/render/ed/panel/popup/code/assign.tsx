@@ -65,6 +65,9 @@ const AssignList: FC<{ id_code: string; mode: "page" | "comp" }> = ({
         const list = await db.component_site.findMany({
           where: {
             id_site: p.site.id,
+            component_group: {
+              name: { not: { equals: "__TRASH__" } },
+            },
           },
           select: {
             component_group: { select: { id: true, name: true } },
