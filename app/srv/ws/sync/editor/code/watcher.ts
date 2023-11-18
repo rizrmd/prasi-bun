@@ -33,13 +33,27 @@ export const startCodeWatcher = async (code: DBCode) => {
   let delay = false;
   const indexes = {} as Record<string, (typeof code)["code_file"][0]>;
 
-  if (code.code_file.length === 0) {
+  if (!code.code_file.find((e) => e.path === "package.json")) {
     code.code_file.push(
       await db.code_file.create({
         data: {
           id_code: code.id,
           path: "package.json",
           content: JSON.stringify({ name: code.id, dependencies: {} }),
+        },
+      })
+    );
+  }
+
+  if (!code.code_file.find((e) => e.path === "index.tsx")) {
+    let content = `export const hello = 'world';`;
+
+    code.code_file.push(
+      await db.code_file.create({
+        data: {
+          id_code: code.id,
+          path: "index.tsx",
+          content,
         },
       })
     );
@@ -67,6 +81,8 @@ export const startCodeWatcher = async (code: DBCode) => {
     stderr: "ignore",
     stdout: "ignore",
   }).exited;
+  
+  await codeBuild(code);
 
   Code.watchers[code.id] = {
     id: code.id,
