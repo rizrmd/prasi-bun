@@ -112,7 +112,7 @@ export const EDGlobal = {
     popup: {
       code: {
         init: false,
-        open: true,
+        open: false,
         id: "",
         name: "site",
         log: "",

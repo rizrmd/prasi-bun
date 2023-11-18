@@ -222,7 +222,7 @@ export const EdSiteTree = ({
           )}
         >
           <div className="flex flex-col p-1">
-            <div className="text-[14px] flex items-end h-[30px] pb-[2px] leading-4 overflow-hidden">
+            <div className="text-[13px] flex items-end h-[30px] pb-[2px] leading-4 overflow-hidden">
               {node.text}
             </div>
             <div
