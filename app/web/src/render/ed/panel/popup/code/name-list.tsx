@@ -49,7 +49,6 @@ export const CodeNameList: FC<{
       local.render();
     }
   );
-
   return (
     <>
       <div className="w-[200px] border border-b-0 flex flex-col text-sm">
