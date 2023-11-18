@@ -283,7 +283,7 @@ model code {
   id          String        @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_site     String        @db.Uuid
   name        String        @default("site")
-  site        site          @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  site        site          @relation(fields: [id_site], references: [id], onDelete: Cascade, onUpdate: NoAction)
   code_assign code_assign[]
   code_file   code_file[]
 }
@@ -292,17 +292,17 @@ model code_file {
   path    String
   content String
   id_code String @db.Uuid
-  code    code   @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  code    code   @relation(fields: [id_code], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([path, id_code], map: "id_code_file")
 }
 
 model code_assign {
-  id_code            String          @db.Uuid
-  id_component_group String          @db.Uuid
-  id_page            String          @db.Uuid
-  id                 String          @id(map: "code_assign_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code               code            @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  component_group    component_group @relation(fields: [id_component_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  page               page            @relation(fields: [id_page], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id_code            String           @db.Uuid
+  id_component_group String?          @db.Uuid
+  id_page            String?          @db.Uuid
+  id                 String           @id(map: "code_assign_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code               code             @relation(fields: [id_code], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  component_group    component_group? @relation(fields: [id_component_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  page               page?            @relation(fields: [id_page], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
