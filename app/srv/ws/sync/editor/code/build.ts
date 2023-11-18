@@ -76,6 +76,7 @@ export const codeBuild = async (code: DBCode) => {
         });
       });
   } catch (e: any) {
+    console.error(e);
     activity.site
       .room(code.id_site)
       .findAll({ site_js: code.name })
