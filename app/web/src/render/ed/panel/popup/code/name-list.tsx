@@ -93,6 +93,7 @@ export const CodeNameList: FC<{
               spellCheck={false}
               onBlur={async (e) => {
                 local.newopen = false;
+                local.render();
 
                 const nc = await db.code.create({
                   data: {

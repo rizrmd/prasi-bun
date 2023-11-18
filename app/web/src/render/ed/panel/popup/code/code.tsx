@@ -18,7 +18,7 @@ import { CodeNameItem, CodeNameList, codeName } from "./name-list";
 
 export const EdPopCode = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ namePicker: false });
+  const local = useLocal({ namePicker: false, codeAssign: false });
 
   useEffect(() => {
     (async () => {
@@ -77,7 +77,6 @@ export const EdPopCode = () => {
                       name: p.ui.popup.code.name,
                     });
 
-                    console.log(id_code);
                     if (id_code) {
                       p.ui.popup.code.id = id_code;
                       p.render();
@@ -116,7 +115,7 @@ export const EdPopCode = () => {
                     onClick={async () => {
                       if (
                         prompt(
-                          "Are you sure want to delete this code?\n type 'yes' to confirm:"
+                          "Are you sure want to delete this code?\ntype 'yes' to confirm:"
                         ) === "yes"
                       ) {
                         await db.code.delete({
@@ -140,7 +139,23 @@ export const EdPopCode = () => {
                     ></div>
                   </Tooltip>
                   <Popover
-                    content={<CodeAssign id_code={p.ui.popup.code.name} />}
+                    open={local.codeAssign}
+                    onOpenChange={(open) => {
+                      local.codeAssign = open;
+                      local.render();
+                    }}
+                    backdrop={false}
+                    placement="bottom"
+                    popoverClassName="p-0 shadow-lg bg-white"
+                    content={
+                      <CodeAssign
+                        onClose={() => {
+                          local.codeAssign = false;
+                          local.render();
+                        }}
+                        id_code={p.ui.popup.code.id}
+                      />
+                    }
                     className="flex items-center border-l relative border-l hover:bg-blue-50 cursor-pointer px-2 transition-all"
                   >
                     <div
@@ -155,7 +170,10 @@ export const EdPopCode = () => {
               content="STDOUT Log"
               delay={0}
               placement="bottom"
-              className="flex items-stretch relative border-l"
+              className={cx(
+                "flex items-stretch relative border-l",
+                p.ui.popup.code.error && "bg-red-500 text-white"
+              )}
               onClick={() => {
                 p.ui.popup.code.show_log = !p.ui.popup.code.show_log;
                 p.render();
@@ -199,11 +217,12 @@ export const EdPopCode = () => {
             )}
           </div>
 
-          {local.namePicker && (
+          {(local.namePicker || local.codeAssign) && (
             <div
-              className="absolute inset-0"
+              className="fixed inset-0 z-50"
               onClick={() => {
                 local.namePicker = false;
+                local.codeAssign = false;
                 local.render();
               }}
             ></div>

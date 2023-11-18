@@ -3,6 +3,38 @@ const uf = new uFuzzy({});
 
 export const fuzzy = <T extends object>(
   array: T[],
+  field: keyof T | { pk: keyof T; search: (keyof T)[] },
+  search: string
+) => {
+  if (typeof field === "string") {
+    return fuzzySingle(array, field, search);
+  }
+  const result: Record<any, { row: any; idx: number }> = {};
+
+  if (typeof field === "object") {
+    for (const f of field.search) {
+      const res = fuzzySingle(array, f, search);
+      let idx = 0;
+      for (const row of res) {
+        idx++;
+        const id = row[field.pk] as any;
+        if (!result[id]) {
+          result[id] = { idx, row };
+        } else {
+          result[id].row[f] = row[f];
+        }
+      }
+    }
+  }
+  const final: any = {};
+  for (const i of Object.values(result)) {
+    final[i.idx] = i.row;
+  }
+  return Object.values(final) as T[];
+};
+
+const fuzzySingle = <T extends object>(
+  array: T[],
   field: keyof T,
   search: string
 ) => {
