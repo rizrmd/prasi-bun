@@ -63,13 +63,20 @@ export const edInitSync = (p: PG) => {
       page_id: params.page_id,
       events: {
         code(arg) {
+          p.ui.popup.code.error = false;
+
           if (arg.event === "code-loading") {
             p.ui.popup.code.log = "";
             p.ui.popup.code.loading = true;
             p.render();
           } else if (arg.event === "code-done") {
-            if (typeof arg.content === "string")
+            if (typeof arg.content === "string") {
+              if (arg.content !== "OK") {
+                p.ui.popup.code.error = true;
+              }
+
               p.ui.popup.code.log += arg.content;
+            }
             p.ui.popup.code.loading = false;
             p.render();
           } else {

@@ -26,7 +26,6 @@ export const Code = {
 };
 
 export const startCodeWatcher = async (code: DBCode) => {
-  console.log(code)
   if (code.id && Code.watchers[code.id]) {
     return;
   }
@@ -79,7 +78,7 @@ export const startCodeWatcher = async (code: DBCode) => {
           clearTimeout(Code.timeout[code.id]);
           Code.timeout[code.id] = setTimeout(() => {
             codeBuild(code);
-          }, 1000);
+          }, 100);
         }
 
         if (path) {
