@@ -1,9 +1,15 @@
-import { useGlobal } from "web-utils";
-import { VG, ViewGlobal } from "./global";
+import { VG } from "./global";
 import { VLoad } from "./types";
 
-export const VInit = (v: VG, load: VLoad) => {
-  v.mode = "ready";
+export const vInit = (
+  v: VG,
+  arg: { load: VLoad; site_id: string; page_id: string }
+) => {
+  const { load, site_id, page_id } = arg;
+
+  v.mode = "load-code";
+  v.current.site_id = site_id;
+  v.current.page_id = page_id;
 
   if (load.mode === "tree_meta") {
     v.meta = load.meta;

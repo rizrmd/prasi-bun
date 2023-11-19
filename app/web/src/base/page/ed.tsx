@@ -13,7 +13,7 @@ export default page({
     if (!edInitSync(p)) {
       return <Loading note="init sync" />;
     }
-
+    
     return <EdBase />;
   },
 });

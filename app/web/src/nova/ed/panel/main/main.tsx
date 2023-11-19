@@ -15,6 +15,11 @@ export const EdMain = () => {
             meta: p.page.meta,
             entry: p.page.entry,
           }}
+          site_id={p.site.id}
+          page_id={p.page.cur.id}
+          bind={({ render }) => {
+            p.page.render = render;
+          }}
         />
       )}
     </div>

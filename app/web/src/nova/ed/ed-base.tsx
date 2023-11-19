@@ -1,17 +1,17 @@
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { EdLeft } from "./ed-left";
+import { EdRight } from "./ed-right";
 import { EDGlobal } from "./logic/ed-global";
 import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdMain } from "./panel/main/main";
 import { EdPane } from "./panel/main/pane-resize";
+import { EdPopCode } from "./panel/popup/code/code";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
 import { EdPopSite } from "./panel/popup/site/site";
 import { EdScriptInit } from "./panel/script/monaco/init";
-import { EdRight } from "./ed-right";
-import { EdPopCode } from "./panel/popup/code/code";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -19,12 +19,12 @@ export const EdBase = () => {
   edUndoManager(p);
 
   if (p.status === "init") {
-    edInit(p);
+    edInit(p)
   }
 
   edRoute(p);
 
-  if (p.status === "loading" || p.status === "init") {
+  if (p.status === "loading") {
     return <Loading note={`${p.status}-page`} />;
   }
   if (p.status === "site-not-found" || p.status === "page-not-found") {

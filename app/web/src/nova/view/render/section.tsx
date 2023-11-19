@@ -1,10 +1,6 @@
-import { FC, ReactNode } from "react";
-import { ISection } from "../../../utils/types/section";
+import { FC } from "react";
+import { ViewMeta } from "./meta";
 
-export const VSection: FC<{ item: ISection; children: ReactNode }> = ({
-  item,
-  children,
-}) => {
-  console.log(item);
-  return <div></div>;
+export const VSection: FC<{ id: string }> = ({ id }) => {
+  return <ViewMeta id={id} />;
 };

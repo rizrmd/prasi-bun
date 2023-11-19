@@ -82,6 +82,7 @@ export const EDGlobal = {
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
+    render: () => {},
   },
   comp: {
     cur: EmptyComp,
