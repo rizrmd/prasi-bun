@@ -1,14 +1,8 @@
-import type * as Y from "yjs";
-import { syncronize } from "y-pojo";
+import * as ImportYJS from "yjs";
+import * as YPojo from "y-pojo";
+type Yjs = typeof ImportYJS;
 
-export import Doc = Y.Doc;
-export import UndoManager = Y.UndoManager;
-export import applyUpdate = Y.applyUpdate;
-export import encodeStateVector = Y.encodeStateVector;
-export import encodeStateAsUpdate = Y.encodeStateAsUpdate;
-export import Text = Y.Text;
-export import Map = Y.Map;
-export import Array = Y.Array;
-export import syncronize = syncronize;
-
-export as namespace Y;
+declare global {
+  const Y: Yjs;
+  const syncronize: typeof YPojo.syncronize;
+}

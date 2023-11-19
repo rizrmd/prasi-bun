@@ -14,11 +14,15 @@ export const codeBuild = async (code: DBCode) => {
     const id_code = code.id;
     if (!Code.build.ctx[id_code]) {
       Code.build.ctx[id_code] = await context({
-        absWorkingDir: dir.path(`${g.datadir}/site/code/${id_code}`),
+        absWorkingDir: dir.path(
+          `${g.datadir}/site/code/${code.id_site}/${id_code}`
+        ),
         entryPoints: ["index.tsx"],
         bundle: true,
         format: "cjs",
-        outfile: dir.path(`${g.datadir}/build/code/${id_code}/index.js`),
+        outfile: dir.path(
+          `${g.datadir}/site/build/${id_code}/index.js`
+        ),
         minify: true,
         treeShaking: true,
         sourcemap: true,

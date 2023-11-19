@@ -6,9 +6,11 @@ export type DBCode = Exclude<Awaited<ReturnType<typeof getCode>>, null>;
 export const prepCode = async (site_id: string, name: string) => {
   let code = await getCode(site_id, name);
 
-  const pkgfile = Bun.file(dir.path(`${g.datadir}/site/code/package.json`));
+  const pkgfile = Bun.file(
+    dir.path(`${g.datadir}/site/code/${site_id}/package.json`)
+  );
   if (!(await pkgfile.exists())) {
-    await dirAsync(dir.path(`${g.datadir}/site/code`));
+    await dirAsync(dir.path(`${g.datadir}/site/code/${site_id}`));
     await Bun.write(
       pkgfile,
       JSON.stringify(
@@ -23,7 +25,7 @@ export const prepCode = async (site_id: string, name: string) => {
   }
 
   if (code) {
-    await dirAsync(dir.path(`${g.datadir}/site/code/${code.id}`));
+    await dirAsync(dir.path(`${g.datadir}/site/code/${site_id}/${code.id}`));
     return code;
   }
   let new_code = await db.code.create({
