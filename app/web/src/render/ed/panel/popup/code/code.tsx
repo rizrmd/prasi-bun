@@ -110,7 +110,7 @@ export const EdPopCode = () => {
                 <>
                   <Tooltip
                     content={"Delete Code Module"}
-                    className="flex items-center border-l relative border-l hover:bg-red-50 cursor-pointer px-2 transition-all text-red-500"
+                    className="flex items-center border-l relative hover:bg-red-50 cursor-pointer px-2 transition-all text-red-500"
                     placement="bottom"
                     onClick={async () => {
                       if (
@@ -156,7 +156,7 @@ export const EdPopCode = () => {
                         id_code={p.ui.popup.code.id}
                       />
                     }
-                    className="flex items-center border-l relative border-l hover:bg-blue-50 cursor-pointer px-2 transition-all"
+                    className="flex items-center border-l relative hover:bg-blue-50 cursor-pointer px-2 transition-all"
                   >
                     <div
                       dangerouslySetInnerHTML={{
@@ -208,7 +208,7 @@ export const EdPopCode = () => {
               <>
                 <iframe
                   className="flex flex-1 absolute inset-0 w-full h-full z-10"
-                  src={`${vscode_url}folder=/site/code/${p.ui.popup.code.id}`}
+                  src={`${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`}
                 ></iframe>
                 <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
                   Loading VS Code...
