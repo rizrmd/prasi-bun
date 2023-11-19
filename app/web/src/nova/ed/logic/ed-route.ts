@@ -1,7 +1,6 @@
 import { compress, decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
-import { w } from "../../../utils/types/general";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready") {

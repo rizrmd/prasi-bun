@@ -3,7 +3,7 @@ import {
   EComp,
   EPage,
   ESite,
-} from "../../../web/src/render/ed/logic/ed-global";
+} from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
 import { activity } from "./entity/activity";

@@ -76,11 +76,12 @@ export const EDGlobal = {
   page: {
     cur: EmptyPage,
     doc: null as null | DPage,
-    root: null as null | IRoot,
+    list: {} as Record<string, { page: EPage; doc: DPage }>,
+
+    building: false,
+    meta: {} as Record<string, EdMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
-    meta: {} as Record<string, EdMeta>,
-    list: {} as Record<string, { page: EPage; doc: DPage }>,
   },
   comp: {
     cur: EmptyComp,
@@ -112,7 +113,7 @@ export const EDGlobal = {
     popup: {
       code: {
         init: false,
-        open: false, 
+        open: false,
         id: "",
         name: "site",
         log: "",

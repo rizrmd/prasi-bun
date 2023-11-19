@@ -5,7 +5,7 @@ import { mobileCSS } from "../elements/e-page";
 import { editorStyle } from "../elements/style";
 import { EditorGlobal } from "../logic/global";
 import { Toolbar } from "./toolbar/Toolbar";
-import { EdScriptInit } from "../../ed/panel/script/monaco/init";
+import { EdScriptInit } from "../../../nova/ed/panel/script/monaco/init";
 
 const ETree = lazy(async () => ({
   default: (await import("./tree/tree")).ETree,

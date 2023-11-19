@@ -1,5 +1,5 @@
 import { validate } from "uuid";
-import { ESite } from "../../../../web/src/render/ed/logic/ed-global";
+import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { SyncConnection } from "../type";
 import { activity } from "../entity/activity";

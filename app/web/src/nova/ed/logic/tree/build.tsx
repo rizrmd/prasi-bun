@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { decompress } from "wasm-gzip";
 import { syncronize } from "y-pojo";
 import { TypedMap } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
@@ -9,10 +10,9 @@ import {
   FNCompDef,
   FNComponent,
 } from "../../../../utils/types/meta-fn";
-import { DComp } from "../../../../utils/types/root";
+import { DComp, IRoot } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
-import { decompress } from "wasm-gzip";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const doc = p.page.doc;
@@ -20,6 +20,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
   const root = doc.getMap("map").get("root");
   if (root) {
+    p.page.building = true;
+    p.render();
+
     const sections = root.get("childs");
     if (sections) {
       const loaded = new Set<string>();
@@ -60,6 +63,8 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         }
       }
     });
+
+    p.page.building = false;
     p.render();
   }
 };

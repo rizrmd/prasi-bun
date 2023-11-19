@@ -3,7 +3,7 @@ import { IContent } from "../../../../../../../utils/types/general";
 import { MItem } from "../../../../../../../utils/types/item";
 import { PG, active } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
-import { fillID } from "../../../../../../editor/tools/fill-id";
+import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 
 export const edActionPaste = async (p: PG, item: IContent) => {
   const mitem = p.page.meta[item.id].mitem;

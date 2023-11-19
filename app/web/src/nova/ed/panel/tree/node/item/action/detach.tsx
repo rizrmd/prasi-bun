@@ -2,7 +2,7 @@ import { syncronize } from "y-pojo";
 import { IItem } from "../../../../../../../utils/types/item";
 import { PG } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
-import { fillID } from "../../../../../../editor/tools/fill-id";
+import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 
 export const edActionDetach = (p: PG, item: IItem) => {
   const mitem = p.page.meta[item.id].mitem;

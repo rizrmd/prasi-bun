@@ -1,7 +1,7 @@
 import { syncronize } from "y-pojo";
 import { IContent, MContent } from "../../../../../../../utils/types/general";
 import { IItem } from "../../../../../../../utils/types/item";
-import { fillID } from "../../../../../../editor/tools/fill-id";
+import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 import { PG } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
 
