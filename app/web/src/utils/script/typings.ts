@@ -94,7 +94,12 @@ declare module "ts:prisma" {
   register(
     monaco,
     `\
-import React from 'react';
+import React from "react";
+import {
+  FC as ReactFC,
+  ReactNode as RNode,
+  ReactElement as RElement,
+} from "react";
 import prisma from 'ts:prisma';
 
 ${iftext(
@@ -109,7 +114,6 @@ declare global {;
   
   ${baseTypings}
 
-  const moko: {nama: string};
   ${propText.join("\n")}
 
   ${iftext(
