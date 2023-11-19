@@ -193,6 +193,7 @@ export const EdApiServer = forwardRef<
             "px-1 m-1 border flex-1 font-mono text-[11px] outline-none focus:border-blue-500",
             dev.enabled && "border-green-700"
           )}
+          placeholder="http://local-dev-server"
           value={dev.url}
           onChange={(e) => {
             dev.url = e.currentTarget.value;
