@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { useGlobal } from "web-utils";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMetaRender } from "./render";
@@ -9,9 +9,11 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   scopeIndex,
 }) => {
   const v = useGlobal(ViewGlobal, "VIEW");
+  const [, _render] = useState({});
 
   const meta = v.meta[id];
   if (!meta) return null;
+  meta.render = () => _render({});
 
   const item = meta.item;
 

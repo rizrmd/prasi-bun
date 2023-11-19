@@ -13,14 +13,26 @@ export const View: FC<{
   component: VLoadComponent;
   site_id: string;
   page_id: string;
+  api_url: string;
   mode: "desktop" | "mobile";
   bind?: (arg: { render: () => void }) => void;
   hidden?: (item: IContent) => boolean;
   hover?: { get: (item: IContent) => boolean; set: (id: string) => void };
   active?: { get: (item: IContent) => boolean; set: (id: string) => void };
-}> = ({ load, site_id, page_id, bind, hover, active, hidden, component }) => {
+}> = ({
+  load,
+  site_id,
+  page_id,
+  bind,
+  hover,
+  active,
+  hidden,
+  component,
+  api_url,
+}) => {
   const v = useGlobal(ViewGlobal, "VIEW");
 
+  v.script.api_url = api_url;
   if (hidden) v.view.hidden = hidden;
   if (hover) v.view.hover = hover;
   if (active) v.view.active = active;
