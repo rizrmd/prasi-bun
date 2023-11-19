@@ -4,7 +4,7 @@ import { g } from "utils/global";
 
 export const _ = {
   url: "/nova-load/:mode/:id/**",
-  async api(mode: "site" | "page" | "code", id: string) {
+  async api(mode: "site" | "code", id: string) {
     const { req, res } = apiContext(this);
 
     if (mode === "site") {
@@ -17,10 +17,6 @@ export const _ = {
           return new Response(file as any);
         }
       }
-    }
-    if (mode === "page") {
-      const code = await db.code_assign.findMany({ where: { id_page: id } });
-      return code.map((e) => e.id);
     } else if (mode === "code") {
       const file = Bun.file(
         dir.path(`${g.datadir}/site/build/${id}/${req.params["*"]}`)
