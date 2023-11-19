@@ -83,7 +83,7 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
   }
 };
 
-const loadCGroupCode = async (comp_id: string) => {
+export const loadCompCode = async (comp_id: string) => {
   const cgroup_id = codeMap.comp[comp_id];
   if (codeMap.compGroup[cgroup_id]) {
     const promises = [];
