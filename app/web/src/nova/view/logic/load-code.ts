@@ -18,7 +18,6 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
 
     const { site_id, page_id } = v.current;
     const w = window as any;
-    const promises = [];
 
     if (!codeLoaded.has(site_id)) {
       codeLoaded.add(site_id);
@@ -59,6 +58,7 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
       }
     }
 
+    const promises = [];
     if (codeMap.page[page_id]) {
       for (const id of codeMap.page[page_id]) {
         promises.push(
