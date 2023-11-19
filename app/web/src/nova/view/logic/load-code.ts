@@ -4,6 +4,7 @@ export const codeLoaded = new Set<string>();
 const codeMap = {
   page: {} as Record<string, string[]>,
   compGroup: {} as Record<string, string[]>,
+  comp: {} as Record<string, string>,
 };
 export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
   if (forceLoad) {
@@ -17,38 +18,45 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
 
     const { site_id, page_id } = v.current;
     const w = window as any;
-    const promises = [
-      new Promise<void>(async (resolve) => {
-        if (!codeLoaded.has(site_id)) {
-          codeLoaded.add(site_id);
-          const module = await importCJS(`/nova-load/site/${site_id}/index.js`);
-          for (const [k, v] of Object.entries(module)) {
-            w[k] = v;
-          }
-        }
-        resolve();
-      }),
-    ];
-    const code_ids: string[] = [];
-    const code = await db.code.findMany({
-      where: { id_site: site_id, name: { notIn: ["site", "SSR"] } },
-      select: { code_assign: true },
-    });
+    const promises = [];
 
-    codeMap.compGroup = {};
-    codeMap.page = {};
-    for (const c of code) {
-      c.code_assign.forEach((e) => {
-        if (e.id_page) {
-          if (!codeMap.page[e.id_page]) codeMap.page[e.id_page] = [];
-          codeMap.page[e.id_page].push(e.id_code);
-        }
-        if (e.id_component_group) {
-          if (!codeMap.compGroup[e.id_component_group])
-            codeMap.compGroup[e.id_component_group] = [];
-          codeMap.page[e.id_component_group].push(e.id_code);
-        }
+    if (!codeLoaded.has(site_id)) {
+      codeLoaded.add(site_id);
+      const module = await importCJS(`/nova-load/site/${site_id}/index.js`);
+      for (const [k, v] of Object.entries(module)) {
+        w[k] = v;
+      }
+
+      const code = await db.code.findMany({
+        where: { id_site: site_id, name: { notIn: ["site", "SSR"] } },
+        select: { code_assign: true },
       });
+      codeMap.compGroup = {};
+      codeMap.page = {};
+      for (const c of code) {
+        c.code_assign.forEach((e) => {
+          if (e.id_page) {
+            if (!codeMap.page[e.id_page]) codeMap.page[e.id_page] = [];
+            codeMap.page[e.id_page].push(e.id_code);
+          }
+          if (e.id_component_group) {
+            if (!codeMap.compGroup[e.id_component_group])
+              codeMap.compGroup[e.id_component_group] = [];
+            codeMap.page[e.id_component_group].push(e.id_code);
+          }
+        });
+      }
+
+      codeMap.comp = {};
+      const comps = await db.component.findMany({
+        where: { id_component_group: { in: Object.keys(codeMap.compGroup) } },
+        select: { id: true, id_component_group: true },
+      });
+      for (const c of comps) {
+        if (c.id && c.id_component_group) {
+          codeMap.comp[c.id] = c.id_component_group;
+        }
+      }
     }
 
     if (codeMap.page[page_id]) {
@@ -75,7 +83,8 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
   }
 };
 
-const loadCGroupCode = async (cgroup_id: string) => {
+const loadCGroupCode = async (comp_id: string) => {
+  const cgroup_id = codeMap.comp[comp_id];
   if (codeMap.compGroup[cgroup_id]) {
     const promises = [];
     const w = window as any;
