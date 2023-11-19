@@ -4,20 +4,24 @@ import { VG } from "../../logic/global";
 import { ViewMetaChildren } from "./children";
 import { produceCSS } from "../../../../utils/css/gen";
 
-export const ViewMetaRender: FC<{ item: IContent; v: VG; props?: any }> = ({
-  item,
-  v,
-  props,
-}) => {
-  const className = produceCSS(item, {
-    mode: v.mode,
-    hover: v.view.hover ? v.view.hover.get(item) : undefined,
-    active: v.view.active ? v.view.active.get(item) : undefined,
-  });
+export const ViewMetaRender: FC<{
+  item: IContent;
+  v: VG;
+  props?: any;
+  className?: string;
+}> = ({ item, v, props, className }) => {
+  let _className = className;
+  if (!className) {
+    _className = produceCSS(item, {
+      mode: v.mode,
+      hover: v.view.hover ? v.view.hover.get(item) : undefined,
+      active: v.view.active ? v.view.active.get(item) : undefined,
+    });
+  }
 
   return (
     <div
-      className={className}
+      className={_className}
       {...props}
       onPointerOver={
         v.view.hover

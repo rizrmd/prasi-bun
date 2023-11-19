@@ -126,9 +126,7 @@ export const mergeScopeUpwards = (
   }
 
   let cur = meta;
-
   const finalScope: any = {};
-
   while (cur) {
     let scope = null;
 

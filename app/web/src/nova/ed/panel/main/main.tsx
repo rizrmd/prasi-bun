@@ -12,10 +12,11 @@ export const EdMain = () => {
       {!p.page.building && (
         <View
           mode={p.mode}
+          api_url={p.site.config.api_url}
           component={{
             map: p.comp.map,
-            load(id_comp) {
-              loadComponent(p, id_comp);
+            async load(id_comp) {
+              await loadComponent(p, id_comp);
             },
           }}
           load={{

@@ -61,10 +61,19 @@ export type EdMeta = {
     mcomp: MItem;
   };
   el?: ReactElement;
-  memoize?: Record<string, {
-    Local: FC<any>;
-    PassProp: FC<any>;
-  }>;
+  isLayout?: boolean;
+  /** script related meta **/
+  propval?: Record<string, any>;
+  indexedScope: Record<string, any>;
+  memoize?: Record<
+    string,
+    {
+      Local: FC<any>;
+      PassProp: FC<any>;
+    }
+  >;
+  scope?: Record<string, any>;
+  render?: () => void;
 };
 
 export const EDGlobal = {

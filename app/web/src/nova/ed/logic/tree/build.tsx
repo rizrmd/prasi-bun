@@ -212,6 +212,7 @@ const walkMap = (
           mitem: mitem as MItem,
           parent_item,
           parent_comp,
+          indexedScope: {},
         };
         p.page.meta[item.id] = meta;
 
@@ -277,6 +278,7 @@ const walkMap = (
     mitem: mitem as MItem,
     parent_item,
     parent_comp,
+    indexedScope: {},
   };
 
   if (item.name.startsWith("⬅")) {
