@@ -36,6 +36,7 @@ const EmptyComp = {
 
 const target = { active_id: false as any };
 export const active = {
+  hover_id: "",
   get item_id() {
     if (target.active_id === false) {
       target.active_id = localStorage.getItem("prasi-active-id") || "";
@@ -63,6 +64,7 @@ export type EdMeta = {
 };
 
 export const EDGlobal = {
+  mode: "" as "desktop" | "mobile",
   user: { id: "", username: "", client_id: "" },
   clients: {} as Record<string, { id: string; username: string }>,
   status: "init" as

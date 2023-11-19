@@ -42,7 +42,8 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         `,
         active.item_id === item.id
           ? ["bg-blue-100"]
-          : ["hover:bg-blue-50", isComponent && `bg-purple-50`]
+          : [isComponent && `bg-purple-50`],
+        active.hover_id === item.id && "bg-blue-50"
       )}
       onKeyDown={(e) => {
         p.ui.prevent_indent_hook = true;
@@ -237,6 +238,12 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         active.item_id = item.id;
         p.ui.tree.search = "";
         p.render();
+        p.page.render();
+      }}
+      onMouseOver={() => {
+        active.hover_id = item.id;
+        p.render();
+        p.page.render();
       }}
     >
       <div className="focus hidden absolute left-0 bottom-0 top-0 w-[4px] bg-blue-500"></div>

@@ -6,6 +6,7 @@ import { useLocal } from "web-utils";
 export const TopBtn = ({
   children,
   className,
+  innerClassName,
   disabled,
   underlight,
   onClick,
@@ -15,6 +16,7 @@ export const TopBtn = ({
 }: {
   children: ReactNode;
   className?: string;
+  innerClassName?: string;
   disabled?: boolean;
   underlight?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
@@ -76,6 +78,7 @@ export const TopBtn = ({
           local.open = open;
           local.render();
         }}
+        className={innerClassName}
         placement={placement}
       >
         {result}

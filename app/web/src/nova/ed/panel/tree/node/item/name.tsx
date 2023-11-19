@@ -37,6 +37,12 @@ export const EdTreeName = ({
           onFocus={(e) => {
             e.currentTarget.select();
           }}
+          onBlur={() => {
+            item.name = local.rename;
+            mitem.set("name", item.name);
+            p.ui.tree.rename_id = "";
+            p.render();
+          }}
           onKeyDown={(e) => {
             e.stopPropagation();
             if (e.key === "Enter" || e.key === "Escape") {

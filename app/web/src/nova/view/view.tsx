@@ -1,51 +1,64 @@
 import { FC } from "react";
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
-import { ViewGlobal } from "./logic/global";
+import { VG, ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
 import { vLoadCode } from "./logic/load-code";
 import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
+import { IContent } from "../../utils/types/general";
 
 export const View: FC<{
   load: VLoad;
   component: VLoadComponent;
   site_id: string;
   page_id: string;
+  mode: "desktop" | "mobile";
   bind?: (arg: { render: () => void }) => void;
-}> = ({ load, site_id, page_id, bind: onLoad }) => {
+  hidden?: (item: IContent) => boolean;
+  hover?: { get: (item: IContent) => boolean; set: (id: string) => void };
+  active?: { get: (item: IContent) => boolean; set: (id: string) => void };
+}> = ({ load, site_id, page_id, bind, hover, active, hidden }) => {
   const v = useGlobal(ViewGlobal, "VIEW");
 
+  if (hidden) v.view.hidden = hidden;
+  if (hover) v.view.hover = hover;
+  if (active) v.view.active = active;
+
   if (v.current.page_id !== page_id || v.current.site_id !== site_id) {
-    v.mode = "init";
+    v.status = "init";
   }
 
-  if (onLoad) {
-    onLoad({
+  if (bind) {
+    bind({
       render() {
-        v.mode = "rebuild";
+        v.status = "rebuild";
         v.render();
       },
     });
   }
 
-  if (v.mode === "init") {
+  if (v.status === "init") {
     vInit(v, { load, page_id, site_id });
-    if (v.mode === "init") {
+    if (v.status === "init") {
       return <Loading backdrop={false} note="init" />;
     }
   }
 
-  if (v.mode === "load-code" || v.mode === "loading-code") {
+  if (v.status === "load-code" || v.status === "loading-code") {
     vLoadCode(v);
-    if (v.mode === "load-code" || v.mode === "loading-code") {
+    if (v.status === "load-code" || v.status === "loading-code") {
       return <Loading backdrop={false} note="load" />;
     }
   }
 
-  if (v.mode === "rebuild") {
+  if (v.status === "rebuild") {
+    if (load.mode === "tree_meta") {
+      v.meta = load.meta;
+      v.entry = load.entry;
+    }
     v.bodyCache = <VEntry />;
-    v.mode = "ready";
+    v.status = "ready";
   }
 
   return <div className="flex flex-1 flex-col relative">{v.bodyCache}</div>;
