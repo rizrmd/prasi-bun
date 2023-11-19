@@ -1,6 +1,13 @@
 import { VG } from "./global";
 
-export const vLoadCode = async (v: VG) => {
+export const codeLoaded = new Set<string>();
+export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
+  if (forceLoad) {
+    codeLoaded.clear();
+    v.mode = "load-code";
+    v.render();
+  }
+
   if (v.mode === "load-code") {
     v.mode = "loading-code";
 
@@ -8,9 +15,12 @@ export const vLoadCode = async (v: VG) => {
     const w = window as any;
     const promises = [
       new Promise<void>(async (resolve) => {
-        const module = await importCJS(`/nova-load/site/${site_id}/index.js`);
-        for (const [k, v] of Object.entries(module)) {
-          w[k] = v;
+        if (!codeLoaded.has(site_id)) {
+          codeLoaded.add(site_id);
+          const module = await importCJS(`/nova-load/site/${site_id}/index.js`);
+          for (const [k, v] of Object.entries(module)) {
+            w[k] = v;
+          }
         }
         resolve();
       }),
@@ -20,9 +30,12 @@ export const vLoadCode = async (v: VG) => {
     for (const id of code_ids) {
       promises.push(
         new Promise<void>(async (resolve) => {
-          const module = await importCJS(`/nova-load/code/${id}/index.js`);
-          for (const [k, v] of Object.entries(module)) {
-            w[k] = v;
+          if (!codeLoaded.has(id)) {
+            codeLoaded.add(id);
+            const module = await importCJS(`/nova-load/code/${id}/index.js`);
+            for (const [k, v] of Object.entries(module)) {
+              w[k] = v;
+            }
           }
           resolve();
         })
