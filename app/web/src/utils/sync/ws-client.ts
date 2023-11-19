@@ -80,6 +80,7 @@ export const clientStartSync = async (arg: {
       id: string;
       event: "code-loading" | "code-done";
       content?: string;
+      src?: Uint8Array;
     }) => void;
     activity: (arg: {
       activity: string;

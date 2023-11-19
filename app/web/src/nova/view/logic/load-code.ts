@@ -107,23 +107,24 @@ export const loadCompCode = async (comp_id: string) => {
 };
 
 const importCJS = async (url: string) => {
-  const module = { exports: { __esModule: true as true | undefined } };
   const res = await fetch(url);
-
   const src = await res.text();
+  return evalCJS(src);
+};
+
+export const evalCJS = (src: string) => {
   if (src) {
-    try {
-      const fn = new Function("module", src);
-      await fn(module);
-
-      const result = { ...module.exports };
-      if (result.__esModule) {
-        delete result.__esModule;
-      }
-
-      return result;
-    } catch (e) {}
+    const module = { exports: { __esModule: true as true | undefined } };
+    eval(`try {
+        ${src}
+      } catch(e) {
+        console.error(e);
+      }`);
+    const result = { ...module.exports };
+    if (result.__esModule) {
+      delete result.__esModule;
+    }
+    return result;
   }
-
   return {};
 };
