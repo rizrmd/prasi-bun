@@ -2,6 +2,7 @@ import { useGlobal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
 import { EDGlobal } from "../../logic/ed-global";
+import { loadComponent } from "../../logic/tree/build";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -10,6 +11,12 @@ export const EdMain = () => {
       {!!p.page.building && <Loading backdrop={false} />}
       {!p.page.building && (
         <View
+          component={{
+            map: p.comp.map,
+            load(id_comp) {
+              loadComponent(p, id_comp);
+            },
+          }}
           load={{
             mode: "tree_meta",
             meta: p.page.meta,

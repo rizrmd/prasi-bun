@@ -93,7 +93,7 @@ const walkLoad = async (p: PG, mitem: MItem, loaded: Set<string>) => {
     if (id) {
       loaded.add(id);
       if (!p.comp.list[id]) {
-        await loadComponent(p, comp);
+        await loadComponent(p, comp.id);
       }
 
       const pcomp = p.comp.list[id];
@@ -305,13 +305,17 @@ const walkMap = (
   }
 };
 
-const loadComponent = async (p: PG, item_comp: FNComponent) => {
-  const cur = await p.sync.comp.load(item_comp.id);
+export const loadComponent = async (p: PG, id_comp: string) => {
+  const cur = await p.sync.comp.load(id_comp);
   if (cur && cur.snapshot) {
     const doc = new Y.Doc() as DComp;
     if (cur.snapshot) {
       Y.applyUpdate(doc as any, decompress(cur.snapshot));
-      p.comp.list[item_comp.id] = { comp: cur, doc };
+      p.comp.map[id_comp] = {
+        id: id_comp,
+        item: doc.getMap("map").get("root")?.toJSON() as IItem,
+      };
+      p.comp.list[id_comp] = { comp: cur, doc };
       return true;
     }
   }

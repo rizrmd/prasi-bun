@@ -7,6 +7,7 @@ import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
+import { FNComponent } from "../../../utils/types/meta-fn";
 
 export const EmptySite = {
   id: "",
@@ -88,6 +89,7 @@ export const EDGlobal = {
     cur: EmptyComp,
     doc: null as null | DComp,
     item: null as null | IItem,
+    map: {} as Record<string, { id: string; item: IItem }>,
     list: {} as Record<string, { comp: EComp; doc: DComp }>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
