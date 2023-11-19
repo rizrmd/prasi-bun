@@ -4,10 +4,15 @@ import { ViewGlobal } from "../../logic/global";
 import { ViewMetaRender } from "./render";
 import { ViewMetaScript } from "./script";
 
-export const ViewMeta: FC<{ id: string }> = ({ id }) => {
+export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
+  id,
+  scopeIndex,
+}) => {
   const v = useGlobal(ViewGlobal, "VIEW");
 
   const meta = v.meta[id];
+  if (!meta) return null;
+
   const item = meta.item;
 
   if (item.hidden && v.view.hidden) {
@@ -17,8 +22,8 @@ export const ViewMeta: FC<{ id: string }> = ({ id }) => {
   }
 
   if (item.adv) {
-    if (item.adv.js) {
-      return <ViewMetaScript v={v} item={item} />;
+    if (item.adv.js && item.adv.jsBuilt) {
+      return <ViewMetaScript v={v} item={item} scopeIndex={scopeIndex} />;
     }
   }
 

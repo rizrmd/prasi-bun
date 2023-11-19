@@ -1,5 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { ReactElement } from "react";
+import { FC, ReactElement } from "react";
 import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
 import { clientStartSync } from "../../../utils/sync/ws-client";
@@ -61,6 +61,10 @@ export type EdMeta = {
     mcomp: MItem;
   };
   el?: ReactElement;
+  memoize?: Record<string, {
+    Local: FC<any>;
+    PassProp: FC<any>;
+  }>;
 };
 
 export const EDGlobal = {
@@ -75,7 +79,10 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),
-  script: { siteTypes: {} as Record<string, string> },
+  script: {
+    siteTypes: {} as Record<string, string>,
+    loaded: false,
+  },
   page: {
     cur: EmptyPage,
     doc: null as null | DPage,

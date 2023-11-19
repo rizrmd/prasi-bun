@@ -19,7 +19,7 @@ export const EdBase = () => {
   edUndoManager(p);
 
   if (p.status === "init") {
-    edInit(p)
+    edInit(p);
   }
 
   edRoute(p);

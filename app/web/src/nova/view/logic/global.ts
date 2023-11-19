@@ -1,9 +1,6 @@
 import { ReactElement } from "react";
 import { IContent } from "../../../utils/types/general";
-import { IItem } from "../../../utils/types/item";
-import { ISection } from "../../../utils/types/section";
-import { IText } from "../../../utils/types/text";
-import { EdMeta } from "../../ed/logic/ed-global";
+import { EdMeta, PG } from "../../ed/logic/ed-global";
 
 export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
@@ -12,6 +9,15 @@ export const ViewGlobal = {
   meta: {} as Record<string, EdMeta>,
   entry: [] as string[],
   bodyCache: null as null | ReactElement,
+  component: {
+    map: {} as PG["comp"]["map"],
+    load: async (id_comp: string) => {},
+  },
+  script: {
+    api_url: "",
+    db: null as any,
+    api: null as any,
+  },
   view: {
     hidden: undefined as undefined | ((item: IContent) => boolean),
     active: undefined as
