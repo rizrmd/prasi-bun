@@ -6,6 +6,7 @@ import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";
 import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
+import { evalCJS } from "../../view/logic/load-code";
 
 const decoder = new TextDecoder();
 
@@ -78,6 +79,17 @@ export const edInitSync = (p: PG) => {
               p.ui.popup.code.log += arg.content;
             }
             p.ui.popup.code.loading = false;
+
+            if (arg.src) {
+              const w = window as any;
+              console.clear();
+              const module = evalCJS(decoder.decode(decompress(arg.src)));
+              if (typeof module === "object") {
+                for (const [k, v] of Object.entries(module)) {
+                  w[k] = v;
+                }
+              }
+            }
             p.render();
           } else {
             if (typeof arg.content === "string")

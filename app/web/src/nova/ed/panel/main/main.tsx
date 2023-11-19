@@ -12,6 +12,7 @@ export const EdMain = () => {
       {!p.page.building && (
         <View
           mode={p.mode}
+          isEditor={true}
           api_url={p.site.config.api_url}
           component={{
             map: p.comp.map,
