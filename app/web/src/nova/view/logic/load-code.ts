@@ -112,15 +112,17 @@ const importCJS = async (url: string) => {
 
   const src = await res.text();
   if (src) {
-    const fn = new Function("module", src);
-    await fn(module);
+    try {
+      const fn = new Function("module", src);
+      await fn(module);
 
-    const result = { ...module.exports };
-    if (result.__esModule) {
-      delete result.__esModule;
-    }
+      const result = { ...module.exports };
+      if (result.__esModule) {
+        delete result.__esModule;
+      }
 
-    return result;
+      return result;
+    } catch (e) {}
   }
 
   return {};

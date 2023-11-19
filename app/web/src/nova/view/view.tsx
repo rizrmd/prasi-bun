@@ -4,11 +4,12 @@ import { Loading } from "../../utils/ui/loading";
 import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
 import { vLoadCode } from "./logic/load-code";
-import { VLoad } from "./logic/types";
+import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
 
 export const View: FC<{
   load: VLoad;
+  component: VLoadComponent;
   site_id: string;
   page_id: string;
   bind?: (arg: { render: () => void }) => void;
