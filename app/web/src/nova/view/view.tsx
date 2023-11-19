@@ -1,12 +1,12 @@
 import { FC } from "react";
 import { useGlobal } from "web-utils";
+import { IContent } from "../../utils/types/general";
 import { Loading } from "../../utils/ui/loading";
-import { VG, ViewGlobal } from "./logic/global";
+import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
 import { vLoadCode } from "./logic/load-code";
 import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
-import { IContent } from "../../utils/types/general";
 
 export const View: FC<{
   load: VLoad;
@@ -18,16 +18,17 @@ export const View: FC<{
   hidden?: (item: IContent) => boolean;
   hover?: { get: (item: IContent) => boolean; set: (id: string) => void };
   active?: { get: (item: IContent) => boolean; set: (id: string) => void };
-}> = ({ load, site_id, page_id, bind, hover, active, hidden }) => {
+}> = ({ load, site_id, page_id, bind, hover, active, hidden, component }) => {
   const v = useGlobal(ViewGlobal, "VIEW");
 
   if (hidden) v.view.hidden = hidden;
   if (hover) v.view.hover = hover;
   if (active) v.view.active = active;
-
   if (v.current.page_id !== page_id || v.current.site_id !== site_id) {
     v.status = "init";
   }
+  v.component.map = component.map;
+  v.component.load = component.load;
 
   if (bind) {
     bind({
@@ -48,7 +49,7 @@ export const View: FC<{
   if (v.status === "load-code" || v.status === "loading-code") {
     vLoadCode(v);
     if (v.status === "load-code" || v.status === "loading-code") {
-      return <Loading backdrop={false} note="load" />;
+      return <Loading backdrop={false} note="rendering-view" />;
     }
   }
 

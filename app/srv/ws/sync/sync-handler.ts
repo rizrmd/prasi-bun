@@ -49,7 +49,6 @@ export const syncHandler: WebSocketHandler<WSData> = {
 
           conn.user_id = user_id;
           conn.user = await db.user.findFirst({ where: { id: user_id } });
-
           let conf = await user.conf.getOrCreate(user_id);
           if (site_id) {
             const newconf = await loadSitePage(user_id, site_id, page_id);
