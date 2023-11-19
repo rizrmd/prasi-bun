@@ -10,7 +10,7 @@ import {
 } from "../../../../srv/ws/sync/actions-def";
 import { UserConf } from "../../../../srv/ws/sync/entity/user";
 import { SyncType } from "../../../../srv/ws/sync/type";
-import { ESite } from "../../render/ed/logic/ed-global";
+import { ESite } from "../../nova/ed/logic/ed-global";
 import { w } from "../types/general";
 import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { page, useGlobal } from "web-utils";
-import { EDGlobal } from "../../render/ed/logic/ed-global";
-import { edInitSync } from "../../render/ed/logic/ed-sync";
+import { EDGlobal } from "../../nova/ed/logic/ed-global";
+import { edInitSync } from "../../nova/ed/logic/ed-sync";
 import { Loading } from "../../utils/ui/loading";
 import { isLocalhost } from "../../utils/ui/is-localhost";
 

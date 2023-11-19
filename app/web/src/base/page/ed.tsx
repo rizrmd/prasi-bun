@@ -1,9 +1,9 @@
 import { page, useGlobal } from "web-utils";
-import { EdBase } from "../../render/ed/ed-base";
-import { EDGlobal } from "../../render/ed/logic/ed-global";
+import { EdBase } from "../../nova/ed/ed-base";
+import { EDGlobal } from "../../nova/ed/logic/ed-global";
 import { Loading } from "../../utils/ui/loading";
 import { initSync } from "wasm-gzip";
-import { edInitSync } from "../../render/ed/logic/ed-sync";
+import { edInitSync } from "../../nova/ed/logic/ed-sync";
 
 export default page({
   url: "/ed/:site_id/:page_id",
