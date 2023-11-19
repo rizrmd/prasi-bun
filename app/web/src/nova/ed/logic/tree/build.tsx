@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { decompress } from "wasm-gzip";
 import { syncronize } from "y-pojo";
-import { TypedMap } from "yjs-types";
+import { TypedArray, TypedMap } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import {
@@ -10,7 +10,7 @@ import {
   FNCompDef,
   FNComponent,
 } from "../../../../utils/types/meta-fn";
-import { DComp, IRoot } from "../../../../utils/types/root";
+import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
 
@@ -28,7 +28,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       const loaded = new Set<string>();
       await Promise.all(
         sections.map((e) => {
-          p.page.entry.push(e.get("id"));
           return walkLoad(p, e, loaded);
         })
       );
@@ -66,6 +65,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
     p.page.building = false;
     p.render();
+    p.page.render();
   }
 };
 
@@ -80,7 +80,11 @@ const mapItem = (mitem: MContent, item: any) => {
       }
       item[k] = val;
     } else {
-      item[k] = [];
+      if (!item[k]) item[k] = [];
+      const childs = e as unknown as TypedArray<{}>;
+      childs.forEach((c) => {
+        item[k].push({ id: c.get("id") });
+      });
     }
   });
 };

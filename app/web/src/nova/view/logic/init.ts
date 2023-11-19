@@ -7,7 +7,7 @@ export const vInit = (
 ) => {
   const { load, site_id, page_id } = arg;
 
-  v.mode = "load-code";
+  v.status = "load-code";
   v.current.site_id = site_id;
   v.current.page_id = page_id;
 

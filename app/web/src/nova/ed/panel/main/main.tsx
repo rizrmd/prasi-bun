@@ -1,7 +1,7 @@
 import { useGlobal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
-import { EDGlobal } from "../../logic/ed-global";
+import { EDGlobal, active } from "../../logic/ed-global";
 import { loadComponent } from "../../logic/tree/build";
 
 export const EdMain = () => {
@@ -11,6 +11,7 @@ export const EdMain = () => {
       {!!p.page.building && <Loading backdrop={false} />}
       {!p.page.building && (
         <View
+          mode={p.mode}
           component={{
             map: p.comp.map,
             load(id_comp) {
@@ -26,6 +27,30 @@ export const EdMain = () => {
           page_id={p.page.cur.id}
           bind={({ render }) => {
             p.page.render = render;
+          }}
+          hidden={(item) => {
+            if (item.hidden) return true;
+            return false;
+          }}
+          hover={{
+            get(item) {
+              return active.hover_id === item.id;
+            },
+            set(id) {
+              active.hover_id = id;
+              p.render();
+              p.page.render();
+            },
+          }}
+          active={{
+            get(item) {
+              return active.item_id === item.id;
+            },
+            set(id) {
+              active.item_id = id;
+              p.render();
+              p.page.render();
+            },
           }}
         />
       )}

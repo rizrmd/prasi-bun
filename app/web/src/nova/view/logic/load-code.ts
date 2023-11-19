@@ -9,12 +9,12 @@ const codeMap = {
 export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
   if (forceLoad) {
     codeLoaded.clear();
-    v.mode = "load-code";
+    v.status = "load-code";
     v.render();
   }
 
-  if (v.mode === "load-code") {
-    v.mode = "loading-code";
+  if (v.status === "load-code") {
+    v.status = "loading-code";
 
     const { site_id, page_id } = v.current;
     const w = window as any;
@@ -78,7 +78,7 @@ export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
 
     await Promise.all(promises);
 
-    v.mode = "rebuild";
+    v.status = "rebuild";
     v.render();
   }
 };
