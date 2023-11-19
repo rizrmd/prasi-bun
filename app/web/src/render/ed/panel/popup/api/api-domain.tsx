@@ -8,11 +8,11 @@ export const EdApiDomain = ({ domains }: { domains: string[] }) => {
   const api = apiRef[apiUrl(p)];
 
   return (
-    <div className="flex border-b py-2 px-2 border-slate-300 boxed  flex items-center space-x-1">
+    <div className="flex border-b py-2 px-2 border-slate-300 boxed flex-wrap  items-center space-x-1">
       <div>Domains:</div>
       {domains.map((e) => {
         return (
-          <div className="border flex items-stretch" key={e}>
+          <div className="border flex items-stretch mb-1" key={e}>
             <a
               className="border-r flex items-center px-1 hover:underline hover:text-blue-500"
               href={e}

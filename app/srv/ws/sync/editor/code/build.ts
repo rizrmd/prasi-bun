@@ -20,9 +20,7 @@ export const codeBuild = async (code: DBCode) => {
         entryPoints: ["index.tsx"],
         bundle: true,
         format: "cjs",
-        outfile: dir.path(
-          `${g.datadir}/site/build/${id_code}/index.js`
-        ),
+        outfile: dir.path(`${g.datadir}/site/build/${id_code}/index.js`),
         minify: true,
         treeShaking: true,
         sourcemap: true,

@@ -22,7 +22,7 @@ export const EdPopCode = () => {
 
   useEffect(() => {
     (async () => {
-      if (!p.ui.popup.code.init) {
+      if (p.ui.popup.code.open) {
         const id_code = await p.sync.activity("site", {
           action: p.ui.popup.code.open ? "open" : "close",
           id: p.site.id,
@@ -211,7 +211,7 @@ export const EdPopCode = () => {
                   src={`${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`}
                 ></iframe>
                 <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
-                  Loading VS Code...
+                  Loading VSCode...
                 </div>
               </>
             )}
