@@ -3,6 +3,7 @@ import { useGlobal } from "web-utils";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMetaRender } from "./render";
 import { ViewMetaScript } from "./script";
+import { compPropVal } from "./script/comp-propval";
 
 export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   id,
@@ -16,6 +17,10 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   meta.render = () => _render({});
 
   const item = meta.item;
+
+  if (item.type === "item" && item.component?.id) {
+    compPropVal(v, meta);
+  }
 
   if (item.hidden && v.view.hidden) {
     if (v.view.hidden(item)) {
