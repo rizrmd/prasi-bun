@@ -3,7 +3,7 @@ import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 
 export const edRoute = async (p: PG) => {
-  if (p.status === "ready") {
+  if (p.status === "ready" || p.status === "init") {
     if (!p.site.domain && !p.site.name) {
       p.status = "loading";
       const site = await p.sync.site.load(p.site.id);
