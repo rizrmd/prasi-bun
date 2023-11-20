@@ -143,6 +143,10 @@ export const EDGlobal = {
         show_log: false,
         list: {} as Record<string, string>,
       },
+      script: {
+        open: false,
+        mode: "js" as "js" | "css" | "html",
+      },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {
         group_id: string;

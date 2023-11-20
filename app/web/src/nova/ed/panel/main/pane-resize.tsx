@@ -67,8 +67,8 @@ const EdPaneResize = (arg: {
       <div className={cx("relative")}>
         <div
           className={cx(
-            "w-[4px] absolute inset-0 z-50 -mx-[2px] cursor-ew-resize hover:bg-blue-800 transition-all duration-700",
-            local.dragging && "bg-blue-800"
+            "w-[4px] absolute inset-0 -mx-[2px] cursor-ew-resize hover:bg-blue-800 transition-all duration-700",
+            local.dragging && "z-40 bg-blue-800"
           )}
           onDoubleClick={() => {
             arg.onResize(local.default);
