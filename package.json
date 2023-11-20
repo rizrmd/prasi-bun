@@ -27,7 +27,6 @@
   "dependencies": {
     "brotli-wasm": "^2.0.1",
     "fdir": "^6.1.0",
-    "oxc-parser": "^0.2.0",
     "typescript": "^5.2.2"
   }
 }
