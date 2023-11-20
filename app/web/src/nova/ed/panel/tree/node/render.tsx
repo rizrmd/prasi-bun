@@ -39,6 +39,11 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
               display: flex;
             }
           }
+          &:hover {
+            .action-script {
+              opacity: 0.6;
+            }
+          }
         `,
         active.item_id === item.id
           ? ["bg-blue-100"]
