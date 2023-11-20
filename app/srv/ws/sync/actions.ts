@@ -1,9 +1,5 @@
 import { component, page } from "dbgen";
-import {
-  EComp,
-  EPage,
-  ESite,
-} from "../../../web/src/nova/ed/logic/ed-global";
+import { EComp, EPage, ESite } from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
 import { activity } from "./entity/activity";
@@ -91,5 +87,12 @@ export const SyncActions = {
   client: {
     info: async (client_ids: string[]) =>
       ({}) as Record<string, { id: string; username: string }>,
+  },
+  swc: {
+    parse: async (
+      arg:
+        | { page_id: string; item_id?: string }
+        | { comp_id: string; item_id?: string }
+    ) => ({}) as Record<string, string>,
   },
 };
