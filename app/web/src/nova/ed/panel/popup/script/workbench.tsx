@@ -15,6 +15,7 @@ export const ScriptWorkbench = () => {
           ].map((e) => {
             return (
               <div
+                key={e.type}
                 className={cx(
                   css`
                     color: ${e.color};

@@ -88,6 +88,7 @@ export const EDGlobal = {
     | "ready",
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),
+  site_dts: "",
   script: {
     siteTypes: {} as Record<string, string>,
     loaded: false,
