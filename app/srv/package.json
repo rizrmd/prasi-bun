@@ -8,8 +8,6 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/mime-types": "^2.1.2",
     "esbuild": "^0.19.4",
-    "@swc/core": "^1.3.96",
-    "woodpile": "^0.0.5",
     "lmdb": "^2.8.5",
     "mime-types": "^2.1.35",
     "msgpackr": "^1.9.9",

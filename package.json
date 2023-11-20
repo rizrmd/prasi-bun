@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot ./pkgs/core/index.ts dev",
-    "clean": "m -rf app/static && rm -rf app/web/.parcel-cache",
+    "clean": "rm -rf app/static && rm -rf app/web/.parcel-cache",
     "build": "bun run --silent ./pkgs/core/build.ts",
     "build-site": "bun run --silent ./pkgs/core/build-site.ts",
     "db-pull": "bun run ./pkgs/crm -rf data && rore/db-pull.ts",
@@ -27,6 +27,7 @@
   "dependencies": {
     "brotli-wasm": "^2.0.1",
     "fdir": "^6.1.0",
+    "oxc-parser": "^0.2.0",
     "typescript": "^5.2.2"
   }
 }

@@ -62,10 +62,12 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         }
       }
     });
+    await p.sync.swc.parse({ type: "page", page_id: p.page.cur.id });
 
     p.page.building = false;
     p.render();
     p.page.render();
+    
   }
 };
 

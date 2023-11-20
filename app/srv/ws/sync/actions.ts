@@ -91,8 +91,8 @@ export const SyncActions = {
   swc: {
     parse: async (
       arg:
-        | { page_id: string; item_id?: string }
-        | { comp_id: string; item_id?: string }
+        | { type: "page", page_id: string; item_id?: string }
+        | { type: "comp", comp_id: string; item_id?: string }
     ) => ({}) as Record<string, string>,
   },
 };

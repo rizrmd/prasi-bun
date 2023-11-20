@@ -24,6 +24,9 @@ export const SyncActionDefinition = {
   "activity": "14",
   "client": {
     "info": "15"
+  },
+  "swc": {
+    "parse": "16"
   }
 };
 export const SyncActionPaths = {
@@ -42,5 +45,6 @@ export const SyncActionPaths = {
   "12": "yjs.diff_local",
   "13": "yjs.sv_remote",
   "14": "activity",
-  "15": "client.info"
+  "15": "client.info",
+  "16": "swc.parse"
 };
