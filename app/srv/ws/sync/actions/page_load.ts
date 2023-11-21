@@ -1,4 +1,8 @@
+import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
+import { IContent } from "../../../../web/src/utils/types/general";
+import { DPage, IRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
+import { parseJs } from "../editor/parser/parse-js";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -106,6 +110,7 @@ export const page_load: SAction["page"]["load"] = async function (
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
+        scope: scanMeta(docs.page[id].doc),
       };
     }
   } else if (snap && !ydoc) {
@@ -138,6 +143,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
+      scope: scanMeta(docs.page[id].doc),
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -155,6 +161,65 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
+      scope: scanMeta(ydoc.doc),
     };
+  }
+};
+
+const scanMeta = (doc: DPage) => {
+  const root = doc.getMap("map").get("root")?.toJSON() as IRoot;
+  if (root) {
+    const result = {};
+    for (const c of root.childs) {
+      parseItem(c, result, "");
+    }
+    return result;
+  }
+
+  return {};
+};
+
+export const parseItem = (
+  item: IContent,
+  result: EPage["scope"],
+  parent_id: string
+) => {
+  const js = item.adv?.js;
+
+  const parent_ids: string[] = [];
+  if (!!parent_id) {
+    if (!!result[parent_id]) {
+      result[parent_id].p.forEach((e) => parent_ids.push(e));
+    } else {
+      throw new Error(
+        `Parent item not found: ${JSON.stringify(
+          parent_id
+        )} \nitem:\n${JSON.stringify(
+          { id: item.id, name: item.name, type: item.type },
+          null,
+          2
+        )}`
+      );
+    }
+
+    parent_ids.push(parent_id);
+  }
+
+  result[item.id] = { p: parent_ids, s: undefined };
+
+  if (typeof js === "string") {
+    const res = parseJs(js);
+    if (res) {
+      result[item.id].s = res;
+    }
+  }
+
+  if (item.type !== "text") {
+    if (item.type === "item" && item.component?.id) {
+      return;
+    }
+    for (const c of item.childs) {
+      parseItem(c, result, item.id);
+    }
   }
 };

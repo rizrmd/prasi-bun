@@ -4,10 +4,10 @@ import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem, MItem } from "../../../utils/types/item";
-import { DComp, DPage, IRoot } from "../../../utils/types/root";
+import { DComp, DPage } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
-import { FNComponent } from "../../../utils/types/meta-fn";
+import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 
 export const EmptySite = {
   id: "",
@@ -27,6 +27,7 @@ const EmptyPage = {
   name: "",
   url: "",
   snapshot: null as null | Uint8Array,
+  scope: {} as Record<string, { p: string[]; s: ReturnType<typeof parseJs> }>,
 };
 
 const EmptyComp = {
@@ -97,7 +98,6 @@ export const EDGlobal = {
     cur: EmptyPage,
     doc: null as null | DPage,
     list: {} as Record<string, { page: EPage; doc: DPage }>,
-
     building: false,
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],

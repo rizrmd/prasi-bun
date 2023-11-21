@@ -7,6 +7,7 @@ import { Loading } from "../../../utils/ui/loading";
 import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 import { evalCJS } from "../../view/logic/load-code";
+import { reloadPage } from "./ed-route";
 
 const decoder = new TextDecoder();
 
@@ -123,7 +124,7 @@ export const edInitSync = (p: PG) => {
         },
         async editor_start(e) {
           if (p.ui.syncing) {
-            await p.sync.page.load(params.page_id);
+            await reloadPage(p);
             if (p.page.doc) {
               p.page.doc.transact(() => {
                 p.page.doc?.getMap("map").set("ts", Date.now());
