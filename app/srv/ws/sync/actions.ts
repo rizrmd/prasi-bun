@@ -3,6 +3,7 @@ import { EComp, EPage, ESite } from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
 import { activity } from "./entity/activity";
+import { parseJs } from "./editor/parser/parse-js";
 
 /* 
    WARNING:
@@ -89,10 +90,7 @@ export const SyncActions = {
       ({}) as Record<string, { id: string; username: string }>,
   },
   swc: {
-    parse: async (
-      arg:
-        | { type: "page", page_id: string; item_id?: string }
-        | { type: "comp", comp_id: string; item_id?: string }
-    ) => ({}) as Record<string, string>,
+    parse: async (code: string | Record<string, string>) =>
+      ({}) as Record<string, ReturnType<typeof parseJs>>,
   },
 };
