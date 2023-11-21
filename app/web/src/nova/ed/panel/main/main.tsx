@@ -2,7 +2,7 @@ import { useGlobal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
-import { loadComponent } from "../../logic/tree/build";
+import { loadComponent } from "../../logic/tree/sync-walk";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -26,7 +26,7 @@ export const EdMain = () => {
             meta: p.page.meta,
             entry: p.page.entry,
           }}
-          site_id={p.site.id}
+          site_id={p.site.id} 
           page_id={p.page.cur.id}
           bind={({ render }) => {
             p.page.render = render;

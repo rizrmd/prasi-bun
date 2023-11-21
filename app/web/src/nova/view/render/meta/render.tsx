@@ -1,16 +1,21 @@
 import { FC } from "react";
-import { IContent } from "../../../../utils/types/general";
+import { produceCSS } from "../../../../utils/css/gen";
+import { EdMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../../logic/global";
 import { ViewMetaChildren } from "./children";
-import { produceCSS } from "../../../../utils/css/gen";
 
 export const ViewMetaRender: FC<{
-  item: IContent;
+  meta: EdMeta;
   v: VG;
   props?: any;
   className?: string;
-}> = ({ item, v, props, className }) => {
+}> = ({ meta, v, props, className }) => {
   let _className = className;
+  const item = meta.item;
+  if (meta.isLayout && !v.layout.show) {
+    return <ViewMetaChildren item={item} />;
+  }
+
   if (!className) {
     _className = produceCSS(item, {
       mode: v.mode,

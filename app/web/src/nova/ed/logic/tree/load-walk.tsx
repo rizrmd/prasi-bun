@@ -3,6 +3,7 @@ import { IContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
 import { FNComponent } from "../../../../utils/types/meta-fn";
 import { EdMeta, PG } from "../ed-global";
+import { deepClone } from "web-utils";
 
 export const walkLoad = async (
   p: { map: PG["comp"]["map"] },
@@ -85,12 +86,12 @@ export const walkMap = (
     }
   }
 
-  let item = mapItem(arg.item);
+  let item = arg.item;
   if (override_id) {
     item.id = override_id;
   }
 
-  const item_comp = item.component;
+  const item_comp = item.type === "item" ? item.component : null;
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
     const comp_ref = p.comps[item_comp.id];
@@ -108,7 +109,7 @@ export const walkMap = (
         item_comp.ref_ids = ref_ids;
       }
       const original_id = item.id;
-      item = mapItem(mcomp);
+      item = deepClone(mcomp);
       item.id = original_id;
 
       const meta: EdMeta = {
@@ -135,6 +136,7 @@ export const walkMap = (
               parent_item: { id: item.id },
               portal: arg.portal,
               parent_comp: { id: item.id, comp_id: item_comp.id },
+              each: arg.each,
             });
           }
         }
@@ -147,6 +149,7 @@ export const walkMap = (
           parent_item: { id: item.id },
           portal: arg.portal,
           parent_comp: { id: item.id, comp_id: item_comp.id },
+          each: arg.each,
         });
       }
     }
@@ -169,25 +172,18 @@ export const walkMap = (
   if (arg.each) arg.each(meta);
   p.meta[item.id] = meta;
 
-  for (const c of item.childs) {
-    walkMap(p, {
-      isLayout: arg.isLayout,
-      item: c,
-      parent_item: { id: item.id },
-      portal: arg.portal,
-      parent_comp,
-    });
+  if (item.type !== "text") {
+    for (const c of item.childs) {
+      if (c) {
+        walkMap(p, {
+          isLayout: arg.isLayout,
+          item: c,
+          parent_item: { id: item.id },
+          portal: arg.portal,
+          parent_comp,
+          each: arg.each,
+        });
+      }
+    }
   }
-};
-
-const mapItem = (item: IContent) => {
-  return {
-    ...item,
-    childs:
-      item.type !== "text"
-        ? (item.childs.map((e) => {
-            id: e.id;
-          }) as any)
-        : undefined,
-  } as IItem;
 };

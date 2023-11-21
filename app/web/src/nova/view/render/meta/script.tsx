@@ -26,7 +26,7 @@ export const ViewMetaScript: FC<{
     hover: v.view.hover ? v.view.hover.get(item) : undefined,
     active: v.view.active ? v.view.active.get(item) : undefined,
   });
-  const children = <ViewMetaRender item={item} v={v} className={className} />;
+  const children = <ViewMetaRender meta={meta} v={v} className={className} />;
   let args = {};
 
   if (js && meta) {
