@@ -26,6 +26,6 @@ export const _ = {
       }
     }
 
-    return "This is nova-load.ts";
+    return `console.warn("Script [CODE] not found in db\\n", "   mode: ${mode}\\n", "   id  : ${id}")`;
   },
 };

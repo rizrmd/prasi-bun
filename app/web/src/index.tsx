@@ -20,7 +20,6 @@ const start = async () => {
   if (navigator.serviceWorker) {
     if (!isLocalhost()) {
       const sw = await registerServiceWorker();
-
       const cacheCurrentPage = () => {
         const swController = navigator.serviceWorker.controller;
         if (swController) {

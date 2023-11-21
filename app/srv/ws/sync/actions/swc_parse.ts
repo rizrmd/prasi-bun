@@ -17,24 +17,3 @@ export const swc_parse: SAction["swc"]["parse"] = async function (
   
   return { _: parseJs(code) };
 };
-
-type ParseParent = Record<string, {}>;
-export const parseItem = (item: IContent, _parents?: ParseParent) => {
-  const parents = _parents || {};
-
-  const js = item.adv?.js;
-  if (typeof js === "string") {
-    const res = parseJs(js);
-    if (res) {
-      parents[item.id] = res;
-    }
-  }
-
-  if (item.type !== "text") {
-    for (const c of item.childs) {
-      parseItem(c, parents);
-    }
-  }
-
-  return parents;
-};

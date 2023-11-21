@@ -120,7 +120,6 @@ export const ScriptMonaco = () => {
         monaco.editor.registerEditorOpener({
           openCodeEditor(source, resource, selectionOrPosition) {
             // https://github.com/microsoft/vscode/pull/177064#issue-1623100628
-            console.log(source, resource, selectionOrPosition);
             return false;
           },
         });
