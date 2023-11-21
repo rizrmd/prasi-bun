@@ -1,9 +1,9 @@
 import { createId } from "@paralleldrive/cuid2";
+import { deepClone } from "web-utils";
 import { IContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
 import { FNComponent } from "../../../../utils/types/meta-fn";
 import { EdMeta, PG } from "../ed-global";
-import { deepClone } from "web-utils";
 
 export const walkLoad = async (
   p: { map: PG["comp"]["map"] },
