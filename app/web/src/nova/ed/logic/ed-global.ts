@@ -2,12 +2,12 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { FC, ReactElement } from "react";
 import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
+import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem, MItem } from "../../../utils/types/item";
-import { DComp, DPage } from "../../../utils/types/root";
+import { DComp, DPage, IRoot } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
-import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 
 export const EmptySite = {
   id: "",
@@ -16,6 +16,7 @@ export const EmptySite = {
   config: { api_url: "" },
   js: "",
   js_compiled: "",
+  layout: undefined as undefined | IRoot,
 };
 
 export type ESite = typeof EmptySite;
