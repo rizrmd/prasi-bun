@@ -58,7 +58,8 @@ export type EdMeta = {
     id: string;
     mitem?: MItem;
   };
-  parent_comp?: {
+  parent_comp?: { id: string; comp_id: string };
+  parent_mcomp?: {
     mitem: MItem;
     mcomp: MItem;
   };
