@@ -34,5 +34,5 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
     }
   }
 
-  return <ViewMetaRender item={item} v={v} />;
+  return <ViewMetaRender meta={meta} v={v} />;
 };

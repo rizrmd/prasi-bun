@@ -69,7 +69,7 @@ export const syncWalkMap = (
     parent_item: EdMeta["parent_item"];
     parent_mcomp?: EdMeta["parent_mcomp"];
     skip_add_tree?: boolean;
-    each?: (meta: EdMeta) => void;
+    tree_root_id: string;
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
@@ -113,7 +113,7 @@ export const syncWalkMap = (
     if (!skip_tree) {
       p.page.tree.push({
         id: item.id,
-        parent: parent_item.id,
+        parent: arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
         text: item.name,
       });
     }
@@ -154,13 +154,13 @@ export const syncWalkMap = (
         if (item.name.startsWith("⮕")) {
           arg.portal.out[item.name] = meta;
         }
-        if (arg.each) arg.each(meta);
         p.page.meta[item.id] = meta;
 
         if (!skip_tree) {
           p.page.tree.push({
             id: item.id,
-            parent: parent_item.id,
+            parent:
+              arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
             text: item.name,
             data: meta,
           });
@@ -184,6 +184,7 @@ export const syncWalkMap = (
                   if (mcontent) {
                     syncWalkMap(p, {
                       isLayout: arg.isLayout,
+                      tree_root_id: arg.tree_root_id,
                       mitem: mcontent,
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_mcomp: { mitem: mitem as MItem, mcomp },
@@ -201,6 +202,7 @@ export const syncWalkMap = (
         for (const e of childs) {
           syncWalkMap(p, {
             isLayout: arg.isLayout,
+            tree_root_id: arg.tree_root_id,
             mitem: e,
             parent_item: { id: item.id, mitem: mitem as MItem },
             parent_mcomp: { mitem: mitem as MItem, mcomp },
@@ -230,13 +232,12 @@ export const syncWalkMap = (
   if (item.name.startsWith("⮕")) {
     arg.portal.out[item.name] = meta;
   }
-  if (arg.each) arg.each(meta);
   p.page.meta[item.id] = meta;
 
   if (!skip_tree) {
     p.page.tree.push({
       id: item.id,
-      parent: parent_item.id,
+      parent: arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
       text: item.name,
       data: meta,
     });
@@ -246,6 +247,7 @@ export const syncWalkMap = (
   for (const e of childs) {
     syncWalkMap(p, {
       isLayout: arg.isLayout,
+      tree_root_id: arg.tree_root_id,
       mitem: e,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: arg.parent_mcomp,

@@ -11,6 +11,10 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     p.page.building = true;
     p.render();
 
+    p.page.entry = [];
+    p.page.tree = [];
+    p.page.meta = {};
+
     const sections = root.get("childs");
     if (sections) {
       const loaded = new Set<string>();
@@ -34,7 +38,8 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           walkLoad(p.comp, e, loaded, (id) => loadComponent(p, id))
         )
       );
-      p.site.layout.childs.map((e) =>
+      p.site.layout.childs.map((e) => {
+        p.page.entry.push(e.id);
         walkMap(
           { meta: p.page.meta, comps: p.comp.map },
           {
@@ -48,23 +53,30 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               }
             },
           }
-        )
-      );
+        );
+      });
+
+      // if root_id is root, it means content is not found.
+      // if content is not found, do not use layout.
+      if (root_id === "root") {
+        p.page.entry = [];
+        p.page.tree = [];
+        p.page.meta = {};
+      }
     }
 
     doc.transact(async () => {
-      p.page.entry = [];
-      p.page.tree = [];
-      p.page.meta = {};
-
       const sections = root.get("childs");
       if (sections) {
         sections.map((e) => {
-          p.page.entry.push(e.get("id"));
+          if (root_id === "root") {
+            p.page.entry.push(e.get("id"));
+          }
           syncWalkMap(p, {
             isLayout: false,
             mitem: e,
             parent_item: { id: root_id },
+            tree_root_id: root_id,
             portal,
           });
         });
