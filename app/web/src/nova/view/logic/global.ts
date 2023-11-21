@@ -1,11 +1,13 @@
 import { ReactElement } from "react";
 import { IContent } from "../../../utils/types/general";
 import { EdMeta, PG } from "../../ed/logic/ed-global";
+import { IRoot } from "../../../utils/types/root";
 
 export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
   status: "init" as "init" | "load-code" | "loading-code" | "ready" | "rebuild",
   current: { site_id: "", page_id: "" },
+  layout: { show: false, root: undefined as void | IRoot },
   meta: {} as Record<string, EdMeta>,
   entry: [] as string[],
   bodyCache: null as null | ReactElement,

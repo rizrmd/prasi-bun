@@ -8,6 +8,7 @@ import { vLoadCode } from "./logic/load-code";
 import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
 import { ErrorBox } from "./render/meta/script/error-box";
+import { IRoot } from "../../utils/types/root";
 
 type ViewProp = {
   load: VLoad;
@@ -16,6 +17,7 @@ type ViewProp = {
   page_id: string;
   api_url: string;
   mode: "desktop" | "mobile";
+  layout?: { root: undefined | IRoot; show: boolean };
   isEditor?: boolean;
   bind?: (arg: { render: () => void }) => void;
   hidden?: (item: IContent) => boolean;
@@ -36,6 +38,7 @@ export const View: FC<ViewProp> = (props) => {
 const BoxedView: FC<ViewProp> = ({
   load,
   site_id,
+  layout,
   page_id,
   bind,
   hover,
@@ -55,6 +58,8 @@ const BoxedView: FC<ViewProp> = ({
   if (v.current.page_id !== page_id || v.current.site_id !== site_id) {
     v.status = "init";
   }
+
+  v.layout = layout ? layout : { show: false, root: undefined };
   v.component.map = component.map;
   v.component.load = component.load;
 
@@ -96,4 +101,3 @@ const BoxedView: FC<ViewProp> = ({
 
   return <div className="flex flex-1 flex-col relative">{v.bodyCache}</div>;
 };
-
