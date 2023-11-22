@@ -1,15 +1,7 @@
-import { createId } from "@paralleldrive/cuid2";
-import {
-  EPage,
-  IScope,
-  IScopeComp,
-} from "../../../../web/src/nova/ed/logic/ed-global";
-import { IContent } from "../../../../web/src/utils/types/general";
-import { IItem } from "../../../../web/src/utils/types/item";
-import { DComp, DPage, IRoot } from "../../../../web/src/utils/types/root";
+import { EdMeta } from "../../../../web/src/nova/ed/logic/ed-global";
+import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
-import { loadComponent } from "../editor/load-component";
-import { parseJs } from "../editor/parser/parse-js";
+import { serverWalkLoad, serverWalkMap } from "../editor/load-page";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -112,7 +104,7 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
-      const { scope, comps } = await scanMeta(docs.page[id].doc, this);
+      const { scope, scope_comps } = await scanMeta(docs.page[id].doc, this);
 
       return {
         id: id,
@@ -120,7 +112,7 @@ export const page_load: SAction["page"]["load"] = async function (
         name: page.name,
         snapshot: await gzipAsync(bin),
         scope,
-        comps,
+        scope_comps,
       };
     }
   } else if (snap && !ydoc) {
@@ -148,7 +140,7 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const { scope, comps } = await scanMeta(docs.page[id].doc, this);
+    const { scope, scope_comps } = await scanMeta(docs.page[id].doc, this);
 
     return {
       id: id,
@@ -156,7 +148,7 @@ export const page_load: SAction["page"]["load"] = async function (
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
       scope,
-      comps,
+      scope_comps,
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -169,139 +161,39 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const { scope, comps } = await scanMeta(ydoc.doc, this);
+    const { scope, scope_comps } = await scanMeta(ydoc.doc, this);
     return {
       id: snap.id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
       scope,
-      comps,
+      scope_comps,
     };
   }
 };
 
-const scanMeta = async (
-  doc: DPage | DComp,
-  sync: SyncConnection,
-  existing?: { scope: IScope; comps: Record<string, IScopeComp> }
-) => {
-  const root = doc.getMap("map").get("root")?.toJSON() as IRoot;
+const scanMeta = async (doc: DPage, sync: SyncConnection) => {
+  const scope = {};
+  const scope_comps = {};
+  const loaded = new Set<string>();
 
-  const scope = existing ? existing.scope : ({} as IScope);
-  const comps = existing ? existing.comps : ({} as Record<string, IScopeComp>);
-
-  const instantiate = (item: IItem, comp_id: string) => {
-    const ref = docs.comp[comp_id];
-    if (ref) {
-      const item_comp = assignNewID(
-        ref.doc.getMap("map").get("root")?.toJSON() as IItem
-      );
-      parseItem(item_comp, scope, item.id, loadComp);
-    }
+  const portal = {
+    in: {} as Record<string, EdMeta>,
+    out: {} as Record<string, EdMeta>,
   };
-
-  const pendingComp = new Set<IItem>();
-  const loadComp = (item: IItem) => {
-    const comp_id = item.component?.id;
-    if (comp_id) {
-      const comp = comps[comp_id];
-      if (!comp) {
-        pendingComp.add(item);
-      } else {
-        instantiate(item, comp_id);
-      }
-      return false;
-    }
-    return true;
-  };
-  if (root) {
-    for (const c of root.childs) {
-      parseItem(c, scope, "", loadComp);
-    }
+  const childs = doc.getMap("map").get("root")?.get("childs") || [];
+  if (childs) {
+    await Promise.all(childs.map((m) => serverWalkLoad(m, sync, loaded)));
+    await Promise.all(
+      childs.map((m) =>
+        serverWalkMap(
+          { sync, scope, scope_comps },
+          { isLayout: false, mitem: m, parent_item: { id: "root" }, portal }
+        )
+      )
+    );
   }
 
-  for (const item of pendingComp) {
-    const comp_id = item.component?.id;
-    if (comp_id) {
-      let ref = docs.comp[comp_id];
-      if (!ref) {
-        await loadComponent(comp_id, sync);
-        ref = docs.comp[comp_id];
-        if (ref) {
-          await scanMeta(ref.doc, sync, {
-            scope,
-            comps,
-          });
-        }
-      }
-
-      if (ref) {
-        instantiate(item, comp_id);
-      }
-    }
-  }
-
-  Object.entries(comps)
-    .filter(([k, v]) => !v)
-    .map(async ([id, v]) => {});
-
-  return { scope, comps };
-};
-
-const assignNewID = (item: IItem) => {
-  item.id = createId();
-  for (const c of item.childs) {
-    if (c.type !== "text") {
-      assignNewID(c);
-    }
-  }
-  return item;
-};
-
-export const parseItem = (
-  item: IContent,
-  result: EPage["scope"],
-  parent_id: string,
-  each: (item: IItem) => boolean
-) => {
-  const js = item.adv?.js;
-
-  const parent_ids: string[] = [];
-  if (!!parent_id) {
-    if (!!result[parent_id]) {
-      result[parent_id].p.forEach((e) => parent_ids.push(e));
-    } else {
-      throw new Error(
-        `Parent item not found: ${JSON.stringify(
-          parent_id
-        )} \nitem:\n${JSON.stringify(
-          { id: item.id, name: item.name, type: item.type },
-          null,
-          2
-        )}`
-      );
-    }
-
-    parent_ids.push(parent_id);
-  }
-
-  result[item.id] = { p: parent_ids, s: null };
-
-  if (!!each && !each(item as IItem)) {
-    return;
-  }
-
-  if (typeof js === "string") {
-    const res = parseJs(js);
-    if (res) {
-      result[item.id].s = res;
-    }
-  }
-
-  if (item.type !== "text") {
-    for (const c of item.childs) {
-      parseItem(c, result, item.id, each);
-    }
-  }
+  return { scope, scope_comps };
 };
