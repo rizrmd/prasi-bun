@@ -28,19 +28,22 @@ export type IScope = Record<
   { p: string[]; s: null | Exclude<ReturnType<typeof parseJs>, undefined> }
 >;
 
-export type IScopeComp = {
-  id: string;
-  name: string;
-  snapshot: Uint8Array;
-  scope: IScope;
-};
+export type IScopeComp = Record<
+  string,
+  {
+    id: string;
+    name: string;
+    snapshot: Uint8Array;
+    scope: IScope;
+  }
+>;
 const EmptyPage = {
   id: "",
   name: "",
   url: "",
   snapshot: null as null | Uint8Array,
   scope: {} as IScope,
-  comps: {} as Record<string, IScopeComp>,
+  scope_comps: {} as IScopeComp,
 };
 
 const EmptyComp = {
