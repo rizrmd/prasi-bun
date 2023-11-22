@@ -1,7 +1,14 @@
-import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
+import { createId } from "@paralleldrive/cuid2";
+import {
+  EPage,
+  IScope,
+  IScopeComp,
+} from "../../../../web/src/nova/ed/logic/ed-global";
 import { IContent } from "../../../../web/src/utils/types/general";
-import { DPage, IRoot } from "../../../../web/src/utils/types/root";
+import { IItem } from "../../../../web/src/utils/types/item";
+import { DComp, DPage, IRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
+import { loadComponent } from "../editor/load-component";
 import { parseJs } from "../editor/parser/parse-js";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
@@ -105,12 +112,15 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
+      const { scope, comps } = await scanMeta(docs.page[id].doc, this);
+
       return {
         id: id,
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        scope: scanMeta(docs.page[id].doc),
+        scope,
+        comps,
       };
     }
   } else if (snap && !ydoc) {
@@ -138,12 +148,15 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
+    const { scope, comps } = await scanMeta(docs.page[id].doc, this);
+
     return {
       id: id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      scope: scanMeta(docs.page[id].doc),
+      scope,
+      comps,
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -156,33 +169,101 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
+    const { scope, comps } = await scanMeta(ydoc.doc, this);
     return {
       id: snap.id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      scope: scanMeta(ydoc.doc),
+      scope,
+      comps,
     };
   }
 };
 
-const scanMeta = (doc: DPage) => {
+const scanMeta = async (
+  doc: DPage | DComp,
+  sync: SyncConnection,
+  existing?: { scope: IScope; comps: Record<string, IScopeComp> }
+) => {
   const root = doc.getMap("map").get("root")?.toJSON() as IRoot;
-  if (root) {
-    const result = {};
-    for (const c of root.childs) {
-      parseItem(c, result, "");
+
+  const scope = existing ? existing.scope : ({} as IScope);
+  const comps = existing ? existing.comps : ({} as Record<string, IScopeComp>);
+
+  const instantiate = (item: IItem, comp_id: string) => {
+    const ref = docs.comp[comp_id];
+    if (ref) {
+      const item_comp = assignNewID(
+        ref.doc.getMap("map").get("root")?.toJSON() as IItem
+      );
+      parseItem(item_comp, scope, item.id, loadComp);
     }
-    return result;
+  };
+
+  const pendingComp = new Set<IItem>();
+  const loadComp = (item: IItem) => {
+    const comp_id = item.component?.id;
+    if (comp_id) {
+      const comp = comps[comp_id];
+      if (!comp) {
+        pendingComp.add(item);
+      } else {
+        instantiate(item, comp_id);
+      }
+      return false;
+    }
+    return true;
+  };
+  if (root) {
+    for (const c of root.childs) {
+      parseItem(c, scope, "", loadComp);
+    }
   }
 
-  return {};
+  for (const item of pendingComp) {
+    const comp_id = item.component?.id;
+    if (comp_id) {
+      let ref = docs.comp[comp_id];
+      if (!ref) {
+        await loadComponent(comp_id, sync);
+        ref = docs.comp[comp_id];
+        if (ref) {
+          await scanMeta(ref.doc, sync, {
+            scope,
+            comps,
+          });
+        }
+      }
+
+      if (ref) {
+        instantiate(item, comp_id);
+      }
+    }
+  }
+
+  Object.entries(comps)
+    .filter(([k, v]) => !v)
+    .map(async ([id, v]) => {});
+
+  return { scope, comps };
+};
+
+const assignNewID = (item: IItem) => {
+  item.id = createId();
+  for (const c of item.childs) {
+    if (c.type !== "text") {
+      assignNewID(c);
+    }
+  }
+  return item;
 };
 
 export const parseItem = (
   item: IContent,
   result: EPage["scope"],
-  parent_id: string
+  parent_id: string,
+  each: (item: IItem) => boolean
 ) => {
   const js = item.adv?.js;
 
@@ -205,7 +286,11 @@ export const parseItem = (
     parent_ids.push(parent_id);
   }
 
-  result[item.id] = { p: parent_ids, s: undefined };
+  result[item.id] = { p: parent_ids, s: null };
+
+  if (!!each && !each(item as IItem)) {
+    return;
+  }
 
   if (typeof js === "string") {
     const res = parseJs(js);
@@ -215,11 +300,8 @@ export const parseItem = (
   }
 
   if (item.type !== "text") {
-    if (item.type === "item" && item.component?.id) {
-      return;
-    }
     for (const c of item.childs) {
-      parseItem(c, result, item.id);
+      parseItem(c, result, item.id, each);
     }
   }
 };

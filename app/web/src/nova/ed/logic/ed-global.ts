@@ -23,12 +23,24 @@ export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
 
+export type IScope = Record<
+  string,
+  { p: string[]; s: null | Exclude<ReturnType<typeof parseJs>, undefined> }
+>;
+
+export type IScopeComp = {
+  id: string;
+  name: string;
+  snapshot: Uint8Array;
+  scope: IScope;
+};
 const EmptyPage = {
   id: "",
   name: "",
   url: "",
   snapshot: null as null | Uint8Array,
-  scope: {} as Record<string, { p: string[]; s: ReturnType<typeof parseJs> }>,
+  scope: {} as IScope,
+  comps: {} as Record<string, IScopeComp>,
 };
 
 const EmptyComp = {
