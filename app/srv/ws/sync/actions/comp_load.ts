@@ -1,5 +1,4 @@
 import { IScopeComp } from "../../../../web/src/nova/ed/logic/ed-global";
-import { MItem } from "../../../../web/src/utils/types/item";
 import { DComp } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { loadComponent } from "../editor/load-component";

@@ -8,6 +8,7 @@ import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 import { evalCJS } from "../../view/logic/load-code";
 import { reloadPage } from "./ed-route";
+import { loadSite } from "./ed-site";
 
 const decoder = new TextDecoder();
 
@@ -28,9 +29,9 @@ export const edInitSync = (p: PG) => {
       p.site = deepClone(EmptySite);
       p.site.id = "--loading--";
       p.ui.popup.code.init = false;
-      p.sync.site.load(params.site_id).then((site) => {
+      p.sync.site.load(params.site_id).then(async (site) => {
         if (site) {
-          p.site = site;
+          await loadSite(p, site);
           p.render();
         } else {
           alert("Site not found. redirecting...");
@@ -124,7 +125,7 @@ export const edInitSync = (p: PG) => {
         },
         async editor_start(e) {
           if (p.ui.syncing) {
-            await reloadPage(p);
+            await reloadPage(p, params.page_id);
             if (p.page.doc) {
               p.page.doc.transact(() => {
                 p.page.doc?.getMap("map").set("ts", Date.now());
