@@ -177,19 +177,20 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
   const scope = {};
   const scope_comps = {};
   const loaded = new Set<string>();
-
-  const portal = {
-    in: {} as Record<string, EdMeta>,
-    out: {} as Record<string, EdMeta>,
-  };
   const childs = doc.getMap("map").get("root")?.get("childs") || [];
   if (childs) {
-    await Promise.all(childs.map((m) => serverWalkLoad(m, sync, loaded)));
+    await Promise.all(
+      childs.map((m) => serverWalkLoad(m, scope_comps, sync, loaded))
+    );
     await Promise.all(
       childs.map((m) =>
         serverWalkMap(
           { sync, scope, scope_comps },
-          { isLayout: false, mitem: m, parent_item: { id: "root" }, portal }
+          {
+            mitem: m,
+            parent_item: { id: "root" },
+            parent_ids: ["root"],
+          }
         )
       )
     );

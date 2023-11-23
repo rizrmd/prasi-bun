@@ -1,19 +1,16 @@
 import { createId } from "@paralleldrive/cuid2";
 import { decompress } from "wasm-gzip";
-import { syncronize } from "y-pojo";
-import { TypedArray, TypedMap } from "yjs-types";
+import { TypedArray } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import {
-  FMCompDef,
-  FMComponent,
   FNCompDef,
-  FNComponent,
+  FNComponent
 } from "../../../../utils/types/meta-fn";
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
-import { ensurePropContent } from "./sync-walk-utils";
+import { ensureMItemProps, ensureMProp, ensurePropContent } from "./sync-walk-utils";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -273,33 +270,6 @@ export const loadComponent = async (p: PG, id_comp: string) => {
     }
   }
   return false;
-};
-
-const ensureMProp = (
-  mitem_props: TypedMap<Record<string, FMCompDef>>,
-  k: string,
-  v: FNCompDef
-) => {
-  let mprop = mitem_props.get(k);
-  if (!mprop) {
-    const newprop = new Y.Map();
-    syncronize(newprop, v);
-    mitem_props.set(k, newprop as FMCompDef);
-    mprop = mitem_props.get(k);
-  }
-  return mprop;
-};
-
-const ensureMItemProps = (mitem_comp: FMComponent, item_comp: FNComponent) => {
-  let mitem_props = mitem_comp.get("props");
-  if (!mitem_props) {
-    mitem_comp.set("props", new Y.Map() as any);
-    mitem_props = mitem_comp.get("props");
-  }
-  if (!item_comp.props) {
-    item_comp.props = {};
-  }
-  return mitem_props;
 };
 
 const mapItem = (mitem: MContent, item: any) => {
