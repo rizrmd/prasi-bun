@@ -3,14 +3,15 @@ import { decompress } from "wasm-gzip";
 import { TypedArray } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
-import {
-  FNCompDef,
-  FNComponent
-} from "../../../../utils/types/meta-fn";
+import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
 import { EdMeta, PG } from "../ed-global";
-import { ensureMItemProps, ensureMProp, ensurePropContent } from "./sync-walk-utils";
+import {
+  ensureMItemProps,
+  ensureMProp,
+  ensurePropContent,
+} from "./sync-walk-utils";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -256,18 +257,23 @@ export const syncWalkMap = (
 };
 
 export const loadComponent = async (p: PG, id_comp: string) => {
-  const cur = await p.sync.comp.load(id_comp);
-  if (cur && cur.snapshot) {
-    const doc = new Y.Doc() as DComp;
-    if (cur.snapshot) {
-      Y.applyUpdate(doc as any, decompress(cur.snapshot));
-      p.comp.map[id_comp] = {
-        id: id_comp,
-        item: doc.getMap("map").get("root")?.toJSON() as IItem,
-      };
-      p.comp.list[id_comp] = { comp: cur, doc };
-      return true;
+  const comps = await p.sync.comp.load(id_comp);
+
+  if (comps) {
+    for (const cur of Object.values(comps)) {
+      if (cur && cur.snapshot) {
+        const doc = new Y.Doc() as DComp;
+        if (cur.snapshot) {
+          Y.applyUpdate(doc as any, decompress(cur.snapshot));
+          p.comp.map[id_comp] = {
+            id: id_comp,
+            item: doc.getMap("map").get("root")?.toJSON() as IItem,
+          };
+          p.comp.list[id_comp] = { comp: cur, doc, scope: cur.scope };
+        }
+      }
     }
+    return true;
   }
   return false;
 };
