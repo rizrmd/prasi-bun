@@ -54,7 +54,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 p.page.entry.push(e.get("id"));
               }
               syncWalkMap(p, {
-                isLayout: false,
+                isLayout: true,
                 mitem: e,
                 parent_item: { id: root_id },
                 tree_root_id: root_id,

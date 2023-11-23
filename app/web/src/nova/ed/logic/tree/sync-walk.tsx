@@ -193,6 +193,7 @@ export const syncWalkMap = (
                       parent_mcomp: { mitem: mitem as MItem, mcomp },
                       portal: arg.portal,
                       skip_add_tree: skip_tree_child,
+                      each: arg.each,
                     });
                   }
                 }
@@ -211,6 +212,7 @@ export const syncWalkMap = (
             parent_mcomp: { mitem: mitem as MItem, mcomp },
             skip_add_tree: true,
             portal: arg.portal,
+            each: arg.each,
           });
         }
         return;
@@ -258,6 +260,7 @@ export const syncWalkMap = (
       parent_mcomp: arg.parent_mcomp,
       portal: arg.portal,
       skip_add_tree: skip_tree_child,
+      each: arg.each,
     });
   }
 };

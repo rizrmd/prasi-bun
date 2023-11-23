@@ -4,11 +4,8 @@ import { Root } from "./base/root";
 import "./index.css";
 import { createAPI, createDB, reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
-import * as Y from "yjs";
 import { registerMobile } from "./render/live/logic/mobile";
 import { isLocalhost } from "./utils/ui/is-localhost";
-
-(window as any).Y = Y;
 
 const start = async () => {
   const base = `${location.protocol}//${location.host}`;
@@ -142,7 +139,7 @@ const start = async () => {
       });
     }
   }
-  
+
   defineReact();
   await defineWindow(false);
   w.serverurl = base;
