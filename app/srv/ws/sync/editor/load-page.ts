@@ -1,47 +1,71 @@
+import { createId } from "@paralleldrive/cuid2"
+import { TypedArray } from "yjs-types"
 import {
   EdMeta,
   IScope,
   IScopeComp,
-} from "../../../../web/src/nova/ed/logic/ed-global";
-import { ensurePropContent } from "../../../../web/src/nova/ed/logic/tree/sync-walk-utils";
-import { MItem } from "../../../../web/src/utils/types/item";
-import { FNComponent } from "../../../../web/src/utils/types/meta-fn";
-import { docs } from "../entity/docs";
-import { SyncConnection } from "../type";
-import { loadComponent } from "./load-component";
+} from "../../../../web/src/nova/ed/logic/ed-global"
+import {
+  ensureMItemProps,
+  ensureMProp,
+  ensurePropContent,
+} from "../../../../web/src/nova/ed/logic/tree/sync-walk-utils"
+import { MContent } from "../../../../web/src/utils/types/general"
+import { IItem, MItem } from "../../../../web/src/utils/types/item"
+import { FNCompDef, FNComponent } from "../../../../web/src/utils/types/meta-fn"
+import { docs } from "../entity/docs"
+import { gzipAsync } from "../entity/zlib"
+import { SyncConnection } from "../type"
+import { loadComponent } from "./load-component"
+import { parseJs } from "./parser/parse-js"
 
 export const serverWalkLoad = async (
   mitem: MItem,
+  scope_comps: IScopeComp,
   sync: SyncConnection,
   loaded: Set<string>
 ) => {
-  const mcomp = mitem.get("component");
+  const mcomp = mitem.get("component")
   if (mcomp) {
-    const id = mcomp.get("id");
-    const comp = mcomp.toJSON() as FNComponent;
+    const id = mcomp.get("id")
+    const comp = mcomp.toJSON() as FNComponent
     if (id) {
-      const isFirstLoaded = !loaded.has(id);
-      loaded.add(id);
+      const isFirstLoaded = !loaded.has(id)
+      loaded.add(id)
       if (!docs.comp[id]) {
-        await loadComponent(id, sync);
+        await loadComponent(id, sync)
       }
 
-      const pcomp = docs.comp[id];
+      const pcomp = docs.comp[id]
       if (pcomp) {
-        const pitem = pcomp.doc.getMap("map").get("root");
-        if (pitem && isFirstLoaded) {
-          await serverWalkLoad(pitem, sync, loaded);
+        const pitem = pcomp.doc.getMap("map").get("root")
+
+        if (pitem) {
+          const id = pitem.get("id")
+          const name = pitem.get("name")
+          if (id && name) {
+            const bin = Y.encodeStateAsUpdate(pcomp.doc as any)
+            scope_comps[id] = {
+              id,
+              name,
+              scope: {},
+              snapshot: await gzipAsync(bin),
+            }
+            if (isFirstLoaded) {
+              await serverWalkLoad(pitem, scope_comps, sync, loaded)
+            }
+          }
         }
       }
     }
 
     for (const [propName, prop] of Object.entries(comp.props || {})) {
       if (prop.meta?.type === "content-element") {
-        const mprop = mcomp.get("props")?.get(propName);
+        const mprop = mcomp.get("props")?.get(propName)
         if (mprop) {
-          const mcontent = ensurePropContent(mprop, propName);
+          const mcontent = ensurePropContent(mprop, propName)
           if (mcontent) {
-            await serverWalkLoad(mcontent, sync, loaded);
+            await serverWalkLoad(mcontent, scope_comps, sync, loaded)
           }
         }
       }
@@ -49,24 +73,187 @@ export const serverWalkLoad = async (
   }
 
   for (const e of mitem.get("childs")?.map((e) => e) || []) {
-    await serverWalkLoad(e, sync, loaded);
+    await serverWalkLoad(e, scope_comps, sync, loaded)
   }
-};
+}
 
 export const serverWalkMap = async (
   p: {
-    sync: SyncConnection;
-    scope: IScope;
-    scope_comps: IScopeComp;
+    sync: SyncConnection
+    scope: IScope
+    scope_comps: IScopeComp
   },
   arg: {
-    isLayout: boolean;
-    mitem: MItem;
-    portal: {
-      in: Record<string, EdMeta>;
-      out: Record<string, EdMeta>;
-    };
-    parent_item: EdMeta["parent_item"];
-    parent_mcomp?: EdMeta["parent_mcomp"];
+    mitem: MItem
+    parent_ids: string[]
+    parent_item: EdMeta["parent_item"]
+    parent_mcomp?: EdMeta["parent_mcomp"] & { id: string }
   }
-) => {};
+) => {
+  const { mitem, parent_item, parent_mcomp } = arg
+  const item = {} as unknown as IItem
+
+  let override_id = ""
+  const id = mitem.get("id")
+
+  if (parent_mcomp && id) {
+    const fcomp = parent_mcomp.mitem.get("component")
+    if (fcomp) {
+      const ref_ids = fcomp.get("ref_ids")
+
+      if (ref_ids) {
+        let ref_id = ref_ids.get(id)
+
+        if (!ref_id) {
+          ref_id = createId()
+          ref_ids.set(id, ref_id)
+        }
+        override_id = ref_id
+      }
+    }
+
+    mapItem(mitem, item)
+
+    if (override_id) {
+      item.id = override_id
+    }
+
+    const item_comp = item.component
+    const mitem_comp = mitem.get("component")
+
+    if (item_comp && item_comp.id && parent_item.id !== "root") {
+      if (!docs.comp[item_comp.id]) {
+        console.error("Component failed to load: ", item_comp.id)
+        return
+      }
+
+      if (!p.scope_comps[item_comp.id]) {
+        console.error("Failed to assign component: ", item_comp.id)
+        return
+      }
+
+      const ref_comp = docs.comp[item_comp.id]
+
+      if (ref_comp && mitem_comp) {
+        const mcomp = ref_comp.doc.getMap("map").get("root")
+
+        if (mcomp) {
+          let ref_ids: Record<string, string> = item_comp.ref_ids
+          if (!ref_ids) {
+            mitem_comp.set("ref_ids", new Y.Map() as any)
+            ref_ids = {}
+          }
+          const original_id = item.id
+          mapItem(mcomp, item)
+          item.id = original_id
+
+          const pcomp = p.scope_comps[item_comp.id]
+          pcomp.scope[item.id] = { p: arg.parent_ids, s: null }
+          const js = item.adv?.js
+          if (typeof js === "string") {
+            const scope = parseJs(js)
+            if (scope) p.scope[item.id].s = scope
+          }
+
+          const mprops = mcomp
+            .get("component")
+            ?.get("props")
+            ?.toJSON() as Record<string, FNCompDef>
+
+          if (mprops) {
+            const mitem_comp = mitem.get("component")
+            if (mitem_comp) {
+              const mitem_props = ensureMItemProps(mitem_comp, item_comp)
+              if (mitem_props) {
+                for (const [k, v] of Object.entries(mprops)) {
+                  const mprop = ensureMProp(mitem_props, k, v)
+                  item_comp.props[k] = v
+                  if (mprop && v.meta?.type === "content-element") {
+                    const mcontent = ensurePropContent(mprop, k)
+                    if (mcontent) {
+                      serverWalkMap(p, {
+                        parent_ids: [...arg.parent_ids, item.id],
+                        mitem: mcontent,
+                        parent_item: { id: item.id, mitem: mitem as MItem },
+                        parent_mcomp: {
+                          id: item_comp.id,
+                          mitem: mitem as MItem,
+                          mcomp,
+                        },
+                      })
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          const childs = mcomp.get("childs")?.map((e) => e) || []
+          for (const e of childs) {
+            serverWalkMap(p, {
+              mitem: e,
+              parent_ids: [...arg.parent_ids, item.id],
+              parent_item: {
+                id: item.id,
+                mitem: mitem as MItem,
+              },
+              parent_mcomp: {
+                id: item_comp.id,
+                mitem: mitem as MItem,
+                mcomp,
+              },
+            })
+          }
+          return
+        }
+      }
+    }
+
+    if (arg.parent_mcomp) {
+      const pcomp = p.scope_comps[arg.parent_mcomp.id]
+      pcomp.scope[item.id] = { p: arg.parent_ids, s: null }
+      const js = item.adv?.js
+      if (typeof js === "string") {
+        const scope = parseJs(js)
+        if (scope) p.scope[item.id].s = scope
+      }
+    } else {
+      p.scope[item.id] = { p: arg.parent_ids, s: null }
+      const js = item.adv?.js
+      if (typeof js === "string") {
+        const scope = parseJs(js)
+        if (scope) p.scope[item.id].s = scope
+      }
+    }
+
+    const childs = mitem.get("childs")?.map((e) => e) || []
+    for (const e of childs) {
+      serverWalkMap(p, {
+        mitem: e,
+        parent_item: { id: item.id, mitem: mitem as MItem },
+        parent_mcomp: arg.parent_mcomp,
+        parent_ids: [...arg.parent_ids, item.id],
+      })
+    }
+  }
+}
+
+const mapItem = (mitem: MContent, item: any) => {
+  mitem.forEach((e, k) => {
+    if (k !== "childs") {
+      let val = e
+      if (typeof e === "object" && e) {
+        if ((e as any).toJSON) {
+          val = e.toJSON() as any
+        }
+      }
+      item[k] = val
+    } else {
+      if (!item[k]) item[k] = []
+      const childs = e as unknown as TypedArray<{}>
+      childs.forEach((c) => {
+        item[k].push({ id: c.get("id") })
+      })
+    }
+  })
+}
