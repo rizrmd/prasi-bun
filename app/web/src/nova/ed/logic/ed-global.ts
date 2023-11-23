@@ -5,7 +5,7 @@ import { SAction } from "../../../../../srv/ws/sync/actions";
 import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem, MItem } from "../../../utils/types/item";
-import { DComp, DPage, IRoot } from "../../../utils/types/root";
+import { DComp, DPage } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
 
@@ -16,7 +16,7 @@ export const EmptySite = {
   config: { api_url: "" },
   js: "",
   js_compiled: "",
-  layout: undefined as undefined | IRoot,
+  layout: { snapshot: null as null | Uint8Array, id: "" },
 };
 
 export type ESite = typeof EmptySite;
@@ -114,8 +114,14 @@ export const EDGlobal = {
   page: {
     cur: EmptyPage,
     doc: null as null | DPage,
-    doc_on_update: async (bin: Uint8Array, origin: any) => {},
-    list: {} as Record<string, { page: EPage; doc: DPage }>,
+    list: {} as Record<
+      string,
+      {
+        page: EPage;
+        doc: DPage;
+        on_update?: (bin: Uint8Array, origin: any) => Promise<void>;
+      }
+    >,
     building: false,
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],

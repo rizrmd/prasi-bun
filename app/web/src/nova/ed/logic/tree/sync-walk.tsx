@@ -16,7 +16,8 @@ import {
 export const syncWalkLoad = async (
   p: PG,
   mitem: MItem,
-  loaded: Set<string>
+  loaded: Set<string>,
+  loadComponent: (id: string) => Promise<boolean>
 ) => {
   const mcomp = mitem.get("component");
   if (mcomp) {
@@ -26,14 +27,14 @@ export const syncWalkLoad = async (
       const isFirstLoaded = !loaded.has(id);
       loaded.add(id);
       if (!p.comp.list[id]) {
-        await loadComponent(p, comp.id);
+        await loadComponent(comp.id);
       }
 
       const pcomp = p.comp.list[id];
       if (pcomp) {
         const pitem = pcomp.doc.getMap("map").get("root");
         if (pitem && isFirstLoaded) {
-          await syncWalkLoad(p, pitem, loaded);
+          await syncWalkLoad(p, pitem, loaded, loadComponent);
         }
       }
     }
@@ -44,7 +45,7 @@ export const syncWalkLoad = async (
         if (mprop) {
           const mcontent = ensurePropContent(mprop, propName);
           if (mcontent) {
-            await syncWalkLoad(p, mcontent, loaded);
+            await syncWalkLoad(p, mcontent, loaded, loadComponent);
           }
         }
       }
@@ -52,7 +53,7 @@ export const syncWalkLoad = async (
   }
 
   for (const e of mitem.get("childs")?.map((e) => e) || []) {
-    await syncWalkLoad(p, e, loaded);
+    await syncWalkLoad(p, e, loaded, loadComponent);
   }
 };
 
@@ -69,6 +70,7 @@ export const syncWalkMap = (
     parent_mcomp?: EdMeta["parent_mcomp"];
     skip_add_tree?: boolean;
     tree_root_id: string;
+    each?: (meta: EdMeta) => void;
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
@@ -153,6 +155,8 @@ export const syncWalkMap = (
         if (item.name.startsWith("⮕")) {
           arg.portal.out[item.name] = meta;
         }
+
+        if (arg.each) arg.each(meta);
         p.page.meta[item.id] = meta;
 
         if (!skip_tree) {
@@ -231,6 +235,8 @@ export const syncWalkMap = (
   if (item.name.startsWith("⮕")) {
     arg.portal.out[item.name] = meta;
   }
+
+  if (arg.each) arg.each(meta);
   p.page.meta[item.id] = meta;
 
   if (!skip_tree) {

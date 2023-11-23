@@ -21,15 +21,14 @@ export const site_load: SAction["site"]["load"] = async function (
 
       activity.site.room(site.id).join({ ws: this.ws });
 
-      let layout = undefined;
-      const _layout = await db.page.findFirst({
+      const layout = await db.page.findFirst({
         where: {
           id_site: id,
           is_deleted: false,
           is_default_layout: true,
         },
+        select: { id: true },
       });
-      if (_layout) layout = _layout.content_tree as IRoot;
 
       return {
         id: site.id,
@@ -38,7 +37,7 @@ export const site_load: SAction["site"]["load"] = async function (
         domain: site.domain,
         js: site.js || "",
         js_compiled: site.js_compiled || "",
-        layout,
+        layout: { id: layout?.id || "" },
       };
     }
   }

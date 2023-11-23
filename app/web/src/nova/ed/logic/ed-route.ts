@@ -3,6 +3,7 @@ import { IItem } from "../../../utils/types/item";
 import { DComp } from "../../../utils/types/root";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
+import { loadSite } from "./ed-site";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
@@ -15,7 +16,7 @@ export const edRoute = async (p: PG) => {
         return;
       }
 
-      p.site = site;
+      await loadSite(p, site);
     }
 
     if (
@@ -23,22 +24,23 @@ export const edRoute = async (p: PG) => {
       !p.page.cur.snapshot ||
       !p.page.list[p.page.cur.id]
     ) {
-      if (p.page.list[params.page_id] && p.page.doc) {
-        p.page.doc.off("update", p.page.doc_on_update);
+      const page = p.page.list[params.page_id];
+      if (page && p.page.doc && page.on_update) {
+        p.page.doc.off("update", page.on_update);
 
         const cur = p.page.list[params.page_id];
         p.page.cur = cur.page;
         p.page.doc = cur.doc;
       }
 
-      await reloadPage(p);
+      await reloadPage(p, params.page_id);
     }
   }
 };
 
-export const reloadPage = async (p: PG) => {
+export const reloadPage = async (p: PG, page_id: string) => {
   p.status = "loading";
-  const remotePage = await p.sync.page.load(params.page_id);
+  const remotePage = await p.sync.page.load(page_id);
 
   if (!remotePage) {
     p.status = "page-not-found";
@@ -66,7 +68,17 @@ export const reloadPage = async (p: PG) => {
     const doc = new Y.Doc();
     Y.applyUpdate(doc, decompress(remotePage.snapshot));
 
-    p.page.doc_on_update = async (bin: Uint8Array, origin: any) => {
+    let page = p.page.list[remotePage.id];
+    if (!page) {
+      p.page.list[remotePage.id] = {} as any;
+      page = p.page.list[remotePage.id];
+    }
+
+    if (page.on_update && page.doc) {
+      page.doc.off("update", page.on_update);
+    }
+
+    page.on_update = async (bin: Uint8Array, origin: any) => {
       if (origin === "sv_remote" || origin === "local") return;
 
       const res = await p.sync.yjs.sv_local(
@@ -93,14 +105,12 @@ export const reloadPage = async (p: PG) => {
       }
     };
 
-    doc.on("update", p.page.doc_on_update);
+    doc.on("update", page.on_update);
 
     p.page.doc = doc as any;
     if (p.page.doc) {
-      p.page.list[remotePage.id] = {
-        page: p.page.cur,
-        doc: p.page.doc,
-      };
+      page.page = p.page.cur;
+      page.doc = p.page.doc;
     }
 
     if (p.page.doc) {
