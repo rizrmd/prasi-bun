@@ -66,7 +66,7 @@ export const parseJs = (code: string) => {
     local: typeof local | undefined;
     passprop: typeof passprop | undefined;
   };
-  if (!local.name) {
+  if (local.name) {
     result.local = local;
   }
   if (Object.keys(passprop).length > 0) {

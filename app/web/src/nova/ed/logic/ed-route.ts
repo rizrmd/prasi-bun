@@ -21,22 +21,15 @@ export const edRoute = async (p: PG) => {
       !p.page.cur.snapshot ||
       !p.page.list[p.page.cur.id]
     ) {
-      let loadFromServer = true;
-      if (p.page.list[params.page_id]) {
+      if (p.page.list[params.page_id] && p.page.doc) {
+        p.page.doc.off("update", p.page.doc_on_update);
+
         const cur = p.page.list[params.page_id];
         p.page.cur = cur.page;
         p.page.doc = cur.doc;
-        loadFromServer = false;
-
-        const res = await p.sync.page.load(params.page_id);
-        if (res) {
-          treeRebuild(p);
-        }
       }
 
-      if (loadFromServer) {
-        await reloadPage(p);
-      }
+      await reloadPage(p);
     }
   }
 };
@@ -51,11 +44,14 @@ export const reloadPage = async (p: PG) => {
     return;
   }
 
+  console.log(remotePage.scope, remotePage.scope_comps);
+
   p.page.cur = remotePage;
   if (remotePage.snapshot) {
     const doc = new Y.Doc();
     Y.applyUpdate(doc, decompress(remotePage.snapshot));
-    doc.on("update", async (bin: Uint8Array, origin: any) => {
+
+    p.page.doc_on_update = async (bin: Uint8Array, origin: any) => {
       if (origin === "sv_remote" || origin === "local") return;
 
       const res = await p.sync.yjs.sv_local(
@@ -80,7 +76,9 @@ export const reloadPage = async (p: PG) => {
         p.ui.syncing = false;
         p.render();
       }
-    });
+    };
+
+    doc.on("update", p.page.doc_on_update);
 
     p.page.doc = doc as any;
     if (p.page.doc) {
