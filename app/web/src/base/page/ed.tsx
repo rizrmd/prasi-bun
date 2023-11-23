@@ -9,6 +9,16 @@ export default page({
   component: ({}) => {
     const p = useGlobal(EDGlobal, "EDITOR");
 
+    const w = window as any;
+    if (!w.Y) {
+      (async () => {
+        (window as any).Y = await import("yjs");
+        (window as any).syncronize = (await import("y-pojo")).syncronize;
+        p.render();
+      })();
+      return <Loading note="init" />;
+    }
+
     if (!edInitSync(p)) {
       return <Loading note="connecting-ws" />;
     }
