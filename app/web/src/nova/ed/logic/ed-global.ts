@@ -114,6 +114,7 @@ export const EDGlobal = {
   page: {
     cur: EmptyPage,
     doc: null as null | DPage,
+    doc_on_update: async (bin: Uint8Array, origin: any) => {},
     list: {} as Record<string, { page: EPage; doc: DPage }>,
     building: false,
     meta: {} as Record<string, EdMeta>,
