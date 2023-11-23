@@ -96,32 +96,7 @@ export const serverWalkMap = (
   const { mitem, parent_item, parent_mcomp } = arg;
 
   const item = {} as unknown as IItem;
-
-  let override_id = "";
-  const id = mitem.get("id");
-
-  if (parent_mcomp && id) {
-    const fcomp = parent_mcomp.mitem.get("component");
-
-    if (fcomp) {
-      const ref_ids = fcomp.get("ref_ids");
-
-      if (ref_ids) {
-        let ref_id = ref_ids.get(id);
-
-        if (!ref_id) {
-          ref_id = createId();
-          ref_ids.set(id, ref_id);
-        }
-        override_id = ref_id;
-      }
-    }
-  }
-
   mapItem(mitem, item);
-  if (override_id) {
-    item.id = override_id;
-  }
 
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");

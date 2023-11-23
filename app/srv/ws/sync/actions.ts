@@ -1,8 +1,11 @@
 import { component, page } from "dbgen";
-import { EComp, EPage, ESite } from "../../../web/src/nova/ed/logic/ed-global";
+import {
+  EPage,
+  ESite,
+  IScopeComp
+} from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
-import { activity } from "./entity/activity";
 import { parseJs } from "./editor/parser/parse-js";
 
 /* 
@@ -41,7 +44,7 @@ export const SyncActions = {
       ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>
       ({}) as Record<string, { id: string; name: string; comps: string[] }>,
-    load: async (id: string) => ({}) as EComp | void,
+    load: async (id: string) => ({}) as IScopeComp | void,
   },
   page: {
     list: async (id_site: string) =>

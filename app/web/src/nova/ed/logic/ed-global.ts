@@ -127,7 +127,7 @@ export const EDGlobal = {
     doc: null as null | DComp,
     item: null as null | IItem,
     map: {} as Record<string, { id: string; item: IItem }>,
-    list: {} as Record<string, { comp: EComp; doc: DComp }>,
+    list: {} as Record<string, { comp: EComp; doc: DComp; scope: IScope }>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {

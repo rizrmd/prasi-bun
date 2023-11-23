@@ -1,4 +1,6 @@
 import { compress, decompress } from "wasm-gzip";
+import { IItem } from "../../../utils/types/item";
+import { DComp } from "../../../utils/types/root";
 import { PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 
@@ -43,8 +45,21 @@ export const reloadPage = async (p: PG) => {
     p.render();
     return;
   }
-
-  console.log(remotePage.scope, remotePage.scope_comps);
+  if (remotePage.scope_comps) {
+    for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
+      if (c && c.snapshot) {
+        const doc = new Y.Doc() as DComp;
+        if (c.snapshot) {
+          Y.applyUpdate(doc as any, decompress(c.snapshot));
+          p.comp.map[id_comp] = {
+            id: id_comp,
+            item: doc.getMap("map").get("root")?.toJSON() as IItem,
+          };
+          p.comp.list[id_comp] = { comp: c, doc, scope: c.scope };
+        }
+      }
+    }
+  }
 
   p.page.cur = remotePage;
   if (remotePage.snapshot) {
