@@ -58,6 +58,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 mitem: e,
                 parent_item: { id: root_id },
                 tree_root_id: root_id,
+                skip_add_tree: true,
                 portal,
                 each(meta) {
                   if (meta.item.name === "content") {
