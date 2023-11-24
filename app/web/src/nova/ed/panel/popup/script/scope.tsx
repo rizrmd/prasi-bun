@@ -9,8 +9,12 @@ export const declareScope = async (
   editor: MonacoEditor,
   monaco: Monaco
 ) => {
-  const active_id = active.item_id;
-  const s = deepClone(p.page.scope[active_id]);
+  let active_id = active.item_id;
+  let s = deepClone(p.page.scope[active_id]);
+
+  if (active.comp_id) {
+    s = deepClone(p.comp.list[active.comp_id].scope[active.item_id]);
+  }
 
   monaco.editor.getModels().forEach((model) => {
     if (model.uri.toString().startsWith("ts:scope~")) {
@@ -37,18 +41,28 @@ export const declareScope = async (
   });
 
   spreadScope(p, s, (arg) => {
-    addScope(
-      monaco,
-      `${arg.type}~${arg.id}`,
-      `\
+    if (arg.type !== "local") {
+      addScope(
+        monaco,
+        `${arg.type}~${arg.name}`,
+        `\
+export const {};
+declare global {
+  const ${arg.name} = ${arg.value};
+}`
+      );
+    } else {
+      addScope(
+        monaco,
+        `${arg.type}~${arg.id}`,
+        `\
 export const {};
 const __val = ${arg.value};
 declare global {
-  const ${arg.name}: typeof __val ${
-    arg.type === "local" ? " & { render: ()=>void}" : ""
-  };
+  const ${arg.name}: typeof __val & { render: ()=>void };
 }`
-    );
+      );
+    }
   });
 };
 
@@ -100,7 +114,11 @@ const spreadScope = (
       }
     }
     if (!item) {
-      item = p.page.scope[parent_id];
+      if (active.comp_id) {
+        item = p.comp.list[active.comp_id].scope[parent_id];
+      } else {
+        item = p.page.scope[parent_id];
+      }
     }
 
     if (item) {
@@ -120,7 +138,7 @@ const spreadScope = (
           for (const [k, v] of Object.entries(scope.passprop)) {
             each({
               s,
-              type: "prop",
+              type: "passprop",
               id: parent_id,
               name: k,
               value: v.value,
@@ -133,7 +151,7 @@ const spreadScope = (
           for (const [k, v] of Object.entries(scope.props)) {
             each({
               s,
-              type: "passprop",
+              type: "prop",
               id: parent_id,
               name: k,
               value: v.value,

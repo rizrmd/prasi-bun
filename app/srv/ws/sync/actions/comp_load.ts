@@ -27,28 +27,22 @@ const scanMeta = async (id: string, doc: DComp, sync: SyncConnection) => {
   const scope = {};
   const scope_comps: IScopeComp = {};
   const loaded = new Set<string>();
-  const root = doc.getMap("map").get("root");
-  if (root) {
-    const name = root.get("name") || "";
-    const childs = root.get("childs");
-    if (childs) {
-      await Promise.all(
-        childs.map((m) => serverWalkLoad(m, scope_comps, sync, loaded))
-      );
-      childs.map((m, i) => {
-        serverWalkMap(
-          { sync, scope, scope_comps },
-          {
-            mitem: m,
-            parent_item: { id: "root" },
-            parent_ids: ["root"],
-          }
-        );
-      });
-    }
+  const mitem = doc.getMap("map").get("root");
+  if (mitem) {
+    const name = mitem.get("name") || "";
+    await serverWalkLoad(mitem, scope_comps, sync, loaded);
+    serverWalkMap(
+      { sync, scope, scope_comps },
+      {
+        mitem,
+        parent_item: { id: "root" },
+        parent_ids: ["root"],
+      }
+    );
 
     const bin = Y.encodeStateAsUpdate(doc as any);
     const snapshot = await gzipAsync(bin);
+
     scope_comps[id] = { id, name, scope, snapshot };
   }
 
