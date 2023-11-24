@@ -5,14 +5,10 @@ import {
   IScope,
   IScopeComp,
 } from "../../../../web/src/nova/ed/logic/ed-global";
-import {
-  ensurePropContent
-} from "../../../../web/src/nova/ed/logic/tree/sync-walk-utils";
+import { ensurePropContent } from "../../../../web/src/nova/ed/logic/tree/sync-walk-utils";
 import { MContent } from "../../../../web/src/utils/types/general";
 import { IItem, MItem } from "../../../../web/src/utils/types/item";
-import {
-  FNComponent
-} from "../../../../web/src/utils/types/meta-fn";
+import { FNComponent } from "../../../../web/src/utils/types/meta-fn";
 import { docs } from "../entity/docs";
 import { gzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
@@ -215,8 +211,9 @@ export const serverWalkMap = (
           if (!parent_mcomp) {
             p.scope[item.id] = {
               p: arg.parent_ids,
-              n: item.name,
+              n: item.name, 
               s: null,
+              c: item.component?.id,
             };
             if (scope) p.scope[item.id].s = scope;
           }

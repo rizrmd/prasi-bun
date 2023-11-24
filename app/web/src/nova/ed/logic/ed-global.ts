@@ -27,6 +27,7 @@ export type ISingleScope = {
   p: string[];
   n: string;
   s: null | Exclude<ReturnType<typeof parseJs>, undefined>;
+  c?: string;
 };
 export type IScope = Record<string, ISingleScope>;
 
