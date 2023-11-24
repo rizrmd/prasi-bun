@@ -22,7 +22,11 @@ export const ScriptMonaco = () => {
   const Editor = jscript.editor;
   if (!Editor) return null;
 
-  const meta = p.page.meta[active.item_id];
+  let meta = p.page.meta[active.item_id];
+  if (active.comp_id) {
+    meta = p.comp.list[active.comp_id].meta[active.item_id];
+  }
+
   if (!meta) return null;
 
   const item = meta.item;

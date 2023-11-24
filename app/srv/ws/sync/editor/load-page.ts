@@ -6,20 +6,18 @@ import {
   IScopeComp,
 } from "../../../../web/src/nova/ed/logic/ed-global";
 import {
-  ensureMItemProps,
-  ensureMProp,
-  ensurePropContent,
+  ensurePropContent
 } from "../../../../web/src/nova/ed/logic/tree/sync-walk-utils";
 import { MContent } from "../../../../web/src/utils/types/general";
 import { IItem, MItem } from "../../../../web/src/utils/types/item";
 import {
-  FNCompDef,
-  FNComponent,
+  FNComponent
 } from "../../../../web/src/utils/types/meta-fn";
 import { docs } from "../entity/docs";
 import { gzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 import { loadComponent } from "./load-component";
+import { extractMItemProps } from "./load-page-comp";
 import { parseJs } from "./parser/parse-js";
 
 export const serverWalkLoad = async (
@@ -123,113 +121,126 @@ export const serverWalkMap = (
 
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
-  if (item_comp && item_comp.id && parent_item.id !== "root") {
-    if (!docs.comp[item_comp.id]) {
-      console.error("Component failed to load:", item_comp.id);
-      return;
-    }
-
-    if (!p.scope_comps[item_comp.id]) {
-      console.error("Failed to assign component:", item_comp.id);
-      return;
-    }
-
-    const ref_comp = docs.comp[item_comp.id];
-
-    if (ref_comp && mitem_comp) {
-      const mcomp = ref_comp.doc.getMap("map").get("root");
-
-      if (mcomp) {
-        let ref_ids: Record<string, string> = item_comp.ref_ids;
-        if (!ref_ids) {
-          mitem_comp.set("ref_ids", new Y.Map() as any);
-          ref_ids = {};
-        }
-        const original_id = item.id;
-        mapItem(mcomp, item);
-        item.id = original_id;
-
-        const mprops = mcomp.get("component")?.get("props")?.toJSON() as Record<
-          string,
-          FNCompDef
-        >;
-
-        const scope = { props: {} } as Exclude<
-          ReturnType<typeof parseJs>,
-          undefined
-        >;
-
-        if (mprops) {
-          const mitem_comp = mitem.get("component");
-          if (mitem_comp) {
-            const mitem_props = ensureMItemProps(mitem_comp, item_comp);
-            if (mitem_props) {
-              for (const [k, v] of Object.entries(mprops)) {
-                scope.props[k] = { name: k, value: `null as any` };
-                const mprop = ensureMProp(mitem_props, k, v);
-                item_comp.props[k] = v;
-                if (mprop && v.meta?.type === "content-element") {
-                  scope.props[k].value = "null as ReactElement";
-                  const mcontent = ensurePropContent(mprop, k);
-                  if (mcontent) {
-                    serverWalkMap(p, {
-                      parent_ids: [...arg.parent_ids, item.id],
-                      mitem: mcontent,
-                      parent_item: { id: item.id, mitem: mitem as MItem },
-                      is_prop: true,
-                      parent_mcomp: {
-                        id: item_comp.id,
-                        mitem: mitem as MItem,
-                        mcomp,
-                      },
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        const pcomp = p.scope_comps[item_comp.id];
-        pcomp.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
-        const js = item.adv?.js;
-        if (typeof js === "string") {
-          const res = parseJs(js);
-          if (res) {
-            scope.local = res.local;
-            scope.passprop = res.passprop;
-          }
-        }
-
-        if (scope) pcomp.scope[item.id].s = scope;
-        if (!parent_mcomp) {
-          p.scope[item.id] = {
-            p: arg.parent_ids,
-            n: item.name,
-            s: null,
-          };
-          if (scope) p.scope[item.id].s = scope;
-        }
-
-        const childs = mcomp.get("childs")?.map((e) => e) || [];
-        for (const e of childs) {
-          serverWalkMap(p, {
-            mitem: e,
-            parent_ids: [...arg.parent_ids, item.id],
-            parent_item: {
-              id: item.id,
-              mitem: mitem as MItem,
-            },
-            parent_mcomp: {
-              id: item_comp.id,
-              mitem: mitem as MItem,
-              mcomp,
-            },
-          });
+  if (item_comp && item_comp.id) {
+    if (parent_item.id === "root") {
+      const scope = { props: {} } as Exclude<
+        ReturnType<typeof parseJs>,
+        undefined
+      >;
+      extractMItemProps({
+        item_comp,
+        mitem,
+        mcomp: mitem,
+        scope,
+        mcontent(mcontent) {},
+      });
+      p.scope[item.id] = {
+        p: arg.parent_ids,
+        n: item.name,
+        s: scope,
+      };
+      const js = item.adv?.js;
+      if (typeof js === "string") {
+        const s = parseJs(js);
+        const ps = p.scope[item.id].s;
+        if (ps) {
+          if (s?.local) ps.local = s.local;
+          if (s?.passprop) ps.passprop = s.passprop;
         }
       }
+    } else {
+      if (!docs.comp[item_comp.id]) {
+        console.error("Component failed to load:", item_comp.id);
+        return;
+      }
+
+      if (!p.scope_comps[item_comp.id]) {
+        console.error("Failed to assign component:", item_comp.id);
+        return;
+      }
+
+      const ref_comp = docs.comp[item_comp.id];
+
+      if (ref_comp && mitem_comp) {
+        const mcomp = ref_comp.doc.getMap("map").get("root");
+
+        if (mcomp) {
+          let ref_ids: Record<string, string> = item_comp.ref_ids;
+          if (!ref_ids) {
+            mitem_comp.set("ref_ids", new Y.Map() as any);
+            ref_ids = {};
+          }
+          const original_id = item.id;
+          mapItem(mcomp, item);
+          item.id = original_id;
+
+          const scope = { props: {} } as Exclude<
+            ReturnType<typeof parseJs>,
+            undefined
+          >;
+
+          extractMItemProps({
+            item_comp,
+            mitem,
+            mcomp,
+            scope,
+            mcontent(mcontent) {
+              serverWalkMap(p, {
+                parent_ids: ["root", item.id],
+                mitem: mcontent,
+                parent_item: { id: item.id, mitem: mitem as MItem },
+                is_prop: true,
+                parent_mcomp: {
+                  id: item_comp.id,
+                  mitem: mitem as MItem,
+                  mcomp,
+                },
+              });
+            },
+          });
+
+          const pcomp = p.scope_comps[item_comp.id];
+          pcomp.scope[item.id] = { p: ["root"], n: item.name, s: null };
+
+          const js = item.adv?.js;
+          if (typeof js === "string") {
+            const res = parseJs(js);
+            if (res) {
+              scope.local = res.local;
+              scope.passprop = res.passprop;
+            }
+          }
+
+          if (scope) pcomp.scope[item.id].s = scope;
+          if (!parent_mcomp) {
+            p.scope[item.id] = {
+              p: arg.parent_ids,
+              n: item.name,
+              s: null,
+            };
+            if (scope) p.scope[item.id].s = scope;
+          }
+
+          const childs = mcomp.get("childs")?.map((e) => e) || [];
+          for (const e of childs) {
+            serverWalkMap(p, {
+              mitem: e,
+              parent_ids: ["root", item.id],
+              parent_item: {
+                id: item.id,
+                mitem: mitem as MItem,
+              },
+              parent_mcomp: {
+                id: item_comp.id,
+                mitem: mitem as MItem,
+                mcomp,
+              },
+            });
+          }
+        }
+      }
+      return;
     }
-    return;
   }
 
   if (arg.parent_mcomp && !arg.is_prop) {
@@ -241,11 +252,13 @@ export const serverWalkMap = (
       if (scope) pcomp.scope[item.id].s = scope;
     }
   } else {
-    p.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
-    const js = item.adv?.js;
-    if (typeof js === "string") {
-      const scope = parseJs(js);
-      if (scope) p.scope[item.id].s = scope;
+    if (!(item_comp && item_comp.id)) {
+      p.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
+      const js = item.adv?.js;
+      if (typeof js === "string") {
+        const scope = parseJs(js);
+        if (scope) p.scope[item.id].s = scope;
+      }
     }
   }
 
