@@ -1,9 +1,8 @@
 import { compress, decompress } from "wasm-gzip";
-import { IItem } from "../../../utils/types/item";
-import { DComp } from "../../../utils/types/root";
 import { PG } from "./ed-global";
-import { treeRebuild } from "./tree/build";
 import { loadSite } from "./ed-site";
+import { treeRebuild } from "./tree/build";
+import { loadCompSnapshot } from "./tree/sync-walk";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
@@ -52,15 +51,14 @@ export const reloadPage = async (p: PG, page_id: string) => {
   if (remotePage.scope_comps) {
     for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
       if (c && c.snapshot) {
-        const doc = new Y.Doc() as DComp;
-        if (c.snapshot) {
-          Y.applyUpdate(doc as any, decompress(c.snapshot));
-          // p.comp.list[id_comp] = {
-          //   id: id_comp,
-          //   item: doc.getMap("map").get("root")?.toJSON() as IItem,
-          // };
-          // p.comp.list[id_comp] = { comp: c, doc, scope: c.scope };
-        }
+
+        await loadCompSnapshot(
+          p,
+          id_comp,
+          new Set<string>(),
+          c.snapshot,
+          c.scope
+        );
       }
     }
   }
