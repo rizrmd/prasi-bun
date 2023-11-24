@@ -1,19 +1,20 @@
-import type { OnMount } from "@monaco-editor/react";
+import type { Monaco, OnMount } from "@monaco-editor/react";
 import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
 import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
-import { EDGlobal, active } from "../../../logic/ed-global";
+import { EDGlobal, ISingleScope, active } from "../../../logic/ed-global";
 import { declareScope } from "./scope";
+import { useEffect } from "react";
 
 export type MonacoEditor = Parameters<OnMount>[0];
 export const ScriptMonaco = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     editor: null as null | MonacoEditor,
-    reloading: false,
+    monaco: null as null | Monaco,
     changeTimeout: 0 as any,
     historyOpen: false,
     idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
@@ -23,9 +24,43 @@ export const ScriptMonaco = () => {
   if (!Editor) return null;
 
   let meta = p.page.meta[active.item_id];
-  if (active.comp_id) {
+  if (active.comp_id && p.comp.list[active.comp_id]) {
     meta = p.comp.list[active.comp_id].meta[active.item_id];
   }
+
+  useEffect(() => {
+    if (local.monaco && local.editor) {
+      const val: string = (
+        typeof adv[p.ui.popup.script.mode] === "string"
+          ? adv[p.ui.popup.script.mode]
+          : ""
+      ) as any;
+      local.monaco.editor.getModels().forEach((model) => {
+        const uri = model.uri.toString();
+        if (
+          uri.startsWith("inmemory://model") ||
+          uri.startsWith("ts:comp-") ||
+          uri.startsWith("ts:page-")
+        ) {
+          model.dispose();
+        }
+      });
+
+      let model = local.monaco.editor.createModel(
+        val,
+        "typescript",
+        local.monaco.Uri.parse(
+          `ts:${
+            active.comp_id ? `comp-${active.comp_id}` : `page-${p.page.cur.id}`
+          }-${active.item_id}.tsx`
+        )
+      );
+      local.editor.setModel(model);
+      declareScope(p, local.editor, local.monaco).then(() => {
+        local.render();
+      });
+    }
+  }, [active.item_id]);
 
   if (!meta) return null;
 
@@ -120,35 +155,47 @@ export const ScriptMonaco = () => {
             )
           );
           editor.setModel(model);
-        }
-        monaco.editor.registerEditorOpener({
-          openCodeEditor(source, r, selectionOrPosition) {
-            const path = r.path.split("~");
-            const id = path[path.length - 1].replace(".d.ts", "");
-            const meta = p.page.meta[id];
+          monaco.editor.registerEditorOpener({
+            openCodeEditor(source, r, selectionOrPosition) {
+              const cpath = r.path.substring(`scope~`.length).split("__");
+              const comp_id = cpath[0];
+              const path = cpath[1].split("~");
+              const type = path[0] as "prop" | "passprop" | "local";
+              const id = path[path.length - 1].replace(".d.ts", "");
 
-            if (meta) {
-              console.log(meta.item, meta);
-            }
+              if (comp_id) {
+                let meta = p.page.meta[id];
+                if (active.comp_id) {
+                  meta = p.comp.list[active.comp_id].meta[id];
+                }
 
-            // https://github.com/microsoft/vscode/pull/177064#issue-1623100628
-            return false;
-          },
-        });
+                if (meta && meta.item.originalId) {
+                  active.item_id = meta.item.originalId;
+                }
+                active.comp_id = comp_id;
+              } else {
+                active.item_id = id;
+              }
+              p.render();
 
-        await jsMount(editor, monaco);
-        await monacoTypings(
-          {
-            site_dts: p.site_dts,
-            script: {
-              siteTypes: {},
+              return false;
             },
-            site: p.site.config,
-          },
-          monaco,
-          { types: {}, values: {} }
-        );
-        await declareScope(p, editor, monaco);
+          });
+
+          await jsMount(editor, monaco);
+          await monacoTypings(
+            {
+              site_dts: p.site_dts,
+              script: {
+                siteTypes: {},
+              },
+              site: p.site.config,
+            },
+            monaco,
+            { types: {}, values: {} }
+          );
+          await declareScope(p, editor, monaco);
+        }
       }}
     />
   );

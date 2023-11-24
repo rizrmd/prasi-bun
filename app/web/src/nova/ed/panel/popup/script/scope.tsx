@@ -12,9 +12,11 @@ export const declareScope = async (
   let active_id = active.item_id;
   let s = deepClone(p.page.scope[active_id]);
 
-  if (active.comp_id) {
+  if (active.comp_id && p.comp.list[active.comp_id]) {
     s = deepClone(p.comp.list[active.comp_id].scope[active.item_id]);
   }
+
+  if (!s) return;
 
   monaco.editor.getModels().forEach((model) => {
     if (model.uri.toString().startsWith("ts:scope~")) {
@@ -44,7 +46,7 @@ export const declareScope = async (
     if (arg.type !== "local") {
       addScope(
         monaco,
-        `${arg.type}~${arg.name}`,
+        `${arg.comp_id || ""}__${arg.type}~${arg.name}~${arg.id}`,
         `\
 export const {};
 declare global {
@@ -54,7 +56,7 @@ declare global {
     } else {
       addScope(
         monaco,
-        `${arg.type}~${arg.id}`,
+        `${arg.comp_id || ""}__${arg.type}~${arg.id}`,
         `\
 export const {};
 const __val = ${arg.value};
@@ -75,13 +77,15 @@ type IEachArgScope = {
   id: string;
   type: "local" | "prop" | "passprop";
   index?: number;
-  isProp?: boolean;
+  is_prop?: boolean;
+  comp_id?: string;
 };
 const spreadScope = (
   p: PG,
-  s: ISingleScope,
+  s: ISingleScope | undefined,
   each: (arg: IEachArgScope) => void
 ) => {
+  if (!s) return;
   const parents = [...s.p];
   const layout_id = p.site.layout.id;
   let layout = null as null | EPage;
@@ -122,7 +126,7 @@ const spreadScope = (
       if (!item) {
         if (comp_id) {
           item = p.comp.list[comp_id].scope[parent_id];
-        } else if (active.comp_id) {
+        } else if (active.comp_id && p.comp.list[active.comp_id]) {
           item = p.comp.list[active.comp_id].scope[parent_id];
         } else {
           item = p.page.scope[parent_id];
@@ -131,6 +135,7 @@ const spreadScope = (
 
       if (item) {
         if (item.c) {
+          comp_id = item.c;
           mergeScopes(item.p, each, item.c);
         }
 
@@ -139,6 +144,7 @@ const spreadScope = (
           if (scope.local)
             each({
               s,
+              comp_id,
               type: "local",
               id: parent_id,
               name: scope.local.name,
@@ -150,6 +156,7 @@ const spreadScope = (
             for (const [k, v] of Object.entries(scope.passprop)) {
               each({
                 s,
+                comp_id,
                 type: "passprop",
                 id: parent_id,
                 name: k,
@@ -163,11 +170,12 @@ const spreadScope = (
             for (const [k, v] of Object.entries(scope.props)) {
               each({
                 s,
+                comp_id,
                 type: "prop",
                 id: parent_id,
                 name: k,
                 value: v.value,
-                isProp: true,
+                is_prop: true,
               });
             }
           }

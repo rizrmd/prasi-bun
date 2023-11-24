@@ -144,9 +144,10 @@ export const syncWalkMap = (
           mitem_comp.set("ref_ids", new Y.Map() as any);
           ref_ids = {};
         }
-        const original_id = item.id;
+        const old_id = item.id;
         mapItem(mcomp, item);
-        item.id = original_id;
+        item.originalId = item.id;
+        item.id = old_id;
 
         const meta: EdMeta = {
           item,
