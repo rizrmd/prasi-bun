@@ -125,7 +125,7 @@ export const edInitSync = (p: PG) => {
         },
         async editor_start(e) {
           if (p.ui.syncing) {
-            await reloadPage(p, params.page_id);
+            await reloadPage(p, params.page_id, "editor-start");
             if (p.page.doc) {
               p.page.doc.transact(() => {
                 p.page.doc?.getMap("map").set("ts", Date.now());
@@ -154,28 +154,31 @@ export const edInitSync = (p: PG) => {
           p.render();
         },
         async remote_svlocal(data) {
-          if (p[data.type].cur.id === data.id) {
-            const doc = p[data.type].doc as Y.Doc;
+          let doc = null as any;
+          if (data.type === "page" && p.page.cur.id === data.id) {
+            doc = p.page.doc as Y.Doc;
+          } else if (data.type === "comp" && p.comp.list[data.id]) {
+            doc = p.comp.list[data.id].doc;
+          }
 
-            if (doc) {
-              const diff_remote = Y.encodeStateAsUpdate(
-                doc,
-                decompress(data.sv_local)
-              );
-              const sv_remote = Y.encodeStateVector(doc);
+          if (doc) {
+            const diff_remote = Y.encodeStateAsUpdate(
+              doc,
+              decompress(data.sv_local)
+            );
+            const sv_remote = Y.encodeStateVector(doc);
 
-              const sv = Buffer.from(compress(sv_remote));
-              const diff = Buffer.from(compress(diff_remote));
-              const res = await p.sync.yjs.sv_remote(
-                data.type,
-                data.id,
-                sv,
-                diff
-              );
-              if (res) {
-                Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
-                await treeRebuild(p, { note: "sv_remote" });
-              }
+            const sv = Buffer.from(compress(sv_remote));
+            const diff = Buffer.from(compress(diff_remote));
+            const res = await p.sync.yjs.sv_remote(
+              data.type,
+              data.id,
+              sv,
+              diff
+            );
+            if (res) {
+              Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
+              await treeRebuild(p, { note: "sv_remote" });
             }
           }
         },

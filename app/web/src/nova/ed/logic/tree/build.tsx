@@ -1,5 +1,10 @@
 import { EdMeta, PG } from "../ed-global";
-import { loadComponent, syncWalkLoad, syncWalkMap } from "./sync-walk";
+import {
+  component,
+  loadComponent,
+  syncWalkLoad,
+  syncWalkMap,
+} from "./sync-walk";
 
 export const compLoaded = new Set<string>();
 
@@ -16,24 +21,13 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     p.page.tree = [];
     p.page.meta = {};
 
-    const sections = root.get("childs");
-    if (sections) {
-      await Promise.all(
-        sections.map((e) => {
-          return syncWalkLoad(p, e, compLoaded, (id) => {
-            return loadComponent(p, id, compLoaded);
-          });
-        })
-      );
-    }
-
     const portal = {
       in: {} as Record<string, EdMeta>,
       out: {} as Record<string, EdMeta>,
     };
 
     let root_id = "root";
-    if (p.site.layout) {
+    if (p.site.layout && p.site.layout.id !== p.page.cur.id) {
       const ldoc = p.page.list[p.site.layout.id];
       if (ldoc) {
         const lroot = ldoc.doc.getMap("map").get("root");
@@ -48,6 +42,8 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 });
               })
             );
+
+            if (component.pending) await component.pending;
 
             sections.map((e) => {
               if (root_id === "root") {
@@ -98,6 +94,19 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           }
         }
       }
+    }
+
+    const sections = root.get("childs");
+    if (sections) {
+      await Promise.all(
+        sections.map((e) => {
+          return syncWalkLoad(p, e, compLoaded, (id) => {
+            return loadComponent(p, id, compLoaded);
+          });
+        })
+      );
+
+      if (component.pending) await component.pending;
     }
 
     doc.transact(async () => {

@@ -13,7 +13,6 @@ import {
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
-import { waitUntil } from "web-utils";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -28,8 +27,8 @@ export const syncWalkLoad = async (
     if (id) {
       const isFirstLoaded = !loaded.has(id);
       loaded.add(id);
-      if (!p.comp.list[id]) {
-        await loadComponent(comp.id);
+      if (!p.comp.list[id] && isFirstLoaded) {
+        loadComponent(comp.id);
       }
 
       const pcomp = p.comp.list[id];
@@ -320,22 +319,45 @@ export const loadCompSnapshot = async (
   }
 };
 
+const loadcomp = { timeout: 0 as any, pending: new Set<string>() };
+export const component = {
+  pending: null as null | Promise<void>,
+  resolve: null as null | (() => void),
+};
 export const loadComponent = async (
   p: PG,
   id_comp: string,
   loaded: Set<string>
 ) => {
-  const comps = await p.sync.comp.load(id_comp);
-
-  if (comps) {
-    for (const cur of Object.values(comps)) {
-      if (cur && cur.snapshot) {
-        await loadCompSnapshot(p, id_comp, loaded, cur.snapshot, cur.scope);
-      }
-    }
-    return true;
+  if (!component.pending) {
+    component.pending = new Promise((resolve) => {
+      component.resolve = resolve;
+    });
   }
-  return false;
+
+  return new Promise<boolean>((resolve) => {
+    loadcomp.pending.add(id_comp);
+    clearTimeout(loadcomp.timeout);
+    loadcomp.timeout = setTimeout(async () => {
+      const comps = await p.sync.comp.load([...loadcomp.pending]);
+      let result = Object.entries(comps);
+      loadcomp.pending.clear();
+
+      for (const [id_comp, comp] of result) {
+        for (const cur of Object.values(comp)) {
+          if (cur && cur.snapshot) {
+            await loadCompSnapshot(p, id_comp, loaded, cur.snapshot, cur.scope);
+          }
+        }
+      }
+      resolve(result.length > 0);
+      if (component.resolve) {
+        component.resolve();
+        component.pending = null;
+        component.resolve = null;
+      }
+    }, 150);
+  });
 };
 
 const mapItem = (mitem: MContent, item: any) => {
