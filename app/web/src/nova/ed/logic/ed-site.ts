@@ -13,7 +13,7 @@ export const loadSite = async (p: PG, site: ESite) => {
     }
 
     if (site.layout.id) {
-      await reloadPage(p, site.layout.id);
+      await reloadPage(p, site.layout.id, "load-layout");
     }
   }
 };

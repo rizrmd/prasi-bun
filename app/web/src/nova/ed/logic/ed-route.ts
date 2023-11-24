@@ -32,12 +32,12 @@ export const edRoute = async (p: PG) => {
         p.page.doc = cur.doc;
       }
 
-      await reloadPage(p, params.page_id);
+      await reloadPage(p, params.page_id, "load-route");
     }
   }
 };
 
-export const reloadPage = async (p: PG, page_id: string) => {
+export const reloadPage = async (p: PG, page_id: string, note: string) => {
   p.status = "loading";
   const remotePage = await p.sync.page.load(page_id);
 
@@ -51,7 +51,6 @@ export const reloadPage = async (p: PG, page_id: string) => {
   if (remotePage.scope_comps) {
     for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
       if (c && c.snapshot) {
-
         await loadCompSnapshot(
           p,
           id_comp,
@@ -93,7 +92,7 @@ export const reloadPage = async (p: PG, page_id: string) => {
           decompress(res.sv)
         );
         Y.applyUpdate(doc as any, decompress(res.diff), "local");
-        await treeRebuild(p);
+        await treeRebuild(p, { note: "page-on-update" });
 
         await p.sync.yjs.diff_local(
           "page",
@@ -114,7 +113,7 @@ export const reloadPage = async (p: PG, page_id: string) => {
     }
 
     if (p.page.doc) {
-      await treeRebuild(p);
+      await treeRebuild(p, { note: "reload-page-init" });
     }
   }
   p.status = "ready";

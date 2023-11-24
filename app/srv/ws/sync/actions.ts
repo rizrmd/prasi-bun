@@ -2,7 +2,7 @@ import { component, page } from "dbgen";
 import {
   EPage,
   ESite,
-  IScopeComp
+  IScopeComp,
 } from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
@@ -44,7 +44,7 @@ export const SyncActions = {
       ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>
       ({}) as Record<string, { id: string; name: string; comps: string[] }>,
-    load: async (id: string) => ({}) as IScopeComp | void,
+    load: async (ids: string[]) => ({}) as Record<string, IScopeComp>,
   },
   page: {
     list: async (id_site: string) =>

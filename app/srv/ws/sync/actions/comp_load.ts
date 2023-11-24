@@ -9,14 +9,18 @@ import { SyncConnection } from "../type";
 
 export const comp_load: SAction["comp"]["load"] = async function (
   this: SyncConnection,
-  id: string
+  ids: string[]
 ) {
-  const root = await loadComponent(id, this);
+  const result: Record<string, IScopeComp> = {};
+  for (const id of ids) {
+    const root = await loadComponent(id, this);
 
-  let ref = docs.comp[id];
-  if (ref) {
-    return scanMeta(id, ref.doc, this);
+    let ref = docs.comp[id];
+    if (ref) {
+      result[id] = await scanMeta(id, ref.doc, this);
+    }
   }
+  return result;
 };
 
 const scanMeta = async (id: string, doc: DComp, sync: SyncConnection) => {
