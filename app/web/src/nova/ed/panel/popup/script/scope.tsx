@@ -18,6 +18,8 @@ export const declareScope = async (
 
   if (!s) return;
 
+  s.p.push(active_id);
+
   monaco.editor.getModels().forEach((model) => {
     if (model.uri.toString().startsWith("ts:scope~")) {
       model.dispose();
