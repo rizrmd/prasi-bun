@@ -66,11 +66,18 @@ export const ScriptMonaco = () => {
 
   const item = meta.item;
   const adv = item.adv || {};
-  const val: string = (
+  let val: string = (
     typeof adv[p.ui.popup.script.mode] === "string"
       ? adv[p.ui.popup.script.mode]
       : ""
   ) as any;
+
+  if (active.prop_name && item.type === "item" && item.component) {
+    const prop = item.component.props[active.prop_name];
+    if (prop) {
+      val = prop.value;
+    }
+  }
 
   const doEdit = async (newval: string, all?: boolean) => {
     if (local.editor && jscript.prettier.standalone) {
@@ -155,40 +162,8 @@ export const ScriptMonaco = () => {
             )
           );
           editor.setModel(model);
-          monaco.editor.registerEditorOpener({
-            openCodeEditor(source, r, selectionOrPosition) {
-              const cpath = r.path.substring(`scope~`.length).split("__");
-              const comp_id = cpath[0];
-              if (cpath[1]) {
-                const path = cpath[1].split("~");
-                const type = path[0] as "prop" | "passprop" | "local";
-                const id = path[path.length - 1].replace(".d.ts", "");
 
-                if (type === "prop") {
-                  return false;
-                }
-
-                if (comp_id) {
-                  let meta = p.page.meta[id];
-                  if (active.comp_id) {
-                    meta = p.comp.list[active.comp_id].meta[id];
-                  }
-
-                  if (meta && meta.item.originalId) {
-                    active.item_id = meta.item.originalId;
-                  }
-                  active.comp_id = comp_id;
-                } else {
-                  active.item_id = id;
-                }
-                p.render();
-              }
-
-              return false;
-            },
-          });
-
-          await jsMount(editor, monaco);
+          await jsMount(editor, monaco, p);
           await monacoTypings(
             {
               site_dts: p.site_dts,

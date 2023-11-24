@@ -75,13 +75,19 @@ export const EdTreeAction = ({
 
                   const comp_id = comp.id;
                   if (comp_id) {
-                    active.comp_id = comp_id;
-                    active.comp_item_id = item.id;
+                    active.instance.item_id = item.id;
+                    active.instance.comp_id = active.comp_id;
+                    console.log(
+                      active.instance.comp_id,
+                      active.instance.item_id
+                    );
+
+                    active.comp_id = comp_id || "";
                     const root = p.comp.list[comp_id].tree.find(
                       (e) => e.parent === "root"
                     );
                     if (root && typeof root.id === "string") {
-                      active.item_id = root.id;
+                      active.item_id = root.id || "";
                     }
 
                     p.render();
@@ -102,9 +108,10 @@ export const EdTreeAction = ({
                     e.preventDefault();
 
                     if (active.comp_id) {
-                      active.comp_id = "";
-                      active.item_id = active.comp_item_id;
-                      active.comp_item_id = "";
+                      active.comp_id = active.instance.comp_id || "";
+                      active.item_id = active.instance.item_id || "";
+                      active.instance.comp_id = "";
+                      active.instance.item_id = "";
                       p.render();
                     }
                   }}
