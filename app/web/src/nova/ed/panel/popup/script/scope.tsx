@@ -89,9 +89,10 @@ const spreadScope = (
     layout = p.page.list[layout_id].page;
     if (!layout_scope[layout_id]) {
       if (layout) {
-        const scope = Object.values(layout.scope).find((e) => {
+        const scopes = Object.values(layout.scope).filter((e) => {
           return e.n === "content";
         });
+        const scope = scopes.shift();
         if (scope) {
           layout_scope[layout_id] = scope;
         }
@@ -101,67 +102,81 @@ const spreadScope = (
     const scope = layout_scope[layout_id];
     if (scope) {
       parents.shift();
-      scope.p.forEach((e) => parents.unshift(e));
+      scope.p.forEach((e) => parents.push(e));
     }
   }
 
-  for (const parent_id of parents) {
-    let item = null as null | ISingleScope;
-    if (layout && layout_scope[layout_id]) {
-      const scope = layout_scope[layout_id];
-      if (scope.p.includes(parent_id)) {
-        item = layout.scope[parent_id];
-      }
-    }
-    if (!item) {
-      if (active.comp_id) {
-        item = p.comp.list[active.comp_id].scope[parent_id];
-      } else {
-        item = p.page.scope[parent_id];
-      }
-    }
-
-    if (item) {
-      const scope = item.s;
-      if (scope) {
-        if (scope.local)
-          each({
-            s,
-            type: "local",
-            id: parent_id,
-            name: scope.local.name,
-            value: scope.local?.value,
-            index: scope.local?.index,
-          });
-
-        if (scope.passprop) {
-          for (const [k, v] of Object.entries(scope.passprop)) {
-            each({
-              s,
-              type: "passprop",
-              id: parent_id,
-              name: k,
-              value: v.value,
-              index: v.index,
-            });
-          }
-        }
-
-        if (scope.props) {
-          for (const [k, v] of Object.entries(scope.props)) {
-            each({
-              s,
-              type: "prop",
-              id: parent_id,
-              name: k,
-              value: v.value,
-              isProp: true,
-            });
-          }
+  const mergeScopes = (
+    parents: string[],
+    each: (arg: IEachArgScope) => void,
+    comp_id?: string
+  ) => {
+    for (const parent_id of parents) {
+      let item = null as null | ISingleScope;
+      if (layout && layout_scope[layout_id]) {
+        const scope = layout_scope[layout_id];
+        if (scope.p.includes(parent_id) || comp_id) {
+          item = layout.scope[parent_id];
         }
       }
+      if (!item) {
+        if (comp_id) {
+          item = p.comp.list[comp_id].scope[parent_id];
+        } else if (active.comp_id) {
+          item = p.comp.list[active.comp_id].scope[parent_id];
+        } else {
+          item = p.page.scope[parent_id];
+        }
+      }
+
+      if (item) {
+        if (item.c) {
+          mergeScopes(item.p, each, item.c);
+        }
+
+        const scope = item.s;
+        if (scope) {
+          if (scope.local)
+            each({
+              s,
+              type: "local",
+              id: parent_id,
+              name: scope.local.name,
+              value: scope.local?.value,
+              index: scope.local?.index,
+            });
+
+          if (scope.passprop) {
+            for (const [k, v] of Object.entries(scope.passprop)) {
+              each({
+                s,
+                type: "passprop",
+                id: parent_id,
+                name: k,
+                value: v.value,
+                index: v.index,
+              });
+            }
+          }
+
+          if (scope.props) {
+            for (const [k, v] of Object.entries(scope.props)) {
+              each({
+                s,
+                type: "prop",
+                id: parent_id,
+                name: k,
+                value: v.value,
+                isProp: true,
+              });
+            }
+          }
+        }
+      }
     }
-  }
+  };
+
+  mergeScopes(parents, each);
 };
 
 const addScope = (monaco: Monaco, id: string, source: string) => {
