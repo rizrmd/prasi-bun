@@ -137,7 +137,6 @@ export const ScriptMonaco = () => {
         });
 
         await jsMount(editor, monaco);
-        await declareScope(p, editor, monaco);
         await monacoTypings(
           {
             site_dts: p.site_dts,
@@ -149,6 +148,7 @@ export const ScriptMonaco = () => {
           monaco,
           { types: {}, values: {} }
         );
+        await declareScope(p, editor, monaco);
       }}
     />
   );
