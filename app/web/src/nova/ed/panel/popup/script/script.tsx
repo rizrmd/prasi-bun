@@ -2,7 +2,7 @@ import { useGlobal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import { ScriptWorkbench } from "./workbench";
 
 export const EdPopScript = () => {
@@ -14,6 +14,7 @@ export const EdPopScript = () => {
         onOpenChange={(open) => {
           if (!open) {
             p.ui.popup.script.open = false;
+            active.prop_name = "";
             p.render();
           }
         }}

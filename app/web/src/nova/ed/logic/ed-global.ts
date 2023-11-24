@@ -57,39 +57,55 @@ const EmptyComp = {
 const target = {
   active_id: false as any,
   comp_id: false as any,
-  comp_item_id: false as any,
+  instance_comp_id: false as any,
+  instance_item_id: false as any,
 };
 export const active = {
   hover_id: "",
+  prop_name: "",
   get item_id() {
     if (target.active_id === false) {
       target.active_id = localStorage.getItem("prasi-active-id") || "";
     }
-    return target.active_id;
+    return target.active_id || "";
   },
   set item_id(val: string) {
-    localStorage.setItem("prasi-active-id", val);
-    target.active_id = val;
+    localStorage.setItem("prasi-active-id", val || "");
+    target.active_id = val || "";
   },
   get comp_id() {
     if (target.comp_id === false) {
       target.comp_id = localStorage.getItem("prasi-comp-id") || "";
     }
-    return target.comp_id;
+    return target.comp_id || "";
   },
   set comp_id(val: string) {
-    localStorage.setItem("prasi-comp-id", val);
-    target.comp_id = val;
+    localStorage.setItem("prasi-comp-id", val || "");
+    target.comp_id = val || "";
   },
-  get comp_item_id() {
-    if (target.comp_item_id === false) {
-      target.comp_item_id = localStorage.getItem("prasi-comp-item-id") || "";
-    }
-    return target.comp_item_id;
-  },
-  set comp_item_id(val: string) {
-    localStorage.setItem("prasi-comp-item-id", val);
-    target.comp_item_id = val;
+  instance: {
+    get comp_id() {
+      if (target.instance_comp_id === false) {
+        target.instance_comp_id =
+          localStorage.getItem("prasi-instance-comp-id") || "";
+      }
+      return target.instance_comp_id || "";
+    },
+    set comp_id(val: string) {
+      localStorage.setItem("prasi-instance-comp-id", val || "");
+      target.instance_comp_id = val || "";
+    },
+    get item_id() {
+      if (target.instance_item_id === false) {
+        target.instance_item_id =
+          localStorage.getItem("prasi-instance-item-id") || "";
+      }
+      return target.instance_item_id || "";
+    },
+    set item_id(val: string) {
+      localStorage.setItem("prasi-instance-item-id", val || "");
+      target.instance_item_id = val || "";
+    },
   },
 };
 

@@ -45,10 +45,13 @@ export const declareScope = async (
   });
 
   spreadScope(p, s, (arg) => {
+    let { prev } = arg;
     if (arg.type !== "local") {
       addScope(
         monaco,
-        `${arg.comp_id || ""}__${arg.type}~${arg.name}~${arg.id}`,
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
+          arg.type
+        }~${arg.name}~${arg.id}`,
         `\
 export const {};
 declare global {
@@ -58,7 +61,9 @@ declare global {
     } else {
       addScope(
         monaco,
-        `${arg.comp_id || ""}__${arg.type}~${arg.id}`,
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
+          arg.type
+        }~${arg.id}`,
         `\
 export const {};
 const __val = ${arg.value};
@@ -81,6 +86,7 @@ type IEachArgScope = {
   index?: number;
   is_prop?: boolean;
   comp_id?: string;
+  prev?: { comp_id: string; item_id: string };
 };
 const spreadScope = (
   p: PG,
@@ -115,8 +121,9 @@ const spreadScope = (
   const mergeScopes = (
     parents: string[],
     each: (arg: IEachArgScope) => void,
-    comp_id?: string
+    arg: { comp_id?: string; prev?: { comp_id: string; item_id: string } }
   ) => {
+    let { comp_id, prev } = arg;
     for (const parent_id of parents) {
       let item = null as null | ISingleScope;
       if (layout && layout_scope[layout_id]) {
@@ -138,7 +145,10 @@ const spreadScope = (
       if (item) {
         if (item.c) {
           comp_id = item.c;
-          mergeScopes(item.p, each, item.c);
+          mergeScopes(item.p, each, {
+            comp_id: item.c,
+            prev: { item_id: parent_id, comp_id: arg.comp_id || "" },
+          });
         }
 
         const scope = item.s;
@@ -152,6 +162,7 @@ const spreadScope = (
               name: scope.local.name,
               value: scope.local?.value,
               index: scope.local?.index,
+              prev,
             });
 
           if (scope.passprop) {
@@ -164,6 +175,7 @@ const spreadScope = (
                 name: k,
                 value: v.value,
                 index: v.index,
+                prev,
               });
             }
           }
@@ -178,6 +190,7 @@ const spreadScope = (
                 name: k,
                 value: v.value,
                 is_prop: true,
+                prev,
               });
             }
           }
@@ -186,7 +199,7 @@ const spreadScope = (
     }
   };
 
-  mergeScopes(parents, each);
+  mergeScopes(parents, each, {});
 };
 
 const addScope = (monaco: Monaco, id: string, source: string) => {
