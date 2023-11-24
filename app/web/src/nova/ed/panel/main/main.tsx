@@ -4,6 +4,7 @@ import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { loadComponent } from "../../logic/tree/sync-walk";
 
+const compLoaded = new Set<string>();
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   return (
@@ -12,13 +13,12 @@ export const EdMain = () => {
       {!p.page.building && (
         <View
           mode={p.mode}
-          layout={{ show: false, root: p.site.layout }}
+          layout={{ show: false }}
           isEditor={true}
           api_url={p.site.config.api_url}
           component={{
-            map: p.comp.map,
             async load(id_comp) {
-              await loadComponent(p, id_comp);
+              await loadComponent(p, id_comp, compLoaded);
             },
           }}
           load={{
@@ -26,7 +26,7 @@ export const EdMain = () => {
             meta: p.page.meta,
             entry: p.page.entry,
           }}
-          site_id={p.site.id} 
+          site_id={p.site.id}
           page_id={p.page.cur.id}
           bind={({ render }) => {
             p.page.render = render;

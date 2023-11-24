@@ -17,7 +17,7 @@ type ViewProp = {
   page_id: string;
   api_url: string;
   mode: "desktop" | "mobile";
-  layout?: { root: undefined | IRoot; show: boolean };
+  layout?: { show: boolean };
   isEditor?: boolean;
   bind?: (arg: { render: () => void }) => void;
   hidden?: (item: IContent) => boolean;
@@ -59,8 +59,7 @@ const BoxedView: FC<ViewProp> = ({
     v.status = "init";
   }
 
-  v.layout = layout ? layout : { show: false, root: undefined };
-  v.component.map = component.map;
+  v.layout = layout ? layout : { show: false };
   v.component.load = component.load;
 
   if (bind) {

@@ -1,3 +1,4 @@
+import { NodeModel } from "@minoru/react-dnd-treeview";
 import { createId } from "@paralleldrive/cuid2";
 import { decompress } from "wasm-gzip";
 import { TypedArray } from "yjs-types";
@@ -58,7 +59,12 @@ export const syncWalkLoad = async (
 };
 
 export const syncWalkMap = (
-  p: PG,
+  p: {
+    item_loading: PG["ui"]["tree"]["item_loading"];
+    tree?: NodeModel<EdMeta>[];
+    comps: PG["comp"]["list"];
+    meta: Record<string, EdMeta>;
+  },
   arg: {
     isLayout: boolean;
     mitem: MItem | MSection;
@@ -81,7 +87,7 @@ export const syncWalkMap = (
 
   let skip_tree = arg.skip_add_tree;
   let skip_tree_child = skip_tree;
-  if (id && p.ui.tree.item_loading.includes(id)) {
+  if (id && p.item_loading.includes(id)) {
     skip_tree_child = true;
   }
 
@@ -111,8 +117,8 @@ export const syncWalkMap = (
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
   const metaNotFound = () => {
-    if (!skip_tree) {
-      p.page.tree.push({
+    if (!skip_tree && p.tree) {
+      p.tree.push({
         id: item.id,
         parent: arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
         text: item.name,
@@ -121,12 +127,12 @@ export const syncWalkMap = (
   };
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
-    if (!p.comp.list[item_comp.id]) {
+    if (!p.comps[item_comp.id]) {
       console.error("Component failed to load: ", item_comp.id);
       return;
     }
 
-    const ref_comp = p.comp.list[item_comp.id];
+    const ref_comp = p.comps[item_comp.id];
 
     if (ref_comp && mitem_comp) {
       const mcomp = ref_comp.doc.getMap("map").get("root");
@@ -157,10 +163,10 @@ export const syncWalkMap = (
         }
 
         if (arg.each) arg.each(meta);
-        p.page.meta[item.id] = meta;
+        p.meta[item.id] = meta;
 
-        if (!skip_tree) {
-          p.page.tree.push({
+        if (!skip_tree && p.tree) {
+          p.tree.push({
             id: item.id,
             parent:
               arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
@@ -239,10 +245,10 @@ export const syncWalkMap = (
   }
 
   if (arg.each) arg.each(meta);
-  p.page.meta[item.id] = meta;
+  p.meta[item.id] = meta;
 
-  if (!skip_tree) {
-    p.page.tree.push({
+  if (!skip_tree && p.tree) {
+    p.tree.push({
       id: item.id,
       parent: arg.tree_root_id === parent_item.id ? "root" : parent_item.id,
       text: item.name,
@@ -265,7 +271,11 @@ export const syncWalkMap = (
   }
 };
 
-export const loadComponent = async (p: PG, id_comp: string) => {
+export const loadComponent = async (
+  p: PG,
+  id_comp: string,
+  loaded: Set<string>
+) => {
   const comps = await p.sync.comp.load(id_comp);
 
   if (comps) {
@@ -274,11 +284,15 @@ export const loadComponent = async (p: PG, id_comp: string) => {
         const doc = new Y.Doc() as DComp;
         if (cur.snapshot) {
           Y.applyUpdate(doc as any, decompress(cur.snapshot));
-          p.comp.map[id_comp] = {
-            id: id_comp,
-            item: doc.getMap("map").get("root")?.toJSON() as IItem,
-          };
-          p.comp.list[id_comp] = { comp: cur, doc, scope: cur.scope };
+          const mitem = doc.getMap("map").get("root");
+          if (mitem) {
+            await syncWalkLoad(p, mitem, loaded, (id) =>
+              loadComponent(p, id, loaded)
+            );
+
+            // syncWalkMap()
+            // p.comp.list[id_comp] = { comp: cur, doc, scope: cur.scope;  };
+          }
         }
       }
     }

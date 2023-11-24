@@ -7,12 +7,11 @@ export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
   status: "init" as "init" | "load-code" | "loading-code" | "ready" | "rebuild",
   current: { site_id: "", page_id: "" },
-  layout: { show: false, root: undefined as void | IRoot },
+  layout: { show: false },
   meta: {} as Record<string, EdMeta>,
   entry: [] as string[],
   bodyCache: null as null | ReactElement,
   component: {
-    map: {} as PG["comp"]["map"],
     load: async (id_comp: string) => {},
   },
   script: {
