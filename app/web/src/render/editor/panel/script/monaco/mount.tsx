@@ -41,13 +41,22 @@ export const jsMount = async (p: PG, editor: MonacoEditor, monaco: Monaco) => {
   };
 
   const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
-  const { highlighter } = jsxHgController.highlighterBuilder({
-    editor: editor,
-  });
-  highlighter();
-  editor.onDidChangeModelContent(() => {
-    highlighter();
-  });
+  try {
+    const { highlighter } = jsxHgController.highlighterBuilder({
+      editor: editor,
+    });
+
+    if (typeof editor.getModel === "function") {
+      highlighter();
+    }
+    editor.onDidChangeModelContent(() => {
+      if (typeof editor.getModel === "function") {
+        try {
+          highlighter();
+        } catch (e) {}
+      }
+    });
+  } catch (e) {}
 
   monaco.languages.registerDocumentFormattingEditProvider("typescript", {
     async provideDocumentFormattingEdits(model, options, token) {

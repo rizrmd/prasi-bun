@@ -143,9 +143,16 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco) => {
       const { highlighter } = jsxHgController.highlighterBuilder({
         editor: editor,
       });
-      highlighter();
-      editor.onDidChangeModelContent(() => {
+
+      if (typeof editor.getModel === "function") {
         highlighter();
+      }
+      editor.onDidChangeModelContent(() => {
+        if (typeof editor.getModel === "function") {
+          try {
+            highlighter();
+          } catch (e) {}
+        }
       });
     }
 
