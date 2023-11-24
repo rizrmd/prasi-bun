@@ -26,7 +26,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco) => {
     jsxFragmentFactory: "React.Fragment",
     target: monaco.languages.typescript.ScriptTarget.ES2015,
     allowNonTsExtensions: true,
-    lib: ["esnext", "dom"],
+    lib: ["esnext"],
     module: monaco.languages.typescript.ModuleKind.ESNext,
     esModuleInterop: true,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
