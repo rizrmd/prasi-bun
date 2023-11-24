@@ -1,6 +1,8 @@
 import { EdMeta, PG } from "../ed-global";
 import { loadComponent, syncWalkLoad, syncWalkMap } from "./sync-walk";
 
+export const compLoaded = new Set<string>();
+
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const doc = p.page.doc;
   if (!doc) return;
@@ -16,11 +18,10 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
     const sections = root.get("childs");
     if (sections) {
-      const loaded = new Set<string>();
       await Promise.all(
         sections.map((e) => {
-          return syncWalkLoad(p, e, loaded, (id) => {
-            return loadComponent(p, id, loaded);
+          return syncWalkLoad(p, e, compLoaded, (id) => {
+            return loadComponent(p, id, compLoaded);
           });
         })
       );
@@ -112,13 +113,15 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               item_loading: p.ui.tree.item_loading,
               meta: p.page.meta,
               tree: p.page.tree,
-            }, {
-            isLayout: false,
-            mitem: e,
-            parent_item: { id: root_id },
-            tree_root_id: root_id,
-            portal,
-          });
+            },
+            {
+              isLayout: false,
+              mitem: e,
+              parent_item: { id: root_id },
+              tree_root_id: root_id,
+              portal,
+            }
+          );
         });
 
         for (const [k, portal_out] of Object.entries(portal.out)) {

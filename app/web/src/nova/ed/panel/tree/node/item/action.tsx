@@ -27,6 +27,9 @@ export const EdTreeAction = ({
           content="Edit Component"
           className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
           onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
             const comp_id = item.component?.id;
             if (comp_id) {
               active.comp_id = comp_id;

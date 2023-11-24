@@ -7,12 +7,13 @@ import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, PG } from "../ed-global";
+import { EdMeta, IScope, PG } from "../ed-global";
 import {
   ensureMItemProps,
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
+import { waitUntil } from "web-utils";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -64,6 +65,7 @@ export const syncWalkMap = (
     tree?: NodeModel<EdMeta>[];
     comps: PG["comp"]["list"];
     meta: Record<string, EdMeta>;
+    warn_component_loaded?: boolean;
   },
   arg: {
     isLayout: boolean;
@@ -127,7 +129,7 @@ export const syncWalkMap = (
   };
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
-    if (!p.comps[item_comp.id]) {
+    if (!p.comps[item_comp.id] && p.warn_component_loaded !== false) {
       console.error("Component failed to load: ", item_comp.id);
       return;
     }
@@ -271,6 +273,53 @@ export const syncWalkMap = (
   }
 };
 
+export const loadCompSnapshot = async (
+  p: PG,
+  id_comp: string,
+  loaded: Set<string>,
+  snapshot: Uint8Array,
+  scope: IScope
+) => {
+  if (loaded.has(id_comp)) {
+    return;
+  }
+  const doc = new Y.Doc() as DComp;
+  Y.applyUpdate(doc as any, decompress(snapshot));
+  const mitem = doc.getMap("map").get("root");
+  if (mitem) {
+    await syncWalkLoad(p, mitem, loaded, (id) => loadComponent(p, id, loaded));
+    const tree: NodeModel<EdMeta>[] = [];
+    const meta = {};
+    const portal = {
+      in: {} as Record<string, EdMeta>,
+      out: {} as Record<string, EdMeta>,
+    };
+    syncWalkMap(
+      {
+        comps: p.comp.list,
+        item_loading: p.ui.tree.item_loading,
+        meta,
+        tree,
+        warn_component_loaded: false,
+      },
+      {
+        mitem,
+        isLayout: false,
+        parent_item: { id: "root" },
+        portal,
+        tree_root_id: "root",
+      }
+    );
+    p.comp.list[id_comp] = {
+      comp: { id: id_comp, snapshot },
+      doc,
+      scope: scope,
+      meta,
+      tree,
+    };
+  }
+};
+
 export const loadComponent = async (
   p: PG,
   id_comp: string,
@@ -281,19 +330,7 @@ export const loadComponent = async (
   if (comps) {
     for (const cur of Object.values(comps)) {
       if (cur && cur.snapshot) {
-        const doc = new Y.Doc() as DComp;
-        if (cur.snapshot) {
-          Y.applyUpdate(doc as any, decompress(cur.snapshot));
-          const mitem = doc.getMap("map").get("root");
-          if (mitem) {
-            await syncWalkLoad(p, mitem, loaded, (id) =>
-              loadComponent(p, id, loaded)
-            );
-
-            // syncWalkMap()
-            // p.comp.list[id_comp] = { comp: cur, doc, scope: cur.scope;  };
-          }
-        }
+        await loadCompSnapshot(p, id_comp, loaded, cur.snapshot, cur.scope);
       }
     }
     return true;
