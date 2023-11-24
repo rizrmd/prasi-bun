@@ -191,7 +191,7 @@ export const serverWalkMap = (
         }
 
         const pcomp = p.scope_comps[item_comp.id];
-        pcomp.scope[item.id] = { p: arg.parent_ids, s: null };
+        pcomp.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
         const js = item.adv?.js;
         if (typeof js === "string") {
           const res = parseJs(js);
@@ -205,9 +205,9 @@ export const serverWalkMap = (
         if (!parent_mcomp) {
           p.scope[item.id] = {
             p: arg.parent_ids,
-            name: item.name,
+            n: item.name,
             s: null,
-          } as any;
+          };
           if (scope) p.scope[item.id].s = scope;
         }
 
@@ -234,14 +234,14 @@ export const serverWalkMap = (
 
   if (arg.parent_mcomp && !arg.is_prop) {
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
-    pcomp.scope[item.id] = { p: arg.parent_ids, s: null };
+    pcomp.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
     const js = item.adv?.js;
     if (typeof js === "string") {
       const scope = parseJs(js);
       if (scope) pcomp.scope[item.id].s = scope;
     }
   } else {
-    p.scope[item.id] = { p: arg.parent_ids, name: item.name, s: null } as any;
+    p.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
     const js = item.adv?.js;
     if (typeof js === "string") {
       const scope = parseJs(js);

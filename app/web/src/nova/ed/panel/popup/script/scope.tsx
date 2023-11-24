@@ -1,6 +1,6 @@
 import type { OnMount } from "@monaco-editor/react";
 import { deepClone } from "web-utils";
-import { ISingleScope, PG, active } from "../../../logic/ed-global";
+import { EPage, ISingleScope, PG, active } from "../../../logic/ed-global";
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
 
@@ -44,11 +44,15 @@ export const declareScope = async (
 export const {};
 const __val = ${arg.value};
 declare global {
-  const ${arg.name}: typeof __val;
+  const ${arg.name}: typeof __val ${
+    arg.type === "local" ? " & { render: ()=>void}" : ""
+  };
 }`
     );
   });
 };
+
+const layout_scope = {} as Record<string, ISingleScope>;
 
 type IEachArgScope = {
   s: ISingleScope;
@@ -64,8 +68,41 @@ const spreadScope = (
   s: ISingleScope,
   each: (arg: IEachArgScope) => void
 ) => {
-  for (const parent_id of s.p) {
-    const item = p.page.scope[parent_id];
+  const parents = [...s.p];
+  const layout_id = p.site.layout.id;
+  let layout = null as null | EPage;
+  if (layout_id && p.page.list[layout_id]) {
+    layout = p.page.list[layout_id].page;
+    if (!layout_scope[layout_id]) {
+      if (layout) {
+        const scope = Object.values(layout.scope).find((e) => {
+          return e.n === "content";
+        });
+        if (scope) {
+          layout_scope[layout_id] = scope;
+        }
+      }
+    }
+
+    const scope = layout_scope[layout_id];
+    if (scope) {
+      parents.shift();
+      scope.p.forEach((e) => parents.unshift(e));
+    }
+  }
+
+  for (const parent_id of parents) {
+    let item = null as null | ISingleScope;
+    if (layout && layout_scope[layout_id]) {
+      const scope = layout_scope[layout_id];
+      if (scope.p.includes(parent_id)) {
+        item = layout.scope[parent_id];
+      }
+    }
+    if (!item) {
+      item = p.page.scope[parent_id];
+    }
+
     if (item) {
       const scope = item.s;
       if (scope) {
