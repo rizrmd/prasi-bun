@@ -30,6 +30,7 @@ export const EdTreeAction = ({
             const comp_id = item.component?.id;
             if (comp_id) {
               active.comp_id = comp_id;
+              active.comp_item_id = item.id;
               p.render();
             }
           }}

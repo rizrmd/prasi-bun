@@ -1,5 +1,4 @@
 import { EdMeta, PG } from "../ed-global";
-import { walkLoad, walkMap } from "./load-walk";
 import { loadComponent, syncWalkLoad, syncWalkMap } from "./sync-walk";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
@@ -21,7 +20,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       await Promise.all(
         sections.map((e) => {
           return syncWalkLoad(p, e, loaded, (id) => {
-            return loadComponent(p, id);
+            return loadComponent(p, id, loaded);
           });
         })
       );
@@ -44,7 +43,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             await Promise.all(
               sections.map((e) => {
                 return syncWalkLoad(p, e, loaded, (id) => {
-                  return loadComponent(p, id);
+                  return loadComponent(p, id, loaded);
                 });
               })
             );
@@ -53,19 +52,26 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (root_id === "root") {
                 p.page.entry.push(e.get("id"));
               }
-              syncWalkMap(p, {
-                isLayout: true,
-                mitem: e,
-                parent_item: { id: root_id },
-                tree_root_id: root_id,
-                skip_add_tree: true,
-                portal,
-                each(meta) {
-                  if (meta.item.name === "content") {
-                    root_id = meta.item.id;
-                  }
+              syncWalkMap(
+                {
+                  comps: p.comp.list,
+                  item_loading: p.ui.tree.item_loading,
+                  meta: p.page.meta,
                 },
-              });
+                {
+                  isLayout: true,
+                  mitem: e,
+                  parent_item: { id: root_id },
+                  tree_root_id: root_id,
+                  skip_add_tree: true,
+                  portal,
+                  each(meta) {
+                    if (meta.item.name === "content") {
+                      root_id = meta.item.id;
+                    }
+                  },
+                }
+              );
             });
 
             for (const [k, portal_out] of Object.entries(portal.out)) {
@@ -100,7 +106,13 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           if (root_id === "root") {
             p.page.entry.push(e.get("id"));
           }
-          syncWalkMap(p, {
+          syncWalkMap(
+            {
+              comps: p.comp.list,
+              item_loading: p.ui.tree.item_loading,
+              meta: p.page.meta,
+              tree: p.page.tree,
+            }, {
             isLayout: false,
             mitem: e,
             parent_item: { id: root_id },

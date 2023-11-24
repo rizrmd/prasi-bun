@@ -55,11 +55,11 @@ export const reloadPage = async (p: PG, page_id: string) => {
         const doc = new Y.Doc() as DComp;
         if (c.snapshot) {
           Y.applyUpdate(doc as any, decompress(c.snapshot));
-          p.comp.map[id_comp] = {
-            id: id_comp,
-            item: doc.getMap("map").get("root")?.toJSON() as IItem,
-          };
-          p.comp.list[id_comp] = { comp: c, doc, scope: c.scope };
+          // p.comp.list[id_comp] = {
+          //   id: id_comp,
+          //   item: doc.getMap("map").get("root")?.toJSON() as IItem,
+          // };
+          // p.comp.list[id_comp] = { comp: c, doc, scope: c.scope };
         }
       }
     }

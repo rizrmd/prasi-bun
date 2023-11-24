@@ -52,7 +52,11 @@ const EmptyComp = {
   snapshot: null as null | Uint8Array,
 };
 
-const target = { active_id: false as any };
+const target = {
+  active_id: false as any,
+  comp_id: false as any,
+  comp_item_id: false as any,
+};
 export const active = {
   hover_id: "",
   get item_id() {
@@ -66,14 +70,24 @@ export const active = {
     target.active_id = val;
   },
   get comp_id() {
-    if (target.active_id === false) {
-      target.active_id = localStorage.getItem("prasi-comp-id") || "";
+    if (target.comp_id === false) {
+      target.comp_id = localStorage.getItem("prasi-comp-id") || "";
     }
-    return target.active_id;
+    return target.comp_id;
   },
   set comp_id(val: string) {
     localStorage.setItem("prasi-comp-id", val);
-    target.active_id = val;
+    target.comp_id = val;
+  },
+  get comp_item_id() {
+    if (target.comp_item_id === false) {
+      target.comp_item_id = localStorage.getItem("prasi-comp-item-id") || "";
+    }
+    return target.comp_item_id;
+  },
+  set comp_item_id(val: string) {
+    localStorage.setItem("prasi-comp-item-id", val);
+    target.comp_item_id = val;
   },
 };
 
@@ -143,8 +157,16 @@ export const EDGlobal = {
   comp: {
     doc: null as null | DComp,
     item: null as null | IItem,
-    map: {} as Record<string, { id: string; item: IItem }>,
-    list: {} as Record<string, { comp: EComp; doc: DComp; scope: IScope }>,
+    list: {} as Record<
+      string,
+      {
+        comp: EComp;
+        doc: DComp;
+        scope: IScope;
+        tree: NodeModel<EdMeta>[];
+        meta: Record<string, EdMeta>;
+      }
+    >,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {

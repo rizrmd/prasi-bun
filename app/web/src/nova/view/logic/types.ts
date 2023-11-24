@@ -10,6 +10,5 @@ export type VLoad =
     };
 
 export type VLoadComponent = {
-  map: PG["comp"]["map"];
   load: (id_comp: string) => Promise<void>;
 };
