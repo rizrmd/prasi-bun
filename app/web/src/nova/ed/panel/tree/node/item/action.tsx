@@ -13,7 +13,10 @@ export const EdTreeAction = ({
   const p = useGlobal(EDGlobal, "EDITOR");
   const item = node.data?.item;
   if (!item) return null;
-  const isComponent = item.type === "item" && !!item.component?.id;
+  const comp = {
+    enabled: item.type === "item" && !!item.component?.id,
+    id: item.type === "item" && item.component ? item.component.id : "",
+  };
 
   let mode = "";
   if (item.adv?.js) mode = "js";
@@ -22,27 +25,61 @@ export const EdTreeAction = ({
 
   return (
     <div className="flex items-center pr-1">
-      {isComponent && (
-        <Tooltip
-          content="Edit Component"
-          className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
+      {comp.enabled && (
+        <>
+          {comp.id !== active.comp_id && (
+            <Tooltip content="Edit Component">
+              <div
+                className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
 
-            const comp_id = item.component?.id;
-            if (comp_id) {
-              active.comp_id = comp_id;
-              active.comp_item_id = item.id;
-              p.render();
-            }
-          }}
-        >
-          <>Edit</>
-        </Tooltip>
+                  const comp_id = comp.id;
+                  if (comp_id) {
+                    active.comp_id = comp_id;
+                    active.comp_item_id = item.id;
+                    const root = p.comp.list[comp_id].tree.find(
+                      (e) => e.parent === "root"
+                    );
+                    if (root && typeof root.id === "string") {
+                      active.item_id = root.id;
+                    }
+
+                    p.render();
+                  }
+                }}
+              >
+                Edit
+              </div>
+            </Tooltip>
+          )}
+          {comp.id === active.comp_id && (
+            <>
+              <Tooltip content="Edit Component">
+                <div
+                  className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    if (active.comp_id) {
+                      active.comp_id = "";
+                      active.item_id = active.comp_item_id;
+                      active.comp_item_id = "";
+                      p.render();
+                    }
+                  }}
+                >
+                  Close
+                </div>
+              </Tooltip>
+            </>
+          )}
+        </>
       )}
 
-      {!isComponent && (
+      {!comp.enabled && (
         <Tooltip
           content={`Edit ${mode}`}
           className={cx(

@@ -3,7 +3,6 @@ import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
-import { ScriptMonaco } from "./monaco";
 import { ScriptWorkbench } from "./workbench";
 
 export const EdPopScript = () => {

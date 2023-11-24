@@ -5,13 +5,13 @@ import {
   PlaceholderRender,
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
+import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
+import { DEPTH_WIDTH } from "./node/item/indent";
 import { indentHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
-import { FC } from "react";
-import { DEPTH_WIDTH } from "./node/item/indent";
 import { doTreeSearch } from "./search";
 
 export const EdTreeBody = () => {
@@ -25,9 +25,15 @@ export const EdTreeBody = () => {
   if (p.ui.tree.search) {
     tree = doTreeSearch(p);
   } else {
-    if (active.comp_id) {
+    if (
+      active.comp_id &&
+      p.comp.list[active.comp_id] &&
+      p.comp.list[active.comp_id].tree
+    ) {
+      tree = p.comp.list[active.comp_id].tree;
+    } else {
+      tree = p.page.tree;
     }
-    tree = p.page.tree;
   }
 
   if (tree.length === 0)
@@ -47,27 +53,29 @@ export const EdTreeBody = () => {
     );
 
   return (
-    <TypedTree
-      tree={tree}
-      rootId={"root"}
-      insertDroppableFirst={false}
-      classes={treeClasses}
-      ref={(el) => {
-        local.tree = el;
-      }}
-      sort={false}
-      dropTargetOffset={10}
-      render={nodeRender}
-      onDrop={nodeOnDrop}
-      canDrop={(_, args) => {
-        if (!args.dragSource?.data?.item) return false;
-        return canDrop(p, args);
-      }}
-      dragPreviewRender={DragPreview}
-      placeholderRender={(node, params) => (
-        <Placeholder node={node} params={params} />
-      )}
-    />
+    <>
+      <TypedTree
+        tree={tree}
+        rootId={"root"}
+        insertDroppableFirst={false}
+        classes={treeClasses}
+        ref={(el) => {
+          local.tree = el;
+        }}
+        sort={false}
+        dropTargetOffset={10}
+        render={nodeRender}
+        onDrop={nodeOnDrop}
+        canDrop={(_, args) => {
+          if (!args.dragSource?.data?.item) return false;
+          return canDrop(p, args);
+        }}
+        dragPreviewRender={DragPreview}
+        placeholderRender={(node, params) => (
+          <Placeholder node={node} params={params} />
+        )}
+      />
+    </>
   );
 };
 

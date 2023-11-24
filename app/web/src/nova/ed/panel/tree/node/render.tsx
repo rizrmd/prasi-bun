@@ -34,11 +34,6 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         "relative border-b flex items-stretch outline-none min-h-[26px]",
         prm.hasChild && "has-child",
         css`
-          &:focus {
-            .focus {
-              display: flex;
-            }
-          }
           &:hover {
             .action-script {
               opacity: 0.6;
@@ -251,7 +246,11 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         p.page.render();
       }}
     >
-      <div className="focus hidden absolute left-0 bottom-0 top-0 w-[4px] bg-blue-500"></div>
+      {active.item_id === item.id && (
+        <div
+          className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-500")}
+        ></div>
+      )}
       {local.rightClick && (
         <EdTreeCtxMenu
           node={node}

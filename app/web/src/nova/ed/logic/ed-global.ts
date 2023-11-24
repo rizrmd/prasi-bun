@@ -25,6 +25,7 @@ export type EComp = typeof EmptyComp;
 
 export type ISingleScope = {
   p: string[];
+  n: string;
   s: null | Exclude<ReturnType<typeof parseJs>, undefined>;
 };
 export type IScope = Record<string, ISingleScope>;

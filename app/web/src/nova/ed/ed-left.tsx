@@ -34,7 +34,7 @@ export const EdLeft = () => {
 
         <EdTreeSearch />
         <div className="tree-body flex relative flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="absolute inset-0 flex">
+          <div className="absolute inset-0 flex flex-col">
             <DndProvider backend={MultiBackend} options={getBackendOptions()}>
               <EdTreeBody />
             </DndProvider>
