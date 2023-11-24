@@ -1,6 +1,3 @@
-import { component } from "../../../../../db/db";
-import { IItem } from "../../../utils/types/item";
-import { FNComponent } from "../../../utils/types/meta-fn";
 import { EdMeta, PG } from "../../ed/logic/ed-global";
 
 export type VLoad =

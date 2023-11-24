@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { PG } from "./ed-global";
+import { PG, active } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 
 export const edUndoManager = async (p: PG) => {
@@ -18,8 +18,8 @@ export const edUndoManager = async (p: PG) => {
         (evt.ctrlKey || evt.metaKey) &&
         !evt.shiftKey
       ) {
-        if (p.comp.cur.id) {
-          p.sync.yjs.um("comp", "redo", p.comp.cur.id);
+        if (active.comp_id) {
+          p.sync.yjs.um("comp", "redo", active.comp_id);
         } else {
           p.sync.yjs.um("page", "redo", p.page.cur.id);
         }
@@ -31,8 +31,8 @@ export const edUndoManager = async (p: PG) => {
         (evt.ctrlKey || evt.metaKey) &&
         evt.shiftKey
       ) {
-        if (p.comp.cur.id) {
-          p.sync.yjs.um("comp", "redo", p.comp.cur.id);
+        if (active.comp_id) {
+          p.sync.yjs.um("comp", "redo", active.comp_id);
         } else {
           p.sync.yjs.um("page", "redo", p.page.cur.id);
         }
@@ -44,8 +44,8 @@ export const edUndoManager = async (p: PG) => {
         (evt.ctrlKey || evt.metaKey) &&
         !evt.shiftKey
       ) {
-        if (p.comp.cur.id) {
-          p.sync.yjs.um("comp", "undo", p.comp.cur.id);
+        if (active.comp_id) {
+          p.sync.yjs.um("comp", "undo", active.comp_id);
         } else {
           p.sync.yjs.um("page", "undo", p.page.cur.id);
         }

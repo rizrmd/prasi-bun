@@ -1,7 +1,7 @@
 import { DropOptions, NodeModel } from "@minoru/react-dnd-treeview";
-import { EdMeta, PG } from "../../../logic/ed-global";
-import { MContent } from "../../../../../utils/types/general";
 import get from "lodash.get";
+import { MContent } from "../../../../../utils/types/general";
+import { EdMeta, PG, active } from "../../../logic/ed-global";
 
 export const nodeOnDrop: (
   tree: NodeModel<EdMeta>[],
@@ -48,7 +48,7 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
             dropTarget.data.item.component?.id
           ) {
             if (p.comp) {
-              if (p.comp.cur.id === dropTarget.data.item.component?.id) {
+              if (active.comp_id === dropTarget.data.item.component?.id) {
                 return true;
               }
             }
@@ -65,7 +65,7 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
             dropTarget.data.item.component?.id
           ) {
             if (p.comp) {
-              if (p.comp.cur.id === dropTarget.data.item.component.id) {
+              if (active.comp_id === dropTarget.data.item.component.id) {
                 return true;
               }
             }

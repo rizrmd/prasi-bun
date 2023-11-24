@@ -6,7 +6,7 @@ export const parseJs = (code: string) => {
   });
 
   const local = { name: "", value: "", index: 0 };
-  const passprop: any = {};
+  const passprop: Record<string, { value: string; index: number }> = {};
   recast.visit(ast, {
     visitJSXOpeningElement({ node }) {
       if (node.name.type === "JSXIdentifier" && node.attributes) {
@@ -65,6 +65,7 @@ export const parseJs = (code: string) => {
   const result = {} as {
     local: typeof local | undefined;
     passprop: typeof passprop | undefined;
+    props: Record<string, { name: string; value: string }>;
   };
   if (local.name) {
     result.local = local;

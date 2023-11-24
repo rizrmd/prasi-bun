@@ -1,12 +1,12 @@
 import type { OnMount } from "@monaco-editor/react";
 import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
-import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
-import { EDGlobal, active } from "../../../logic/ed-global";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
+import { EDGlobal, active } from "../../../logic/ed-global";
+import { declareScope } from "./scope";
 
 export type MonacoEditor = Parameters<OnMount>[0];
 export const ScriptMonaco = () => {
@@ -109,8 +109,8 @@ export const ScriptMonaco = () => {
             "typescript",
             monaco.Uri.parse(
               `ts:${
-                p.comp.cur.id
-                  ? `comp-${p.comp.cur.id}`
+                active.comp_id
+                  ? `comp-${active.comp_id}`
                   : `page-${p.page.cur.id}`
               }-${active.item_id}.tsx`
             )
@@ -118,13 +118,22 @@ export const ScriptMonaco = () => {
           editor.setModel(model);
         }
         monaco.editor.registerEditorOpener({
-          openCodeEditor(source, resource, selectionOrPosition) {
+          openCodeEditor(source, r, selectionOrPosition) {
+            const path = r.path.split("~");
+            const id = path[path.length - 1].replace(".d.ts", "");
+            const meta = p.page.meta[id];
+
+            if (meta) {
+              console.log(meta.item, meta);
+            }
+
             // https://github.com/microsoft/vscode/pull/177064#issue-1623100628
             return false;
           },
         });
 
         await jsMount(editor, monaco);
+        await declareScope(p, editor, monaco);
         await monacoTypings(
           {
             site_dts: p.site_dts,

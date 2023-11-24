@@ -53,7 +53,6 @@ export const registerMobile = () => {
   if (window.parent) {
     window.addEventListener("message", async ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
-        console.log("capacitor", raw);
         const data = raw as unknown as
           | {
               type: "notification-token";

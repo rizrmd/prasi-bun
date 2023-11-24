@@ -3,19 +3,19 @@ import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../../../utils/types/item";
 import { FNComponent } from "../../../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../../../utils/ui/context-menu";
-import { EDGlobal, EdMeta } from "../../../../logic/ed-global";
+import { EDGlobal, EdMeta, active } from "../../../../logic/ed-global";
 import { edActionAttach } from "./action/attach";
 import { edActionClone } from "./action/clone";
 import { edActionCopy } from "./action/copy";
 import { edActionCut } from "./action/cut";
+import { edActionDelete } from "./action/del";
 import { edActionDetach } from "./action/detach";
 import { edActionHide } from "./action/hide";
 import { edActionNewComp } from "./action/new-comp";
 import { edActionPaste } from "./action/paste";
-import { edActionWrap } from "./action/wrap";
-import { edActionUnwrap } from "./action/unwrap";
 import { edActionRename } from "./action/rename";
-import { edActionDelete } from "./action/del";
+import { edActionUnwrap } from "./action/unwrap";
+import { edActionWrap } from "./action/wrap";
 
 export const EdTreeCtxMenu = ({
   node,
@@ -52,9 +52,8 @@ export const EdTreeCtxMenu = ({
   const item = node.data?.item;
   const type = item?.type;
   const comp = (item as IItem).component as FNComponent | undefined;
-  const rootComp = p.comp.cur;
   const isComponent = comp?.id;
-  const isActiveComponent = rootComp && rootComp.id === item?.id && rootComp.id;
+  const isActiveComponent = active.comp_id === item?.id;
 
   if (!item) {
     return (
