@@ -6,7 +6,7 @@ import {
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta } from "../../logic/ed-global";
+import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { indentHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
@@ -25,10 +25,12 @@ export const EdTreeBody = () => {
   if (p.ui.tree.search) {
     tree = doTreeSearch(p);
   } else {
+    if (active.comp_id) {
+    }
     tree = p.page.tree;
   }
 
-  if (p.page.tree.length === 0)
+  if (tree.length === 0)
     return (
       <div className="flex py-[100px] select-none justify-center flex-1">
         <div className="flex flex-col">
@@ -43,6 +45,7 @@ export const EdTreeBody = () => {
         </div>
       </div>
     );
+
   return (
     <TypedTree
       tree={tree}

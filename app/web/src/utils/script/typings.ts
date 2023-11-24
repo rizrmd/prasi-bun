@@ -109,7 +109,7 @@ import "./api"
 import type * as SRVAPI from "${apiPath}";`
 )}
 
-declare global {;
+declare global {
   const db: prisma.PrismaClient; 
   
   ${baseTypings}

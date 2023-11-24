@@ -47,6 +47,8 @@ export const reloadPage = async (p: PG, page_id: string) => {
     p.render();
     return;
   }
+
+  p.page.scope = remotePage.scope || {};
   if (remotePage.scope_comps) {
     for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
       if (c && c.snapshot) {

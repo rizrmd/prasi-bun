@@ -16,11 +16,11 @@ export const edActionNewComp = (
         let item_id = active.item_id;
         p.ui.tree.item_loading.push(item_id);
         await treeRebuild(p);
-        if (p.comp.cur.id) {
+        if (active.comp_id) {
           await p.sync.comp.new({
             group_id,
             item,
-            comp_id: p.comp.cur.id,
+            comp_id: active.comp_id,
             item_id: active.item_id,
           });
         } else {

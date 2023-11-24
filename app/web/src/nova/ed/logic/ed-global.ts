@@ -23,10 +23,11 @@ export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
 
-export type IScope = Record<
-  string,
-  { p: string[]; s: null | Exclude<ReturnType<typeof parseJs>, undefined> }
->;
+export type ISingleScope = {
+  p: string[];
+  s: null | Exclude<ReturnType<typeof parseJs>, undefined>;
+};
+export type IScope = Record<string, ISingleScope>;
 
 export type IScopeComp = Record<
   string,
@@ -62,6 +63,16 @@ export const active = {
   },
   set item_id(val: string) {
     localStorage.setItem("prasi-active-id", val);
+    target.active_id = val;
+  },
+  get comp_id() {
+    if (target.active_id === false) {
+      target.active_id = localStorage.getItem("prasi-comp-id") || "";
+    }
+    return target.active_id;
+  },
+  set comp_id(val: string) {
+    localStorage.setItem("prasi-comp-id", val);
     target.active_id = val;
   },
 };
@@ -122,6 +133,7 @@ export const EDGlobal = {
         on_update?: (bin: Uint8Array, origin: any) => Promise<void>;
       }
     >,
+    scope: {} as IScope,
     building: false,
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],
@@ -129,7 +141,6 @@ export const EDGlobal = {
     render: () => {},
   },
   comp: {
-    cur: EmptyComp,
     doc: null as null | DComp,
     item: null as null | IItem,
     map: {} as Record<string, { id: string; item: IItem }>,

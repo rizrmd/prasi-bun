@@ -95,8 +95,31 @@ export const serverWalkMap = (
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
 
+  let override_id = "";
+  const id = mitem.get("id");
+
+  if (parent_mcomp && id) {
+    const fcomp = parent_mcomp.mitem.get("component");
+    if (fcomp) {
+      const ref_ids = fcomp.get("ref_ids");
+
+      if (ref_ids) {
+        let ref_id = ref_ids.get(id);
+
+        if (!ref_id) {
+          ref_id = createId();
+          ref_ids.set(id, ref_id);
+        }
+        override_id = ref_id;
+      }
+    }
+  }
+
   const item = {} as unknown as IItem;
   mapItem(mitem, item);
+  if (override_id) {
+    item.id = override_id;
+  }
 
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
@@ -126,17 +149,14 @@ export const serverWalkMap = (
         mapItem(mcomp, item);
         item.id = original_id;
 
-        const pcomp = p.scope_comps[item_comp.id];
-        pcomp.scope[item.id] = { p: arg.parent_ids, s: null };
-        const js = item.adv?.js;
-        if (typeof js === "string") {
-          const scope = parseJs(js);
-          if (scope) pcomp.scope[item.id].s = scope;
-        }
-
         const mprops = mcomp.get("component")?.get("props")?.toJSON() as Record<
           string,
           FNCompDef
+        >;
+
+        const scope = { props: {} } as Exclude<
+          ReturnType<typeof parseJs>,
+          undefined
         >;
 
         if (mprops) {
@@ -145,9 +165,11 @@ export const serverWalkMap = (
             const mitem_props = ensureMItemProps(mitem_comp, item_comp);
             if (mitem_props) {
               for (const [k, v] of Object.entries(mprops)) {
+                scope.props[k] = { name: k, value: `null as any` };
                 const mprop = ensureMProp(mitem_props, k, v);
                 item_comp.props[k] = v;
                 if (mprop && v.meta?.type === "content-element") {
+                  scope.props[k].value = "null as ReactElement";
                   const mcontent = ensurePropContent(mprop, k);
                   if (mcontent) {
                     serverWalkMap(p, {
@@ -166,6 +188,27 @@ export const serverWalkMap = (
               }
             }
           }
+        }
+
+        const pcomp = p.scope_comps[item_comp.id];
+        pcomp.scope[item.id] = { p: arg.parent_ids, s: null };
+        const js = item.adv?.js;
+        if (typeof js === "string") {
+          const res = parseJs(js);
+          if (res) {
+            scope.local = res.local;
+            scope.passprop = res.passprop;
+          }
+        }
+
+        if (scope) pcomp.scope[item.id].s = scope;
+        if (!parent_mcomp) {
+          p.scope[item.id] = {
+            p: arg.parent_ids,
+            name: item.name,
+            s: null,
+          } as any;
+          if (scope) p.scope[item.id].s = scope;
         }
 
         const childs = mcomp.get("childs")?.map((e) => e) || [];
@@ -198,7 +241,7 @@ export const serverWalkMap = (
       if (scope) pcomp.scope[item.id].s = scope;
     }
   } else {
-    p.scope[item.id] = { p: arg.parent_ids, s: null };
+    p.scope[item.id] = { p: arg.parent_ids, name: item.name, s: null } as any;
     const js = item.adv?.js;
     if (typeof js === "string") {
       const scope = parseJs(js);
