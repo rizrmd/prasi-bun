@@ -4,7 +4,7 @@ import { useGlobal } from "web-utils";
 import { EDGlobal } from "./logic/ed-global";
 import { EdApi } from "./panel/header/left/api";
 import { EdSiteJS } from "./panel/header/left/js";
-import { EdSitePicker } from "./panel/header/left/site";
+import { EdSitePicker } from "./panel/header/left/site-picker";
 import { EdTreeBody } from "./panel/tree/body";
 import { EdTreeSearch } from "./panel/tree/search";
 

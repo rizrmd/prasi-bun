@@ -221,6 +221,10 @@ export const EDGlobal = {
         show_log: false,
         list: {} as Record<string, string>,
       },
+      page: {
+        go: () => {},
+        form: null as null | {},
+      },
       script: {
         open: false,
         mode: "js" as "js" | "css" | "html",
