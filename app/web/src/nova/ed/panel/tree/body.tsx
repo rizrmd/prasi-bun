@@ -5,7 +5,7 @@ import {
   PlaceholderRender,
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { DEPTH_WIDTH } from "./node/item/indent";
@@ -39,6 +39,24 @@ export const EdTreeBody = () => {
       tree = p.page.tree;
     }
   }
+
+  useEffect(() => {
+    if (local.tree) {
+      let parents = [];
+      if (active.comp_id) {
+        parents = p.comp.list[local.comp_id].scope[active.item_id].p;
+      } else {
+        parents = p.page.scope[active.item_id].p;
+      }
+      if (parents.length === 1) {
+        local.tree.open(
+          tree.filter((e) => e.parent === "root").map((e) => e.id)
+        );
+      } else {
+        local.tree.open(parents);
+      }
+    }
+  }, [active.item_id, active.comp_id]);
 
   if (tree.length === 0)
     return (
