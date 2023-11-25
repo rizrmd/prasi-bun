@@ -2,7 +2,7 @@ import { compress, decompress } from "wasm-gzip";
 import { PG } from "./ed-global";
 import { loadSite } from "./ed-site";
 import { treeRebuild } from "./tree/build";
-import { loadCompSnapshot } from "./tree/sync-walk";
+import { loadCompSnapshot } from "./tree/sync-walk-comp";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
