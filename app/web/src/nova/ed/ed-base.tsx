@@ -10,10 +10,10 @@ import { edUndoManager } from "./logic/ed-undo";
 import { EdPane } from "./panel/main/pane-resize";
 import { EdPopCode } from "./panel/popup/code/code";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
-import { EdPopScript } from "./panel/popup/script/script";
+import { EdPagePop } from "./panel/popup/page/page-popup";
+import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { EdScriptInit } from "./panel/script/monaco/init";
-import { EdPagePop } from "./panel/popup/page/page-popup";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
