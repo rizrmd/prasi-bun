@@ -37,6 +37,13 @@ const scanMeta = async (id: string, doc: DComp, sync: SyncConnection) => {
         mitem,
         parent_item: { id: "root" },
         parent_ids: ["root"],
+        parent_mcomp: {
+          id,
+          jsx_props: {},
+          mcomp: mitem,
+          mitem,
+          parent_ids: [],
+        },
       }
     );
 

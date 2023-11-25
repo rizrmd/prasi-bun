@@ -16,6 +16,7 @@ export const loadCompSnapshot = async (
   if (loaded.has(id_comp)) {
     return;
   }
+  loaded.add(id_comp);
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
   const mitem = doc.getMap("map").get("root");
@@ -24,12 +25,16 @@ export const loadCompSnapshot = async (
       doc.off("update", p.comp.list[id_comp].on_update);
     }
 
-    const { tree, meta } = await walkCompTree(p, mitem, loaded);
-
     p.comp.list[id_comp] = {
       comp: { id: id_comp, snapshot },
       doc,
       scope: scope,
+    } as any;
+
+    const { tree, meta } = await walkCompTree(p, mitem, loaded);
+
+    p.comp.list[id_comp] = {
+      ...p.comp.list[id_comp],
       meta,
       tree,
       async on_update(bin, origin) {

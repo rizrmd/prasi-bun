@@ -295,6 +295,11 @@ export const loadComponent = async (
   }
 
   return new Promise<boolean>((resolve) => {
+    if (p.comp.list[id_comp]) {
+      resolve(true);
+      return;
+    }
+    console.log("loading", id_comp);
     loadcomp.pending.add(id_comp);
     clearTimeout(loadcomp.timeout);
     loadcomp.timeout = setTimeout(async () => {
