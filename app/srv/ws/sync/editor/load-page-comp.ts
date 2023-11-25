@@ -15,7 +15,7 @@ export const extractMItemProps = (arg: {
   item_comp: FNComponent;
   mcomp: MItem;
   scope: Exclude<ReturnType<typeof parseJs>, undefined>;
-  mcontent: (mcontent: MItem) => void;
+  mcontent: (mcontent: MItem, prop_name: string) => void;
 }) => {
   const { mitem, item_comp, mcomp, scope } = arg;
 
@@ -35,7 +35,7 @@ export const extractMItemProps = (arg: {
           scope.props[k].value = "null as ReactElement";
           const mcontent = ensurePropContent(mprop, k);
           if (mcontent) {
-            arg.mcontent(mcontent);
+            arg.mcontent(mcontent, k);
           }
         }
       }
