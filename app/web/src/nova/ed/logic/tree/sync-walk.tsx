@@ -69,7 +69,7 @@ export const syncWalkMap = (
     warn_component_loaded?: boolean;
   },
   arg: {
-    isLayout: boolean;
+    is_layout: boolean;
     mitem: MItem | MSection;
     portal: {
       in: Record<string, EdMeta>;
@@ -77,6 +77,7 @@ export const syncWalkMap = (
     };
     parent_item: EdMeta["parent_item"];
     parent_mcomp?: EdMeta["parent_mcomp"];
+    is_jsx_prop?: boolean;
     skip_add_tree?: boolean;
     tree_root_id: string;
     each?: (meta: EdMeta) => void;
@@ -157,7 +158,7 @@ export const syncWalkMap = (
           parent_item,
           parent_mcomp: parent_mcomp,
           idexed_scope: {},
-          is_layout: arg.isLayout,
+          is_layout: arg.is_layout,
         };
         if (item.name.startsWith("⬅")) {
           arg.portal.in[item.name] = meta;
@@ -195,9 +196,10 @@ export const syncWalkMap = (
                   const mcontent = ensurePropContent(mprop, k);
                   if (mcontent) {
                     syncWalkMap(p, {
-                      isLayout: arg.isLayout,
+                      is_layout: arg.is_layout,
                       tree_root_id: arg.tree_root_id,
                       mitem: mcontent,
+                      is_jsx_prop: true,
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       parent_mcomp: { mitem: mitem as MItem, mcomp },
                       portal: arg.portal,
@@ -214,7 +216,7 @@ export const syncWalkMap = (
         const childs = mcomp.get("childs")?.map((e) => e) || [];
         for (const e of childs) {
           syncWalkMap(p, {
-            isLayout: arg.isLayout,
+            is_layout: arg.is_layout,
             tree_root_id: arg.tree_root_id,
             mitem: e,
             parent_item: { id: item.id, mitem: mitem as MItem },
@@ -233,10 +235,11 @@ export const syncWalkMap = (
   }
 
   const meta: EdMeta = {
-    is_layout: arg.isLayout,
+    is_layout: arg.is_layout,
     item,
     mitem: mitem as MItem,
     parent_item,
+    is_jsx_prop: arg.is_jsx_prop,
     parent_mcomp: parent_mcomp,
     idexed_scope: {},
   };
@@ -263,7 +266,7 @@ export const syncWalkMap = (
   const childs = mitem.get("childs")?.map((e) => e) || [];
   for (const e of childs) {
     syncWalkMap(p, {
-      isLayout: arg.isLayout,
+      is_layout: arg.is_layout,
       tree_root_id: arg.tree_root_id,
       mitem: e,
       parent_item: { id: item.id, mitem: mitem as MItem },

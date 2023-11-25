@@ -56,7 +56,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                   meta: p.page.meta,
                 },
                 {
-                  isLayout: true,
+                  is_layout: true,
                   mitem: e,
                   parent_item: { id: p.page.root_id },
                   tree_root_id: p.page.root_id,
@@ -129,7 +129,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               tree: p.page.tree,
             },
             {
-              isLayout: false,
+              is_layout: false,
               mitem: e,
               parent_item: { id: p.page.root_id },
               tree_root_id: p.page.root_id,
