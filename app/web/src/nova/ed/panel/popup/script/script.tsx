@@ -71,21 +71,8 @@ export const EdPopScript = () => {
               `
             )}
           >
-            {(!jscript.editor || !jscript.build) && (
-              <>
-                {!jscript.editor && !jscript.build && (
-                  <Loading note={"js-code"} backdrop={false} />
-                )}
-                {!jscript.editor && jscript.build && (
-                  <Loading note={"js-editor"} backdrop={false} />
-                )}
-                {!jscript.build && jscript.editor && (
-                  <Loading note={"js-build"} backdrop={false} />
-                )}
-              </>
-            )}
-
-            {jscript.editor && jscript.build && <ScriptWorkbench />}
+            {!jscript.editor && <Loading note={"js-editor"} backdrop={false} />}
+            {jscript.editor && <ScriptWorkbench />}
           </div>
         </div>
       </Modal>

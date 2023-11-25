@@ -7,10 +7,7 @@ import { EDGlobal } from "../../../logic/ed-global";
 import { EdFormSite } from "./site-form";
 import { EdSiteHead } from "./site-head";
 import { EdSiteTree, SiteGroupItem } from "./site-tree";
-
-import uFuzzy from "@leeoniya/ufuzzy";
 import { fuzzy } from "../../../../../utils/ui/fuzzy";
-const uf = new uFuzzy({});
 
 const conf = { group: null as any };
 

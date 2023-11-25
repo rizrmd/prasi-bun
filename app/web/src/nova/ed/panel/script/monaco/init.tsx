@@ -38,7 +38,7 @@ export const EdMonacoWrap = ({
 }) => {
   const local = useLocal({});
 
-  if (jscript.pending && (!jscript.editor || !jscript.build)) {
+  if (jscript.pending && !jscript.editor) {
     jscript.pending.then(() => {
       local.render();
     });
@@ -99,7 +99,7 @@ export const EdMonacoWrap = ({
       {header}
       <div className="relative flex-1">
         <div className="absolute inset-0">
-          {!jscript.editor || !jscript.build ? (
+          {!jscript.editor ? (
             <Loading note="script-cst" backdrop={false} />
           ) : (
             children(jscript.editor)

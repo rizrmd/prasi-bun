@@ -112,6 +112,7 @@ export const serverWalkMap = (
   const item = {} as unknown as IItem;
   mapItem(mitem, item);
   if (override_id) {
+    item.originalId = item.id;
     item.id = override_id;
   }
 
@@ -167,6 +168,7 @@ export const serverWalkMap = (
             ref_ids = {};
           }
           const original_id = item.id;
+
           mapItem(mcomp, item);
           item.id = original_id;
 
@@ -208,10 +210,11 @@ export const serverWalkMap = (
           }
 
           if (scope) pcomp.scope[item.id].s = scope;
+
           if (!parent_mcomp) {
             p.scope[item.id] = {
               p: arg.parent_ids,
-              n: item.name, 
+              n: item.name,
               s: null,
               c: item.component?.id,
             };
@@ -241,12 +244,17 @@ export const serverWalkMap = (
   }
 
   if (arg.parent_mcomp && !arg.is_prop) {
+    let id = item.originalId || item.id;
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
-    pcomp.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
+    pcomp.scope[id] = {
+      p: arg.parent_ids,
+      n: item.name,
+      s: null,
+    };
     const js = item.adv?.js;
     if (typeof js === "string") {
       const scope = parseJs(js);
-      if (scope) pcomp.scope[item.id].s = scope;
+      if (scope) pcomp.scope[id].s = scope;
     }
   } else {
     if (!(item_comp && item_comp.id)) {
