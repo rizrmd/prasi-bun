@@ -84,7 +84,10 @@ export const serverWalkMap = (
     parent_ids: string[];
     parent_item: EdMeta["parent_item"];
     is_prop?: boolean;
-    parent_mcomp?: EdMeta["parent_mcomp"] & { id: string };
+    parent_mcomp?: EdMeta["parent_mcomp"] & {
+      id: string;
+      parent_ids: string[];
+    };
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
@@ -184,11 +187,12 @@ export const serverWalkMap = (
             scope,
             mcontent(mcontent) {
               serverWalkMap(p, {
-                parent_ids: ["root", item.id],
+                parent_ids: [...arg.parent_ids, item.id],
                 mitem: mcontent,
                 parent_item: { id: item.id, mitem: mitem as MItem },
                 is_prop: true,
                 parent_mcomp: {
+                  parent_ids: ["root", item.id],
                   id: item_comp.id,
                   mitem: mitem as MItem,
                   mcomp,
@@ -225,12 +229,13 @@ export const serverWalkMap = (
           for (const e of childs) {
             serverWalkMap(p, {
               mitem: e,
-              parent_ids: ["root", item.id],
+              parent_ids: [...arg.parent_ids, item.id],
               parent_item: {
                 id: item.id,
                 mitem: mitem as MItem,
               },
               parent_mcomp: {
+                parent_ids: ["root", item.id],
                 id: item_comp.id,
                 mitem: mitem as MItem,
                 mcomp,
@@ -247,7 +252,7 @@ export const serverWalkMap = (
     let id = item.originalId || item.id;
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
     pcomp.scope[id] = {
-      p: arg.parent_ids,
+      p: arg.parent_mcomp.parent_ids,
       n: item.name,
       s: null,
     };
@@ -273,7 +278,12 @@ export const serverWalkMap = (
       mitem: e,
       is_prop: arg.is_prop,
       parent_item: { id: item.id, mitem: mitem as MItem },
-      parent_mcomp: arg.parent_mcomp,
+      parent_mcomp: arg.parent_mcomp
+        ? {
+            ...arg.parent_mcomp,
+            parent_ids: [...(arg.parent_mcomp?.parent_ids || []), item.id],
+          }
+        : undefined,
       parent_ids: [...arg.parent_ids, item.id],
     });
   }
