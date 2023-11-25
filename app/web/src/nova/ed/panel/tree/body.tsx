@@ -16,21 +16,25 @@ import { doTreeSearch } from "./search";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ tree: null as TreeMethods | null });
+  const local = useLocal({ tree: null as TreeMethods | null, comp_id: "" });
   const TypedTree = DNDTree<EdMeta>;
 
   indentHook(p, local);
+
+  if (active.comp_id && local.comp_id !== active.comp_id) {
+    local.comp_id = active.comp_id;
+    const ref = p.comp.list[active.comp_id];
+    if (ref) {
+      p.comp.tree = ref.tree;
+    }
+  }
 
   let tree: NodeModel<EdMeta>[] = [];
   if (p.ui.tree.search) {
     tree = doTreeSearch(p);
   } else {
-    if (
-      active.comp_id &&
-      p.comp.list[active.comp_id] &&
-      p.comp.list[active.comp_id].tree
-    ) {
-      tree = p.comp.list[active.comp_id].tree;
+    if (!!active.comp_id) {
+      tree = p.comp.tree;
     } else {
       tree = p.page.tree;
     }
@@ -39,7 +43,7 @@ export const EdTreeBody = () => {
   if (tree.length === 0)
     return (
       <div className="flex py-[100px] select-none justify-center flex-1">
-        <div className="flex flex-col">
+        <div className="flex flex-col items-center">
           <img
             draggable={false}
             src="/img/empty.png"
@@ -47,7 +51,26 @@ export const EdTreeBody = () => {
               width: 50px;
             `}
           />
-          <div className="mt-[20px]">No Item</div>
+          <div className="mt-[20px] text-[12px]">— No Item —</div>
+          {active.comp_id && (
+            <div
+              className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600 mt-5"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                if (active.comp_id) {
+                  active.comp_id = active.instance.comp_id || "";
+                  active.item_id = active.instance.item_id || "";
+                  active.instance.comp_id = "";
+                  active.instance.item_id = "";
+                  p.render();
+                }
+              }}
+            >
+              Close Component
+            </div>
+          )}
         </div>
       </div>
     );

@@ -17,7 +17,6 @@ export const declareScope = async (
   }
 
   if (!s) return;
-
   s.p.push(active_id);
 
   monaco.editor.getModels().forEach((model) => {
@@ -29,6 +28,7 @@ export const declareScope = async (
   const existing: Record<string, IEachArgScope> = {};
   spreadScope(p, s, (arg) => {
     const { name } = arg;
+
     const e = existing[name];
     if (e && e.s.s) {
       if (e.type === "local") {
@@ -132,6 +132,7 @@ const spreadScope = (
           item = layout.scope[parent_id];
         }
       }
+
       if (!item) {
         if (comp_id) {
           item = p.comp.list[comp_id].scope[parent_id];

@@ -177,6 +177,7 @@ export const EDGlobal = {
   comp: {
     doc: null as null | DComp,
     item: null as null | IItem,
+    tree: [] as NodeModel<EdMeta>[],
     list: {} as Record<
       string,
       {

@@ -30,7 +30,7 @@ export const jscript = {
     estree: null as null | typeof estree,
     ts: null as null | typeof ts,
   },
-  async init(render: () => void) {
+  async init(render: () => void, enabled?: { esbuild: boolean }) {
     if (this.pending) {
       await this.pending;
       render();
@@ -39,9 +39,12 @@ export const jscript = {
       this.pending = new Promise<void>(async (resolve) => {
         this.events.pendingDone = resolve;
 
-        const { sendIPC } = await import("./esbuild/ipc");
-        await initJS();
-        this.events.esbuildLoaded();
+        let sendIPC = null as any;
+        if (enabled?.esbuild !== false) {
+          sendIPC = (await import("./esbuild/ipc")).sendIPC;
+          await initJS();
+          this.events.esbuildLoaded();
+        }
 
         this.prettier.standalone = (
           await import("prettier/standalone")
@@ -55,29 +58,31 @@ export const jscript = {
         e.loader.config({ paths: { vs: "/min/vs" } });
         this.events.editorLoaded();
 
-        this.build = async (entry, src, files, verbose?: boolean) => {
-          const options: BuildOptions = {
-            entryPoints: [entry],
-            jsx: "transform",
-            bundle: true,
-            format: "cjs",
-            minify: true,
+        if (enabled?.esbuild !== false) {
+          this.build = async (entry, src, files, verbose?: boolean) => {
+            const options: BuildOptions = {
+              entryPoints: [entry],
+              jsx: "transform",
+              bundle: true,
+              format: "cjs",
+              minify: true,
+            };
+            const res = await sendIPC({
+              command_: "build",
+              input_: { ...files, [entry]: src },
+              options_: options,
+            });
+
+            if (verbose && res.stderr_) {
+              console.log(res.stderr_);
+            }
+            if (res.outputFiles_) return res.outputFiles_[0].text;
+
+            return "";
           };
-          const res = await sendIPC({
-            command_: "build",
-            input_: { ...files, [entry]: src },
-            options_: options,
-          });
 
-          if (verbose && res.stderr_) {
-            console.log(res.stderr_);
-          }
-          if (res.outputFiles_) return res.outputFiles_[0].text;
-
-          return "";
-        };
-
-        await this.build("el.tsx", `return ""`);
+          await this.build("el.tsx", `return ""`);
+        }
         render();
       });
     }
