@@ -21,11 +21,11 @@ export const mergeScopeUpwards = (
 
     let indexedScope = null;
 
-    if (cur.indexedScope && scopeIndex) {
+    if (cur.idexed_scope && scopeIndex) {
       const idx = scopeIndex[cur.item.id];
 
-      if (typeof idx !== "undefined" && cur.indexedScope[idx]) {
-        indexedScope = cur.indexedScope[idx];
+      if (typeof idx !== "undefined" && cur.idexed_scope[idx]) {
+        indexedScope = cur.idexed_scope[idx];
       }
     }
 

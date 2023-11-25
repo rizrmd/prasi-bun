@@ -77,10 +77,6 @@ export const EdTreeAction = ({
                   if (comp_id) {
                     active.instance.item_id = item.id;
                     active.instance.comp_id = active.comp_id;
-                    console.log(
-                      active.instance.comp_id,
-                      active.instance.item_id
-                    );
 
                     active.comp_id = comp_id || "";
                     const root = p.comp.list[comp_id].tree.find(
