@@ -42,13 +42,13 @@ export const EdTreeBody = () => {
 
   useEffect(() => {
     if (local.tree) {
-      let parents = [];
-      if (active.comp_id) {
+      let parents: string[] = [];
+      if (active.comp_id && p.comp.list[local.comp_id].scope[active.item_id]) {
         parents = p.comp.list[local.comp_id].scope[active.item_id].p;
-      } else {
+      } else if (p.page.scope[active.item_id]) {
         parents = p.page.scope[active.item_id].p;
       }
-      if (parents.length === 1) {
+      if (parents.length <= 1) {
         local.tree.open(
           tree.filter((e) => e.parent === "root").map((e) => e.id)
         );

@@ -84,7 +84,6 @@ export const EdPopSite = () => {
 
   return (
     <>
-      {local.status === "loading" && <Loading note="listing-site" />}
       <Modal
         open
         onOpenChange={(open) => {
@@ -94,8 +93,17 @@ export const EdPopSite = () => {
           }
         }}
       >
-        <div className="absolute inset-[5%] bg-white flex">
+        <div
+          className={cx(
+            "absolute inset-[5%] bg-white flex",
+            css`
+              z-index: 100;
+            `
+          )}
+        >
           <div className="relative flex flex-1">
+            {local.status === "loading" && <Loading note="listing-site" backdrop={false} />}
+
             {(local.status === "ready" || local.group.length > 0) && (
               <SitePicker
                 group={local.group}
