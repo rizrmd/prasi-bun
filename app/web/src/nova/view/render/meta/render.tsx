@@ -12,7 +12,7 @@ export const ViewMetaRender: FC<{
 }> = ({ meta, v, props, className }) => {
   let _className = className;
   const item = meta.item;
-  if (meta.isLayout && !v.layout.show) {
+  if (meta.is_layout && !v.layout.show) {
     return <ViewMetaChildren item={item} />;
   }
 

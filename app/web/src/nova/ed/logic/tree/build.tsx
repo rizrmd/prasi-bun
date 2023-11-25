@@ -26,7 +26,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       out: {} as Record<string, EdMeta>,
     };
 
-    let root_id = "root";
+    p.page.root_id = "root";
     if (p.site.layout && p.site.layout.id !== p.page.cur.id) {
       const ldoc = p.page.list[p.site.layout.id];
       if (ldoc) {
@@ -46,7 +46,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             if (component.pending) await component.pending;
 
             sections.map((e) => {
-              if (root_id === "root") {
+              if (p.page.root_id === "root") {
                 p.page.entry.push(e.get("id"));
               }
               syncWalkMap(
@@ -58,13 +58,13 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 {
                   isLayout: true,
                   mitem: e,
-                  parent_item: { id: root_id },
-                  tree_root_id: root_id,
+                  parent_item: { id: p.page.root_id },
+                  tree_root_id: p.page.root_id,
                   skip_add_tree: true,
                   portal,
                   each(meta) {
                     if (meta.item.name === "content") {
-                      root_id = meta.item.id;
+                      p.page.root_id = meta.item.id;
                     }
                   },
                 }
@@ -85,9 +85,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             }
           }
 
-          // if root_id is root, it means content is not found.
+          // if p.page.root_id is root, it means content is not found.
           // if content is not found, do not use layout.
-          if (root_id === "root") {
+          if (p.page.root_id === "root") {
             p.page.entry = [];
             p.page.tree = [];
             p.page.meta = {};
@@ -113,8 +113,13 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       const sections = root.get("childs");
       if (sections) {
         sections.map((e) => {
-          if (root_id === "root") {
+          if (p.page.root_id === "root") {
             p.page.entry.push(e.get("id"));
+          } else {
+            const meta = p.page.meta[p.page.root_id];
+            if (meta && meta.item.type === "item") {
+              meta.item.childs.push({ id: e.get("id") } as any);
+            }
           }
           syncWalkMap(
             {
@@ -126,8 +131,8 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             {
               isLayout: false,
               mitem: e,
-              parent_item: { id: root_id },
-              tree_root_id: root_id,
+              parent_item: { id: p.page.root_id },
+              tree_root_id: p.page.root_id,
               portal,
             }
           );

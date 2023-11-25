@@ -1,4 +1,3 @@
-import { deepClone } from "web-utils";
 import { createAPI, createDB } from "../../../../../utils/script/init-api";
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EdMeta } from "../../../../ed/logic/ed-global";
@@ -8,17 +7,13 @@ import { ViewMeta } from "../meta";
 import { mergeScopeUpwards } from "./merge-upward";
 
 const jsxProps = {} as Record<string, any>;
-export const compPropVal = (
-  v: VG,
-  meta: EdMeta,
-) => {
+export const compPropVal = (v: VG, meta: EdMeta) => {
   let props = {} as Record<string, FNCompDef>;
   let cprops = {} as [string, FNCompDef][];
   const item = meta.item;
   if (item.type === "item" && item.component?.id) {
     const icomp = item.component;
     if (icomp) {
-      props = deepClone(v.component.map[icomp.id]?.item.component?.props || {});
       cprops = Object.entries(props);
 
       if (v.script.api_url) {

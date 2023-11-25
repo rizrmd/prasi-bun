@@ -11,11 +11,11 @@ export const createPassProp = (
     const meta = v.meta[id];
 
     if (typeof arg.idx !== "undefined" && meta && meta.item && meta.item.id) {
-      meta.indexedScope[arg.idx] = {};
+      meta.idexed_scope[arg.idx] = {};
 
       for (const [k, v] of Object.entries(arg)) {
         if (k === "children") continue;
-        meta.indexedScope[arg.idx][k] = v;
+        meta.idexed_scope[arg.idx][k] = v;
       }
 
       const scopeIndex = { ...existingScopeIndex, [meta.item.id]: arg.idx };

@@ -92,7 +92,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
           decompress(res.sv)
         );
         Y.applyUpdate(doc as any, decompress(res.diff), "local");
-        await treeRebuild(p, { note: "page-on-update" });
+        await treeRebuild(p, { note: note + " page-on-update" });
 
         await p.sync.yjs.diff_local(
           "page",
@@ -113,7 +113,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     }
 
     if (p.page.doc) {
-      await treeRebuild(p, { note: "reload-page-init" });
+      await treeRebuild(p, { note: note + " page-init" });
     }
   }
   p.status = "ready";

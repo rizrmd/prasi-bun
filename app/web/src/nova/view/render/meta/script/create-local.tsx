@@ -41,11 +41,11 @@ export const createLocal = (
       }
       scope = meta.scope;
     } else {
-      if (!meta.indexedScope) {
-        meta.indexedScope = {};
+      if (!meta.idexed_scope) {
+        meta.idexed_scope = {};
       }
-      if (!meta.indexedScope[local_id]) meta.indexedScope[local_id] = {};
-      scope = meta.indexedScope[local_id];
+      if (!meta.idexed_scope[local_id]) meta.idexed_scope[local_id] = {};
+      scope = meta.idexed_scope[local_id];
     }
 
     const render = () => {
@@ -80,7 +80,7 @@ export const createLocal = (
     let page_id = v.current.page_id || "";
     const itemid = meta.item.id + (local_id ? `_${local_id}` : "");
 
-    if (meta.isLayout) {
+    if (meta.is_layout) {
       page_id = "layout";
       if (cachedLayout[meta.item.id]) {
         scope[name] = cachedLocal[page_id][itemid];
@@ -129,7 +129,7 @@ export const createLocal = (
 
     useEffect(() => {
       if (effect) {
-        if (meta.isLayout) {
+        if (meta.is_layout) {
           if (cachedLayout[meta.item.id]) {
             return;
           }

@@ -115,8 +115,8 @@ export const walkMap = (
       const meta: EdMeta = {
         item,
         parent_item,
-        indexedScope: {},
-        isLayout: arg.isLayout,
+        idexed_scope: {},
+        is_layout: arg.isLayout,
       };
       if (item.name.startsWith("⬅")) {
         arg.portal.in[item.name] = meta;
@@ -159,9 +159,9 @@ export const walkMap = (
   const meta: EdMeta = {
     item,
     parent_item,
-    indexedScope: {},
+    idexed_scope: {},
     parent_comp,
-    isLayout: arg.isLayout,
+    is_layout: arg.isLayout,
   };
   if (item.name.startsWith("⬅")) {
     arg.portal.in[item.name] = meta;

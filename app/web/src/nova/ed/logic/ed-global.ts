@@ -122,10 +122,10 @@ export type EdMeta = {
     mcomp: MItem;
   };
   el?: ReactElement;
-  isLayout?: boolean;
+  is_layout?: boolean;
   /** script related meta **/
   propval?: Record<string, any>;
-  indexedScope: Record<string, any>;
+  idexed_scope: Record<string, any>;
   memoize?: Record<
     string,
     {
@@ -156,6 +156,7 @@ export const EDGlobal = {
     do_edit: async (newval: string, all?: boolean) => {},
   },
   page: {
+    root_id: "root",
     cur: EmptyPage,
     doc: null as null | DPage,
     list: {} as Record<

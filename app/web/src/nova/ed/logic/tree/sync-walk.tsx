@@ -154,8 +154,8 @@ export const syncWalkMap = (
           mitem: mitem as MItem,
           parent_item,
           parent_mcomp: parent_mcomp,
-          indexedScope: {},
-          isLayout: arg.isLayout,
+          idexed_scope: {},
+          is_layout: arg.isLayout,
         };
         if (item.name.startsWith("⬅")) {
           arg.portal.in[item.name] = meta;
@@ -163,7 +163,6 @@ export const syncWalkMap = (
         if (item.name.startsWith("⮕")) {
           arg.portal.out[item.name] = meta;
         }
-
         if (arg.each) arg.each(meta);
         p.meta[item.id] = meta;
 
@@ -232,11 +231,12 @@ export const syncWalkMap = (
   }
 
   const meta: EdMeta = {
+    is_layout: arg.isLayout,
     item,
     mitem: mitem as MItem,
     parent_item,
     parent_mcomp: parent_mcomp,
-    indexedScope: {},
+    idexed_scope: {},
   };
 
   if (item.name.startsWith("⬅")) {
