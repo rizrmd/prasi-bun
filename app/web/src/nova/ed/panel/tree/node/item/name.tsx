@@ -25,7 +25,9 @@ export const EdTreeName = ({
 
   const isRenaming = p.ui.tree.rename_id === item.id;
   return (
-    <div className="text-[14px] relative flex items-center cursor-pointer flex-1">
+    <div className="text-[14px] relative flex flex-col justify-center cursor-pointer flex-1">
+      <div className="text-[10px]">{item.id}</div>
+
       {isRenaming ? (
         <input
           className={cx(
