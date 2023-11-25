@@ -1,6 +1,7 @@
-import { MultiBackend, getBackendOptions } from "@minoru/react-dnd-treeview";
+import { getBackendOptions } from "@minoru/react-dnd-treeview";
 import { DndProvider } from "react-dnd";
-import { useGlobal } from "web-utils";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "./logic/ed-global";
 import { EdApi } from "./panel/header/left/api";
 import { EdSiteJS } from "./panel/header/left/js";
@@ -10,6 +11,7 @@ import { EdTreeSearch } from "./panel/tree/search";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({ tree: null as any });
   return (
     <div
       className={cx(
@@ -33,11 +35,25 @@ export const EdLeft = () => {
         </div>
 
         <EdTreeSearch />
-        <div className="tree-body flex relative flex-1 overflow-y-auto overflow-x-hidden">
+        <div
+          className="tree-body flex relative flex-1 overflow-y-auto overflow-x-hidden"
+          ref={(ref) => {
+            if (ref) local.tree = ref;
+          }}
+        >
           <div className="absolute inset-0 flex flex-col">
-            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-              <EdTreeBody />
-            </DndProvider>
+            {local.tree && (
+              <DndProvider
+                backend={HTML5Backend}
+                options={getBackendOptions({
+                  html5: {
+                    rootElement: local.tree,
+                  },
+                })}
+              >
+                <EdTreeBody />
+              </DndProvider>
+            )}
           </div>
         </div>
       </div>

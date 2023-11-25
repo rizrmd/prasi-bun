@@ -9,6 +9,7 @@ export const EdPagePicker = () => {
     <TopBtn
       onClick={(e) => {
         p.ui.popup.page.open = (page_id) => {
+          p.ui.popup.page.open = null;
           navigate(`/ed/${p.site.id}/${page_id}`);
         };
         p.render();

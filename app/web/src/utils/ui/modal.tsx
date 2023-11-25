@@ -163,6 +163,7 @@ export const ModalContent = React.forwardRef<
           "modal-overlay",
           "flex items-center justify-center transition-all ",
           css`
+            z-index: 100;
             background: rgba(0, 0, 0, 0.3);
             display: grid;
             place-items: center;
