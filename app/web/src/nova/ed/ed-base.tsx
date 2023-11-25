@@ -1,18 +1,19 @@
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
 import { EdLeft } from "./ed-left";
+import { EdMid } from "./ed-mid";
 import { EdRight } from "./ed-right";
 import { EDGlobal } from "./logic/ed-global";
 import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { edUndoManager } from "./logic/ed-undo";
-import { EdMain } from "./panel/main/main";
 import { EdPane } from "./panel/main/pane-resize";
 import { EdPopCode } from "./panel/popup/code/code";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
-import { EdPopSite } from "./panel/popup/site/site";
-import { EdScriptInit } from "./panel/script/monaco/init";
 import { EdPopScript } from "./panel/popup/script/script";
+import { EdPopSite } from "./panel/popup/site/site-popup";
+import { EdScriptInit } from "./panel/script/monaco/init";
+import { EdPagePop } from "./panel/popup/page/page-popup";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -42,7 +43,7 @@ export const EdBase = () => {
       <div className="flex flex-1 items-stretch">
         <EdLeft />
         <EdPane type="left" />
-        <EdMain />
+        <EdMid />
         <EdPane type="right" />
         <EdRight />
       </div>
@@ -50,6 +51,7 @@ export const EdBase = () => {
         <EdPopCode />
         <EdPopScript />
         <EdPopSite />
+        <EdPagePop />
         <EdPopCompGroup />
         <EdScriptInit />
       </>

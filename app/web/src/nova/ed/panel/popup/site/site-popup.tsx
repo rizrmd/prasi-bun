@@ -8,7 +8,7 @@ import { EdFormSite } from "./site-form";
 import { EdSiteHead } from "./site-head";
 import { EdSiteTree, SiteGroupItem } from "./site-tree";
 
-import uFuzzy, { Info } from "@leeoniya/ufuzzy";
+import uFuzzy from "@leeoniya/ufuzzy";
 import { fuzzy } from "../../../../../utils/ui/fuzzy";
 const uf = new uFuzzy({});
 
