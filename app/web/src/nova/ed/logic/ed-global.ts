@@ -153,6 +153,7 @@ export const EDGlobal = {
   script: {
     siteTypes: {} as Record<string, string>,
     loaded: false,
+    do_edit: async (newval: string, all?: boolean) => {},
   },
   page: {
     cur: EmptyPage,

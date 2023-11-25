@@ -29,6 +29,12 @@ export const ScriptMonaco = () => {
   }
 
   useEffect(() => {
+    return () => {
+      p.script.do_edit = async () => {};
+    };
+  }, []);
+
+  useEffect(() => {
     if (local.monaco && local.editor) {
       const val: string = (
         typeof adv[p.ui.popup.script.mode] === "string"
@@ -103,6 +109,7 @@ export const ScriptMonaco = () => {
       ]);
     }
   };
+  p.script.do_edit = doEdit;
 
   let mitem = meta.mitem;
 
