@@ -20,14 +20,13 @@ export const extractMItemProps = (arg: {
   const { mitem, item_comp, mcomp, scope } = arg;
 
   const mitem_comp = mitem.get("component");
-
   const mprops = mcomp.get("component")?.get("props")?.toJSON() as Record<
     string,
     FNCompDef
   >;
   if (mitem_comp) {
     const mitem_props = ensureMItemProps(mitem_comp, item_comp);
-    if (mitem_props) {
+    if (mitem_props && mprops) {
       for (const [k, v] of Object.entries(mprops)) {
         scope.props[k] = { name: k, value: `null as any` };
         const mprop = ensureMProp(mitem_props, k, v);
