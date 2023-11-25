@@ -123,6 +123,7 @@ export type EdMeta = {
   };
   el?: ReactElement;
   is_layout?: boolean;
+  is_jsx_prop?: boolean;
   /** script related meta **/
   propval?: Record<string, any>;
   idexed_scope: Record<string, any>;

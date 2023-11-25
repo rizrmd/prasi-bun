@@ -91,7 +91,7 @@ const walkCompTree = async (p: PG, mitem: MItem, loaded: Set<string>) => {
     },
     {
       mitem,
-      isLayout: false,
+      is_layout: false,
       parent_item: { id: "root" },
       portal,
       tree_root_id: "root",
