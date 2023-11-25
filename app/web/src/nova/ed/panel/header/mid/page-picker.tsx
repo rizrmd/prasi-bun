@@ -7,7 +7,12 @@ export const EdPagePicker = () => {
 
   return (
     <TopBtn
-      onClick={(e) => {}}
+      onClick={(e) => {
+        p.ui.popup.page.open = (page_id) => {
+          navigate(`/ed/${p.site.id}/${page_id}`);
+        };
+        p.render();
+      }}
       innerClassName="flex items-center justify-center space-x-2"
     >
       <div

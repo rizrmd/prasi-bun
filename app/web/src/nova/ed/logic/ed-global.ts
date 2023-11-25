@@ -223,7 +223,7 @@ export const EDGlobal = {
         list: {} as Record<string, string>,
       },
       page: {
-        go: () => {},
+        open: null as null | ((page_id: string) => void),
         form: null as null | {},
       },
       script: {
