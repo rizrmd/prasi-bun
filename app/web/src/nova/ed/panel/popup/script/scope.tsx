@@ -26,6 +26,7 @@ export const declareScope = async (
   });
 
   const existing: Record<string, IEachArgScope> = {};
+
   spreadScope(p, s, (arg) => {
     const { name } = arg;
 
@@ -133,7 +134,7 @@ const spreadScope = (
         }
       }
 
-      if (!item) {
+      if (!item) { 
         if (comp_id) {
           item = p.comp.list[comp_id].scope[parent_id];
         } else if (active.comp_id && p.comp.list[active.comp_id]) {

@@ -1,18 +1,20 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { createId } from "@paralleldrive/cuid2";
-import { decompress } from "wasm-gzip";
+import { compress, decompress } from "wasm-gzip";
 import { TypedArray } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, IScope, PG } from "../ed-global";
+import { EdMeta, IScope, PG, active } from "../ed-global";
 import {
   ensureMItemProps,
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
+import { treeRebuild } from "./build";
+import { loadCompSnapshot } from "./sync-walk-comp";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -270,53 +272,6 @@ export const syncWalkMap = (
       skip_add_tree: skip_tree_child,
       each: arg.each,
     });
-  }
-};
-
-export const loadCompSnapshot = async (
-  p: PG,
-  id_comp: string,
-  loaded: Set<string>,
-  snapshot: Uint8Array,
-  scope: IScope
-) => {
-  if (loaded.has(id_comp)) {
-    return;
-  }
-  const doc = new Y.Doc() as DComp;
-  Y.applyUpdate(doc as any, decompress(snapshot));
-  const mitem = doc.getMap("map").get("root");
-  if (mitem) {
-    await syncWalkLoad(p, mitem, loaded, (id) => loadComponent(p, id, loaded));
-    const tree: NodeModel<EdMeta>[] = [];
-    const meta = {};
-    const portal = {
-      in: {} as Record<string, EdMeta>,
-      out: {} as Record<string, EdMeta>,
-    };
-    syncWalkMap(
-      {
-        comps: p.comp.list,
-        item_loading: p.ui.tree.item_loading,
-        meta,
-        tree,
-        warn_component_loaded: false,
-      },
-      {
-        mitem,
-        isLayout: false,
-        parent_item: { id: "root" },
-        portal,
-        tree_root_id: "root",
-      }
-    );
-    p.comp.list[id_comp] = {
-      comp: { id: id_comp, snapshot },
-      doc,
-      scope: scope,
-      meta,
-      tree,
-    };
   }
 };
 

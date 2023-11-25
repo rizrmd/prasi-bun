@@ -186,6 +186,7 @@ export const EDGlobal = {
         scope: IScope;
         tree: NodeModel<EdMeta>[];
         meta: Record<string, EdMeta>;
+        on_update: (bin: Uint8Array, origin: any) => Promise<void>;
       }
     >,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
