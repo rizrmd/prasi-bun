@@ -2,7 +2,6 @@ import { useGlobal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
-import { compLoaded } from "../../logic/tree/build";
 import { loadComponent } from "../../logic/tree/sync-walk";
 import { code } from "../popup/code/code";
 
@@ -17,7 +16,7 @@ export const EdMain = () => {
         `
       )}
     >
-      <div className="absolute overflow-auto inset-0">
+      <div className="absolute overflow-auto inset-0 flex">
         {!!p.page.building && <Loading backdrop={false} />}
         {!p.page.building && code.mode !== "" && (
           <View
@@ -28,7 +27,7 @@ export const EdMain = () => {
             api_url={p.site.config.api_url}
             component={{
               async load(id_comp) {
-                await loadComponent(p, id_comp, compLoaded);
+                await loadComponent(p, id_comp);
               },
             }}
             load={{

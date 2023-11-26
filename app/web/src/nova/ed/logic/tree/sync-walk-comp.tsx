@@ -9,14 +9,9 @@ import { MItem } from "../../../../utils/types/item";
 export const loadCompSnapshot = async (
   p: PG,
   id_comp: string,
-  loaded: Set<string>,
   snapshot: Uint8Array,
   scope: IScope
 ) => {
-  if (loaded.has(id_comp)) {
-    return;
-  }
-  loaded.add(id_comp);
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
   const mitem = doc.getMap("map").get("root");
@@ -24,15 +19,14 @@ export const loadCompSnapshot = async (
     if (typeof p.comp.list[id_comp]?.on_update === "function") {
       doc.off("update", p.comp.list[id_comp].on_update);
     }
-
+ 
     p.comp.list[id_comp] = {
       comp: { id: id_comp, snapshot },
       doc,
       scope: scope,
     } as any;
 
-    const { tree, meta } = await walkCompTree(p, mitem, loaded);
-
+    const { tree, meta } = await walkCompTree(p, mitem);
     p.comp.list[id_comp] = {
       ...p.comp.list[id_comp],
       meta,
@@ -54,7 +48,7 @@ export const loadCompSnapshot = async (
           Y.applyUpdate(doc as any, decompress(res.diff), "local");
           const mitem = doc.getMap("map").get("root");
           if (mitem) {
-            const { tree, meta } = await walkCompTree(p, mitem, loaded);
+            const { tree, meta } = await walkCompTree(p, mitem);
             p.comp.list[id_comp].tree = tree;
             p.comp.list[id_comp].meta = meta;
             await treeRebuild(p);
@@ -77,14 +71,14 @@ export const loadCompSnapshot = async (
   }
 };
 
-const walkCompTree = async (p: PG, mitem: MItem, loaded: Set<string>) => {
+const walkCompTree = async (p: PG, mitem: MItem) => {
   const tree: NodeModel<EdMeta>[] = [];
   const meta = {};
   const portal = {
     in: {} as Record<string, EdMeta>,
     out: {} as Record<string, EdMeta>,
   };
-  await syncWalkLoad(p, mitem, loaded, (id) => loadComponent(p, id, loaded));
+  await syncWalkLoad(p, mitem, (id) => loadComponent(p, id));
 
   syncWalkMap(
     {
