@@ -193,31 +193,33 @@ export const syncWalkMap = (
             if (mitem_props) {
               for (const [k, v] of Object.entries(mprops)) {
                 const mprop = ensureMProp(mitem_props, k, v);
-                item_comp.props[k] = v;
-                if (meta.item.type === "item" && meta.item.component) {
-                  meta.item.component.props[k] = v;
-                }
-
-                if (mprop && v.meta?.type === "content-element") {
-                  const mcontent = ensurePropContent(mprop, k);
-                  item_comp.props[k].content = mcontent?.toJSON() as IItem;
+                if (mprop) {
+                  item_comp.props[k] = mprop.toJSON() as FNCompDef;
                   if (meta.item.type === "item" && meta.item.component) {
-                    meta.item.component.props[k].content =
-                      item_comp.props[k].content;
+                    meta.item.component.props[k] = item_comp.props[k];
                   }
 
-                  if (mcontent) {
-                    syncWalkMap(p, {
-                      is_layout: arg.is_layout,
-                      tree_root_id: arg.tree_root_id,
-                      mitem: mcontent,
-                      is_jsx_prop: true,
-                      parent_mcomp: arg.parent_mcomp,
-                      parent_item: { id: item.id, mitem: mitem as MItem },
-                      portal: arg.portal,
-                      skip_add_tree: skip_tree_child,
-                      each: arg.each,
-                    });
+                  if (mprop && v.meta?.type === "content-element") {
+                    const mcontent = ensurePropContent(mprop, k);
+                    item_comp.props[k].content = mcontent?.toJSON() as IItem;
+                    if (meta.item.type === "item" && meta.item.component) {
+                      meta.item.component.props[k].content =
+                        item_comp.props[k].content;
+                    }
+
+                    if (mcontent) {
+                      syncWalkMap(p, {
+                        is_layout: arg.is_layout,
+                        tree_root_id: arg.tree_root_id,
+                        mitem: mcontent,
+                        is_jsx_prop: true,
+                        parent_mcomp: arg.parent_mcomp,
+                        parent_item: { id: item.id, mitem: mitem as MItem },
+                        portal: arg.portal,
+                        skip_add_tree: skip_tree_child,
+                        each: arg.each,
+                      });
+                    }
                   }
                 }
               }
