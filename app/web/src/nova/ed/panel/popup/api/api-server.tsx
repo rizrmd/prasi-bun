@@ -1,11 +1,11 @@
 import { forwardRef } from "react";
 import { deepClone, useGlobal, useLocal } from "web-utils";
+import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
 import { EdApiDB } from "./api-db";
 import { EdApiDeploy } from "./api-deploy";
 import { EdApiDomain } from "./api-domain";
 import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
-import { Modal } from "../../../../../utils/ui/modal";
 
 export const EdPopApi = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

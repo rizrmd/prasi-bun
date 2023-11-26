@@ -63,15 +63,12 @@ export const EdPagePop = () => {
               pagePicker.ref = ref;
             }
           }}
-          className={cx(
-            "absolute inset-[5%] bg-white flex",
-            css`
-              z-index: 100;
-            `
-          )}
+          className={cx("absolute inset-[5%] bg-white flex")}
         >
           <div className="relative flex flex-1 items-stretch text-[12px] overflow-auto">
-            {pagePicker.status === "loading" && <Loading note="listing-page" backdrop={false} />}
+            {pagePicker.status === "loading" && (
+              <Loading note="listing-page" backdrop={false} />
+            )}
 
             {pagePicker.ref && (
               <DndProvider
