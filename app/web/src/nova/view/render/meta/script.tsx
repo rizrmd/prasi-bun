@@ -7,7 +7,7 @@ import { ISection } from "../../../../utils/types/section";
 import { IText } from "../../../../utils/types/text";
 import { VG } from "../../logic/global";
 import { extractNavigate, preload } from "../../logic/router";
-import { ViewMetaRender } from "./render";
+import { ViewMetaChildren } from "./children";
 import { createLocal } from "./script/create-local";
 import { createPassProp } from "./script/create-pass-prop";
 import { ErrorBox } from "./script/error-box";
@@ -26,7 +26,7 @@ export const ViewMetaScript: FC<{
     hover: v.view.hover ? v.view.hover.get(item) : undefined,
     active: v.view.active ? v.view.active.get(item) : undefined,
   });
-  const children = <ViewMetaRender meta={meta} v={v} className={className} />;
+  const children = <ViewMetaChildren item={item} />;
   let args = {};
 
   if (js && meta) {
