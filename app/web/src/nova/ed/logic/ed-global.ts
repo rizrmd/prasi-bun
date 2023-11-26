@@ -27,7 +27,6 @@ export type ISingleScope = {
   p: string[];
   n: string;
   s: null | Exclude<ReturnType<typeof parseJs>, undefined>;
-  c?: string;
 };
 export type IScope = Record<string, ISingleScope>;
 
@@ -116,7 +115,6 @@ export type EdMeta = {
     id: string;
     mitem?: MItem;
   };
-  parent_comp?: { id: string; comp_id: string };
   parent_mcomp?: {
     mitem: MItem;
     mcomp: MItem;
@@ -126,7 +124,7 @@ export type EdMeta = {
   is_jsx_prop?: boolean;
   /** script related meta **/
   propval?: Record<string, any>;
-  idexed_scope: Record<string, any>;
+  indexed_scope: Record<string, any>;
   memoize?: Record<
     string,
     {

@@ -41,11 +41,11 @@ export const createLocal = (
       }
       scope = meta.scope;
     } else {
-      if (!meta.idexed_scope) {
-        meta.idexed_scope = {};
+      if (!meta.indexed_scope) {
+        meta.indexed_scope = {};
       }
-      if (!meta.idexed_scope[local_id]) meta.idexed_scope[local_id] = {};
-      scope = meta.idexed_scope[local_id];
+      if (!meta.indexed_scope[local_id]) meta.indexed_scope[local_id] = {};
+      scope = meta.indexed_scope[local_id];
     }
 
     const render = () => {

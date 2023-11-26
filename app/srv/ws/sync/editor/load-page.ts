@@ -76,7 +76,15 @@ export const serverWalkLoad = async (
 type ArgParentMComp = EdMeta["parent_mcomp"] & {
   id: string;
   parent_ids: string[];
-  jsx_props: Record<string, { id: string; parent_ids: string[] }>;
+  jsx_props: Record<
+    string,
+    {
+      id: string;
+      mitem: MItem;
+      parent_mcomp?: ArgParentMComp;
+      parent_ids: string[];
+    }
+  >;
 };
 export const serverWalkMap = (
   p: {
@@ -88,7 +96,6 @@ export const serverWalkMap = (
     mitem: MItem;
     parent_ids: string[];
     parent_item: EdMeta["parent_item"];
-    is_jsx_prop?: boolean;
     parent_mcomp?: ArgParentMComp;
   }
 ) => {
@@ -189,27 +196,22 @@ export const serverWalkMap = (
             mcomp,
             jsx_props: {},
           };
+
           extractMItemProps({
             item_comp,
             mitem,
             mcomp,
             scope,
             mcontent(mcontent, prop_name) {
-              const parent_ids = [...arg.parent_ids, item.id];
               const id = mcontent.get("id");
               if (id) {
                 parent_mcomp.jsx_props[prop_name] = {
                   id,
-                  parent_ids,
+                  mitem: mcontent,
+                  parent_mcomp: arg.parent_mcomp,
+                  parent_ids: [...arg.parent_ids, item.id],
                 };
               }
-              serverWalkMap(p, {
-                parent_ids,
-                mitem: mcontent,
-                parent_item: { id: item.id, mitem: mitem as MItem },
-                is_jsx_prop: true,
-                parent_mcomp,
-              });
             },
           });
 
@@ -227,12 +229,11 @@ export const serverWalkMap = (
 
           if (scope) pcomp.scope[item.id].s = scope;
 
-          if (!parent_mcomp) {
+          if (!arg.parent_mcomp) {
             p.scope[item.id] = {
               p: arg.parent_ids,
               n: item.name,
               s: null,
-              c: item.component?.id,
             };
             if (scope) p.scope[item.id].s = scope;
           }
@@ -255,16 +256,7 @@ export const serverWalkMap = (
     }
   }
 
-  if (item.name.startsWith("jsx=")) {
-    console.log(
-      item.name,
-      !!arg.parent_mcomp,
-      !arg.is_jsx_prop,
-      arg.parent_item.mitem?.get("name")
-    );
-  }
-
-  if (arg.parent_mcomp && !arg.is_jsx_prop) {
+  if (arg.parent_mcomp) {
     let id = item.originalId || item.id;
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
 
@@ -278,6 +270,24 @@ export const serverWalkMap = (
     if (typeof js === "string") {
       const scope = parseJs(js);
       if (scope) pcomp.scope[id].s = scope;
+    }
+
+    if (item.name.startsWith("jsx=")) {
+      const name = item.name.substring(4).trim();
+      if (arg.parent_mcomp.jsx_props[name]) {
+        const jsx = arg.parent_mcomp.jsx_props[name];
+        serverWalkMap(p, {
+          mitem: jsx.mitem,
+          parent_item: { id: item.id, mitem: mitem as MItem },
+          parent_mcomp: jsx.parent_mcomp
+            ? {
+                ...jsx.parent_mcomp,
+                parent_ids: [...(arg.parent_ids || []), mitem.get("id") || ""],
+              }
+            : undefined,
+          parent_ids: [...arg.parent_ids, mitem.get("id") || ""],
+        });
+      }
     }
   } else {
     if (!(item_comp && item_comp.id)) {
@@ -294,7 +304,6 @@ export const serverWalkMap = (
   for (const e of childs) {
     serverWalkMap(p, {
       mitem: e,
-      is_jsx_prop: arg.is_jsx_prop,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: !!arg.parent_mcomp
         ? {

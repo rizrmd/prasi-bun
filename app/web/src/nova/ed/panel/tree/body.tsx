@@ -43,8 +43,17 @@ export const EdTreeBody = () => {
   useEffect(() => {
     if (local.tree) {
       let parents: string[] = [];
-      if (active.comp_id && p.comp.list[local.comp_id].scope[active.item_id]) {
-        parents = p.comp.list[local.comp_id].scope[active.item_id].p;
+      if (active.comp_id && p.comp.list[active.comp_id].scope[active.item_id]) {
+        parents = p.comp.list[active.comp_id].scope[active.item_id].p.map(
+          (e) => {
+            if (e === "root") return "root";
+            const meta = p.page.meta[e];
+            if (meta && meta.item.originalId) {
+              return meta.item.originalId;
+            }
+            return e;
+          }
+        );
       } else if (p.page.scope[active.item_id]) {
         parents = p.page.scope[active.item_id].p;
       }

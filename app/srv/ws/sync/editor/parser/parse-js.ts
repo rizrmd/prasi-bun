@@ -48,17 +48,17 @@ export const parseJs = (code: string) => {
                 attr.type === "JSXAttribute" &&
                 attr.name.type === "JSXIdentifier"
               ) {
-                if (
-                  attr.name.name === "value" &&
-                  attr.value &&
-                  attr.value.type === "JSXExpressionContainer" &&
-                  attr.value.expression.loc
-                ) {
-                  const loc = attr.value.expression.loc as any;
-                  passprop[attr.name.name] = {
-                    value: code.substring(loc.start.index, loc.end.index),
-                    index: loc.start.index,
-                  };
+                if (attr.value) {
+                  if (
+                    attr.value.type === "JSXExpressionContainer" &&
+                    attr.value.expression.loc
+                  ) {
+                    const loc = attr.value.expression.loc as any;
+                    passprop[attr.name.name] = {
+                      value: code.substring(loc.start.index, loc.end.index),
+                      index: loc.start.index,
+                    };
+                  } 
                 }
               }
             }
@@ -83,4 +83,3 @@ export const parseJs = (code: string) => {
   }
   return result;
 };
- 

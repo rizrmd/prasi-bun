@@ -1,20 +1,17 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { createId } from "@paralleldrive/cuid2";
-import { compress, decompress } from "wasm-gzip";
 import { TypedArray } from "yjs-types";
 import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
-import { DComp } from "../../../../utils/types/root";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, IScope, PG, active } from "../ed-global";
+import { EdMeta, PG } from "../ed-global";
+import { loadCompSnapshot } from "./sync-walk-comp";
 import {
   ensureMItemProps,
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
-import { treeRebuild } from "./build";
-import { loadCompSnapshot } from "./sync-walk-comp";
 
 export const syncWalkLoad = async (
   p: PG,
@@ -115,6 +112,7 @@ export const syncWalkMap = (
   mapItem(mitem, item);
 
   if (override_id) {
+    if (!item.originalId) item.originalId = item.id;
     item.id = override_id;
   }
 
@@ -157,7 +155,7 @@ export const syncWalkMap = (
           mitem: mitem as MItem,
           parent_item,
           parent_mcomp: parent_mcomp,
-          idexed_scope: {},
+          indexed_scope: {},
           is_layout: arg.is_layout,
         };
         if (item.name.startsWith("⬅")) {
@@ -201,7 +199,6 @@ export const syncWalkMap = (
                       mitem: mcontent,
                       is_jsx_prop: true,
                       parent_item: { id: item.id, mitem: mitem as MItem },
-                      parent_mcomp: { mitem: mitem as MItem, mcomp },
                       portal: arg.portal,
                       skip_add_tree: skip_tree_child,
                       each: arg.each,
@@ -241,7 +238,7 @@ export const syncWalkMap = (
     parent_item,
     is_jsx_prop: arg.is_jsx_prop,
     parent_mcomp: parent_mcomp,
-    idexed_scope: {},
+    indexed_scope: {},
   };
 
   if (item.name.startsWith("⬅")) {
@@ -269,6 +266,7 @@ export const syncWalkMap = (
       is_layout: arg.is_layout,
       tree_root_id: arg.tree_root_id,
       mitem: e,
+      is_jsx_prop: arg.is_jsx_prop,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: arg.parent_mcomp,
       portal: arg.portal,
@@ -299,7 +297,6 @@ export const loadComponent = async (
       resolve(true);
       return;
     }
-    console.log("loading", id_comp);
     loadcomp.pending.add(id_comp);
     clearTimeout(loadcomp.timeout);
     loadcomp.timeout = setTimeout(async () => {
