@@ -10,7 +10,7 @@ export const ViewGlobal = {
   layout: { show: false },
   meta: {} as Record<string, EdMeta>,
   entry: [] as string[],
-  bodyCache: null as null | ReactElement,
+  body_cache: null as null | ReactElement,
   component: {
     load: async (id_comp: string) => {},
   },

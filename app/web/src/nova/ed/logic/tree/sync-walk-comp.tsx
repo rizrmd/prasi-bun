@@ -19,7 +19,7 @@ export const loadCompSnapshot = async (
     if (typeof p.comp.list[id_comp]?.on_update === "function") {
       doc.off("update", p.comp.list[id_comp].on_update);
     }
- 
+
     p.comp.list[id_comp] = {
       comp: { id: id_comp, snapshot },
       doc,
@@ -82,6 +82,7 @@ const walkCompTree = async (p: PG, mitem: MItem) => {
 
   syncWalkMap(
     {
+      note: "walk-comp",
       comps: p.comp.list,
       item_loading: p.ui.tree.item_loading,
       meta,

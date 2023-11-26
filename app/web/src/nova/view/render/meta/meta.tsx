@@ -13,6 +13,7 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   const [, _render] = useState({});
 
   const meta = v.meta[id];
+
   if (!meta) return null;
   meta.render = () => _render({});
 

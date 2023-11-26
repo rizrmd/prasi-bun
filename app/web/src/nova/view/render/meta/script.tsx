@@ -64,7 +64,9 @@ export const ViewMetaScript: FC<{
           } = v as any;
           if (t._jsx && t.Comp) {
             finalScope[k] = (
-              <t.Comp parent_id={meta.item.id} scopeIndex={scopeIndex} />
+              <>
+                <t.Comp parent_id={meta.item.id} scopeIndex={scopeIndex} />
+              </>
             );
           }
         }

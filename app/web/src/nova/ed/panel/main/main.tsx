@@ -7,6 +7,7 @@ import { code } from "../popup/code/code";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const root = p.page.tree.find((e) => e.parent === "root");
   return (
     <div
       className={cx(

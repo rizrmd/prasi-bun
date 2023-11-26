@@ -51,6 +51,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               }
               syncWalkMap(
                 {
+                  note: "tree-rebuild layout",
                   comps: p.comp.list,
                   item_loading: p.ui.tree.item_loading,
                   meta: p.page.meta,
@@ -125,6 +126,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           }
           syncWalkMap(
             {
+              note: "tree-rebuild doc",
               comps: p.comp.list,
               item_loading: p.ui.tree.item_loading,
               meta: p.page.meta,
