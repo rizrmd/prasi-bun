@@ -20,7 +20,7 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   const item = meta.item;
 
   if (item.type === "item" && item.component?.id) {
-    compPropVal(v, meta);
+    compPropVal(v, meta, scopeIndex);
   }
 
   if (item.hidden && v.view.hidden) {

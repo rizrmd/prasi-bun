@@ -7,7 +7,11 @@ import { ViewMeta } from "../meta";
 import { mergeScopeUpwards } from "./merge-upward";
 
 const jsxProps = {} as Record<string, any>;
-export const compPropVal = (v: VG, meta: EdMeta) => {
+export const compPropVal = (
+  v: VG,
+  meta: EdMeta,
+  scopeIndex?: Record<string, any>
+) => {
   let props = {} as Record<string, FNCompDef>;
   let cprops = [] as [string, FNCompDef][];
   const item = meta.item;
@@ -22,7 +26,7 @@ export const compPropVal = (v: VG, meta: EdMeta) => {
         if (!v.script.api) v.script.api = createAPI(v.script.api_url);
 
         const w = window as any;
-        const finalScope = mergeScopeUpwards;
+        const finalScope = mergeScopeUpwards(v, item.id, scopeIndex);
         const args = {
           ...w.exports,
           ...finalScope,
@@ -40,6 +44,7 @@ export const compPropVal = (v: VG, meta: EdMeta) => {
               ...Object.keys(args),
               `return ${prop.valueBuilt}`
             );
+
             try {
               value = fn(...Object.values(args)) || null;
 
