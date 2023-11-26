@@ -6,7 +6,7 @@ import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";
 import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
-import { evalCJS } from "../../view/logic/load-code";
+import { evalCJS } from "../../view/logic/load-code-new";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 
