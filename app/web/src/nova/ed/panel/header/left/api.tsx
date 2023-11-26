@@ -1,12 +1,18 @@
-import { EdApiServer } from "../../popup/api/api-server";
+import { useGlobal } from "web-utils";
 import { TopBtn } from "../top-btn";
+import { EDGlobal } from "../../../logic/ed-global";
 
 export const EdApi = () => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
   return (
     <TopBtn
       style="slim"
       innerClassName="flex-1 flex items-center justify-center"
-      popover={(popover) => <EdApiServer popover={popover} />}
+      onClick={() => {
+        p.ui.popup.api.open = true;
+        p.render();
+      }}
       placement="right"
     >
       <div
