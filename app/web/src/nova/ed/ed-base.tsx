@@ -14,6 +14,7 @@ import { EdPagePop } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { EdScriptInit } from "./panel/script/monaco/init";
+import { EdPopApi } from "./panel/popup/api/api-server";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -51,6 +52,7 @@ export const EdBase = () => {
         <EdPopCode />
         <EdPopScript />
         <EdPopSite />
+        <EdPopApi />
         <EdPagePop />
         <EdPopCompGroup />
         <EdScriptInit />

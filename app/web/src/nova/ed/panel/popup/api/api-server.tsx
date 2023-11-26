@@ -5,6 +5,30 @@ import { EdApiDB } from "./api-db";
 import { EdApiDeploy } from "./api-deploy";
 import { EdApiDomain } from "./api-domain";
 import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
+import { Modal } from "../../../../../utils/ui/modal";
+
+export const EdPopApi = () => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
+  return (
+    <Modal
+      open={p.ui.popup.api.open}
+      onOpenChange={(open) => {
+        p.ui.popup.api.open = open;
+        p.render();
+      }}
+    >
+      <EdApiServer
+        popover={{
+          onClose() {
+            p.ui.popup.api.open = false;
+            p.render();
+          },
+        }}
+      />
+    </Modal>
+  );
+};
 
 export const EdApiServer = forwardRef<
   HTMLDivElement,
