@@ -45,6 +45,22 @@ export const declareScope = async (
     existing[name] = arg;
   });
 
+  // for (const id of s.p) {
+  //   const meta = p.page.meta[id];
+  //   const ss = p.page.scope[id];
+  //   if (meta) {
+  //     let sc = null as any;
+  //     if (meta.parent_mcomp) {
+  //       const comp_id = meta.parent_mcomp.mitem.get('component')?.get('id');
+  //       if (comp_id && p.comp.list[comp_id]) {
+  //         sc = p.comp.list[comp_id].scope
+  //       }
+  //     }
+
+  //     console.log(meta.item.name, meta.item.originalId, ss, sc);
+  //   }
+  // }
+
   spreadScope(p, s, (arg) => {
     let { prev } = arg;
     if (arg.type !== "local") {
@@ -122,37 +138,39 @@ const spreadScope = (
   const mergeScopes = (
     parents: string[],
     each: (arg: IEachArgScope) => void,
-    arg: { comp_id?: string; prev?: { comp_id: string; item_id: string } }
+    arg: { prev?: { comp_id: string; item_id: string } }
   ) => {
-    let { comp_id, prev } = arg;
+    let { prev } = arg;
     for (const parent_id of parents) {
+      if (parent_id === "root") continue;
       let item = null as null | ISingleScope;
+      const meta = p.page.meta[parent_id];
+
       if (layout && layout_scope[layout_id]) {
         const scope = layout_scope[layout_id];
-        if (scope.p.includes(parent_id) || comp_id) {
+        if (scope.p.includes(parent_id)) {
           item = layout.scope[parent_id];
         }
       }
 
-      if (!item) { 
-        if (comp_id) {
-          item = p.comp.list[comp_id].scope[parent_id];
-        } else if (active.comp_id && p.comp.list[active.comp_id]) {
-          item = p.comp.list[active.comp_id].scope[parent_id];
-        } else {
-          item = p.page.scope[parent_id];
+      let comp_id = "";
+      if (!item) {
+        if (meta) {
+          if (meta.parent_mcomp) {
+            comp_id = meta.parent_mcomp.mitem.get("component")?.get("id") || "";
+            if (comp_id) {
+              const scope = p.comp.list[comp_id].scope;
+              item = scope[meta.item.originalId || meta.item.id];
+            }
+          }
+
+          if (!item) {
+            item = p.page.scope[parent_id];
+          }
         }
       }
 
       if (item) {
-        if (item.c) {
-          comp_id = item.c;
-          mergeScopes(item.p, each, {
-            comp_id: item.c,
-            prev: { item_id: parent_id, comp_id: arg.comp_id || "" },
-          });
-        }
-
         const scope = item.s;
         if (scope) {
           if (scope.local)
@@ -201,6 +219,7 @@ const spreadScope = (
     }
   };
 
+  console.clear();
   mergeScopes(parents, each, {});
 };
 

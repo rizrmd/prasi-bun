@@ -68,11 +68,13 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p: PG) => {
             meta = p.comp.list[active.comp_id].meta[id];
           }
 
-          active.instance.comp_id = prev_comp_id;
-          active.instance.item_id = prev_item_id;
+          active.instance.comp_id = active.comp_id;
+          active.instance.item_id = active.item_id;
 
           if (meta && meta.item.originalId) {
             active.item_id = meta.item.originalId;
+          } else {
+            active.item_id = id;
           }
           active.comp_id = comp_id;
         } else {
