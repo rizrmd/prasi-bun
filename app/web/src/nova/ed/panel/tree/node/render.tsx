@@ -7,6 +7,7 @@ import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
+import { useEffect } from "react";
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -27,6 +28,10 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
 
   return (
     <div
+      ref={(el) => {
+        if (el) {
+        }
+      }}
       tabIndex={0}
       className={cx(
         "tree-item",
