@@ -4,6 +4,7 @@ import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { compLoaded } from "../../logic/tree/build";
 import { loadComponent } from "../../logic/tree/sync-walk";
+import { code } from "../popup/code/code";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -18,9 +19,10 @@ export const EdMain = () => {
     >
       <div className="absolute overflow-auto inset-0">
         {!!p.page.building && <Loading backdrop={false} />}
-        {!p.page.building && (
+        {!p.page.building && code.mode !== "" && (
           <View
             mode={p.mode}
+            code_mode={code.mode}
             layout={{ show: false }}
             isEditor={true}
             api_url={p.site.config.api_url}

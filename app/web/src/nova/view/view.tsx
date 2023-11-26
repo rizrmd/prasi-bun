@@ -4,11 +4,12 @@ import { IContent } from "../../utils/types/general";
 import { Loading } from "../../utils/ui/loading";
 import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
-import { vLoadCode } from "./logic/load-code";
+import { newLoadCode } from "./logic/load-code-new";
 import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
 import { ErrorBox } from "./render/meta/script/error-box";
 import { IRoot } from "../../utils/types/root";
+import { oldLoadCode } from "./logic/load-code-old";
 
 type ViewProp = {
   load: VLoad;
@@ -17,6 +18,7 @@ type ViewProp = {
   page_id: string;
   api_url: string;
   mode: "desktop" | "mobile";
+  code_mode?: "old" | "new";
   layout?: { show: boolean };
   isEditor?: boolean;
   bind?: (arg: { render: () => void }) => void;
@@ -41,6 +43,7 @@ const BoxedView: FC<ViewProp> = ({
   layout,
   page_id,
   bind,
+  code_mode,
   hover,
   active,
   hidden,
@@ -79,7 +82,11 @@ const BoxedView: FC<ViewProp> = ({
   }
 
   if (v.status === "load-code" || v.status === "loading-code") {
-    vLoadCode(v);
+    if (!code_mode || code_mode === "new") {
+      newLoadCode(v);
+    } else {
+      oldLoadCode(v);
+    }
     if (v.status === "load-code" || v.status === "loading-code") {
       return (
         <>

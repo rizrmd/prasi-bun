@@ -6,7 +6,7 @@ const codeMap = {
   compGroup: {} as Record<string, string[]>,
   comp: {} as Record<string, string>,
 };
-export const vLoadCode = async (v: VG, forceLoad?: boolean) => {
+export const newLoadCode = async (v: VG, forceLoad?: boolean) => {
   if (forceLoad) {
     codeLoaded.clear();
     v.status = "load-code";
