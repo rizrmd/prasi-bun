@@ -58,6 +58,7 @@ export const syncWalkLoad = async (
 
 export const syncWalkMap = (
   p: {
+    note?: string;
     item_loading: PG["ui"]["tree"]["item_loading"];
     tree?: NodeModel<EdMeta>[];
     comps: PG["comp"]["list"];
@@ -91,6 +92,7 @@ export const syncWalkMap = (
     skip_tree_child = true;
   }
 
+  let mapped = false;
   if (parent_mcomp && id) {
     const fcomp = parent_mcomp.mitem.get("component");
     if (fcomp) {
@@ -104,11 +106,15 @@ export const syncWalkMap = (
           ref_ids.set(id, ref_id);
         }
         override_id = ref_id;
+        mapItem(mitem, item, ref_ids.toJSON());
+        mapped = true;
       }
     }
   }
 
-  mapItem(mitem, item);
+  if (!mapped) {
+    mapItem(mitem, item);
+  }
 
   if (override_id) {
     if (!item.originalId) item.originalId = item.id;
@@ -144,7 +150,7 @@ export const syncWalkMap = (
           ref_ids = {};
         }
         const old_id = item.id;
-        mapItem(mcomp, item);
+        mapItem(mcomp, item, ref_ids);
         item.originalId = item.id;
         item.id = old_id;
 
@@ -188,14 +194,25 @@ export const syncWalkMap = (
               for (const [k, v] of Object.entries(mprops)) {
                 const mprop = ensureMProp(mitem_props, k, v);
                 item_comp.props[k] = v;
+                if (meta.item.type === "item" && meta.item.component) {
+                  meta.item.component.props[k] = v;
+                }
+
                 if (mprop && v.meta?.type === "content-element") {
                   const mcontent = ensurePropContent(mprop, k);
+                  item_comp.props[k].content = mcontent?.toJSON() as IItem;
+                  if (meta.item.type === "item" && meta.item.component) {
+                    meta.item.component.props[k].content =
+                      item_comp.props[k].content;
+                  }
+
                   if (mcontent) {
                     syncWalkMap(p, {
                       is_layout: arg.is_layout,
                       tree_root_id: arg.tree_root_id,
                       mitem: mcontent,
                       is_jsx_prop: true,
+                      parent_mcomp: arg.parent_mcomp,
                       parent_item: { id: item.id, mitem: mitem as MItem },
                       portal: arg.portal,
                       skip_add_tree: skip_tree_child,
@@ -209,6 +226,7 @@ export const syncWalkMap = (
         }
 
         const childs = mcomp.get("childs")?.map((e) => e) || [];
+
         for (const e of childs) {
           syncWalkMap(p, {
             is_layout: arg.is_layout,
@@ -259,6 +277,7 @@ export const syncWalkMap = (
   }
 
   const childs = mitem.get("childs")?.map((e) => e) || [];
+
   for (const e of childs) {
     syncWalkMap(p, {
       is_layout: arg.is_layout,
@@ -301,7 +320,11 @@ export const loadComponent = async (p: PG, id_comp: string) => {
   });
 };
 
-const mapItem = (mitem: MContent, item: any) => {
+const mapItem = (
+  mitem: MContent,
+  item: any,
+  ref_ids?: Record<string, string>
+) => {
   mitem.forEach((e, k) => {
     if (k !== "childs") {
       let val = e;
@@ -312,10 +335,17 @@ const mapItem = (mitem: MContent, item: any) => {
       }
       item[k] = val;
     } else {
-      if (!item[k]) item[k] = [];
+      item[k] = [];
       const childs = e as unknown as TypedArray<{}>;
       childs.forEach((c) => {
-        item[k].push({ id: c.get("id") });
+        if (ref_ids) {
+          const id = ref_ids[c.get("id")];
+          if (id) {
+            item[k].push({ id });
+          }
+        } else {
+          item[k].push({ id: c.get("id") });
+        }
       });
     }
   });

@@ -9,18 +9,17 @@ import { mergeScopeUpwards } from "./merge-upward";
 const jsxProps = {} as Record<string, any>;
 export const compPropVal = (v: VG, meta: EdMeta) => {
   let props = {} as Record<string, FNCompDef>;
-  let cprops = {} as [string, FNCompDef][];
+  let cprops = [] as [string, FNCompDef][];
   const item = meta.item;
   if (item.type === "item" && item.component?.id) {
     const icomp = item.component;
     if (icomp) {
-      cprops = Object.entries(props);
+      props = icomp.props;
+      cprops = Object.entries({ ...icomp.props });
 
       if (v.script.api_url) {
         if (!v.script.db) v.script.db = createDB(v.script.api_url);
         if (!v.script.api) v.script.api = createAPI(v.script.api_url);
-
-        const props = icomp.props;
 
         const w = window as any;
         const finalScope = mergeScopeUpwards;

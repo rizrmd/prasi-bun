@@ -5,11 +5,10 @@ import { Loading } from "../../utils/ui/loading";
 import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
 import { newLoadCode } from "./logic/load-code-new";
+import { oldLoadCode } from "./logic/load-code-old";
 import { VLoad, VLoadComponent } from "./logic/types";
 import { VEntry } from "./render/entry";
 import { ErrorBox } from "./render/meta/script/error-box";
-import { IRoot } from "../../utils/types/root";
-import { oldLoadCode } from "./logic/load-code-old";
 
 type ViewProp = {
   load: VLoad;
@@ -101,9 +100,9 @@ const BoxedView: FC<ViewProp> = ({
       v.meta = load.meta;
       v.entry = load.entry;
     }
-    v.bodyCache = <VEntry />;
+    v.body_cache = <VEntry />;
     v.status = "ready";
   }
 
-  return <div className="flex flex-1 flex-col relative">{v.bodyCache}</div>;
+  return <div className="flex flex-1 flex-col relative">{v.body_cache}</div>;
 };
