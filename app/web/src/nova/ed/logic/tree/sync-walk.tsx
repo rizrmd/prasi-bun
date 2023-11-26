@@ -13,39 +13,38 @@ import {
   ensurePropContent,
 } from "./sync-walk-utils";
 
+const comp_added = new Set<string>();
+
 export const syncWalkLoad = async (
   p: PG,
   mitem: MItem,
-  loaded: Set<string>,
   loadComponent: (id: string) => Promise<boolean>
 ) => {
   const mcomp = mitem.get("component");
   if (mcomp) {
     const id = mcomp.get("id");
-    const comp = mcomp.toJSON() as FNComponent;
-    if (id) {
-      const isFirstLoaded = !loaded.has(id);
-      loaded.add(id);
-      if (!p.comp.list[id] && isFirstLoaded) {
+    if (id && !comp_added.has(id)) {
+      comp_added.add(id);
+      const comp = mcomp.toJSON() as FNComponent;
+      if (!p.comp.list[id]) {
         loadComponent(comp.id);
       }
 
       const pcomp = p.comp.list[id];
       if (pcomp) {
         const pitem = pcomp.doc.getMap("map").get("root");
-        if (pitem && isFirstLoaded) {
-          await syncWalkLoad(p, pitem, loaded, loadComponent);
+        if (pitem) {
+          await syncWalkLoad(p, pitem, loadComponent);
         }
       }
-    }
-
-    for (const [propName, prop] of Object.entries(comp.props || {})) {
-      if (prop.meta?.type === "content-element") {
-        const mprop = mcomp.get("props")?.get(propName);
-        if (mprop) {
-          const mcontent = ensurePropContent(mprop, propName);
-          if (mcontent) {
-            await syncWalkLoad(p, mcontent, loaded, loadComponent);
+      for (const [propName, prop] of Object.entries(comp.props || {})) {
+        if (prop.meta?.type === "content-element") {
+          const mprop = mcomp.get("props")?.get(propName);
+          if (mprop) {
+            const mcontent = ensurePropContent(mprop, propName);
+            if (mcontent) {
+              await syncWalkLoad(p, mcontent, loadComponent);
+            }
           }
         }
       }
@@ -53,7 +52,7 @@ export const syncWalkLoad = async (
   }
 
   for (const e of mitem.get("childs")?.map((e) => e) || []) {
-    await syncWalkLoad(p, e, loaded, loadComponent);
+    await syncWalkLoad(p, e, loadComponent);
   }
 };
 
@@ -130,8 +129,7 @@ export const syncWalkMap = (
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
     if (!p.comps[item_comp.id] && p.warn_component_loaded !== false) {
-      console.error("Component failed to load: ", item_comp.id);
-      return;
+      throw new Error("Component failed to load: " + item_comp.id);
     }
 
     const ref_comp = p.comps[item_comp.id];
@@ -276,22 +274,9 @@ export const syncWalkMap = (
   }
 };
 
-const loadcomp = { timeout: 0 as any, pending: new Set<string>() };
-export const component = {
-  pending: null as null | Promise<void>,
-  resolve: null as null | (() => void),
-};
-export const loadComponent = async (
-  p: PG,
-  id_comp: string,
-  loaded: Set<string>
-) => {
-  if (!component.pending) {
-    component.pending = new Promise((resolve) => {
-      component.resolve = resolve;
-    });
-  }
+export const loadcomp = { timeout: 0 as any, pending: new Set<string>() };
 
+export const loadComponent = async (p: PG, id_comp: string) => {
   return new Promise<boolean>((resolve) => {
     if (p.comp.list[id_comp]) {
       resolve(true);
@@ -302,21 +287,16 @@ export const loadComponent = async (
     loadcomp.timeout = setTimeout(async () => {
       const comps = await p.sync.comp.load([...loadcomp.pending]);
       let result = Object.entries(comps);
-      loadcomp.pending.clear();
 
       for (const [id_comp, comp] of result) {
         for (const cur of Object.values(comp)) {
           if (cur && cur.snapshot) {
-            await loadCompSnapshot(p, id_comp, loaded, cur.snapshot, cur.scope);
+            await loadCompSnapshot(p, id_comp, cur.snapshot, cur.scope);
           }
         }
       }
+      loadcomp.pending.clear();
       resolve(result.length > 0);
-      if (component.resolve) {
-        component.resolve();
-        component.pending = null;
-        component.resolve = null;
-      }
     }, 150);
   });
 };

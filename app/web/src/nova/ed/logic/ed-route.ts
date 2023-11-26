@@ -37,7 +37,6 @@ export const edRoute = async (p: PG) => {
   }
 };
 
-const loaded = new Set<string>();
 export const reloadPage = async (p: PG, page_id: string, note: string) => {
   p.status = "loading";
   const remotePage = await p.sync.page.load(page_id);
@@ -52,7 +51,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   if (remotePage.scope_comps) {
     for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
       if (c && c.snapshot) {
-        await loadCompSnapshot(p, id_comp, loaded, c.snapshot, c.scope);
+        await loadCompSnapshot(p, id_comp, c.snapshot, c.scope);
       }
     }
   }

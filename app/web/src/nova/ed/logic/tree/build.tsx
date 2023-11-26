@@ -1,12 +1,11 @@
+import { waitUntil } from "web-utils";
 import { EdMeta, PG } from "../ed-global";
 import {
-  component,
   loadComponent,
+  loadcomp,
   syncWalkLoad,
   syncWalkMap,
 } from "./sync-walk";
-
-export const compLoaded = new Set<string>();
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const doc = p.page.doc;
@@ -34,16 +33,17 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         if (lroot) {
           const sections = lroot.get("childs");
           if (sections) {
-            const loaded = new Set<string>();
-            await Promise.all(
-              sections.map((e) => {
-                return syncWalkLoad(p, e, loaded, (id) => {
-                  return loadComponent(p, id, loaded);
-                });
-              })
-            );
+            sections.map((e) => {
+              return syncWalkLoad(p, e, (id) => {
+                return loadComponent(p, id);
+              });
+            });
 
-            if (component.pending) await component.pending;
+            if (loadcomp.pending.size > 0) {
+              await waitUntil(() => {
+                return loadcomp.pending.size === 0;
+              });
+            }
 
             sections.map((e) => {
               if (p.page.root_id === "root") {
@@ -98,15 +98,17 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
     const sections = root.get("childs");
     if (sections) {
-      await Promise.all(
-        sections.map((e) => {
-          return syncWalkLoad(p, e, compLoaded, (id) => {
-            return loadComponent(p, id, compLoaded);
-          });
-        })
-      );
+      sections.map((e) => {
+        return syncWalkLoad(p, e, (id) => {
+          return loadComponent(p, id);
+        });
+      });
 
-      if (component.pending) await component.pending;
+      if (loadcomp.pending.size > 0) {
+        await waitUntil(() => {
+          return loadcomp.pending.size === 0;
+        });
+      }
     }
 
     doc.transact(async () => {
