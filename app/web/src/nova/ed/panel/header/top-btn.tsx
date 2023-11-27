@@ -36,7 +36,7 @@ export const TopBtn = ({
                 "border border-slate-300 hover:bg-blue-500 hover:border-blue-500 hover:text-white rounded-[2px]",
               disabled && "text-slate-400 border border-slate-100",
             ]
-          : "px-1 rounded-[3px] hover:bg-blue-500 hover:text-white",
+          : "px-1 rounded-[2px] hover:bg-blue-400 hover:text-white w-[25px] h-[22px] justify-center",
         underlight &&
           css`
             border-bottom-color: ${underlight};

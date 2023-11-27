@@ -1,6 +1,7 @@
 import { FC } from "react";
-import { EdMain } from "./panel/main/main";
+import { EdCompPicker } from "./panel/header/mid/comp-picker";
 import { EdPagePicker } from "./panel/header/mid/page-picker";
+import { EdMain } from "./panel/main/main";
 
 export const EdMid: FC<{}> = () => {
   return (
@@ -10,7 +11,14 @@ export const EdMid: FC<{}> = () => {
           "h-[35px] border-b flex p-1 items-stretch text-[12px] justify-between"
         )}
       >
-        <EdPagePicker />
+        <div className="flex items-stretch">
+          <EdPagePicker />
+        </div>
+
+        <div className="flex items-stretch">
+          <EdCompPicker />
+        </div>
+        <div className="flex items-stretch justify-end"></div>
       </div>
       <EdMain />
     </div>
