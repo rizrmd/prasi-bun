@@ -14,7 +14,7 @@ import { pagePicker, reloadPagePicker } from "./page-reload";
 import { PageItem, edPageTreeRender } from "./page-tree";
 import { EdFormPage } from "./page-form";
 
-export const EdPagePop = () => {
+export const EdPopPage = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     tree: null as TreeMethods | null,
