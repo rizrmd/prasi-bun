@@ -128,6 +128,12 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                   className="btn transition-all bg-white flex items-center border px-1 hover:border-blue-300 hover:bg-blue-100"
                   onClick={(e) => {
                     e.stopPropagation();
+
+                    p.ui.popup.page.form = {
+                      id_site: p.site.id,
+                      id_folder: item.id === "root" ? null : item.id,
+                    };
+                    p.render();
                   }}
                 >
                   + Page

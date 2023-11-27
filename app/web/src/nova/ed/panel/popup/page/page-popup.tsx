@@ -34,10 +34,14 @@ export const EdPagePop = () => {
             cur = pagePicker.tree.find((e) => e.id === parent_id);
           }
         }
-        local.tree.open(parents);
+        if (parents.length === 0) {
+          local.tree.open("page-root");
+        } else {
+          local.tree.open(parents);
+        }
       }
     });
-  }, [p.ui.popup.page.open]);
+  }, [p.ui.popup.page.open, p.page.cur.id, pagePicker.site_id]);
 
   if (!p.ui.popup.page.open) return null;
 
@@ -106,22 +110,28 @@ export const EdPagePop = () => {
               p.ui.popup.page.form = null;
               p.render();
             }}
-            onSave={async (page) => {
+            onSave={async (page, isNew) => {
               p.ui.popup.page.form = null;
 
-              const found = pagePicker.tree.find(
-                (e) => e.id === page.id && e.data?.type === "page"
-              );
-              if (found) {
-                for (const [k, v] of Object.entries(found.data || {})) {
-                  if (page[k]) {
-                    (found.data as any)[k] = page[k];
+              if (isNew) {
+                p.render();
+                await reloadPagePicker(p);
+                navigate(`/ed/${p.site.id}/${page.id}`);
+              } else {
+                const found = pagePicker.tree.find(
+                  (e) => e.id === page.id && e.data?.type === "page"
+                );
+                if (found) {
+                  for (const [k, v] of Object.entries(found.data || {})) {
+                    if (page[k]) {
+                      (found.data as any)[k] = page[k];
+                    }
                   }
+                  found.text = page.name;
                 }
-                found.text = page.name;
-              }
 
-              p.render();
+                p.render();
+              }
             }}
           />
         )}

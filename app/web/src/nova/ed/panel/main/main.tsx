@@ -11,13 +11,13 @@ export const EdMain = () => {
   return (
     <div
       className={cx(
-        "flex flex-1 relative",
+        "flex flex-1 relative overflow-auto ",
         css`
           contain: content;
         `
       )}
     >
-      <div className="absolute overflow-auto inset-0 flex">
+      <div className="absolute inset-0 flex flex-col">
         {!!p.page.building && <Loading backdrop={false} />}
         {!p.page.building && code.mode !== "" && (
           <View
