@@ -1,4 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
+import { page } from "dbgen";
 import { FC, ReactElement } from "react";
 import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
@@ -8,6 +9,7 @@ import { IItem, MItem } from "../../../utils/types/item";
 import { DComp, DPage } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
+import { PageItem } from "../panel/popup/page/page-tree";
 
 export const EmptySite = {
   id: "",
@@ -224,7 +226,7 @@ export const EDGlobal = {
       },
       page: {
         open: null as null | ((page_id: string) => void),
-        form: null as null | {},
+        form: null as null | PageItem,
       },
       script: {
         open: false,

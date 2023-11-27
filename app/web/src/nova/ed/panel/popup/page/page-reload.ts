@@ -26,16 +26,24 @@ export const reloadPagePicker = async (p: PG) => {
   });
 
   const folders = await db.page_folder.findMany({
-    where: { id_site: p.site.id },
-    select: { id: true, is_deleted: false, name: true, parent_id: true },
+    where: { id_site: p.site.id, is_deleted: false },
+    select: { id: true, name: true, parent_id: true },
   });
 
   pagePicker.tree = [];
   const tree = pagePicker.tree;
+
+  tree.push({
+    id: "root",
+    parent: "page-root",
+    text: "pages",
+    data: { id: "root", name: "pages", type: "folder" },
+  });
+
   for (const page of pages) {
     tree.push({
       id: page.id,
-      parent: page.id_folder || "page-root",
+      parent: page.id_folder || "root",
       text: page.name,
       data: {
         id: page.id,
@@ -49,7 +57,7 @@ export const reloadPagePicker = async (p: PG) => {
   for (const folder of folders) {
     tree.push({
       id: folder.id,
-      parent: folder.parent_id || "page-root",
+      parent: folder.parent_id || "root",
       text: folder.name || "",
       droppable: true,
       data: {
