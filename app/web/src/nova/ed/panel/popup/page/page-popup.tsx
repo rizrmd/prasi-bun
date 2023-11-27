@@ -12,6 +12,7 @@ import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
 import { pagePicker, reloadPagePicker } from "./page-reload";
 import { PageItem, edPageTreeRender } from "./page-tree";
+import { EdFormPage } from "./page-form";
 
 export const EdPagePop = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -88,6 +89,7 @@ export const EdPagePop = () => {
                   tree={pagePicker.tree}
                   rootId={"page-root"}
                   onDrop={() => {}}
+                  dragPreviewRender={() => <></>}
                   canDrag={() => true}
                   classes={{ root: "flex-1" }}
                   render={edPageTreeRender}
@@ -96,6 +98,33 @@ export const EdPagePop = () => {
             )}
           </div>
         </div>
+
+        {p.ui.popup.page.form && (
+          <EdFormPage
+            page={p.ui.popup.page.form}
+            onClose={() => {
+              p.ui.popup.page.form = null;
+              p.render();
+            }}
+            onSave={async (page) => {
+              p.ui.popup.page.form = null;
+
+              const found = pagePicker.tree.find(
+                (e) => e.id === page.id && e.data?.type === "page"
+              );
+              if (found) {
+                for (const [k, v] of Object.entries(found.data || {})) {
+                  if (page[k]) {
+                    (found.data as any)[k] = page[k];
+                  }
+                }
+                found.text = page.name;
+              }
+
+              p.render();
+            }}
+          />
+        )}
       </Modal>
     </>
   );
