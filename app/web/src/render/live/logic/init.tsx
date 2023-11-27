@@ -107,6 +107,9 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
             scopes["api"] = createAPI(p.site.api_url);
             scopes["db"] = createDB(p.site.api_url);
           }
+          if (!w.params) {
+            w.params = {};
+          }
           scopes.params = w.params;
           scopes.module = {};
           const f = new Function(...Object.keys(scopes), fn);

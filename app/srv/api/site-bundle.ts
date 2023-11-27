@@ -12,13 +12,11 @@ export const _ = {
   async api(mode: "md5" | "download") {
     const { req, res } = apiContext(this);
 
-    if (!cache.md5) {
-      const content = await readAsync(dir.path("app/srv/site.zip"), "buffer");
-      
-      if (content) {
-        cache.md5 = createHash("md5").update(content).digest("hex");
-        cache.content = content;
-      }
+    const content = await readAsync(dir.path("app/srv/site.zip"), "buffer");
+
+    if (content) {
+      cache.md5 = createHash("md5").update(content).digest("hex");
+      cache.content = content;
     }
     if (mode === "md5") {
       res.setHeader("Content-Type", "text/plain");

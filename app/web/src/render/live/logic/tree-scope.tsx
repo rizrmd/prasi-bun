@@ -83,6 +83,8 @@ export const treeScopeEval = (
       },
     };
 
+    console.log(item, args);
+
     // execute
     const fn = new Function(...Object.keys(args), js);
     const res = fn(...Object.values(args));
