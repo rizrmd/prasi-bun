@@ -63,8 +63,8 @@ export const page_load: SAction["page"]["load"] = async function (
       data.page_id = id_page;
       return data;
     });
-  };
-
+  }; 
+  
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
 

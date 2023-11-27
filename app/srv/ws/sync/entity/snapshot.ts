@@ -48,7 +48,7 @@ export const snapshot = {
   _db: null as null | RootDatabase<DocSnapshot>,
   init() {
     this._db = open<DocSnapshot, string>({
-      name: "user-conf",
+      name: "doc-snapshot",
       path: dir.path(`${g.datadir}/lmdb/doc-snapshot.lmdb`),
       compression: true,
     });

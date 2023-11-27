@@ -35,7 +35,7 @@ export const edInitSync = (p: PG) => {
           p.render();
         } else {
           alert("Site not found. redirecting...");
-          navigate(`/ed/`);
+          location.href = `/ed/`;
         }
       });
       return false;
