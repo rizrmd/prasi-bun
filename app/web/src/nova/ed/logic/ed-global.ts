@@ -226,7 +226,7 @@ export const EDGlobal = {
       },
       page: {
         open: null as null | ((page_id: string) => void),
-        form: null as null | PageItem,
+        form: null as null | Partial<page>,
       },
       script: {
         open: false,

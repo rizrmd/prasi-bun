@@ -142,6 +142,9 @@ export const ScriptMonaco = () => {
         tabSize: 2,
         useTabStops: true,
       }}
+      language={
+        { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
+      }
       onMount={async (editor, monaco) => {
         local.editor = editor;
         editor.focus();
