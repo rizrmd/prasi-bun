@@ -15,7 +15,7 @@ export const EdMid: FC<{}> = () => {
           <EdPagePicker />
         </div>
 
-        <div className="flex items-stretch">
+        <div className="flex items-center">
           <EdCompPicker />
         </div>
         <div className="flex items-stretch justify-end"></div>

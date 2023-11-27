@@ -240,7 +240,9 @@ export const EDGlobal = {
         domain?: string;
         responsive?: string;
       },
-      comp: null as null | ((comp_id: string) => void | Promise<void>),
+      comp: {
+        open: null as null | ((comp_id: string) => void | Promise<void>),
+      },
       comp_group: null as null | {
         mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;
         on_pick?: (group_id: string) => void | Promise<void>;

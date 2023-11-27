@@ -7,7 +7,10 @@ export const EdCompPicker = () => {
 
   return (
     <TopBtn
-      onClick={(e) => {}}
+      onClick={(e) => {
+        p.ui.popup.comp.open = (comp_id) => {};
+        p.render();
+      }}
       style="slim"
     >
       <div
