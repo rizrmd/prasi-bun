@@ -7,7 +7,7 @@ import { compPicker, reloadCompPicker } from "./comp-reload";
 export type CompItem = {
   id: string;
   name: string;
-  type: "page" | "folder";
+  type: "component" | "folder";
 };
 export const edPageTreeRender: NodeRender<CompItem> = (
   node: NodeModel<CompItem>,

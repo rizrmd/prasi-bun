@@ -22,7 +22,7 @@ export const EdPopComp = () => {
   compPicker.render = local.render;
 
   useEffect(() => {
-    // waitUntil(() => local.tree).then(() => {});
+    local.tree?.openAll();
   }, [p.ui.popup.comp.open, compPicker.site_id]);
 
   if (!p.ui.popup.comp.open) return null;

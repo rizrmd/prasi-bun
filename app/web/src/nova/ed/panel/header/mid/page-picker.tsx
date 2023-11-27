@@ -14,7 +14,7 @@ export const EdPagePicker = () => {
         };
         p.render();
       }}
-      innerClassName="flex items-center justify-center space-x-2"
+      style="slim"
     >
       <div
         dangerouslySetInnerHTML={{
