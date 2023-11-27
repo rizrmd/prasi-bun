@@ -1,6 +1,5 @@
 import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
-import { IRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { activity } from "../entity/activity";
 import { SyncConnection } from "../type";
@@ -37,7 +36,7 @@ export const site_load: SAction["site"]["load"] = async function (
         domain: site.domain,
         js: site.js || "",
         js_compiled: site.js_compiled || "",
-        layout: { id: layout?.id || "" },
+        layout: { id: layout?.id || "", snapshot: null },
       };
     }
   }
