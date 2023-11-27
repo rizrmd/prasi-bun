@@ -56,7 +56,11 @@ export const mobileLoader: Loader = {
 
 const load = async (url: string) => {
   const res = await fetch(`${w.mobilepath}${url}`);
-  const text = await res.text();
-  const json = JSON.parse(text);
-  return json;
+  try {
+    const text = await res.text();
+    const json = JSON.parse(text);
+    return json;
+  } catch (e) {
+    return null;
+  }
 };

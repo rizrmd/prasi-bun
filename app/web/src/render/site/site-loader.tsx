@@ -49,7 +49,11 @@ export const siteLoader: Loader = {
 
 const load = async (url: string) => {
   const res = await fetch(`${base}${url}`);
-  const text = await res.text();
-  const json = JSON.parse(text);
-  return json;
+  try {
+    const text = await res.text();
+    const json = JSON.parse(text);
+    return json;
+  } catch (e) {
+    return null;
+  }
 };
