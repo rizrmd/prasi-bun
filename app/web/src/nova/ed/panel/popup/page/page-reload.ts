@@ -2,11 +2,20 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { PG } from "../../../logic/ed-global";
 import { PageItem } from "./page-tree";
 
+export const pagePickerRootItem = {
+  id: "root",
+  parent: "page-root",
+  text: "pages",
+  droppable: true,
+  data: { id: "root", name: "pages", type: "folder" as "folder" | "page" },
+};
+
 export const pagePicker = {
   site_id: "",
   ref: null as any,
   tree: [] as NodeModel<PageItem>[],
   status: "ready" as "loading" | "ready",
+  search: "",
   render: () => {},
 };
 
@@ -33,13 +42,7 @@ export const reloadPagePicker = async (p: PG) => {
   pagePicker.tree = [];
   const tree = pagePicker.tree;
 
-  tree.push({
-    id: "root",
-    parent: "page-root",
-    text: "pages",
-    droppable: true,
-    data: { id: "root", name: "pages", type: "folder" },
-  });
+  tree.push(pagePickerRootItem);
 
   for (const page of pages) {
     tree.push({

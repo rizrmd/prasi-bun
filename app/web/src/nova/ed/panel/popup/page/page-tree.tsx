@@ -1,7 +1,7 @@
 import { NodeModel, NodeRender } from "@minoru/react-dnd-treeview";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { pagePicker, reloadPagePicker } from "./page-reload";
 
 export type PageItem = {
@@ -17,7 +17,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ renaming: node.id === "", rename_to: "" });
   const item = node.data;
-  if (!item) return <></>;
+  if (!item || !item.name) return <></>;
 
   return (
     <div
@@ -97,7 +97,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
               }}
             />
           ) : (
-            <Name name={item.name} />
+            <Name name={node.text} />
           )}
         </div>
 
@@ -199,13 +199,33 @@ export const edPageTreeRender: NodeRender<PageItem> = (
           </div>
         )}
       </div>
-      <div className="pl-1 flex-1">{item.url}</div>
+      <div className="flex pl-1 flex-1 items-stretch">
+        {item.id === "root" ? (
+          <input
+            className="flex-1 outline-none focus:border-blue-500 border border-transparent mr-1 px-1 text-xs py-[2px]"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            spellCheck={false}
+            onChange={(e) => {
+              pagePicker.search = e.currentTarget.value;
+              pagePicker.render();
+            }}
+            value={pagePicker.search}
+            type="search"
+            placeholder="Search.."
+          />
+        ) : (
+          item.url
+        )}
+      </div>
     </div>
   );
 };
 
-const Name: FC<{ name: string }> = ({ name }) => {
-  if (name.startsWith("layout:")) {
+const Name: FC<{ name: ReactNode }> = ({ name }) => {
+  if (typeof name === "string" && name.startsWith("layout:")) {
     return (
       <div className="flex items-center">
         <div className="border border-green-600 text-green-600 mr-1 font-mono text-[8px] px-1 bg-white ">

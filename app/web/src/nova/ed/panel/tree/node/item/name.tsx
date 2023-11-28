@@ -96,7 +96,7 @@ const Name: FC<{ name: string; is_jsx_prop: boolean }> = ({
     );
   }
 
-  if (name.startsWith("jsx:")) {
+  if (typeof name === "string" && name.startsWith("jsx:")) {
     return (
       <div className="flex items-center space-x-1">
         <div className="flex text-purple-500 space-x-[2px] border-r pr-1 items-center justify-center">
@@ -112,7 +112,7 @@ const Name: FC<{ name: string; is_jsx_prop: boolean }> = ({
     );
   }
 
-  if (name.startsWith("jsx=")) {
+  if (typeof name === "string" && name.startsWith("jsx=")) {
     return (
       <div className="flex items-center space-x-1">
         <div

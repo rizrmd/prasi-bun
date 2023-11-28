@@ -7,13 +7,18 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useGlobal, useLocal, waitUntil } from "web-utils";
+import { deepClone, useGlobal, useLocal, waitUntil } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
-import { pagePicker, reloadPagePicker } from "./page-reload";
+import {
+  pagePicker,
+  pagePickerRootItem,
+  reloadPagePicker,
+} from "./page-reload";
 import { PageItem, edPageTreeRender } from "./page-tree";
 import { EdFormPage } from "./page-form";
+import { fuzzy } from "../../../../../utils/ui/fuzzy";
 
 export const EdPopPage = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -35,7 +40,7 @@ export const EdPopPage = () => {
             cur = pagePicker.tree.find((e) => e.id === parent_id);
           }
         }
-        if (parents.length === 0) {
+        if (parents.length <= 1) {
           local.tree.open("page-root");
         } else {
           local.tree.open(parents);
@@ -49,6 +54,24 @@ export const EdPopPage = () => {
   if (p.site.id !== pagePicker.site_id) {
     pagePicker.site_id = p.site.id;
     reloadPagePicker(p);
+  }
+
+  let filtered = pagePicker.tree;
+  if (pagePicker.search) {
+    const result = fuzzy(
+      deepClone(pagePicker.tree),
+      { pk: "id", search: ["text", "data.url"] as any },
+      pagePicker.search
+    );
+
+    if (!result.find((e) => e.id === "root")) {
+      filtered = [...result, pagePickerRootItem];
+    } else {
+      filtered = result;
+    }
+    filtered.map((e) => {
+      if (e.id !== "root") e.parent = "root";
+    });
   }
 
   return (
@@ -98,7 +121,7 @@ export const EdPopPage = () => {
                       local.tree = ref;
                     }
                   }}
-                  tree={pagePicker.tree}
+                  tree={filtered}
                   rootId={"page-root"}
                   onDrop={async (newTree: NodeModel<PageItem>[], opt) => {
                     pagePicker.tree = newTree;

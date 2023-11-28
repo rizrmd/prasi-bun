@@ -1,4 +1,6 @@
 import uFuzzy from "@leeoniya/ufuzzy";
+import get from "lodash.get";
+import set from "lodash.set";
 const uf = new uFuzzy({});
 
 export const fuzzy = <T extends object>(
@@ -21,7 +23,7 @@ export const fuzzy = <T extends object>(
         if (!result[id]) {
           result[id] = { idx, row };
         } else {
-          result[id].row[f] = row[f];
+          set(result[id].row, f, get(row, f));
         }
       }
     }
@@ -39,7 +41,7 @@ const fuzzySingle = <T extends object>(
   search: string
 ) => {
   const [idxs, info] = uf.search(
-    array.map((e) => e[field]) as string[],
+    [...array.map((e) => get(e, field) || "")] as string[],
     search
   );
 
@@ -49,7 +51,7 @@ const fuzzySingle = <T extends object>(
     for (const idx of idxs) {
       const item = array[idx];
       const range = [...info.ranges[ri++]];
-      const val = item[field] as string;
+      const val = get(item, field) as string;
 
       let cur = range.shift();
       let openBold = false;
@@ -86,7 +88,9 @@ const fuzzySingle = <T extends object>(
           dangerouslySetInnerHTML={{ __html: text }}
         />
       );
-      result.push({ ...item, [field]: el });
+      const newitem = { ...item };
+      set(newitem, field, el);
+      result.push(newitem);
     }
     return result;
   }
