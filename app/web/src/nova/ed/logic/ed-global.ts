@@ -241,6 +241,7 @@ export const EDGlobal = {
         responsive?: string;
       },
       comp: {
+        preview_id: "",
         open: null as null | ((comp_id: string) => void | Promise<void>),
       },
       comp_group: null as null | {

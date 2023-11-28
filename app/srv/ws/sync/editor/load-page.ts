@@ -260,33 +260,42 @@ export const serverWalkMap = (
     let id = item.originalId || item.id;
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
 
-    pcomp.scope[id] = {
-      p: arg.parent_mcomp.parent_ids,
-      n: item.name,
-      s: null,
-    };
-
-    const js = item.adv?.js;
-    if (typeof js === "string") {
-      const scope = parseJs(js);
-      if (scope) pcomp.scope[id].s = scope;
+    if (!pcomp) {
+      console.log(arg.parent_mcomp.id);
     }
 
-    if (item.name.startsWith("jsx=")) {
-      const name = item.name.substring(4).trim();
-      if (arg.parent_mcomp.jsx_props[name]) {
-        const jsx = arg.parent_mcomp.jsx_props[name];
-        serverWalkMap(p, {
-          mitem: jsx.mitem,
-          parent_item: { id: item.id, mitem: mitem as MItem },
-          parent_mcomp: jsx.parent_mcomp
-            ? {
-                ...jsx.parent_mcomp,
-                parent_ids: [...(arg.parent_ids || []), mitem.get("id") || ""],
-              }
-            : undefined,
-          parent_ids: [...arg.parent_ids, mitem.get("id") || ""],
-        });
+    if (pcomp) {
+      pcomp.scope[id] = {
+        p: arg.parent_mcomp.parent_ids,
+        n: item.name,
+        s: null,
+      };
+
+      const js = item.adv?.js;
+      if (typeof js === "string") {
+        const scope = parseJs(js);
+        if (scope) pcomp.scope[id].s = scope;
+      }
+
+      if (item.name.startsWith("jsx=")) {
+        const name = item.name.substring(4).trim();
+        if (arg.parent_mcomp.jsx_props[name]) {
+          const jsx = arg.parent_mcomp.jsx_props[name];
+          serverWalkMap(p, {
+            mitem: jsx.mitem,
+            parent_item: { id: item.id, mitem: mitem as MItem },
+            parent_mcomp: jsx.parent_mcomp
+              ? {
+                  ...jsx.parent_mcomp,
+                  parent_ids: [
+                    ...(arg.parent_ids || []),
+                    mitem.get("id") || "",
+                  ],
+                }
+              : undefined,
+            parent_ids: [...arg.parent_ids, mitem.get("id") || ""],
+          });
+        }
       }
     }
   } else {

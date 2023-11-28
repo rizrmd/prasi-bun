@@ -70,7 +70,7 @@ export const EdPopPage = () => {
           }}
           className={cx("absolute inset-[5%] bg-white flex")}
         >
-          <div className="relative flex flex-1 items-stretch text-[12px] overflow-auto">
+          <div className="relative flex flex-1 items-stretch text-[14px] overflow-auto">
             {pagePicker.status === "loading" && (
               <Loading note="listing-page" backdrop={false} />
             )}

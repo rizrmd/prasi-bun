@@ -1,7 +1,7 @@
 import { NodeModel, NodeRender } from "@minoru/react-dnd-treeview";
 import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 
 export type CompItem = {
@@ -21,7 +21,7 @@ export const edPageTreeRender: NodeRender<CompItem> = (
   return (
     <div
       className={cx(
-        "flex border-b py-[2px] items-center hover:bg-blue-50 cursor-pointer relative",
+        "flex hover:bg-blue-50 cursor-pointer",
         css`
           .btn {
             opacity: 0;
@@ -30,174 +30,107 @@ export const edPageTreeRender: NodeRender<CompItem> = (
             opacity: 1;
           }
         `,
-        item.id === p.page.cur.id && `bg-blue-50`
+        item.id === p.page.cur.id && `bg-blue-50`,
+        item.type === "component" && "m-1 border flex-1",
+        item.type === "folder" && "border-t py-[2px] items-center",
+        item.id === p.ui.popup.comp.preview_id &&
+          css`
+            border: 1px solid blue !important;
+          `
       )}
       onClick={() => {
         if (item.type === "folder") {
           onToggle();
-        } else if (p.ui.popup.page.open) {
-          p.ui.popup.page.open(item.id);
+        } else {
+          p.ui.popup.comp.preview_id = item.id;
+          p.render();
         }
       }}
     >
-      <div className="flex w-[40%] items-center relative ">
-        {item.id === p.page.cur.id && (
-          <div className="absolute left-0 top-0 bottom-0 bg-blue-500 w-1"></div>
+      {item.id === p.page.cur.id && (
+        <div className="absolute left-0 top-0 bottom-0 bg-blue-500 w-1"></div>
+      )}
+      <div
+        className={cx(
+          "h-[13px]",
+          item.type === "folder" && "pl-1",
+          item.type === "component" && "hidden"
         )}
-        <div
-          className={cx(
-            "h-[13px] pl-1",
-            css`
-              width: ${depth * 13}px;
-            `
-          )}
-        ></div>
-        {item.type === "folder" && (
-          <>
-            {isOpen && <FolderOpen />}
-            {!isOpen && <FolderClose />}
-          </>
+      ></div>
+      {item.type === "folder" && (
+        <>
+          {isOpen && <FolderOpen />}
+          {!isOpen && <FolderClose />}
+        </>
+      )}
+      <div
+        className={cx(
+          "flex flex-1 px-1",
+          item.type === "component" && "border-r"
         )}
-        <div className="flex flex-1 pl-1">
-          {local.renaming ? (
-            <input
-              value={local.rename_to}
-              autoFocus
-              onBlur={async () => {
-                local.renaming = false;
-                item.name = local.rename_to;
-                if (item.id === "") {
-                  if (item.name) {
-                    db.page_folder.create({
-                      data: { name: local.rename_to, id_site: p.site.id },
-                    });
-                  }
-                  await reloadCompPicker(p);
-                } else {
-                  db.page_folder.update({
-                    where: { id: item.id },
-                    data: { name: local.rename_to },
+      >
+        {local.renaming ? (
+          <input
+            value={local.rename_to}
+            autoFocus
+            onBlur={async () => {
+              local.renaming = false;
+              item.name = local.rename_to;
+              if (item.id === "") {
+                if (item.name) {
+                  db.page_folder.create({
+                    data: { name: local.rename_to, id_site: p.site.id },
                   });
                 }
+                await reloadCompPicker(p);
+              } else {
+                db.page_folder.update({
+                  where: { id: item.id },
+                  data: { name: local.rename_to },
+                });
+              }
+              local.render();
+            }}
+            className="border px-1 bg-white flex-1 outline-none mr-1 border-blue-500 "
+            onChange={(e) => {
+              local.rename_to = e.currentTarget.value;
+              local.render();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+              if (e.key === "Escape") {
+                local.rename_to = item.name;
                 local.render();
-              }}
-              className="border px-1 bg-white flex-1 outline-none mr-1 border-blue-500 "
-              onChange={(e) => {
-                local.rename_to = e.currentTarget.value;
-                local.render();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.currentTarget.blur();
-                if (e.key === "Escape") {
-                  local.rename_to = item.name;
-                  local.render();
-                  e.currentTarget.blur();
-                }
-              }}
-            />
-          ) : (
-            <Name name={item.name} />
-          )}
-        </div>
-
-        {!local.renaming && (
-          <div className="flex pr-2 items-stretch h-[18px] space-x-[2px] text-[10px]">
-            {item.type === "folder" && (
-              <>
-                <div
-                  className="btn transition-all bg-white flex items-center border px-1 hover:border-blue-300 hover:bg-blue-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    compPicker.tree.push({
-                      id: "",
-                      parent: item.id,
-                      text: "",
-                      data: {
-                        id: "",
-                        name: "",
-                        type: "folder",
-                      },
-                    });
-                    p.render();
-                  }}
-                >
-                  + Folder
-                </div>
-                <div
-                  className="btn transition-all bg-white flex items-center border px-1 hover:border-blue-300 hover:bg-blue-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-
-                    p.ui.popup.page.form = {
-                      id_site: p.site.id,
-                      id_folder: item.id === "root" ? null : item.id,
-                    };
-                    p.render();
-                  }}
-                >
-                  + Page
-                </div>
-              </>
-            )}
-            {item.id !== "root" && (
-              <>
-                <div
-                  className="btn transition-all bg-white flex items-center border px-1 hover:border-blue-300 hover:bg-blue-100"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (item.type === "folder") {
-                      local.rename_to = item.name;
-                      local.renaming = true;
-                      local.render();
-                    } else {
-                      p.ui.popup.page.form = item;
-                      p.render();
-                    }
-                  }}
-                >
-                  <EditIcon />
-                </div>
-                <div
-                  className="btn transition-all bg-white flex items-center border px-1 hover:border-red-300 hover:bg-red-100"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    if (confirm("Deletting cannot be undone. Are you sure ?")) {
-                      if (item.type === "folder") {
-                        await db.page.updateMany({
-                          where: { id_folder: node.id as string },
-                          data: {
-                            id_folder:
-                              node.parent === "root"
-                                ? null
-                                : (node.parent as string),
-                          },
-                        });
-                        await db.page_folder.update({
-                          where: { id: node.id as string },
-                          data: {
-                            is_deleted: true,
-                          },
-                        });
-                      } else {
-                        await db.page.update({
-                          where: { id: node.id as string },
-                          data: {
-                            is_deleted: true,
-                          },
-                        });
-                      }
-
-                      await reloadCompPicker(p);
-                    }
-                  }}
-                >
-                  <DeleteIcon />
-                </div>
-              </>
-            )}
-          </div>
+                e.currentTarget.blur();
+              }
+            }}
+          />
+        ) : (
+          <Name name={item.name} />
         )}
       </div>
+
+      {item.type === "component" && (
+        <div
+          className="transition-all bg-white flex items-center px-1 hover:border-blue-300 hover:bg-blue-100 opacity-20 hover:opacity-100"
+          onClick={async (e) => {
+            e.stopPropagation();
+
+            if (p.ui.popup.comp.open) {
+              p.ui.popup.comp.open(item.id);
+            }
+            p.ui.popup.comp.open = null;
+
+            console.log(active.item_id, compPicker.active_id);
+            active.item_id = compPicker.active_id; 
+            compPicker.active_id = "";
+
+            p.page.render();
+          }}
+        >
+          <ImageIcon />
+        </div>
+      )}
     </div>
   );
 };
@@ -206,7 +139,7 @@ const Name: FC<{ name: string }> = ({ name }) => {
   if (name.startsWith("layout::")) {
     return (
       <div className="flex items-center">
-        <div className="border border-green-600 text-green-600 mr-1 font-mono text-[8px] px-1 bg-white ">
+        <div className="border border-green-600 text-green-600 mr-1 font-mono text-[10px] px-1 bg-white ">
           LAYOUT
         </div>
         <div>{name.substring("layout::".length)}</div>
@@ -216,7 +149,13 @@ const Name: FC<{ name: string }> = ({ name }) => {
 
   return <div>{name}</div>;
 };
-
+const ImageIcon = () => (
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `<svg width="12" height="12" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.24182 2.32181C3.3919 2.23132 3.5784 2.22601 3.73338 2.30781L12.7334 7.05781C12.8974 7.14436 13 7.31457 13 7.5C13 7.68543 12.8974 7.85564 12.7334 7.94219L3.73338 12.6922C3.5784 12.774 3.3919 12.7687 3.24182 12.6782C3.09175 12.5877 3 12.4252 3 12.25V2.75C3 2.57476 3.09175 2.4123 3.24182 2.32181ZM4 3.57925V11.4207L11.4288 7.5L4 3.57925Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+    }}
+  ></div>
+);
 const DeleteIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
