@@ -5,10 +5,12 @@ import { CompItem } from "./comp-tree";
 export const compPicker = {
   site_id: "",
   ref: null as any,
+  preview_ref: null as any,
   tab: "all" as "all" | "trash",
   tree: [] as NodeModel<CompItem>[],
   trash: [] as NodeModel<CompItem>[],
   status: "ready" as "loading" | "ready",
+  active_id: "",
   render: () => {},
 };
 
@@ -60,8 +62,6 @@ export const reloadCompPicker = async (p: PG) => {
       });
     }
   }
-
-  console.log(compPicker.tree);
 
   compPicker.status = "ready";
   compPicker.render();
