@@ -205,13 +205,13 @@ export const edPageTreeRender: NodeRender<PageItem> = (
 };
 
 const Name: FC<{ name: string }> = ({ name }) => {
-  if (name.startsWith("layout::")) {
+  if (name.startsWith("layout:")) {
     return (
       <div className="flex items-center">
         <div className="border border-green-600 text-green-600 mr-1 font-mono text-[8px] px-1 bg-white ">
           LAYOUT
         </div>
-        <div>{name.substring("layout::".length)}</div>
+        <div>{name.substring("layout:".length)}</div>
       </div>
     );
   }
