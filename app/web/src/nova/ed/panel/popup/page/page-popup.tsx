@@ -1,6 +1,7 @@
 import {
   Tree as DNDTree,
   DndProvider,
+  NodeModel,
   TreeMethods,
   getBackendOptions,
 } from "@minoru/react-dnd-treeview";
@@ -68,7 +69,14 @@ export const EdPopPage = () => {
               pagePicker.ref = ref;
             }
           }}
-          className={cx("absolute inset-[5%] bg-white flex")}
+          className={cx(
+            "absolute inset-[5%] bg-white flex",
+            css`
+              .dropping {
+                background: #efefff;
+              }
+            `
+          )}
         >
           <div className="relative flex flex-1 items-stretch text-[14px] overflow-auto">
             {pagePicker.status === "loading" && (
@@ -92,10 +100,49 @@ export const EdPopPage = () => {
                   }}
                   tree={pagePicker.tree}
                   rootId={"page-root"}
-                  onDrop={() => {}}
+                  onDrop={async (newTree: NodeModel<PageItem>[], opt) => {
+                    pagePicker.tree = newTree;
+                    p.render();
+
+                    if (!opt.dragSource?.droppable) {
+                      await db.page.update({
+                        where: {
+                          id: opt.dragSourceId as string,
+                        },
+                        data: {
+                          id_folder: (opt.dropTargetId === "root" ||
+                          !opt.dropTargetId
+                            ? null
+                            : opt.dropTargetId) as string,
+                        },
+                        select: { id: true },
+                      });
+                    } else {
+                      await db.page_folder.update({
+                        where: {
+                          id: opt.dragSourceId as string,
+                        },
+                        data: {
+                          parent_id: (opt.dropTargetId === "ROOT" ||
+                          !opt.dropTargetId
+                            ? null
+                            : opt.dropTargetId) as string,
+                        },
+                        select: {
+                          id: true,
+                        },
+                      });
+                    }
+                    reloadPagePicker(p);
+                  }}
                   dragPreviewRender={() => <></>}
                   canDrag={() => true}
-                  classes={{ root: "flex-1" }}
+                  canDrop={(tree, opt) => {
+                    if (opt.dropTarget?.data?.type === "page") return false;
+                    if (opt.dropTargetId === "page-root") return false;
+                    return true;
+                  }}
+                  classes={{ root: "flex-1", dropTarget: "dropping" }}
                   render={edPageTreeRender}
                 />
               </DndProvider>

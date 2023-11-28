@@ -37,6 +37,7 @@ export const reloadPagePicker = async (p: PG) => {
     id: "root",
     parent: "page-root",
     text: "pages",
+    droppable: true,
     data: { id: "root", name: "pages", type: "folder" },
   });
 
@@ -45,6 +46,7 @@ export const reloadPagePicker = async (p: PG) => {
       id: page.id,
       parent: page.id_folder || "root",
       text: page.name,
+      droppable: false,
       data: {
         id: page.id,
         name: page.name,
