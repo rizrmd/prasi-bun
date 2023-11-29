@@ -87,9 +87,9 @@ export const EdPopComp = () => {
                             className={cx(
                               "border cursor-pointer  -mb-[1px] px-2  hover:text-blue-500 hover:border-blue-500 hover:border-b-transparent select-none",
                               local.tab === e &&
-                                "bg-white border-b-transparent",
+                              "bg-white border-b-transparent",
                               local.tab !== e &&
-                                "text-slate-400 border-b-slate-200 border-transparent bg-transparent"
+                              "text-slate-400 border-b-slate-200 border-transparent bg-transparent"
                             )}
                             onClick={() => {
                               local.tab = e;
@@ -123,17 +123,24 @@ export const EdPopComp = () => {
                           > .tree-root > .listitem:first-child > div {
                             border-top: 0;
                           }
-                          > .tree-root > .listitem > .container {
-                            display: flex;
-                            flex-direction: row;
-                            flex-wrap: wrap;
-                            position: relative;
-                          }
 
                           .dropping {
                             background: #efefff;
                           }
-                        `
+                        `,
+                        compPicker.search ? css`
+                        > .tree-root {
+                          display: flex;
+                          flex-direction: row;
+                          flex-wrap: wrap;
+                          position: relative;
+                        }` : css`
+                        > .tree-root > .listitem > .container {
+                          display: flex;
+                          flex-direction: row;
+                          flex-wrap: wrap;
+                          position: relative;
+                        }`
                       )}
                     >
                       {compPicker.ref && compPicker.status === "ready" && (
