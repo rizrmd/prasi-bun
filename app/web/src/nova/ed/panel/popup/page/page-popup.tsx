@@ -33,13 +33,32 @@ export const EdPopPage = () => {
       if (local.tree) {
         const parents: string[] = [];
         let cur = pagePicker.tree.find((e) => e.id === p.page.cur.id);
-        while (cur) {
-          if (typeof cur.id === "string") {
-            const parent_id = cur.parent;
-            parents.push(cur.id);
-            cur = pagePicker.tree.find((e) => e.id === parent_id);
+
+        if (pagePicker.rename_id) {
+          let cur = pagePicker.tree.find((e) => e.id === pagePicker.rename_id);
+          while (cur) {
+            if (typeof cur.id === "string") {
+              if (parents.includes(cur.id)) {
+                continue;
+              }
+              const parent_id = cur.parent;
+              parents.push(cur.id);
+              cur = pagePicker.tree.find((e) => e.id === parent_id);
+            }
+          }
+        } else {
+          while (cur) {
+            if (typeof cur.id === "string") {
+              if (parents.includes(cur.id)) {
+                continue;
+              }
+              const parent_id = cur.parent;
+              parents.push(cur.id);
+              cur = pagePicker.tree.find((e) => e.id === parent_id);
+            }
           }
         }
+
         if (parents.length <= 1) {
           local.tree.open("page-root");
         } else {
@@ -47,7 +66,12 @@ export const EdPopPage = () => {
         }
       }
     });
-  }, [p.ui.popup.page.open, p.page.cur.id, pagePicker.site_id]);
+  }, [
+    p.ui.popup.page.open,
+    p.page.cur.id,
+    pagePicker.site_id,
+    pagePicker.rename_id,
+  ]);
 
   if (!p.ui.popup.page.open) return null;
 
@@ -102,73 +126,75 @@ export const EdPopPage = () => {
           )}
         >
           <div className="relative flex flex-1 items-stretch text-[14px] overflow-auto">
-            {pagePicker.status === "loading" && (
+            {pagePicker.status === "loading" ? (
               <Loading note="listing-page" backdrop={false} />
-            )}
+            ) : (
+              <>
+                {pagePicker.ref && (
+                  <DndProvider
+                    backend={HTML5Backend}
+                    options={getBackendOptions({
+                      html5: {
+                        rootElement: pagePicker.ref,
+                      },
+                    })}
+                  >
+                    <TypedTree
+                      ref={(ref) => {
+                        if (local.tree !== ref) {
+                          local.tree = ref;
+                        }
+                      }}
+                      tree={filtered}
+                      rootId={"page-root"}
+                      onDrop={async (newTree: NodeModel<PageItem>[], opt) => {
+                        pagePicker.tree = newTree;
+                        p.render();
 
-            {pagePicker.ref && (
-              <DndProvider
-                backend={HTML5Backend}
-                options={getBackendOptions({
-                  html5: {
-                    rootElement: pagePicker.ref,
-                  },
-                })}
-              >
-                <TypedTree
-                  ref={(ref) => {
-                    if (local.tree !== ref) {
-                      local.tree = ref;
-                    }
-                  }}
-                  tree={filtered}
-                  rootId={"page-root"}
-                  onDrop={async (newTree: NodeModel<PageItem>[], opt) => {
-                    pagePicker.tree = newTree;
-                    p.render();
-
-                    if (!opt.dragSource?.droppable) {
-                      await db.page.update({
-                        where: {
-                          id: opt.dragSourceId as string,
-                        },
-                        data: {
-                          id_folder: (opt.dropTargetId === "root" ||
-                          !opt.dropTargetId
-                            ? null
-                            : opt.dropTargetId) as string,
-                        },
-                        select: { id: true },
-                      });
-                    } else {
-                      await db.page_folder.update({
-                        where: {
-                          id: opt.dragSourceId as string,
-                        },
-                        data: {
-                          parent_id: (opt.dropTargetId === "ROOT" ||
-                          !opt.dropTargetId
-                            ? null
-                            : opt.dropTargetId) as string,
-                        },
-                        select: {
-                          id: true,
-                        },
-                      });
-                    }
-                    reloadPagePicker(p);
-                  }}
-                  dragPreviewRender={() => <></>}
-                  canDrag={() => true}
-                  canDrop={(tree, opt) => {
-                    if (opt.dropTarget?.data?.type === "page") return false;
-                    if (opt.dropTargetId === "page-root") return false;
-                    return true;
-                  }}
-                  classes={{ root: "flex-1", dropTarget: "dropping" }}
-                  render={edPageTreeRender}
-                />
-              </DndProvider>
+                        if (!opt.dragSource?.droppable) {
+                          await db.page.update({
+                            where: {
+                              id: opt.dragSourceId as string,
+                            },
+                            data: {
+                              id_folder: (opt.dropTargetId === "root" ||
+                              !opt.dropTargetId
+                                ? null
+                                : opt.dropTargetId) as string,
+                            },
+                            select: { id: true },
+                          });
+                        } else {
+                          await db.page_folder.update({
+                            where: {
+                              id: opt.dragSourceId as string,
+                            },
+                            data: {
+                              parent_id: (opt.dropTargetId === "ROOT" ||
+                              !opt.dropTargetId
+                                ? null
+                                : opt.dropTargetId) as string,
+                            },
+                            select: {
+                              id: true,
+                            },
+                          });
+                        }
+                        reloadPagePicker(p);
+                      }}
+                      dragPreviewRender={() => <></>}
+                      canDrag={() => true}
+                      canDrop={(tree, opt) => {
+                        if (opt.dropTarget?.data?.type === "page") return false;
+                        if (opt.dropTargetId === "page-root") return false;
+                        return true;
+                      }}
+                      classes={{ root: "flex-1", dropTarget: "dropping" }}
+                      render={edPageTreeRender}
+                    />
+                  </DndProvider>
+                )}
+              </>
             )}
           </div>
         </div>

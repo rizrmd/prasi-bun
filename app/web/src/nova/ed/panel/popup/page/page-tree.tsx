@@ -1,7 +1,7 @@
 import { NodeModel, NodeRender } from "@minoru/react-dnd-treeview";
+import { FC, ReactNode } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
-import { FC, ReactNode } from "react";
 import { pagePicker, reloadPagePicker } from "./page-reload";
 
 export type PageItem = {
@@ -15,9 +15,9 @@ export const edPageTreeRender: NodeRender<PageItem> = (
   { depth, isOpen, onToggle }
 ) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ renaming: node.id === "", rename_to: "" });
+  const local = useLocal({ rename_to: "" });
   const item = node.data;
-  if (!item || !item.name) return <></>;
+  if (!item) return <></>;
 
   return (
     <div
@@ -60,27 +60,34 @@ export const edPageTreeRender: NodeRender<PageItem> = (
           </>
         )}
         <div className="flex flex-1 pl-1">
-          {local.renaming ? (
+          {pagePicker.rename_id === item.id ? (
             <input
               value={local.rename_to}
               autoFocus
               onBlur={async () => {
-                local.renaming = false;
+                const rename_id = pagePicker.rename_id;
+                pagePicker.rename_id = "";
                 item.name = local.rename_to;
-                if (item.id === "") {
+                local.render();
+
+                if (item.id === "NEW") {
                   if (item.name) {
-                    db.page_folder.create({
-                      data: { name: local.rename_to, id_site: p.site.id },
+                    await db.page_folder.create({
+                      data: {
+                        name: local.rename_to,
+                        id_site: p.site.id,
+                        parent_id: rename_id,
+                      },
                     });
                   }
-                  await reloadPagePicker(p);
                 } else {
-                  db.page_folder.update({
+                  await db.page_folder.update({
                     where: { id: item.id },
                     data: { name: local.rename_to },
                   });
                 }
-                local.render();
+
+                await reloadPagePicker(p);
               }}
               className="border px-1 bg-white flex-1 outline-none mr-1 border-blue-500 "
               onChange={(e) => {
@@ -101,7 +108,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
           )}
         </div>
 
-        {!local.renaming && (
+        {pagePicker.rename_id !== item.id && (
           <div className="flex pr-2 items-stretch h-[18px] space-x-[2px] text-[10px]">
             {item.type === "folder" && (
               <>
@@ -110,15 +117,16 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                   onClick={(e) => {
                     e.stopPropagation();
                     pagePicker.tree.push({
-                      id: "",
+                      id: "NEW",
                       parent: item.id,
                       text: "",
                       data: {
-                        id: "",
+                        id: "NEW",
                         name: "",
                         type: "folder",
                       },
                     });
+                    pagePicker.rename_id = "NEW";
                     p.render();
                   }}
                 >
@@ -148,7 +156,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                     e.stopPropagation();
                     if (item.type === "folder") {
                       local.rename_to = item.name;
-                      local.renaming = true;
+                      pagePicker.rename_id = item.id;
                       local.render();
                     } else {
                       p.ui.popup.page.form = item;

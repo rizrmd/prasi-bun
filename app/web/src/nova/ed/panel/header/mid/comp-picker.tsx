@@ -1,6 +1,10 @@
 import { useGlobal } from "web-utils";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import { TopBtn } from "../top-btn";
+import { loadComponent } from "../../../logic/tree/sync-walk";
+import { MContent } from "../../../../../utils/types/general";
+import { fillID } from "../../../logic/tree/fill-id";
+import { IItem } from "../../../../../utils/types/item";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -8,7 +12,58 @@ export const EdCompPicker = () => {
   return (
     <TopBtn
       onClick={(e) => {
-        p.ui.popup.comp.open = (comp_id) => {};
+        p.ui.popup.comp.open = async (comp_id) => {
+          let comp_ref = p.comp.list[comp_id];
+          if (!comp_ref) {
+            await loadComponent(p, comp_id);
+            comp_ref = p.comp.list[comp_id];
+          }
+
+          if (!comp_ref) {
+            alert("Cannot load component!");
+            return;
+          }
+
+          const comp = comp_ref.doc
+            .getMap("map")
+            .get("root")
+            ?.toJSON() as IItem;
+          if (!comp) {
+            alert("Failed to load component!");
+            return;
+          }
+
+          if (!active.item_id) {
+            const first_id = p.page.entry[0];
+            if (first_id) {
+              const first = p.page.meta[first_id];
+              console.log(first);
+            }
+          } else {
+            const active_meta = p.page.meta[active.item_id];
+            if (active_meta) {
+              const item = active_meta.item;
+              const mitem = active_meta.mitem;
+              if (item && mitem) {
+                if (item.type !== "text") {
+                  const map = new Y.Map() as MContent;
+                  if (map) {
+                    comp.originalId = comp.id;
+                    syncronize(map as any, fillID(comp));
+                    const childs = mitem.get("childs");
+                    if (childs) {
+                      childs.push([map]);
+                    }
+                    const newitem = map.toJSON();
+                    active.item_id = newitem.id;
+                  }
+                }
+              } else {
+                alert("Failed to add component!");
+              }
+            }
+          }
+        };
         p.render();
       }}
       style="slim"
