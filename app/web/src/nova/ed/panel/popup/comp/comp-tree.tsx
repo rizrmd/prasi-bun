@@ -170,6 +170,7 @@ export const edPageTreeRender: NodeRender<CompItem> = (
 
 const Name: FC<{ name: ReactNode }> = ({ name }) => {
   if (typeof name !== "string") return name;
+  if (name === "__TRASH__") return "Trash";
 
   if (name.startsWith("layout::")) {
     return (
