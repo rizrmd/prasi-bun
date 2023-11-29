@@ -6,13 +6,14 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useEffect } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { CompItem, edPageTreeRender } from "./comp-tree";
 import { EdCompPreview } from "./comp-preview";
+import { fuzzy } from "../../../../../utils/ui/fuzzy";
 
 export const EdPopComp = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -41,6 +42,12 @@ export const EdPopComp = () => {
   let tree = compPicker.tree;
   if (local.tab === "Trash") {
     tree = compPicker.trash;
+  }
+
+  if (compPicker.search) {
+    tree = fuzzy(tree, "text", compPicker.search);
+    tree.forEach((e) => (e.parent = "comp-root"));
+    tree = tree.filter((e) => e.data?.type === "component");
   }
 
   return (
@@ -93,6 +100,19 @@ export const EdPopComp = () => {
                           </div>
                         );
                       })}
+                    </div>
+                    <div className="flex flex-1 mr-1 justify-end">
+                      <input
+                        type="search"
+                        placeholder="Search"
+                        spellCheck={false}
+                        className="my-1 bg-transparent bg-white border outline-none px-1 focus:border-blue-500 focus:w-[300px] transition-all"
+                        value={compPicker.search}
+                        onChange={(e) => {
+                          compPicker.search = e.currentTarget.value;
+                          p.render();
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="relative flex-1 overflow-auto flex">

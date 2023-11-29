@@ -13,6 +13,7 @@ export const compPicker = {
   status: "ready" as "loading" | "ready",
   active_id: "",
   render: () => {},
+  search: "",
 };
 
 export const reloadCompPicker = async (p: PG) => {

@@ -1,5 +1,5 @@
 import { NodeModel, NodeRender } from "@minoru/react-dnd-treeview";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { compPicker, reloadCompPicker } from "./comp-reload";
@@ -108,7 +108,7 @@ export const edPageTreeRender: NodeRender<CompItem> = (
             }}
           />
         ) : (
-          <Name name={item.name} />
+          <Name name={node.text} />
         )}
       </div>
 
@@ -168,7 +168,9 @@ export const edPageTreeRender: NodeRender<CompItem> = (
   );
 };
 
-const Name: FC<{ name: string }> = ({ name }) => {
+const Name: FC<{ name: ReactNode }> = ({ name }) => {
+  if (typeof name !== "string") return name;
+
   if (name.startsWith("layout::")) {
     return (
       <div className="flex items-center">
