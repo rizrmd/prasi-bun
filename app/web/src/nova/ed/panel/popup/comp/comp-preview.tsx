@@ -6,7 +6,7 @@ import { IText } from "../../../../../utils/types/text";
 import { EDGlobal, PG, active } from "../../../logic/ed-global";
 import { loadComponent } from "../../../logic/tree/sync-walk";
 import { EdCompPreviewTree } from "./comp-preview-tree";
-import { compPicker } from "./comp-reload";
+import { compPicker, reloadCompPicker } from "./comp-reload";
 
 export const EdCompPreview = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -25,10 +25,12 @@ export const EdCompPreview = () => {
     }
   }, [comp_id]);
 
+  const isTrashed = !!compPicker.trash.find((e) => e.id === comp_id);
+
   return (
     <div className="flex flex-1 flex-col items-stretch overflow-auto border-l">
       {comp_id && item && (
-        <div className="flex px-1 py-1 border-b">
+        <div className="flex px-1 py-1 border-b h-[30px]">
           <div className="flex flex-1 items-center">
             <div>Preview</div>
             <div className="text-[8px] font-mono text-slate-500 mx-1">
@@ -37,41 +39,72 @@ export const EdCompPreview = () => {
           </div>
           <div className="flex flex-1 justify-end">
             <div
-              className="cursor-pointer transition-all  flex items-center border px-1 border-green-700 bg-green-700 text-white hover:opacity-50 mr-1"
+              className={cx(
+                "cursor-pointer transition-all  flex items-center border px-1  text-white hover:opacity-50 mr-1",
+                !isTrashed
+                  ? "border-green-700 bg-green-700"
+                  : "border-purple-700 bg-purple-700"
+              )}
               onClick={async (e) => {
                 e.stopPropagation();
 
-                if (p.ui.popup.comp.open) {
-                  p.ui.popup.comp.open(item.id);
-                }
-                p.ui.popup.comp.open = null;
+                if (isTrashed) {
+                  p.ui.popup.comp_group = {
+                    mouse_event: e,
+                    async on_pick(group_id) {
+                      await db.component.update({
+                        where: { id: comp_id },
+                        data: { id_component_group: group_id },
+                      });
+                      await reloadCompPicker(p);
+                      p.render();
+                    },
+                  };
+                } else {
+                  if (p.ui.popup.comp.open) {
+                    p.ui.popup.comp.open(item.id);
+                  }
+                  p.ui.popup.comp.open = null;
 
-                active.item_id = compPicker.active_id;
-                compPicker.active_id = "";
+                  active.item_id = compPicker.active_id;
+                  compPicker.active_id = "";
+                }
 
                 p.render();
               }}
             >
-              Select Component
+              {isTrashed ? "Restore Component" : "Select Component"}
             </div>
             <div
               className="cursor-pointer transition-all bg-white flex items-center border px-1 hover:border-red-300 hover:bg-red-100"
               onClick={async (e) => {
                 e.stopPropagation();
-                if (confirm("Are you sure to delete this component?")) {
-                  await db.component.delete({
-                    where: { id: p.ui.popup.comp.preview_id },
-                  });
-                  const idx =
-                    compPicker.tree.findIndex((e) => e.id === comp_id) + 1;
+                if (isTrashed) {
+                  if (confirm("Permanently delete this component?")) {
+                    await db.component.delete({
+                      where: { id: p.ui.popup.comp.preview_id },
+                    });
+                    const idx =
+                      compPicker.tree.findIndex((e) => e.id === comp_id) + 1;
 
-                  if (idx >= 0 && compPicker.tree[idx])
-                    p.ui.popup.comp.preview_id = compPicker.tree[idx].id as any;
+                    if (idx >= 0 && compPicker.tree[idx])
+                      p.ui.popup.comp.preview_id = compPicker.tree[idx]
+                        .id as any;
 
-                  compPicker.tree = compPicker.tree.filter(
-                    (e) => e.id !== comp_id
-                  );
-                  p.render();
+                    compPicker.tree = compPicker.tree.filter(
+                      (e) => e.id !== comp_id
+                    );
+                    p.render();
+                  }
+                } else {
+                  if (confirm("Move component to trash?")) {
+                    await db.component.update({
+                      where: { id: comp_id },
+                      data: { id_component_group: compPicker.trash_id },
+                    });
+                    await reloadCompPicker(p);
+                    p.render();
+                  }
                 }
               }}
             >

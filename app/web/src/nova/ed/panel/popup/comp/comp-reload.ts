@@ -9,6 +9,7 @@ export const compPicker = {
   tab: "all" as "all" | "trash",
   tree: [] as NodeModel<CompItem>[],
   trash: [] as NodeModel<CompItem>[],
+  trash_id: "",
   status: "ready" as "loading" | "ready",
   active_id: "",
   render: () => {},
@@ -32,6 +33,7 @@ export const reloadCompPicker = async (p: PG) => {
 
     if (v.name === "__TRASH__") {
       trash_id = k;
+      compPicker.trash_id = k;
     }
     tree.push({
       id: k,

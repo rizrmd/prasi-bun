@@ -260,10 +260,6 @@ export const serverWalkMap = (
     let id = item.originalId || item.id;
     const pcomp = p.scope_comps[arg.parent_mcomp.id];
 
-    if (!pcomp) {
-      console.log(arg.parent_mcomp.id);
-    }
-
     if (pcomp) {
       pcomp.scope[id] = {
         p: arg.parent_mcomp.parent_ids,

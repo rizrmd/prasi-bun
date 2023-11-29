@@ -18,6 +18,8 @@ export const edPageTreeRender: NodeRender<CompItem> = (
   const item = node.data;
   if (!item) return <></>;
 
+  const isTrashed = !!compPicker.trash.find((e) => e.id === item.id);
+
   return (
     <div
       className={cx(
@@ -112,23 +114,54 @@ export const edPageTreeRender: NodeRender<CompItem> = (
 
       {item.type === "component" && (
         <div
-          className="transition-all bg-white flex items-center px-1 hover:border-blue-300 hover:bg-blue-100 opacity-20 hover:opacity-100"
+          className={cx(
+            "transition-all bg-white flex items-center px-1 hover:border-blue-300 hover:bg-blue-100 opacity-20 hover:opacity-100",
+            css`
+              &:hover {
+                .normal {
+                  display: none;
+                }
+                .over {
+                  display: block;
+                }
+              }
+            `
+          )}
           onClick={async (e) => {
             e.stopPropagation();
 
-            if (p.ui.popup.comp.open) {
-              p.ui.popup.comp.open(item.id);
+            if (isTrashed) {
+              p.ui.popup.comp.preview_id = item.id;
+              p.ui.popup.comp_group = {
+                mouse_event: e,
+                async on_pick(group_id) {
+                  await db.component.update({
+                    where: { id: item.id },
+                    data: { id_component_group: group_id },
+                  });
+                  await reloadCompPicker(p);
+                  p.render();
+                },
+              };
+              p.render();
+            } else {
+              if (p.ui.popup.comp.open) {
+                p.ui.popup.comp.open(item.id);
+              }
+              p.ui.popup.comp.open = null;
+              active.item_id = compPicker.active_id;
+              compPicker.active_id = "";
+
+              p.page.render();
             }
-            p.ui.popup.comp.open = null;
-
-            console.log(active.item_id, compPicker.active_id);
-            active.item_id = compPicker.active_id; 
-            compPicker.active_id = "";
-
-            p.page.render();
           }}
         >
-          <ImageIcon />
+          <div className="normal">
+            <PlayIcon />
+          </div>
+          <div className="over hidden">
+            {isTrashed ? <ResetIcon /> : <CheckIcon />}
+          </div>
         </div>
       )}
     </div>
@@ -149,13 +182,31 @@ const Name: FC<{ name: string }> = ({ name }) => {
 
   return <div>{name}</div>;
 };
-const ImageIcon = () => (
+
+const CheckIcon = () => (
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `<svg width="12" height="12" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.49991 0.877045C3.84222 0.877045 0.877075 3.84219 0.877075 7.49988C0.877075 11.1575 3.84222 14.1227 7.49991 14.1227C11.1576 14.1227 14.1227 11.1575 14.1227 7.49988C14.1227 3.84219 11.1576 0.877045 7.49991 0.877045ZM1.82708 7.49988C1.82708 4.36686 4.36689 1.82704 7.49991 1.82704C10.6329 1.82704 13.1727 4.36686 13.1727 7.49988C13.1727 10.6329 10.6329 13.1727 7.49991 13.1727C4.36689 13.1727 1.82708 10.6329 1.82708 7.49988ZM10.1589 5.53774C10.3178 5.31191 10.2636 5.00001 10.0378 4.84109C9.81194 4.68217 9.50004 4.73642 9.34112 4.96225L6.51977 8.97154L5.35681 7.78706C5.16334 7.59002 4.84677 7.58711 4.64973 7.78058C4.45268 7.97404 4.44978 8.29061 4.64325 8.48765L6.22658 10.1003C6.33054 10.2062 6.47617 10.2604 6.62407 10.2483C6.77197 10.2363 6.90686 10.1591 6.99226 10.0377L10.1589 5.53774Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+    }}
+  ></div>
+);
+
+const ResetIcon = () => (
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `<svg width="12" height="12" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.85355 2.14645C5.04882 2.34171 5.04882 2.65829 4.85355 2.85355L3.70711 4H9C11.4853 4 13.5 6.01472 13.5 8.5C13.5 10.9853 11.4853 13 9 13H5C4.72386 13 4.5 12.7761 4.5 12.5C4.5 12.2239 4.72386 12 5 12H9C10.933 12 12.5 10.433 12.5 8.5C12.5 6.567 10.933 5 9 5H3.70711L4.85355 6.14645C5.04882 6.34171 5.04882 6.65829 4.85355 6.85355C4.65829 7.04882 4.34171 7.04882 4.14645 6.85355L2.14645 4.85355C1.95118 4.65829 1.95118 4.34171 2.14645 4.14645L4.14645 2.14645C4.34171 1.95118 4.65829 1.95118 4.85355 2.14645Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+    }}
+  ></div>
+);
+
+const PlayIcon = () => (
   <div
     dangerouslySetInnerHTML={{
       __html: `<svg width="12" height="12" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.24182 2.32181C3.3919 2.23132 3.5784 2.22601 3.73338 2.30781L12.7334 7.05781C12.8974 7.14436 13 7.31457 13 7.5C13 7.68543 12.8974 7.85564 12.7334 7.94219L3.73338 12.6922C3.5784 12.774 3.3919 12.7687 3.24182 12.6782C3.09175 12.5877 3 12.4252 3 12.25V2.75C3 2.57476 3.09175 2.4123 3.24182 2.32181ZM4 3.57925V11.4207L11.4288 7.5L4 3.57925Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
     }}
   ></div>
 );
+
 const DeleteIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
