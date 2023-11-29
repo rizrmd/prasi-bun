@@ -18,13 +18,14 @@ export const EdPopComp = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     tree: null as TreeMethods | null,
+    tab: "Components",
   });
   const TypedTree = DNDTree<CompItem>;
   compPicker.render = local.render;
 
   useEffect(() => {
     local.tree?.openAll();
-  }, [p.ui.popup.comp.open, compPicker.site_id]);
+  }, [p.ui.popup.comp.open, compPicker.site_id, local.tab]);
 
   if (!p.ui.popup.comp.open) return null;
 
@@ -35,6 +36,11 @@ export const EdPopComp = () => {
   if (p.site.id !== compPicker.site_id) {
     compPicker.site_id = p.site.id;
     reloadCompPicker(p);
+  }
+
+  let tree = compPicker.tree;
+  if (local.tab === "Trash") {
+    tree = compPicker.trash;
   }
 
   return (
@@ -64,50 +70,79 @@ export const EdPopComp = () => {
             )}
             {compPicker.status !== "loading" && (
               <>
-                <div className="flex flex-1 relative overflow-auto">
-                  <div
-                    className={cx(
-                      "absolute inset-0",
-                      css`
-                        > .tree-root > .listitem > .container {
-                          display: flex;
-                          flex-direction: row;
-                          flex-wrap: wrap;
-                          position: relative;
-                        }
-                      `
-                    )}
-                  >
-                    {compPicker.ref && compPicker.status === "ready" && (
-                      <DndProvider
-                        backend={HTML5Backend}
-                        options={getBackendOptions({
-                          html5: {
-                            rootElement: compPicker.ref,
-                          },
-                        })}
-                      >
-                        <TypedTree
-                          ref={(ref) => {
-                            if (local.tree !== ref) {
-                              local.tree = ref;
-                            }
-                          }}
-                          tree={compPicker.tree}
-                          initialOpen={true}
-                          rootId={"comp-root"}
-                          onDrop={() => {}}
-                          dragPreviewRender={() => <></>}
-                          canDrag={() => true}
-                          classes={{
-                            root: "tree-root flex-1",
-                            listItem: "listitem",
-                            container: "container",
-                          }}
-                          render={edPageTreeRender}
-                        />
-                      </DndProvider>
-                    )}
+                <div className="flex flex-1 flex-col">
+                  <div className="flex h-[30px] border-b items-stretch mb-2 bg-slate-100">
+                    <div className="flex items-end pl-1 space-x-1">
+                      {["Components", "Trash"].map((e) => {
+                        return (
+                          <div
+                            key={e}
+                            className={cx(
+                              "border cursor-pointer  -mb-[1px] px-2  hover:text-blue-500 hover:border-blue-500 hover:border-b-transparent select-none",
+                              local.tab === e &&
+                                "bg-white border-b-transparent",
+                              local.tab !== e &&
+                                "text-slate-400 border-b-slate-200 border-transparent bg-transparent"
+                            )}
+                            onClick={() => {
+                              local.tab = e;
+                              p.render();
+                            }}
+                          >
+                            {e}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="relative flex-1 overflow-auto flex">
+                    <div
+                      className={cx(
+                        "absolute inset-0",
+                        css`
+                          > .tree-root > .listitem:first-child > div {
+                            border-top: 0;
+                          }
+                          > .tree-root > .listitem > .container {
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: wrap;
+                            position: relative;
+                          }
+                        `
+                      )}
+                    >
+                      {compPicker.ref && compPicker.status === "ready" && (
+                        <DndProvider
+                          backend={HTML5Backend}
+                          options={getBackendOptions({
+                            html5: {
+                              rootElement: compPicker.ref,
+                            },
+                          })}
+                        >
+                          <TypedTree
+                            ref={(ref) => {
+                              if (local.tree !== ref) {
+                                local.tree = ref;
+                              }
+                            }}
+                            tree={tree}
+                            initialOpen={true}
+                            rootId={"comp-root"}
+                            onDrop={() => {}}
+                            dragPreviewRender={() => <></>}
+                            canDrag={() => true}
+                            classes={{
+                              root: "tree-root flex-1",
+                              listItem: "listitem",
+                              container: "container",
+                            }}
+                            render={edPageTreeRender}
+                          />
+                        </DndProvider>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <EdCompPreview />

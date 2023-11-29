@@ -128,7 +128,6 @@ function readDirectoryRecursively(
       result[[...(baseDir || []), item].join("/")] = content;
     } else if (stats.isDirectory()) {
       if (item !== "node_modules") {
-        console.log(itemPath);
         const subdirResult = readDirectoryRecursively(itemPath, [
           ...(baseDir || []),
           item,
