@@ -129,6 +129,10 @@ export const EdPopComp = () => {
                             flex-wrap: wrap;
                             position: relative;
                           }
+
+                          .dropping {
+                            background: #efefff;
+                          }
                         `
                       )}
                     >
@@ -150,13 +154,38 @@ export const EdPopComp = () => {
                             tree={tree}
                             initialOpen={true}
                             rootId={"comp-root"}
-                            onDrop={() => {}}
+                            onDrop={async (newTree, opt) => {
+                              compPicker.tree = newTree;
+                              p.render();
+
+                              if (
+                                typeof opt.dragSourceId === "string" &&
+                                typeof opt.dropTargetId === "string"
+                              ) {
+                                db.component.update({
+                                  where: {
+                                    id: opt.dragSourceId,
+                                  },
+                                  data: {
+                                    id_component_group: opt.dropTargetId,
+                                  },
+                                });
+                              }
+                            }}
                             dragPreviewRender={() => <></>}
                             canDrag={() => true}
+                            canDrop={(tree, opt) => {
+                              if (opt.dropTarget?.data?.type === "component")
+                                return false;
+                              if (opt.dropTargetId === "comp-root")
+                                return false;
+                              return true;
+                            }}
                             classes={{
                               root: "tree-root flex-1",
                               listItem: "listitem",
                               container: "container",
+                              dropTarget: "dropping",
                             }}
                             render={edPageTreeRender}
                           />
