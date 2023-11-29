@@ -14,7 +14,7 @@ export const ViewMetaRender: FC<{
   const item = meta.item;
 
   if (meta.is_layout && !v.layout.show) {
-    return <ViewMetaChildren item={item} />;
+    return <ViewMetaChildren key={item.id} item={item} />;
   }
 
   if (!className) {

@@ -81,6 +81,8 @@ export const syncWalkMap = (
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
+  if (typeof mitem.get !== "function") { return }
+
   const item = {} as unknown as IItem;
 
   let override_id = "";
@@ -115,6 +117,8 @@ export const syncWalkMap = (
   if (!mapped) {
     mapItem(mitem, item);
   }
+
+  if (typeof item.name !== 'string') return;
 
   if (override_id) {
     if (!item.originalId) item.originalId = item.id;
@@ -340,13 +344,15 @@ const mapItem = (
       item[k] = [];
       const childs = e as unknown as TypedArray<{}>;
       childs.forEach((c) => {
-        if (ref_ids) {
-          const id = ref_ids[c.get("id")];
-          if (id) {
-            item[k].push({ id });
+        if (typeof c.get === 'function') {
+          if (ref_ids) {
+            const id = ref_ids[c.get("id")];
+            if (id) {
+              item[k].push({ id });
+            }
+          } else {
+            item[k].push({ id: c.get("id") });
           }
-        } else {
-          item[k].push({ id: c.get("id") });
         }
       });
     }

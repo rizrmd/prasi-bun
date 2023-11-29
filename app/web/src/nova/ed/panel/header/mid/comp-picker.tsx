@@ -4,7 +4,11 @@ import { TopBtn } from "../top-btn";
 import { loadComponent } from "../../../logic/tree/sync-walk";
 import { MContent } from "../../../../../utils/types/general";
 import { fillID } from "../../../logic/tree/fill-id";
-import { IItem } from "../../../../../utils/types/item";
+import { IItem, MItem } from "../../../../../utils/types/item";
+import { MRoot } from "../../../../../utils/types/root";
+import { ISection, MSection } from "../../../../../utils/types/section";
+import { createId } from "@paralleldrive/cuid2";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -19,6 +23,7 @@ export const EdCompPicker = () => {
             comp_ref = p.comp.list[comp_id];
           }
 
+
           if (!comp_ref) {
             alert("Cannot load component!");
             return;
@@ -28,39 +33,41 @@ export const EdCompPicker = () => {
             .getMap("map")
             .get("root")
             ?.toJSON() as IItem;
+
           if (!comp) {
             alert("Failed to load component!");
             return;
           }
 
-          if (!active.item_id) {
-            const first_id = p.page.entry[0];
-            if (first_id) {
-              const first = p.page.meta[first_id];
-              console.log(first);
+          const active_meta = p.page.meta[active.item_id];
+
+          if (!active_meta) {
+            const root = p.page.doc?.getMap('map').get('root');
+            if (root) {
+              const first_meta = p.page.root_id === 'root'
+                ? p.page.meta[p.page.entry[0]]
+                : p.page.meta[p.page.root_id];
+
+              console.log(first_meta)
+              // if (first_meta) {
+              //   console.log(first_meta);
+              // } else {
+              //   const msection = addSection(root);
+              //   if (msection) {
+              //     addComponent(msection, comp);
+              //   }
+              //   treeRebuild(p, { note: 'add-component' });
+              // }
             }
           } else {
-            const active_meta = p.page.meta[active.item_id];
-            if (active_meta) {
-              const item = active_meta.item;
-              const mitem = active_meta.mitem;
-              if (item && mitem) {
-                if (item.type !== "text") {
-                  const map = new Y.Map() as MContent;
-                  if (map) {
-                    comp.originalId = comp.id;
-                    syncronize(map as any, fillID(comp));
-                    const childs = mitem.get("childs");
-                    if (childs) {
-                      childs.push([map]);
-                    }
-                    const newitem = map.toJSON();
-                    active.item_id = newitem.id;
-                  }
-                }
-              } else {
-                alert("Failed to add component!");
+            const item = active_meta.item;
+            const mitem = active_meta.mitem;
+            if (item && mitem) {
+              if (item.type !== "text") {
+                addComponent(mitem as MItem, comp)
               }
+            } else {
+              alert("Failed to add component!");
             }
           }
         };
@@ -76,3 +83,41 @@ export const EdCompPicker = () => {
     </TopBtn>
   );
 };
+
+
+
+const addComponent = (mitem: MItem | MSection, comp: IItem) => {
+  const map = new Y.Map() as MContent;
+  if (map) {
+    comp.originalId = comp.id;
+    syncronize(map as any, fillID(comp));
+    const childs = mitem.get("childs");
+    if (childs) {
+      childs.push([map]);
+    }
+    const newitem = map.toJSON();
+    active.item_id = newitem.id;
+  }
+}
+
+const addSection = (root: MRoot) => {
+  const json = {
+    id: createId(),
+    name: `New Section`,
+    type: "section",
+    dim: { w: "full", h: "full" },
+    childs: [],
+    adv: {
+      css: "",
+    },
+  } as ISection;
+  const childs = root.get("childs");
+  if (childs) {
+    const map = new Y.Map() as MSection;
+    if (map) {
+      syncronize(map as any, fillID(json));
+      childs.push([map]);
+      return map;
+    }
+  }
+}

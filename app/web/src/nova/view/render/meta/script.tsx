@@ -26,7 +26,7 @@ export const ViewMetaScript: FC<{
     hover: v.view.hover ? v.view.hover.get(item) : undefined,
     active: v.view.active ? v.view.active.get(item) : undefined,
   });
-  const children = <ViewMetaChildren item={item} />;
+  const children = <ViewMetaChildren key={item.id} item={item} />;
   let args = {};
 
   if (js && meta) {
@@ -84,17 +84,17 @@ export const ViewMetaScript: FC<{
           className,
           onPointerOver: v.view.hover
             ? (e: any) => {
-                e.stopPropagation();
-                e.preventDefault();
-                v.view.hover?.set(item.id);
-              }
+              e.stopPropagation();
+              e.preventDefault();
+              v.view.hover?.set(item.id);
+            }
             : undefined,
           onClick: v.view.active
             ? (e: any) => {
-                e.stopPropagation();
-                e.preventDefault();
-                v.view.active?.set(item.id);
-              }
+              e.stopPropagation();
+              e.preventDefault();
+              v.view.active?.set(item.id);
+            }
             : undefined,
         },
         useEffect: useEffect,

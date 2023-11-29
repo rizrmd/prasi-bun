@@ -97,6 +97,8 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       }
     }
 
+    console.log(p.page.root_id)
+
     const sections = root.get("childs");
     if (sections) {
       sections.map((e) => {
@@ -160,5 +162,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     p.page.building = false;
     p.render();
     p.page.render();
+
   }
 };
