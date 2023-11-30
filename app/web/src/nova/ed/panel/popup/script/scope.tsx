@@ -66,8 +66,7 @@ export const declareScope = async (
     if (arg.type !== "local") {
       addScope(
         monaco,
-        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
-          arg.type
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${arg.type
         }~${arg.name}~${arg.id}`,
         `\
 export const {};
@@ -78,8 +77,7 @@ declare global {
     } else {
       addScope(
         monaco,
-        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
-          arg.type
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${arg.type
         }~${arg.id}`,
         `\
 export const {};
