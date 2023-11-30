@@ -36,9 +36,18 @@ export const parseJs = (code: string) => {
                   attr.value.expression.type === "ObjectExpression" &&
                   attr.value.expression.loc
                 ) {
+
                   const loc = attr.value.expression.loc as any;
-                  local.value = code.substring(loc.start.index, loc.end.index);
-                  local.index = loc.start.index;
+                  const start = attr.value.expression.properties[0].loc?.start;
+                  const end = attr.value.expression.properties[attr.value.expression.properties.length - 1].loc?.end;
+
+                  if (typeof start === 'number' && typeof end === 'number') {
+                    local.value = code.substring(
+                      loc.start.index,
+                      loc.end.index
+                    );
+                    local.index = loc.start.index;
+                  }
                 }
               }
             }
@@ -58,7 +67,8 @@ export const parseJs = (code: string) => {
                       value: code.substring(loc.start.index, loc.end.index),
                       index: loc.start.index,
                     };
-                  } 
+
+                  }
                 }
               }
             }
