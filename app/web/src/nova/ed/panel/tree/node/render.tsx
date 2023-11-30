@@ -8,6 +8,7 @@ import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 import { useEffect } from "react";
+import { getMetaById } from "../../../logic/tree/build";
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");

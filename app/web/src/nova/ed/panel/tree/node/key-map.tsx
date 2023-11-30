@@ -3,6 +3,7 @@ import { KeyboardEvent } from "react";
 import { IContent } from "../../../../../utils/types/general";
 import { PG, active } from "../../../logic/ed-global";
 import { edActionDelete } from "./item/action/del";
+import { getMetaById } from "../../../logic/tree/build";
 
 export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
   return (e: KeyboardEvent) => {
@@ -178,7 +179,19 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
     }
 
     if (e.key.length === 1 && !e.altKey && !e.metaKey && !e.shiftKey) {
-      p.ui.tree.search_ref?.focus();
+
+
+      const meta = getMetaById(p, item.id);
+      if (meta && meta.item.type === 'text') {
+        setTimeout(() => {
+          const vtext = document.querySelector(`.v-text-${item.id}`) as HTMLInputElement;
+          if (vtext) {
+            vtext.focus()
+          }
+        })
+      } else {
+        p.ui.tree.search_ref?.focus();
+      }
     }
   };
 };

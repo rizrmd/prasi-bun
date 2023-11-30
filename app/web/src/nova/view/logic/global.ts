@@ -26,7 +26,7 @@ export const ViewGlobal = {
       | {
         get: (item: IContent) => boolean;
         set: (id: string) => void;
-        text?: (item: IText, className: string) => ReactNode
+        text?: (item: IText) => ReactNode
       },
     hover: undefined as
       | undefined

@@ -6,8 +6,9 @@ import { IText } from "../../../../utils/types/text";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMeta } from "./meta";
 
-export const ViewMetaChildren: FC<{ item: IItem | IText | ISection }> = ({
+export const ViewMetaChildren: FC<{ item: IItem | IText | ISection, className?: string }> = ({
   item,
+  className
 }) => {
   const v = useGlobal(ViewGlobal, "VIEW");
   const children: Record<string, ReactNode> = {};
@@ -20,7 +21,6 @@ export const ViewMetaChildren: FC<{ item: IItem | IText | ISection }> = ({
     }
   } else {
     if (item.id) {
-
       if (v.view.active?.text && v.view.active?.get(item)) {
         children[item.id] = <Fragment key={item.id}>
           {v.view.active.text(item)}
@@ -28,7 +28,7 @@ export const ViewMetaChildren: FC<{ item: IItem | IText | ISection }> = ({
       } else {
         children[item.id] = <span
           key={item.id}
-          dangerouslySetInnerHTML={{ __html: item.html }
+          dangerouslySetInnerHTML={{ __html: item.html || '&nbsp;' }
           }>
         </span >;
       }

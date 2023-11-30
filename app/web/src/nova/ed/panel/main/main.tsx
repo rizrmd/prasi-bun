@@ -1,9 +1,10 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, waitUntil } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { loadComponent } from "../../logic/tree/sync-walk";
 import { code } from "../popup/code/code";
+import { getMetaById } from "../../logic/tree/build";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -61,13 +62,43 @@ export const EdMain = () => {
               },
               set(id) {
                 active.item_id = id;
+
+
+                const meta = getMetaById(p, id);
+                if (meta.item.type === 'text') {
+                  setTimeout(async () => {
+                    await waitUntil(() => document.querySelector(`.v-text-${id}`))
+                    const vtext = document.querySelector(`.v-text-${id}`) as HTMLInputElement;
+                    if (vtext)
+                      vtext.focus()
+                  })
+                }
                 p.render();
                 p.page.render();
               },
               text(item, className) {
+                if (active.text.id !== item.id) {
+                  active.text.id = item.id;
+                  active.text.content = item.html;
+                }
+
+
                 return <div
-                  className={className}
+                  className={cx(className, `v-text-${item.id} outline-none`)}
                   contentEditable
+                  autoFocus
+                  spellCheck={false}
+                  onInput={(e) => {
+                    const val = e.currentTarget.innerHTML;
+                    active.text.id = item.id;
+                    active.text.content = val;
+                  }}
+                  onBlur={() => {
+                    const meta = getMetaById(p, item.id);
+                    if (meta && meta.mitem && active.text.id === item.id) {
+                      meta.mitem.set('html', active.text.content)
+                    }
+                  }}
                   dangerouslySetInnerHTML={{ __html: item.html }}></div>
               }
             }}
