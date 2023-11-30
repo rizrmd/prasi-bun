@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, Fragment, ReactNode } from "react";
 import { useGlobal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { ISection } from "../../../../utils/types/section";
@@ -20,9 +20,18 @@ export const ViewMetaChildren: FC<{ item: IItem | IText | ISection }> = ({
     }
   } else {
     if (item.id) {
-      children[item.id] = <span key={item.id}
-        dangerouslySetInnerHTML={{ __html: item.html }
-        }></span >;
+
+      if (v.view.active?.text && v.view.active?.get(item)) {
+        children[item.id] = <Fragment key={item.id}>
+          {v.view.active.text(item)}
+        </Fragment>;
+      } else {
+        children[item.id] = <span
+          key={item.id}
+          dangerouslySetInnerHTML={{ __html: item.html }
+          }>
+        </span >;
+      }
     }
   }
 

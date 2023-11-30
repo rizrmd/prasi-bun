@@ -1,7 +1,7 @@
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 import { IContent } from "../../../utils/types/general";
-import { EdMeta, PG } from "../../ed/logic/ed-global";
-import { IRoot } from "../../../utils/types/root";
+import { IText } from "../../../utils/types/text";
+import { EdMeta } from "../../ed/logic/ed-global";
 
 export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
@@ -12,7 +12,7 @@ export const ViewGlobal = {
   entry: [] as string[],
   body_cache: null as null | ReactElement,
   component: {
-    load: async (id_comp: string) => {},
+    load: async (id_comp: string) => { },
   },
   script: {
     api_url: "",
@@ -23,7 +23,11 @@ export const ViewGlobal = {
     hidden: undefined as undefined | ((item: IContent) => boolean),
     active: undefined as
       | undefined
-      | { get: (item: IContent) => boolean; set: (id: string) => void },
+      | {
+        get: (item: IContent) => boolean;
+        set: (id: string) => void;
+        text?: (item: IText, className: string) => ReactNode
+      },
     hover: undefined as
       | undefined
       | { get: (item: IContent) => boolean; set: (id: string) => void },

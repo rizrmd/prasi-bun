@@ -1,6 +1,7 @@
-import { FC, Suspense } from "react";
+import { FC, ReactNode, Suspense } from "react";
 import { useGlobal } from "web-utils";
 import { IContent } from "../../utils/types/general";
+import { IText } from "../../utils/types/text";
 import { Loading } from "../../utils/ui/loading";
 import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
@@ -23,7 +24,11 @@ type ViewProp = {
   bind?: (arg: { render: () => void }) => void;
   hidden?: (item: IContent) => boolean;
   hover?: { get: (item: IContent) => boolean; set: (id: string) => void };
-  active?: { get: (item: IContent) => boolean; set: (id: string) => void };
+  active?: {
+    get: (item: IContent) => boolean;
+    set: (id: string) => void;
+    text?: (item: IText, className: string) => ReactNode
+  };
 };
 
 export const View: FC<ViewProp> = (props) => {

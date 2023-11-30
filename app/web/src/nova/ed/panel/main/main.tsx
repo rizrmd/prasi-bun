@@ -64,6 +64,12 @@ export const EdMain = () => {
                 p.render();
                 p.page.render();
               },
+              text(item, className) {
+                return <div
+                  className={className}
+                  contentEditable
+                  dangerouslySetInnerHTML={{ __html: item.html }}></div>
+              }
             }}
           />
         )}
