@@ -1,14 +1,14 @@
+import { createId } from "@paralleldrive/cuid2";
 import { useGlobal } from "web-utils";
-import { EDGlobal, active } from "../../../logic/ed-global";
-import { TopBtn } from "../top-btn";
-import { loadComponent } from "../../../logic/tree/sync-walk";
 import { MContent } from "../../../../../utils/types/general";
-import { fillID } from "../../../logic/tree/fill-id";
 import { IItem, MItem } from "../../../../../utils/types/item";
 import { MRoot } from "../../../../../utils/types/root";
 import { ISection, MSection } from "../../../../../utils/types/section";
-import { createId } from "@paralleldrive/cuid2";
-import { treeRebuild } from "../../../logic/tree/build";
+import { EDGlobal, active } from "../../../logic/ed-global";
+import { getMRoot, getMetaById } from "../../../logic/tree/build";
+import { fillID } from "../../../logic/tree/fill-id";
+import { loadComponent } from "../../../logic/tree/sync-walk";
+import { TopBtn } from "../top-btn";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -39,29 +39,26 @@ export const EdCompPicker = () => {
             return;
           }
 
-          const active_meta = p.page.meta[active.item_id];
-
+          let active_meta = getMetaById(p, active.item_id)
+          const root = getMRoot(p);
           if (!active_meta) {
-            const root = p.page.doc?.getMap('map').get('root');
-            if (root) {
-              const first_meta = p.page.root_id === 'root'
-                ? p.page.meta[p.page.entry[0]]
-                : p.page.meta[p.page.root_id];
 
-              console.log(first_meta)
-              // if (first_meta) {
-              //   console.log(first_meta);
-              // } else {
-              //   const msection = addSection(root);
-              //   if (msection) {
-              //     addComponent(msection, comp);
-              //   }
-              //   treeRebuild(p, { note: 'add-component' });
-              // }
-            }
+            alert("Please select an item/section to add component!");
           } else {
-            const item = active_meta.item;
+            let item = active_meta.item;
+            if (item.type === 'item' && item.component?.id) {
+              active_meta = getMetaById(p, active_meta.parent_item.id);
+
+              if (active_meta) {
+                item = active_meta.item;
+              } else {
+                alert("Failed to add component!");
+                return;
+              }
+            }
+
             const mitem = active_meta.mitem;
+
             if (item && mitem) {
               if (item.type !== "text") {
                 addComponent(mitem as MItem, comp)
@@ -80,7 +77,7 @@ export const EdCompPicker = () => {
           __html: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 15 15"><path fill="currentColor" fill-rule="evenodd" d="M2 1a1 1 0 00-1 1v11a1 1 0 001 1h11a1 1 0 001-1V2a1 1 0 00-1-1H2zm0 1h11v11H2V2zm2.5 2a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h6a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5h-6zm.5 6V5h5v5H5z" clip-rule="evenodd"></path></svg>`,
         }}
       ></div>
-    </TopBtn>
+    </TopBtn >
   );
 };
 
