@@ -5,7 +5,7 @@ import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, PG } from "../ed-global";
+import { EdMeta, PG, active } from "../ed-global";
 import { loadCompSnapshot } from "./sync-walk-comp";
 import {
   ensureMItemProps,
@@ -154,6 +154,7 @@ export const syncWalkMap = (
           ref_ids = {};
         }
         const old_id = item.id;
+
         mapItem(mcomp, item, ref_ids);
         item.originalId = item.id;
         item.id = old_id;

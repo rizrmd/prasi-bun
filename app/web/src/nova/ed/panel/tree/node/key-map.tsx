@@ -156,18 +156,22 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
     if (e.key === "Backspace" || e.key === "Delete") {
       let last = "";
       let found = null as HTMLInputElement | null;
-      p.page.meta[item.id].parent_item.mitem?.get("childs")?.forEach((e) => {
-        if (e.get("id") === item.id) {
+
+      const meta = getMetaById(p, item.id);
+      if (meta) {
+        meta.parent_item.mitem?.get("childs")?.forEach((e) => {
+          if (e.get("id") === item.id) {
+            found = document.querySelector(`.tree-${last}`);
+          }
+          if (!found) {
+            last = e.get("id");
+          }
+        });
+
+        if (!found) {
+          last = meta.parent_item.mitem?.get("id") || "";
           found = document.querySelector(`.tree-${last}`);
         }
-        if (!found) {
-          last = e.get("id");
-        }
-      });
-
-      if (!found) {
-        last = p.page.meta[item.id].parent_item.mitem?.get("id") || "";
-        found = document.querySelector(`.tree-${last}`);
       }
 
       edActionDelete(p, item);

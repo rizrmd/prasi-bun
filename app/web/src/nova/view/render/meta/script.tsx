@@ -23,10 +23,10 @@ export const ViewMetaScript: FC<{
   const w = window as any;
   const className = produceCSS(item, {
     mode: v.mode,
-    hover: v.view.hover ? v.view.hover.get(item) : undefined,
-    active: v.view.active ? v.view.active.get(item) : undefined,
+    hover: v.view.hover ? v.view.hover.get(meta) : undefined,
+    active: v.view.active ? v.view.active.get(meta) : undefined,
   });
-  const children = <ViewMetaChildren key={item.id} item={item} />;
+  const children = <ViewMetaChildren key={item.id} meta={meta} />;
   let args = {};
 
   if (js && meta) {
@@ -86,14 +86,14 @@ export const ViewMetaScript: FC<{
             ? (e: any) => {
               e.stopPropagation();
               e.preventDefault();
-              v.view.hover?.set(item.id);
+              v.view.hover?.set(meta);
             }
             : undefined,
           onClick: v.view.active
             ? (e: any) => {
               e.stopPropagation();
               e.preventDefault();
-              v.view.active?.set(item.id);
+              v.view.active?.set(meta);
             }
             : undefined,
         },

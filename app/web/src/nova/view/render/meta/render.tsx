@@ -14,17 +14,17 @@ export const ViewMetaRender: FC<{
   const item = meta.item;
 
   if (meta.is_layout && !v.layout.show) {
-    return <ViewMetaChildren key={item.id} item={item} />;
+    return <ViewMetaChildren key={item.id} meta={meta} />;
   }
 
   if (!className) {
     _className = produceCSS(item, {
       mode: v.mode,
-      hover: v.view.hover ? v.view.hover.get(item) : undefined,
-      active: v.view.active ? v.view.active.get(item) : undefined,
+      hover: v.view.hover ? v.view.hover.get(meta) : undefined,
+      active: v.view.active ? v.view.active.get(meta) : undefined,
     });
   }
-  
+
   return (
     <div
       className={_className}
@@ -32,23 +32,23 @@ export const ViewMetaRender: FC<{
       onPointerOver={
         v.view.hover
           ? (e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              v.view.hover?.set(item.id);
-            }
+            e.stopPropagation();
+            e.preventDefault();
+            v.view.hover?.set(meta);
+          }
           : props?.onPointerOver
       }
       onClick={
         v.view.active
           ? (e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              v.view.active?.set(item.id);
-            }
+            e.stopPropagation();
+            e.preventDefault();
+            v.view.active?.set(meta);
+          }
           : props?.onClick
       }
     >
-      <ViewMetaChildren item={item} />
+      <ViewMetaChildren meta={meta} />
     </div>
   );
 };
