@@ -24,6 +24,7 @@ export const ViewMetaRender: FC<{
       active: v.view.active ? v.view.active.get(item) : undefined,
     });
   }
+  
   return (
     <div
       className={_className}

@@ -64,6 +64,7 @@ const target = {
 export const active = {
   hover_id: "",
   prop_name: "",
+  text: { id: "", content: "" },
   get item_id() {
     if (target.active_id === false) {
       target.active_id = localStorage.getItem("prasi-active-id") || "";
@@ -154,7 +155,7 @@ export const EDGlobal = {
   script: {
     siteTypes: {} as Record<string, string>,
     loaded: false,
-    do_edit: async (newval: string, all?: boolean) => {},
+    do_edit: async (newval: string, all?: boolean) => { },
   },
   page: {
     root_id: "root",
@@ -173,7 +174,7 @@ export const EDGlobal = {
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
-    render: () => {},
+    render: () => { },
   },
   comp: {
     doc: null as null | DComp,
