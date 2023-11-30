@@ -10,16 +10,21 @@ export const ViewMetaChildren: FC<{ item: IItem | IText | ISection }> = ({
   item,
 }) => {
   const v = useGlobal(ViewGlobal, "VIEW");
-  const children: ReactNode[] = [];
+  const children: Record<string, ReactNode> = {};
 
   if (item.type !== "text") {
-    let i = 1;
     for (const child of item.childs) {
-      children.push(<ViewMeta id={child.id} key={child.id || i++} />);
+      if (child.id) {
+        children[child.id] = (<ViewMeta id={child.id} key={child.id} />);
+      }
     }
   } else {
-    return <span key={item.id} dangerouslySetInnerHTML={{ __html: item.html }}></span>;
+    if (item.id) {
+      children[item.id] = <span key={item.id}
+        dangerouslySetInnerHTML={{ __html: item.html }
+        }></span >;
+    }
   }
 
-  return <>{children}</>;
+  return <>{Object.values(children)}</>;
 };
