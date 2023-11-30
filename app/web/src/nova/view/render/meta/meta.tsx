@@ -24,7 +24,7 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   }
 
   if (item.hidden && v.view.hidden) {
-    if (v.view.hidden(item)) {
+    if (v.view.hidden(meta)) {
       return null;
     }
   }

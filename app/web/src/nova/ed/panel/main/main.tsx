@@ -42,49 +42,104 @@ export const EdMain = () => {
             bind={({ render }) => {
               p.page.render = render;
             }}
-            hidden={(item) => {
-              if (item.hidden) return true;
+            hidden={(meta) => {
+              if (meta.item.hidden) return true
               return false;
             }}
             hover={{
-              get(item) {
-                return active.hover_id === item.id;
+              get(meta) {
+                const item = meta.item;
+
+                if (item.originalId === active.hover_id || item.id === active.hover_id)
+                  return true;
+
+                return false
               },
-              set(id) {
-                active.hover_id = id;
+              set(meta) {
+
+                if (meta.parent_mcomp) {
+                  const id = meta.parent_mcomp.mitem.get('id');
+
+                  if (active.instance.item_id !== id) {
+                    const original_id = meta.parent_mcomp.mitem.get('originalId');
+
+                    if (active.comp_id && original_id) {
+                      active.item_id = original_id;
+                    } else if (id) {
+                      active.item_id = id;
+                    }
+
+                    p.render();
+                    p.page.render();
+                    return;
+                  }
+                }
+
+                if (active.comp_id) {
+                  if (meta.item.originalId) {
+                    active.hover_id = meta.item.originalId;
+                  } else {
+                    console.error('Failed to hover, original id not found');
+                  }
+                } else {
+                  active.hover_id = meta.item.id
+                }
+
                 p.render();
                 p.page.render();
               },
             }}
             active={{
-              get(item) {
-                return active.item_id === item.id;
+              get(meta) {
+                const item = meta.item;
+
+                if (item.originalId === active.item_id || item.id === active.item_id)
+                  return true;
+
+                return false
               },
-              set(id) {
-                active.item_id = id;
+              set(meta) {
 
+                if (meta.parent_mcomp) {
+                  const id = meta.parent_mcomp.mitem.get('id');
 
-                const meta = getMetaById(p, id);
-                if (meta.item.type === 'text') {
-                  setTimeout(async () => {
-                    await waitUntil(() => document.querySelector(`.v-text-${id}`))
-                    const vtext = document.querySelector(`.v-text-${id}`) as HTMLInputElement;
-                    if (vtext)
-                      vtext.focus()
-                  })
+                  if (active.instance.item_id !== id) {
+                    const original_id = meta.parent_mcomp.mitem.get('originalId');
+
+                    if (active.comp_id && original_id) {
+                      active.item_id = original_id;
+                    } else if (id) {
+                      active.item_id = id;
+                    }
+
+                    p.render();
+                    p.page.render();
+                    return;
+                  }
                 }
+
+                if (active.comp_id) {
+                  if (meta.item.originalId) {
+                    active.item_id = meta.item.originalId;
+                  } else {
+                    console.error('Failed to select, original id not found');
+                  }
+                } else {
+                  active.item_id = meta.item.id
+                }
+
                 p.render();
                 p.page.render();
               },
-              text(item, className) {
+              text(meta) {
+                const { item } = meta;
                 if (active.text.id !== item.id) {
                   active.text.id = item.id;
-                  active.text.content = item.html;
+                  active.text.content = item.html || "";
                 }
 
-
                 return <div
-                  className={cx(className, `v-text-${item.id} outline-none`)}
+                  className={cx(`v-text-${item.id} outline-none`)}
                   contentEditable
                   autoFocus
                   spellCheck={false}
@@ -99,7 +154,7 @@ export const EdMain = () => {
                       meta.mitem.set('html', active.text.content)
                     }
                   }}
-                  dangerouslySetInnerHTML={{ __html: item.html }}></div>
+                  dangerouslySetInnerHTML={{ __html: item.html || "" }}></div>
               }
             }}
           />

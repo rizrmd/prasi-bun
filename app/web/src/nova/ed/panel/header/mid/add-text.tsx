@@ -35,7 +35,8 @@ export const EdAddText = () => {
     if (mitem) {
       if (meta.item.type === 'text'
         || (meta.item.type === 'item' && meta.item.component?.id)) {
-        const parent = getMetaById(p, meta.parent_item.id);
+        const parent_id = meta.parent_item.id;
+        const parent = getMetaById(p, parent_id === 'root' ? meta.item.id : parent_id);
         if (!parent) {
           alert('Failed to add text!');
         } else {

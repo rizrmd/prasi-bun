@@ -20,17 +20,17 @@ export const ViewGlobal = {
     api: null as any,
   },
   view: {
-    hidden: undefined as undefined | ((item: IContent) => boolean),
+    hidden: undefined as undefined | ((meta: EdMeta) => boolean),
     active: undefined as
       | undefined
       | {
-        get: (item: IContent) => boolean;
-        set: (id: string) => void;
-        text?: (item: IText) => ReactNode
+        get: (meta: EdMeta) => boolean;
+        set: (meta: EdMeta) => void;
+        text?: (meta: EdMeta) => ReactNode
       },
     hover: undefined as
       | undefined
-      | { get: (item: IContent) => boolean; set: (id: string) => void },
+      | { get: (meta: EdMeta) => boolean; set: (meta: EdMeta) => void },
   },
 };
 
