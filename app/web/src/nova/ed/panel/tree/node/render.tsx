@@ -73,6 +73,11 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         p.page.render();
       }}
     >
+      {active.hover_id === item.id && (
+        <div
+          className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-300")}
+        ></div>
+      )}
       {active.item_id === item.id && (
         <div
           className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-500")}

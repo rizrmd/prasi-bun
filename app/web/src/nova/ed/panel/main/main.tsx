@@ -56,7 +56,6 @@ export const EdMain = () => {
                 return false
               },
               set(meta) {
-
                 if (meta.parent_mcomp) {
                   const id = meta.parent_mcomp.mitem.get('id');
 
@@ -64,9 +63,9 @@ export const EdMain = () => {
                     const original_id = meta.parent_mcomp.mitem.get('originalId');
 
                     if (active.comp_id && original_id) {
-                      active.item_id = original_id;
+                      active.hover_id = original_id;
                     } else if (id) {
-                      active.item_id = id;
+                      active.hover_id = id;
                     }
 
                     p.render();

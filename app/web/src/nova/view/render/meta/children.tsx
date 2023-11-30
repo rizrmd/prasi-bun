@@ -36,5 +36,5 @@ export const ViewMetaChildren: FC<{
       }
     }
 
-    return <>{item.id}{Object.values(children)}</>;
+    return <>{Object.values(children)}</>;
   };
