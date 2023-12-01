@@ -200,7 +200,6 @@ const spreadScope = (
     }
   };
 
-  console.clear();
   mergeScopes(parents, each, {});
 };
 

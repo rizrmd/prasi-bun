@@ -82,7 +82,6 @@ export const edInitSync = (p: PG) => {
 
             if (arg.src) {
               const w = window as any;
-              console.clear();
               const module = evalCJS(decoder.decode(decompress(arg.src)));
               if (typeof module === "object") {
                 for (const [k, v] of Object.entries(module)) {
