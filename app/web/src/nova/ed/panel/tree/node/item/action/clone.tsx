@@ -3,10 +3,10 @@ import { IContent, MContent } from "../../../../../../../utils/types/general";
 import { IItem } from "../../../../../../../utils/types/item";
 import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 import { PG } from "../../../../../logic/ed-global";
-import { treeRebuild } from "../../../../../logic/tree/build";
+import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionClone = (p: PG, item: IContent) => {
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     mitem.doc?.transact(() => {
       mitem.parent.forEach((e: MContent, idx) => {

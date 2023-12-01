@@ -176,7 +176,7 @@ export const getMRoot = (p: PG) => {
 
 export const getMetaById = (p: PG, id: string) => {
   if (active.comp_id) {
-    return p.comp.list[active.comp_id].meta[id]
+    return p.comp.list[active.comp_id].meta[active.item_id];
   } else {
     return p.page.meta[id]
   }

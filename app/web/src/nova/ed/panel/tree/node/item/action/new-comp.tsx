@@ -1,13 +1,13 @@
 import { IItem } from "../../../../../../../utils/types/item";
 import { PG, active } from "../../../../../logic/ed-global";
-import { treeRebuild } from "../../../../../logic/tree/build";
+import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionNewComp = (
   p: PG,
   item: IItem,
   e: React.MouseEvent<HTMLElement, MouseEvent>
 ) => {
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     p.ui.popup.comp_group = {
       mouse_event: e,

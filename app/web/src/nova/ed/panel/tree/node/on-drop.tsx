@@ -2,11 +2,12 @@ import { DropOptions, NodeModel } from "@minoru/react-dnd-treeview";
 import get from "lodash.get";
 import { MContent } from "../../../../../utils/types/general";
 import { EdMeta, PG, active } from "../../../logic/ed-global";
+import { getMetaById } from "../../../logic/tree/build";
 
 export const nodeOnDrop: (
   tree: NodeModel<EdMeta>[],
   options: DropOptions<EdMeta>
-) => void = () => {};
+) => void = () => { };
 
 export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
   const { dragSource, dragSourceId, dropTargetId, dropTarget } = arg;
@@ -35,7 +36,7 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
           if (parent.item.id === dragSource.data.item.id) {
             return false;
           }
-          parent = p.page.meta[parent.parent_item.id];
+          parent = getMetaById(p, parent.parent_item.id);
         }
       }
 

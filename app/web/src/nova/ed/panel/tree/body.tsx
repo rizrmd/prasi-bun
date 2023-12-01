@@ -9,17 +9,19 @@ import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { DEPTH_WIDTH } from "./node/item/indent";
-import { indentHook } from "./node/item/indent-hook";
+import { expandTreeHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
 import { doTreeSearch } from "./search";
+import { getMetaById } from "../../logic/tree/build";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ tree: null as TreeMethods | null, comp_id: "" });
   const TypedTree = DNDTree<EdMeta>;
 
-  indentHook(p, local);
+  expandTreeHook(p, local);
+
 
   if (active.comp_id && local.comp_id !== active.comp_id) {
     local.comp_id = active.comp_id;
@@ -40,32 +42,6 @@ export const EdTreeBody = () => {
     }
   }
 
-  useEffect(() => {
-    if (local.tree) {
-      let parents: string[] = [];
-      if (active.comp_id && p.comp.list[active.comp_id].scope[active.item_id]) {
-        parents = p.comp.list[active.comp_id].scope[active.item_id].p.map(
-          (e) => {
-            if (e === "root") return "root";
-            const meta = p.page.meta[e];
-            if (meta && meta.item.originalId) {
-              return meta.item.originalId;
-            }
-            return e;
-          }
-        );
-      } else if (p.page.scope[active.item_id]) {
-        parents = p.page.scope[active.item_id].p;
-      }
-      if (parents.length <= 1) {
-        local.tree.open(
-          tree.filter((e) => e.parent === "root").map((e) => e.id)
-        );
-      } else {
-        local.tree.open(parents);
-      }
-    }
-  }, [active.item_id, active.comp_id]);
 
   if (tree.length === 0)
     return (
@@ -101,6 +77,7 @@ export const EdTreeBody = () => {
         </div>
       </div>
     );
+
 
   return (
     <>

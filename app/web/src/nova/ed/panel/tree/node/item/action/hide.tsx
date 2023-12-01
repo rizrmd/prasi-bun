@@ -1,12 +1,13 @@
 import { IContent } from "../../../../../../../utils/types/general";
 import { PG } from "../../../../../logic/ed-global";
+import { getMetaById } from "../../../../../logic/tree/build";
 
 export const edActionHide = (
   p: PG,
   item: IContent,
   mode = "toggle" as "toggle" | "switch"
 ) => {
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     const hidden = mitem.get("hidden");
     if (mode === "toggle") {
