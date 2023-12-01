@@ -13,6 +13,8 @@ import { createPassProp } from "./script/create-pass-prop";
 import { ErrorBox } from "./script/error-box";
 import { mergeScopeUpwards } from "./script/merge-upward";
 
+
+const renderLimit = {} as Record<string, Record<string, { ts: number, count: number; cache: ReactNode }>>;
 export const ViewMetaScript: FC<{
   v: VG;
   item: IItem | IText | ISection;
@@ -26,6 +28,37 @@ export const ViewMetaScript: FC<{
     hover: v.view.hover ? v.view.hover.get(meta) : undefined,
     active: v.view.active ? v.view.active.get(meta) : undefined,
   });
+
+  if (!renderLimit[v.current.page_id]) {
+    renderLimit[v.current.page_id] = {}
+  }
+
+  if (!renderLimit[v.current.page_id][item.id]) {
+    renderLimit[v.current.page_id][item.id] = {
+      ts: Date.now(),
+      count: 1,
+      cache: null
+    }
+  }
+
+  if (renderLimit[v.current.page_id][item.id].ts - Date.now() < 100) {
+    renderLimit[v.current.page_id][item.id].count++
+  } else {
+    renderLimit[v.current.page_id][item.id].ts = Date.now();
+    renderLimit[v.current.page_id][item.id].count = 1;
+  }
+
+  if (renderLimit[v.current.page_id][item.id].count > 100) {
+
+    let js = '';
+    if (typeof item.adv?.js === 'string') {
+      js = item.adv.js;
+    }
+    console.warn(`Maximum render limit (100 render in 100ms) reached in item [${item.name}]:\n${js.length > 30 ? js.substring(0, 30) + '...' : js}`)
+    return renderLimit[v.current.page_id][item.id].cache;
+  }
+
+
   const children = <ViewMetaChildren key={item.id} meta={meta} />;
   let args = {};
 
@@ -104,6 +137,7 @@ export const ViewMetaScript: FC<{
               <Suspense>{jsx}</Suspense>
             </ErrorBox>
           );
+          renderLimit[v.current.page_id][item.id].cache = output.jsx;
         },
       };
 
