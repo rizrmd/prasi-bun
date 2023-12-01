@@ -92,7 +92,26 @@ export const SyncActions = {
     info: async (client_ids: string[]) =>
       ({}) as Record<string, { id: string; username: string }>,
   },
-  swc: {
+  code: {
+    edit: async (
+      arg:
+        | {
+            type: "adv";
+            mode: "js" | "css" | "html";
+            item_id: string;
+            page_id?: string;
+            comp_id?: string;
+            value: Uint8Array;
+          }
+        | {
+            type: "prop";
+            page_id?: string;
+            comp_id?: string;
+            item_id: string;
+            prop_name: string;
+            value: Uint8Array;
+          }
+    ) => ({}) as boolean,
     parse: async (code: string | Record<string, string>) =>
       ({}) as Record<string, ReturnType<typeof parseJs>>,
   },

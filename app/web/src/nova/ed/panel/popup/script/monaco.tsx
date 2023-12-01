@@ -1,14 +1,21 @@
 import type { Monaco, OnMount } from "@monaco-editor/react";
 import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
+import { useEffect } from "react";
+import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
-import { EDGlobal, ISingleScope, active } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
+import { getMetaById } from "../../../logic/tree/build";
 import { declareScope } from "./scope";
-import { useEffect } from "react";
 
+const scriptEdit = {
+  timeout: null as any,
+};
+
+const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
 export const ScriptMonaco = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -145,6 +152,20 @@ export const ScriptMonaco = () => {
       language={
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
+      onChange={(val) => {
+        scriptEdit.timeout = setTimeout(() => {
+          const meta = getMetaById(p, active.item_id);
+          const type = p.ui.popup.script.mode;
+          if (meta && meta.mitem) {
+            p.sync.code.edit({
+              type: "adv",
+              mode: type,
+              item_id: active.item_id,
+              value: compress(encode.encode(val || "")),
+            });
+          }
+        }, 1000);
+      }}
       onMount={async (editor, monaco) => {
         local.editor = editor;
         editor.focus();
