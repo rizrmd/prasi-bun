@@ -1,6 +1,6 @@
 import { IContent } from "../../../../../../../utils/types/general";
 import { PG } from "../../../../../logic/ed-global";
-import { treeRebuild } from "../../../../../logic/tree/build";
+import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionCut = async (p: PG, item: IContent) => {
   const perm = await navigator.permissions.query({
@@ -13,7 +13,7 @@ export const edActionCut = async (p: PG, item: IContent) => {
   let str = `prasi-clipboard:` + JSON.stringify(item);
   navigator.clipboard.writeText(str);
 
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     mitem.parent.forEach((e, k) => {
       if (e == mitem) {

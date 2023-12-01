@@ -4,10 +4,10 @@ import { IItem } from "../../../../../../../utils/types/item";
 import { IText } from "../../../../../../../utils/types/text";
 import { PG } from "../../../../../logic/ed-global";
 import { syncronize } from "y-pojo";
-import { treeRebuild } from "../../../../../logic/tree/build";
+import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionWrap = (p: PG, item: IText | IItem) => {
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     mitem.parent.forEach((e: MContent, idx) => {
       if (e.get("id") === mitem.get("id")) {

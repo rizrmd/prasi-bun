@@ -1,12 +1,12 @@
 import { syncronize } from "y-pojo";
+import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 import { IContent } from "../../../../../../../utils/types/general";
 import { MItem } from "../../../../../../../utils/types/item";
 import { PG, active } from "../../../../../logic/ed-global";
-import { treeRebuild } from "../../../../../logic/tree/build";
-import { fillID } from "../../../../../../../render/editor/tools/fill-id";
+import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionPaste = async (p: PG, item: IContent) => {
-  const mitem = p.page.meta[item.id].mitem;
+  const mitem = getMetaById(p, item.id).mitem;
   if (mitem) {
     const res = await navigator.clipboard.readText();
     if (typeof res === "string" && res.startsWith("prasi-clipboard:")) {

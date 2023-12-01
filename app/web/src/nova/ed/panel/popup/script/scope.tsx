@@ -44,23 +44,6 @@ export const declareScope = async (
     }
     existing[name] = arg;
   });
-
-  // for (const id of s.p) {
-  //   const meta = p.page.meta[id];
-  //   const ss = p.page.scope[id];
-  //   if (meta) {
-  //     let sc = null as any;
-  //     if (meta.parent_mcomp) {
-  //       const comp_id = meta.parent_mcomp.mitem.get('component')?.get('id');
-  //       if (comp_id && p.comp.list[comp_id]) {
-  //         sc = p.comp.list[comp_id].scope
-  //       }
-  //     }
-
-  //     console.log(meta.item.name, meta.item.originalId, ss, sc);
-  //   }
-  // }
-
   spreadScope(p, s, (arg) => {
     let { prev } = arg;
     if (arg.type !== "local") {

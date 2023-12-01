@@ -183,8 +183,6 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
     }
 
     if (e.key.length === 1 && !e.altKey && !e.metaKey && !e.shiftKey) {
-
-
       const meta = getMetaById(p, item.id);
       if (meta && meta.item.type === 'text') {
         setTimeout(() => {
