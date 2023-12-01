@@ -32,7 +32,7 @@ const scanMeta = async (id: string, doc: DComp, sync: SyncConnection) => {
     const name = mitem.get("name") || "";
     await serverWalkLoad(mitem, scope_comps, sync, loaded);
     serverWalkMap(
-      { sync, scope, scope_comps },
+      { sync, scope, scope_comps, note: "comp-load" },
       {
         mitem,
         parent_item: { id: "root" },

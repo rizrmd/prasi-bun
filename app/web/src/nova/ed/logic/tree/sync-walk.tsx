@@ -12,6 +12,8 @@ import {
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
+import { treeRebuild } from "./build";
+import { waitUntil } from "web-utils";
 
 const comp_added = new Set<string>();
 
@@ -63,7 +65,7 @@ export const syncWalkMap = (
     tree?: NodeModel<EdMeta>[];
     comps: PG["comp"]["list"];
     meta: Record<string, EdMeta>;
-    warn_component_loaded?: boolean;
+    component_not_found?: (comp_id: string) => void;
   },
   arg: {
     is_layout: boolean;
@@ -81,7 +83,9 @@ export const syncWalkMap = (
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
-  if (typeof mitem.get !== "function") { return }
+  if (typeof mitem.get !== "function") {
+    return;
+  }
 
   const item = {} as unknown as IItem;
 
@@ -118,7 +122,7 @@ export const syncWalkMap = (
     mapItem(mitem, item);
   }
 
-  if (typeof item.name !== 'string') return;
+  if (typeof item.name !== "string") return;
 
   if (override_id) {
     if (!item.originalId) item.originalId = item.id;
@@ -138,11 +142,13 @@ export const syncWalkMap = (
   };
 
   if (item_comp && item_comp.id && parent_item.id !== "root") {
-    if (!p.comps[item_comp.id] && p.warn_component_loaded !== false) {
-      throw new Error("Component failed to load: " + item_comp.id);
+    if (!p.comps[item_comp.id]) {
+      if (p.component_not_found) {
+        p.component_not_found(item_comp.id);
+      }
     }
 
-    const ref_comp = p.comps[item_comp.id];
+    let ref_comp = p.comps[item_comp.id];
 
     if (ref_comp && mitem_comp) {
       const mcomp = ref_comp.doc.getMap("map").get("root");
@@ -153,6 +159,7 @@ export const syncWalkMap = (
           mitem_comp.set("ref_ids", new Y.Map() as any);
           ref_ids = {};
         }
+
         const old_id = item.id;
 
         mapItem(mcomp, item, ref_ids);
@@ -300,7 +307,10 @@ export const syncWalkMap = (
   }
 };
 
-export const loadcomp = { timeout: 0 as any, pending: new Set<string>() };
+export const loadcomp = {
+  timeout: 0 as any,
+  pending: new Set<string>(),
+};
 
 export const loadComponent = async (p: PG, id_comp: string) => {
   return new Promise<boolean>((resolve) => {
@@ -308,6 +318,7 @@ export const loadComponent = async (p: PG, id_comp: string) => {
       resolve(true);
       return;
     }
+
     loadcomp.pending.add(id_comp);
     clearTimeout(loadcomp.timeout);
     loadcomp.timeout = setTimeout(async () => {
@@ -345,7 +356,7 @@ const mapItem = (
       item[k] = [];
       const childs = e as unknown as TypedArray<{}>;
       childs.forEach((c) => {
-        if (typeof c.get === 'function') {
+        if (typeof c.get === "function") {
           if (ref_ids) {
             const id = ref_ids[c.get("id")];
             if (id) {

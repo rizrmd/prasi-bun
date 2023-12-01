@@ -1,10 +1,16 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { compress, decompress } from "wasm-gzip";
+import { MItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
 import { EdMeta, IScope, PG, active } from "../ed-global";
 import { treeRebuild } from "./build";
-import { loadComponent, syncWalkLoad, syncWalkMap } from "./sync-walk";
-import { MItem } from "../../../../utils/types/item";
+import {
+  loadComponent,
+  loadcomp,
+  syncWalkLoad,
+  syncWalkMap,
+} from "./sync-walk";
+import { waitUntil } from "web-utils";
 
 export const loadCompSnapshot = async (
   p: PG,
@@ -26,7 +32,7 @@ export const loadCompSnapshot = async (
       scope: scope,
     } as any;
 
-    const { tree, meta } = await walkCompTree(p, mitem);
+    const { tree, meta } = await walkCompTree(p, mitem, id_comp);
     p.comp.list[id_comp] = {
       ...p.comp.list[id_comp],
       meta,
@@ -48,7 +54,7 @@ export const loadCompSnapshot = async (
           Y.applyUpdate(doc as any, decompress(res.diff), "local");
           const mitem = doc.getMap("map").get("root");
           if (mitem) {
-            const { tree, meta } = await walkCompTree(p, mitem);
+            const { tree, meta } = await walkCompTree(p, mitem, id_comp);
             p.comp.list[id_comp].tree = tree;
             p.comp.list[id_comp].meta = meta;
             await treeRebuild(p);
@@ -71,14 +77,14 @@ export const loadCompSnapshot = async (
   }
 };
 
-const walkCompTree = async (p: PG, mitem: MItem) => {
+const walkCompTree = async (p: PG, mitem: MItem, comp_id: string) => {
   const tree: NodeModel<EdMeta>[] = [];
   const meta = {};
   const portal = {
     in: {} as Record<string, EdMeta>,
     out: {} as Record<string, EdMeta>,
   };
-  await syncWalkLoad(p, mitem, (id) => loadComponent(p, id));
+  syncWalkLoad(p, mitem, (id) => loadComponent(p, id));
 
   syncWalkMap(
     {
@@ -87,7 +93,20 @@ const walkCompTree = async (p: PG, mitem: MItem) => {
       item_loading: p.ui.tree.item_loading,
       meta,
       tree,
-      warn_component_loaded: false,
+      component_not_found(id) {
+        setTimeout(() => {
+          if (loadcomp.pending.has(id) || p.comp.list[id]) {
+            waitUntil(() => !loadcomp.pending.has(id)).then(async () => {
+              walkCompTree(p, mitem, comp_id);
+
+              const { tree, meta } = await walkCompTree(p, mitem, comp_id);
+              p.comp.list[comp_id].tree = tree;
+              p.comp.list[comp_id].meta = meta;
+              p.render();
+            });
+          }
+        }, 100);
+      },
     },
     {
       mitem,
