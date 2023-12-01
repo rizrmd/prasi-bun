@@ -1,9 +1,8 @@
-import { IContent } from "../../../../web/src/utils/types/general";
 import { SAction } from "../actions";
 import { parseJs } from "../editor/parser/parse-js";
 import { SyncConnection } from "../type";
 
-export const swc_parse: SAction["swc"]["parse"] = async function (
+export const code_parse: SAction["code"]["parse"] = async function (
   this: SyncConnection,
   code
 ) {
@@ -14,6 +13,6 @@ export const swc_parse: SAction["swc"]["parse"] = async function (
     }
     return result;
   }
-  
+
   return { _: parseJs(code) };
 };

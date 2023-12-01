@@ -1,10 +1,9 @@
+import { spawn } from "bun";
 import { activity } from "../../entity/activity";
 import { sendWS } from "../../sync-handler";
 import { SyncType } from "../../type";
-import { spawn } from "bun";
 import { DBCode } from "./prep-code";
 import { Code } from "./watcher";
-import { PassThrough } from "stream";
 
 const decoder = new TextDecoder();
 export const codePkgInstall = async (code: DBCode) => {
@@ -25,7 +24,7 @@ export const codePkgInstall = async (code: DBCode) => {
   try {
     const proc = spawn({
       cmd: ["bun", "i"],
-      cwd: Code.path(code.id),
+      cwd: Code.path(code.id_site, code.id),
       stderr: "pipe",
       stdout: "pipe",
     });
