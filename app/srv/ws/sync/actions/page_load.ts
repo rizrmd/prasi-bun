@@ -63,8 +63,8 @@ export const page_load: SAction["page"]["load"] = async function (
       data.page_id = id_page;
       return data;
     });
-  }; 
-  
+  };
+
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
 
@@ -184,7 +184,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
     );
     childs.map((m, i) => {
       serverWalkMap(
-        { sync, scope, scope_comps },
+        { sync, scope, scope_comps, note: "page-load" },
         {
           mitem: m,
           parent_item: { id: "root" },

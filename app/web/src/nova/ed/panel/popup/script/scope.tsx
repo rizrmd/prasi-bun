@@ -1,6 +1,7 @@
 import type { OnMount } from "@monaco-editor/react";
 import { deepClone } from "web-utils";
 import { EPage, ISingleScope, PG, active } from "../../../logic/ed-global";
+import { getMetaById } from "../../../logic/tree/build";
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
 
@@ -10,6 +11,9 @@ export const declareScope = async (
   monaco: Monaco
 ) => {
   let active_id = active.item_id;
+  const meta = getMetaById(p, active_id);
+  const parent = getMetaById(p, meta?.parent_item.id);
+
   let s = deepClone(p.page.scope[active_id]);
 
   if (active.comp_id && p.comp.list[active.comp_id]) {
@@ -49,7 +53,8 @@ export const declareScope = async (
     if (arg.type !== "local") {
       addScope(
         monaco,
-        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${arg.type
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
+          arg.type
         }~${arg.name}~${arg.id}`,
         `\
 export const {};
@@ -60,7 +65,8 @@ declare global {
     } else {
       addScope(
         monaco,
-        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${arg.type
+        `${arg.comp_id || ""}~${prev?.comp_id || ""}~${prev?.item_id || ""}__${
+          arg.type
         }~${arg.id}`,
         `\
 export const {};

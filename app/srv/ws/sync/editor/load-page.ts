@@ -22,8 +22,7 @@ export const serverWalkLoad = async (
   sync: SyncConnection,
   loaded: Set<string>
 ) => {
-
-  if (typeof mitem.get !== 'function') {
+  if (typeof mitem.get !== "function") {
     return;
   }
 
@@ -96,6 +95,7 @@ export const serverWalkMap = (
     sync: SyncConnection;
     scope: IScope;
     scope_comps: IScopeComp;
+    note: string;
   },
   arg: {
     mitem: MItem;
@@ -146,7 +146,7 @@ export const serverWalkMap = (
         mitem,
         mcomp: mitem,
         scope,
-        mcontent(mcontent) { },
+        mcontent(mcontent) {},
       });
       p.scope[item.id] = {
         p: arg.parent_ids,
@@ -287,12 +287,12 @@ export const serverWalkMap = (
             parent_item: { id: item.id, mitem: mitem as MItem },
             parent_mcomp: jsx.parent_mcomp
               ? {
-                ...jsx.parent_mcomp,
-                parent_ids: [
-                  ...(arg.parent_ids || []),
-                  mitem.get("id") || "",
-                ],
-              }
+                  ...jsx.parent_mcomp,
+                  parent_ids: [
+                    ...(arg.parent_ids || []),
+                    mitem.get("id") || "",
+                  ],
+                }
               : undefined,
             parent_ids: [...arg.parent_ids, mitem.get("id") || ""],
           });
@@ -311,15 +311,16 @@ export const serverWalkMap = (
   }
 
   const childs = mitem.get("childs")?.map((e) => e) || [];
+
   for (const e of childs) {
     serverWalkMap(p, {
       mitem: e,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: !!arg.parent_mcomp
         ? {
-          ...arg.parent_mcomp,
-          parent_ids: [...(arg.parent_mcomp?.parent_ids || []), item.id],
-        }
+            ...arg.parent_mcomp,
+            parent_ids: [...(arg.parent_mcomp?.parent_ids || []), item.id],
+          }
         : undefined,
       parent_ids: [...arg.parent_ids, item.id],
     });
