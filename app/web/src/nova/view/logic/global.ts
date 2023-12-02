@@ -1,7 +1,5 @@
 import { ReactElement, ReactNode } from "react";
-import { IContent } from "../../../utils/types/general";
-import { IText } from "../../../utils/types/text";
-import { EdMeta } from "../../ed/logic/ed-global";
+import { EdMeta, IScope } from "../../ed/logic/ed-global";
 
 export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
@@ -9,10 +7,11 @@ export const ViewGlobal = {
   current: { site_id: "", page_id: "" },
   layout: { show: false },
   meta: {} as Record<string, EdMeta>,
+  scope: null as null | IScope,
   entry: [] as string[],
   body_cache: null as null | ReactElement,
   component: {
-    load: async (id_comp: string) => { },
+    load: async (id_comp: string) => {},
   },
   script: {
     api_url: "",
@@ -24,10 +23,10 @@ export const ViewGlobal = {
     active: undefined as
       | undefined
       | {
-        get: (meta: EdMeta) => boolean;
-        set: (meta: EdMeta) => void;
-        text?: (meta: EdMeta) => ReactNode
-      },
+          get: (meta: EdMeta) => boolean;
+          set: (meta: EdMeta) => void;
+          text?: (meta: EdMeta) => ReactNode;
+        },
     hover: undefined as
       | undefined
       | { get: (meta: EdMeta) => boolean; set: (meta: EdMeta) => void },

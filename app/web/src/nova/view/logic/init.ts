@@ -30,5 +30,6 @@ export const vInit = (
   if (load.mode === "tree_meta") {
     v.meta = load.meta;
     v.entry = load.entry;
+    v.scope = load.scope || null;
   }
 };
