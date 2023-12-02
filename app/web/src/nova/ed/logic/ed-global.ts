@@ -124,8 +124,9 @@ export type EdMeta = {
   };
   el?: ReactElement;
   is_layout?: boolean;
-  is_jsx_prop?: boolean;
+  jsx_prop_name?: string;
   /** script related meta **/
+  jsx_scope_id?: string;
   propval?: Record<string, any>;
   indexed_scope: Record<string, any>;
   memoize?: Record<
@@ -155,7 +156,7 @@ export const EDGlobal = {
   script: {
     siteTypes: {} as Record<string, string>,
     loaded: false,
-    do_edit: async (newval: string, all?: boolean) => { },
+    do_edit: async (newval: string, all?: boolean) => {},
   },
   page: {
     root_id: "root",
@@ -174,7 +175,7 @@ export const EDGlobal = {
     meta: {} as Record<string, EdMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<EdMeta>[],
-    render: () => { },
+    render: () => {},
   },
   comp: {
     doc: null as null | DComp,

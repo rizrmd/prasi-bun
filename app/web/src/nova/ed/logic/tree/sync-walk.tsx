@@ -76,7 +76,7 @@ export const syncWalkMap = (
     };
     parent_item: EdMeta["parent_item"];
     parent_mcomp?: EdMeta["parent_mcomp"];
-    is_jsx_prop?: boolean;
+    jsx_prop_name?: string;
     skip_add_tree?: boolean;
     tree_root_id: string;
     each?: (meta: EdMeta) => void;
@@ -127,6 +127,16 @@ export const syncWalkMap = (
   if (override_id) {
     if (!item.originalId) item.originalId = item.id;
     item.id = override_id;
+  }
+
+  if (arg.jsx_prop_name) {
+    const pitem = p.meta[arg.parent_item.id].item;
+    if (pitem.type === "item" && pitem.component) {
+      const pprop = pitem.component.props[arg.jsx_prop_name];
+      if (pprop.content) {
+        pprop.content.id = item.id;
+      }
+    }
   }
 
   const item_comp = item.component;
@@ -224,7 +234,7 @@ export const syncWalkMap = (
                         is_layout: arg.is_layout,
                         tree_root_id: arg.tree_root_id,
                         mitem: mcontent,
-                        is_jsx_prop: true,
+                        jsx_prop_name: k,
                         parent_mcomp: arg.parent_mcomp,
                         parent_item: { id: item.id, mitem: mitem as MItem },
                         portal: arg.portal,
@@ -264,9 +274,9 @@ export const syncWalkMap = (
   const meta: EdMeta = {
     is_layout: arg.is_layout,
     item,
+    jsx_prop_name: arg.jsx_prop_name,
     mitem: mitem as MItem,
     parent_item,
-    is_jsx_prop: arg.is_jsx_prop,
     parent_mcomp: parent_mcomp,
     indexed_scope: {},
   };
@@ -297,7 +307,6 @@ export const syncWalkMap = (
       is_layout: arg.is_layout,
       tree_root_id: arg.tree_root_id,
       mitem: e,
-      is_jsx_prop: arg.is_jsx_prop,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: arg.parent_mcomp,
       portal: arg.portal,

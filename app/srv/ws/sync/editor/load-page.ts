@@ -133,6 +133,10 @@ export const serverWalkMap = (
     item.id = override_id;
   }
 
+  if (item.name === "render_col") {
+    console.log(item);
+  }
+
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
   if (item_comp && item_comp.id) {
@@ -202,6 +206,8 @@ export const serverWalkMap = (
             jsx_props: {},
           };
 
+          const content_scope: Record<string, MItem> = {};
+
           extractMItemProps({
             item_comp,
             mitem,
@@ -216,6 +222,8 @@ export const serverWalkMap = (
                   parent_mcomp: arg.parent_mcomp,
                   parent_ids: [...arg.parent_ids, item.id],
                 };
+
+                content_scope[prop_name] = mcontent;
               }
             },
           });
@@ -234,13 +242,20 @@ export const serverWalkMap = (
 
           if (scope) pcomp.scope[item.id].s = scope;
 
-          if (!arg.parent_mcomp) {
+          if (!p.scope[item.id]) {
             p.scope[item.id] = {
               p: arg.parent_ids,
               n: item.name,
               s: null,
             };
-            if (scope) p.scope[item.id].s = scope;
+          }
+
+          if (scope) {
+            if (!p.scope[item.id].s) {
+              p.scope[item.id].s = scope;
+            } else {
+              p.scope[item.id].s = { ...p.scope[item.id].s, ...scope };
+            }
           }
 
           const childs = mcomp.get("childs")?.map((e) => e) || [];
@@ -276,27 +291,6 @@ export const serverWalkMap = (
       if (typeof js === "string") {
         const scope = parseJs(js);
         if (scope) pcomp.scope[id].s = scope;
-      }
-
-      if (item.name.startsWith("jsx=")) {
-        const name = item.name.substring(4).trim();
-        if (arg.parent_mcomp.jsx_props[name]) {
-          const jsx = arg.parent_mcomp.jsx_props[name];
-          serverWalkMap(p, {
-            mitem: jsx.mitem,
-            parent_item: { id: item.id, mitem: mitem as MItem },
-            parent_mcomp: jsx.parent_mcomp
-              ? {
-                  ...jsx.parent_mcomp,
-                  parent_ids: [
-                    ...(arg.parent_ids || []),
-                    mitem.get("id") || "",
-                  ],
-                }
-              : undefined,
-            parent_ids: [...arg.parent_ids, mitem.get("id") || ""],
-          });
-        }
       }
     }
   } else {

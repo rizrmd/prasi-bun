@@ -35,6 +35,7 @@ export const EdMain = () => {
               mode: "tree_meta",
               meta: p.page.meta,
               entry: p.page.entry,
+              scope: p.page.scope,
             }}
             site_id={p.site.id}
             page_id={p.page.cur.id}

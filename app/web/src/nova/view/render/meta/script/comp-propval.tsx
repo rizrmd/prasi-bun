@@ -1,4 +1,5 @@
 import { createAPI, createDB } from "../../../../../utils/script/init-api";
+import { IItem } from "../../../../../utils/types/item";
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EdMeta } from "../../../../ed/logic/ed-global";
 import { VG } from "../../../logic/global";
@@ -77,10 +78,18 @@ export const compPropVal = (
                   }) => {
                     if (prop.content) {
                       const meta = v.meta[prop.content.id] as EdMeta;
-                      if (meta) {
-                        if (!meta.parent_item)
-                          meta.parent_item = { id: parent_id };
-                        else meta.parent_item.id = parent_id;
+                      let parent = v.meta[parent_id];
+
+                      if (meta && parent) {
+                        if (v.scope) {
+                          while (parent) {
+                            if (v.scope[parent.item.id]) {
+                              v.scope[prop.content.id] =
+                                v.scope[parent.item.id];
+                            }
+                            parent = v.meta[parent.parent_item.id];
+                          }
+                        }
 
                         return (
                           <ViewMeta
