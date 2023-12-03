@@ -151,7 +151,7 @@ export const ViewMetaScript: FC<{
           e.preventDefault();
           v.view.hover?.set(meta);
         },
-        onClick: (e: any) => {
+        onPointerDown: (e: any) => {
           e.stopPropagation();
           e.preventDefault();
           v.view.active?.set(meta);
