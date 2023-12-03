@@ -153,15 +153,24 @@ export const ScriptMonaco = () => {
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
       onChange={(val) => {
+        clearTimeout(scriptEdit.timeout);
         scriptEdit.timeout = setTimeout(() => {
           const meta = getMetaById(p, active.item_id);
           const type = p.ui.popup.script.mode;
           if (meta && meta.mitem) {
+            let arg = {} as any;
+            if (active.comp_id) {
+              arg.comp_id = active.comp_id;
+            } else {
+              arg.page_id = p.page.cur.id;
+            }
+
             p.sync.code.edit({
               type: "adv",
               mode: type,
               item_id: active.item_id,
               value: compress(encode.encode(val || "")),
+              ...arg,
             });
           }
         }, 1000);

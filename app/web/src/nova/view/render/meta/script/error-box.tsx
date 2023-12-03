@@ -4,10 +4,20 @@ import { EdMeta } from "../../../../ed/logic/ed-global";
 import { ViewGlobal } from "../../../logic/global";
 
 export const ErrorBox = withErrorBoundary(
-  ({ children, meta, id }: { children: any; meta?: EdMeta; id?: string }) => {
+  ({
+    children,
+    meta,
+    id,
+    silent,
+  }: {
+    children: any;
+    meta?: EdMeta;
+    id?: string;
+    silent?: boolean;
+  }) => {
     const local = useLocal({ retrying: false });
     const [error, resetError] = useErrorBoundary((error, errorInfo) => {
-      console.warn(error);
+      if (silent !== true) console.warn(error);
     });
 
     let _meta = meta;

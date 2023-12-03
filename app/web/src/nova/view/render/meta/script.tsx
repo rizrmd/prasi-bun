@@ -12,9 +12,39 @@ import { createLocal } from "./script/create-local";
 import { createPassProp } from "./script/create-pass-prop";
 import { ErrorBox } from "./script/error-box";
 import { mergeScopeUpwards } from "./script/merge-upward";
+import { useLocal } from "web-utils";
 
+const renderLimit = {} as Record<
+  string,
+  Record<string, { ts: number; count: number; cache: ReactNode }>
+>;
 
-const renderLimit = {} as Record<string, Record<string, { ts: number, count: number; cache: ReactNode }>>;
+export const ViewBoundedScript: FC<{
+  v: VG;
+  item: IItem | IText | ISection;
+  scopeIndex?: Record<string, any>;
+  js: string;
+}> = ({ item, v, scopeIndex, js }) => {
+  const local = useLocal({ js: "" });
+
+  useEffect(() => {
+    if (local.js !== js) {
+      local.js = js;
+      local.render();
+    }
+  }, [js]);
+
+  if (local.js !== js) {
+    return null;
+  }
+
+  return (
+    <ErrorBox silent={true}>
+      <ViewMetaScript v={v} item={item} scopeIndex={scopeIndex} />
+    </ErrorBox>
+  );
+};
+
 export const ViewMetaScript: FC<{
   v: VG;
   item: IItem | IText | ISection;
@@ -30,142 +60,129 @@ export const ViewMetaScript: FC<{
   });
 
   if (!renderLimit[v.current.page_id]) {
-    renderLimit[v.current.page_id] = {}
+    renderLimit[v.current.page_id] = {};
   }
 
   if (!renderLimit[v.current.page_id][item.id]) {
     renderLimit[v.current.page_id][item.id] = {
       ts: Date.now(),
       count: 1,
-      cache: null
-    }
+      cache: null,
+    };
   }
 
   if (renderLimit[v.current.page_id][item.id].ts - Date.now() < 100) {
-    renderLimit[v.current.page_id][item.id].count++
+    renderLimit[v.current.page_id][item.id].count++;
   } else {
     renderLimit[v.current.page_id][item.id].ts = Date.now();
     renderLimit[v.current.page_id][item.id].count = 1;
   }
 
   if (renderLimit[v.current.page_id][item.id].count > 100) {
-
-    let js = '';
-    if (typeof item.adv?.js === 'string') {
+    let js = "";
+    if (typeof item.adv?.js === "string") {
       js = item.adv.js;
     }
-    console.warn(`Maximum render limit (100 render in 100ms) reached in item [${item.name}]:\n${js.length > 30 ? js.substring(0, 30) + '...' : js}`)
+    console.warn(
+      `Maximum render limit (100 render in 100ms) reached in item [${
+        item.name
+      }]:\n${js.length > 30 ? js.substring(0, 30) + "..." : js}`
+    );
     return renderLimit[v.current.page_id][item.id].cache;
   }
-
 
   const children = <ViewMetaChildren key={item.id} meta={meta} />;
   let args = {};
 
   if (js && meta) {
-    try {
-      if (!meta.memoize) {
-        meta.memoize = {};
-      }
-      const memoizeKey = hash_sum(scopeIndex) || "default";
-      if (!meta.memoize[memoizeKey]) {
-        meta.memoize[memoizeKey] = {
-          Local: createLocal(v, item.id, scopeIndex),
-          PassProp: createPassProp(v, item.id, scopeIndex),
-        };
-      }
+    if (!meta.memoize) {
+      meta.memoize = {};
+    }
+    const memoizeKey = hash_sum(scopeIndex) || "default";
+    if (!meta.memoize[memoizeKey]) {
+      meta.memoize[memoizeKey] = {
+        Local: createLocal(v, item.id, scopeIndex),
+        PassProp: createPassProp(v, item.id, scopeIndex),
+      };
+    }
 
-      const _js = item.adv?.js;
-      if (typeof _js === "string") {
-        const navs = extractNavigate(_js || "");
-        if (navs.length > 0) {
-          navs.map((nav) => preload(v, nav));
+    const _js = item.adv?.js;
+    if (typeof _js === "string") {
+      const navs = extractNavigate(_js || "");
+      if (navs.length > 0) {
+        navs.map((nav) => preload(v, nav));
+      }
+    }
+
+    if (v.script.api_url) {
+      if (!v.script.db) v.script.db = createDB(v.script.api_url);
+      if (!v.script.api) v.script.api = createAPI(v.script.api_url);
+    }
+
+    const finalScope = mergeScopeUpwards(v, item.id, scopeIndex);
+    for (const [k, v] of Object.entries(finalScope)) {
+      if (v && typeof v === "object") {
+        const t: {
+          _jsx: true;
+          Comp: FC<{ parent_id: string; scopeIndex?: Record<string, any> }>;
+        } = v as any;
+        if (t._jsx && t.Comp) {
+          finalScope[k] = (
+            <>
+              <t.Comp parent_id={meta.item.id} scopeIndex={scopeIndex} />
+            </>
+          );
         }
       }
+    }
+    const output = { jsx: null as any };
 
-      if (v.script.api_url) {
-        if (!v.script.db) v.script.db = createDB(v.script.api_url);
-        if (!v.script.api) v.script.api = createAPI(v.script.api_url);
-      }
-
-      const finalScope = mergeScopeUpwards(v, item.id, scopeIndex);
-      for (const [k, v] of Object.entries(finalScope)) {
-        if (v && typeof v === "object") {
-          const t: {
-            _jsx: true;
-            Comp: FC<{ parent_id: string; scopeIndex?: Record<string, any> }>;
-          } = v as any;
-          if (t._jsx && t.Comp) {
-            finalScope[k] = (
-              <>
-                <t.Comp parent_id={meta.item.id} scopeIndex={scopeIndex} />
-              </>
-            );
-          }
-        }
-      }
-      const output = { jsx: null as any };
-
-      args = {
-        ...w.exports,
-        ...finalScope,
-        ...meta.memoize[memoizeKey],
-        db: v.script.db,
-        api: v.script.api,
-        children,
-        props: {
-          className,
-          onPointerOver: v.view.hover
-            ? (e: any) => {
+    args = {
+      ...w.exports,
+      ...finalScope,
+      ...meta.memoize[memoizeKey],
+      db: v.script.db,
+      api: v.script.api,
+      children,
+      props: {
+        className,
+        onPointerOver: v.view.hover
+          ? (e: any) => {
               e.stopPropagation();
               e.preventDefault();
               v.view.hover?.set(meta);
             }
-            : undefined,
-          onClick: v.view.active
-            ? (e: any) => {
+          : undefined,
+        onClick: v.view.active
+          ? (e: any) => {
               e.stopPropagation();
               e.preventDefault();
               v.view.active?.set(meta);
             }
-            : undefined,
-        },
-        useEffect: useEffect,
-        render: (jsx: ReactNode) => {
-          output.jsx = (
-            <ErrorBox>
-              <Suspense>{jsx}</Suspense>
-            </ErrorBox>
-          );
-          renderLimit[v.current.page_id][item.id].cache = output.jsx;
-        },
-      };
+          : undefined,
+      },
+      useEffect: useEffect,
+      render: (jsx: ReactNode) => {
+        output.jsx = jsx;
+        renderLimit[v.current.page_id][item.id].cache = output.jsx;
+      },
+    };
 
-      // execute
-      const fn = new Function(...Object.keys(args), js);
-      const res = fn(...Object.values(args));
-      if (res instanceof Promise) {
-        res.catch((e: any) => {
-          console.warn(e);
-          console.warn(
-            (
-              `ERROR in ${item.type} [${item.name}]:\n ` +
-              ((item.adv?.js || "") as any)
-            ).trim()
-          );
-          console.warn(`Available var:`, args, `\n\n`);
-        });
-      }
-      return output.jsx;
-    } catch (e) {
-      console.warn(e);
-      console.warn(
-        (
-          `ERROR in ${item.type} [${item.name}]:\n ` +
-          ((item.adv?.js || "") as any)
-        ).trim()
-      );
-      console.warn(`Available var:`, args, `\n\n`);
+    // execute
+    const fn = new Function(...Object.keys(args), js);
+    const res = fn(...Object.values(args));
+    if (res instanceof Promise) {
+      res.catch((e: any) => {
+        console.warn(e);
+        console.warn(
+          (
+            `ERROR in ${item.type} [${item.name}]:\n ` +
+            ((item.adv?.js || "") as any)
+          ).trim()
+        );
+        console.warn(`Available var:`, args, `\n\n`);
+      });
     }
+    return output.jsx;
   }
 };

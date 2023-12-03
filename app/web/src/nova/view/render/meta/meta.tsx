@@ -2,8 +2,9 @@ import { FC, useState } from "react";
 import { useGlobal } from "web-utils";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMetaRender } from "./render";
-import { ViewMetaScript } from "./script";
+import { ViewBoundedScript, ViewMetaScript } from "./script";
 import { compPropVal } from "./script/comp-propval";
+import { ErrorBox } from "./script/error-box";
 
 export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   id,
@@ -30,8 +31,15 @@ export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   }
 
   if (item.adv) {
-    if (item.adv.js && item.adv.jsBuilt) {
-      return <ViewMetaScript v={v} item={item} scopeIndex={scopeIndex} />;
+    if (item.adv.js && item.adv.jsBuilt && typeof item.adv.js === "string") {
+      return (
+        <ViewBoundedScript
+          js={item.adv.js}
+          v={v}
+          item={item}
+          scopeIndex={scopeIndex}
+        />
+      );
     }
   }
 
