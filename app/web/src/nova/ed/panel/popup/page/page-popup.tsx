@@ -10,7 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { deepClone, useGlobal, useLocal, waitUntil } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import {
   pagePicker,
   pagePickerRootItem,
@@ -212,6 +212,8 @@ export const EdPopPage = () => {
               if (isNew) {
                 p.render();
                 await reloadPagePicker(p);
+                active.comp_id = "";
+                active.item_id = "";
                 navigate(`/ed/${p.site.id}/${page.id}`);
               } else {
                 const found = pagePicker.tree.find(

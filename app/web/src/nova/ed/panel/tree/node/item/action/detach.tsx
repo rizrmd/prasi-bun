@@ -5,7 +5,7 @@ import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 
 export const edActionDetach = (p: PG, item: IItem) => {
-  const mitem = getMetaById(p, item.id).mitem;
+  const mitem = getMetaById(p, item.id)?.mitem;
   if (mitem) {
     const compid = mitem.get("component")?.get("id");
     if (compid) {

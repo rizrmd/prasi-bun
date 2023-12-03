@@ -11,9 +11,6 @@ export const declareScope = async (
   monaco: Monaco
 ) => {
   let active_id = active.item_id;
-  const meta = getMetaById(p, active_id);
-  const parent = getMetaById(p, meta?.parent_item.id);
-
   let s = deepClone(p.page.scope[active_id]);
 
   if (active.comp_id && p.comp.list[active.comp_id]) {

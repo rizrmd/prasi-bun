@@ -7,7 +7,7 @@ export const edActionNewComp = (
   item: IItem,
   e: React.MouseEvent<HTMLElement, MouseEvent>
 ) => {
-  const mitem = getMetaById(p, item.id).mitem;
+  const mitem = getMetaById(p, item.id)?.mitem;
   if (mitem) {
     p.ui.popup.comp_group = {
       mouse_event: e,

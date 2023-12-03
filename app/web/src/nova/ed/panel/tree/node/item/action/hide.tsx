@@ -7,7 +7,7 @@ export const edActionHide = (
   item: IContent,
   mode = "toggle" as "toggle" | "switch"
 ) => {
-  const mitem = getMetaById(p, item.id).mitem;
+  const mitem = getMetaById(p, item.id)?.mitem;
   if (mitem) {
     const hidden = mitem.get("hidden");
     if (mode === "toggle") {
