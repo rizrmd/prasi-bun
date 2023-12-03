@@ -14,7 +14,7 @@ import { gzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 import { loadComponent } from "./load-component";
 import { extractMItemProps } from "./load-page-comp";
-import { parseJs } from "./parser/parse-js";
+import { ArgParentMComp, parseJs } from "./parser/parse-js";
 
 export const serverWalkLoad = async (
   mitem: MItem,
@@ -77,19 +77,6 @@ export const serverWalkLoad = async (
   }
 };
 
-type ArgParentMComp = EdMeta["parent_mcomp"] & {
-  id: string;
-  parent_ids: string[];
-  jsx_props: Record<
-    string,
-    {
-      id: string;
-      mitem: MItem;
-      parent_mcomp?: ArgParentMComp;
-      parent_ids: string[];
-    }
-  >;
-};
 export const serverWalkMap = (
   p: {
     sync: SyncConnection;
@@ -102,6 +89,7 @@ export const serverWalkMap = (
     parent_ids: string[];
     parent_item: EdMeta["parent_item"];
     parent_mcomp?: ArgParentMComp;
+    content_scope?: Record<string, string>;
   }
 ) => {
   const { mitem, parent_item, parent_mcomp } = arg;
@@ -133,10 +121,6 @@ export const serverWalkMap = (
     item.id = override_id;
   }
 
-  if (item.name === "render_col") {
-    console.log(item);
-  }
-
   const item_comp = item.component;
   const mitem_comp = mitem.get("component");
   if (item_comp && item_comp.id) {
@@ -148,6 +132,8 @@ export const serverWalkMap = (
       extractMItemProps({
         item_comp,
         mitem,
+        item,
+        content_scope: arg.content_scope,
         mcomp: mitem,
         scope,
         mcontent(mcontent) {},
@@ -159,7 +145,10 @@ export const serverWalkMap = (
       };
       const js = item.adv?.js;
       if (typeof js === "string") {
-        const s = parseJs(js);
+        const s = parseJs(js, {
+          item,
+          content_scope: arg.content_scope,
+        });
         const ps = p.scope[item.id].s;
         if (ps) {
           if (s?.local) ps.local = s.local;
@@ -206,24 +195,27 @@ export const serverWalkMap = (
             jsx_props: {},
           };
 
-          const content_scope: Record<string, MItem> = {};
+          const content_scope: Record<string, string> = {};
 
           extractMItemProps({
             item_comp,
+            item,
             mitem,
             mcomp,
             scope,
+            content_scope: arg.content_scope,
             mcontent(mcontent, prop_name) {
               const id = mcontent.get("id");
               if (id) {
+                let cid = ref_ids[id] || id;
                 parent_mcomp.jsx_props[prop_name] = {
-                  id,
+                  id: cid,
                   mitem: mcontent,
                   parent_mcomp: arg.parent_mcomp,
                   parent_ids: [...arg.parent_ids, item.id],
                 };
 
-                content_scope[prop_name] = mcontent;
+                content_scope[prop_name] = cid;
               }
             },
           });
@@ -233,7 +225,10 @@ export const serverWalkMap = (
 
           const js = item.adv?.js;
           if (typeof js === "string") {
-            const res = parseJs(js);
+            const res = parseJs(js, {
+              item,
+              content_scope: arg.content_scope,
+            });
             if (res) {
               scope.local = res.local;
               scope.passprop = res.passprop;
@@ -268,6 +263,7 @@ export const serverWalkMap = (
                 mitem: mitem as MItem,
               },
               parent_mcomp,
+              content_scope,
             });
           }
         }
@@ -289,7 +285,10 @@ export const serverWalkMap = (
 
       const js = item.adv?.js;
       if (typeof js === "string") {
-        const scope = parseJs(js);
+        const scope = parseJs(js, {
+          item,
+          content_scope: arg.content_scope,
+        });
         if (scope) pcomp.scope[id].s = scope;
       }
     }
@@ -298,7 +297,10 @@ export const serverWalkMap = (
       p.scope[item.id] = { p: arg.parent_ids, n: item.name, s: null };
       const js = item.adv?.js;
       if (typeof js === "string") {
-        const scope = parseJs(js);
+        const scope = parseJs(js, {
+          item,
+          content_scope: arg.content_scope,
+        });
         if (scope) p.scope[item.id].s = scope;
       }
     }
@@ -317,6 +319,7 @@ export const serverWalkMap = (
           }
         : undefined,
       parent_ids: [...arg.parent_ids, item.id],
+      content_scope: arg.content_scope,
     });
   }
 };

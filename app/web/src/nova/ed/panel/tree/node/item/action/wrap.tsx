@@ -7,7 +7,7 @@ import { syncronize } from "y-pojo";
 import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionWrap = (p: PG, item: IText | IItem) => {
-  const mitem = getMetaById(p, item.id).mitem;
+  const mitem = getMetaById(p, item.id)?.mitem;
   if (mitem) {
     mitem.parent.forEach((e: MContent, idx) => {
       if (e.get("id") === mitem.get("id")) {

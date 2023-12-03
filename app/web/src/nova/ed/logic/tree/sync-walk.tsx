@@ -5,7 +5,7 @@ import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, PG, active } from "../ed-global";
+import { EdMeta, IScope, PG, active } from "../ed-global";
 import { loadCompSnapshot } from "./sync-walk-comp";
 import {
   ensureMItemProps,
@@ -66,6 +66,7 @@ export const syncWalkMap = (
     comps: PG["comp"]["list"];
     meta: Record<string, EdMeta>;
     component_not_found?: (comp_id: string) => void;
+    scope?: null | IScope;
   },
   arg: {
     is_layout: boolean;

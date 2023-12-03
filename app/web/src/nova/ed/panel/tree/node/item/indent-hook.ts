@@ -16,15 +16,17 @@ export const expandTreeHook = (
     const open = JSON.parse(localStorage.getItem("prasi-tree-open") || "{}");
     p.ui.tree.open = open;
 
-    let shouldOpen = new Set<string>(open[active.comp_id || p.page.cur.id] || []);
+    let shouldOpen = new Set<string>(
+      open[active.comp_id || p.page.cur.id] || []
+    );
 
     const cur = getMetaById(p, active.item_id);
     if (cur && cur.parent_item) {
-      const id = cur.parent_item.mitem?.get('id');
+      const id = cur.parent_item.mitem?.get("id");
       if (id) {
-        let meta: EdMeta | null = getMetaById(p, id);
+        let meta: EdMeta | undefined = getMetaById(p, id);
         while (meta) {
-          const id = cur.parent_item.mitem?.get('id');
+          const id = cur.parent_item.mitem?.get("id");
           if (id && !shouldOpen.has(id)) {
             shouldOpen.add(id);
             meta = getMetaById(p, id);
@@ -36,9 +38,11 @@ export const expandTreeHook = (
     }
 
     if (active.comp_id) {
-      const root = p.comp.list[active.comp_id].tree.find(e => e.parent === 'root');
-      if (root && typeof root.id === 'string')
-        shouldOpen.add(root.id)
+      const pcomp = p.comp.list[active.comp_id];
+      if (pcomp) {
+        const root = pcomp.tree.find((e) => e.parent === "root");
+        if (root && typeof root.id === "string") shouldOpen.add(root.id);
+      }
     }
 
     if (shouldOpen.size > 0 && local.tree) {
@@ -46,7 +50,7 @@ export const expandTreeHook = (
       local.render();
       if (active.item_id) {
         const meta = getMetaById(p, active.item_id);
-        if (meta && meta.item.type !== 'text') {
+        if (meta && meta.item.type !== "text") {
           setTimeout(() => {
             const el = document.getElementsByClassName(active.item_id);
             if (el.length > 0) {

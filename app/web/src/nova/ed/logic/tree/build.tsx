@@ -55,6 +55,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                   comps: p.comp.list,
                   item_loading: p.ui.tree.item_loading,
                   meta: p.page.meta,
+                  scope: p.page.scope,
                 },
                 {
                   is_layout: true,
@@ -131,6 +132,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               item_loading: p.ui.tree.item_loading,
               meta: p.page.meta,
               tree: p.page.tree,
+              scope: p.page.scope,
             },
             {
               is_layout: false,
@@ -160,24 +162,23 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     p.page.building = false;
     p.render();
     p.page.render();
-
   }
 };
 
 export const getMRoot = (p: PG) => {
-
-  const root = p.page.doc?.getMap('map').get('root');
+  const root = p.page.doc?.getMap("map").get("root");
   if (root) {
-    return p.page.root_id === 'root'
+    return p.page.root_id === "root"
       ? root
-      : p.page.meta[p.page.root_id].mitem?.get('childs')?.get(0);
+      : p.page.meta[p.page.root_id].mitem?.get("childs")?.get(0);
   }
-}
+};
 
 export const getMetaById = (p: PG, id: string) => {
   if (active.comp_id) {
-    return p.comp.list[active.comp_id].meta[active.item_id];
+    if (p.comp.list[active.comp_id])
+      return p.comp.list[active.comp_id].meta[active.item_id];
   } else {
-    return p.page.meta[id]
+    return p.page.meta[id];
   }
-}
+};

@@ -13,7 +13,7 @@ export const edActionCut = async (p: PG, item: IContent) => {
   let str = `prasi-clipboard:` + JSON.stringify(item);
   navigator.clipboard.writeText(str);
 
-  const mitem = getMetaById(p, item.id).mitem;
+  const mitem = getMetaById(p, item.id)?.mitem;
   if (mitem) {
     mitem.parent.forEach((e, k) => {
       if (e == mitem) {

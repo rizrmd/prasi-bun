@@ -1,6 +1,30 @@
 import recast from "recast";
 import babel from "recast/parsers/babel-ts";
-export const parseJs = (code: string) => {
+import { IItem, MItem } from "../../../../../web/src/utils/types/item";
+import { EdMeta } from "../../../../../web/src/nova/ed/logic/ed-global";
+
+export type ArgParentMComp = EdMeta["parent_mcomp"] & {
+  id: string;
+  parent_ids: string[];
+  jsx_props: Record<
+    string,
+    {
+      id: string;
+      mitem: MItem;
+      parent_mcomp?: ArgParentMComp;
+      parent_ids: string[];
+    }
+  >;
+};
+
+export const parseJs = (
+  code: string,
+  arg: {
+    item: IItem;
+    content_scope?: Record<string, string>;
+  }
+) => {
+  const { item } = arg;
   const local = { name: "", value: "", index: 0 };
   const passprop: Record<string, { value: string; index: number }> = {};
   const result = {} as {
@@ -8,6 +32,7 @@ export const parseJs = (code: string) => {
     passprop: typeof passprop | undefined;
     props: Record<string, { name: string; value: string }>;
   };
+
   try {
     const ast = recast.parse(code, {
       parser: babel,
@@ -36,12 +61,14 @@ export const parseJs = (code: string) => {
                   attr.value.expression.type === "ObjectExpression" &&
                   attr.value.expression.loc
                 ) {
-
                   const loc = attr.value.expression.loc as any;
                   const start = attr.value.expression.properties[0].loc?.start;
-                  const end = attr.value.expression.properties[attr.value.expression.properties.length - 1].loc?.end;
+                  const end =
+                    attr.value.expression.properties[
+                      attr.value.expression.properties.length - 1
+                    ].loc?.end;
 
-                  if (typeof start === 'number' && typeof end === 'number') {
+                  if (typeof start === "number" && typeof end === "number") {
                     local.value = code.substring(
                       loc.start.index,
                       loc.end.index
@@ -67,7 +94,6 @@ export const parseJs = (code: string) => {
                       value: code.substring(loc.start.index, loc.end.index),
                       index: loc.start.index,
                     };
-
                   }
                 }
               }

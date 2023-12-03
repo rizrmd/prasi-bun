@@ -7,7 +7,7 @@ import { getMetaById } from "../../../logic/tree/build";
 export const nodeOnDrop: (
   tree: NodeModel<EdMeta>[],
   options: DropOptions<EdMeta>
-) => void = () => { };
+) => void = () => {};
 
 export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
   const { dragSource, dragSourceId, dropTargetId, dropTarget } = arg;
@@ -31,7 +31,7 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
       const to = dropTarget.data.item.type;
 
       if (from === "section" || from === "item") {
-        let parent = dropTarget.data;
+        let parent: EdMeta | undefined = dropTarget.data;
         while (parent) {
           if (parent.item.id === dragSource.data.item.id) {
             return false;
