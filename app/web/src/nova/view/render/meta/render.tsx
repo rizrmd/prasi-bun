@@ -29,24 +29,16 @@ export const ViewMetaRender: FC<{
     <div
       className={_className}
       {...props}
-      onPointerOver={
-        v.view.hover
-          ? (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            v.view.hover?.set(meta);
-          }
-          : props?.onPointerOver
-      }
-      onClick={
-        v.view.active
-          ? (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            v.view.active?.set(meta);
-          }
-          : props?.onClick
-      }
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        v.view.hover?.set(meta);
+      }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        v.view.active?.set(meta);
+      }}
     >
       <ViewMetaChildren meta={meta} />
     </div>

@@ -2,9 +2,8 @@ import { FC, useState } from "react";
 import { useGlobal } from "web-utils";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMetaRender } from "./render";
-import { ViewBoundedScript, ViewMetaScript } from "./script";
+import { ViewBoundedScript } from "./script";
 import { compPropVal } from "./script/comp-propval";
-import { ErrorBox } from "./script/error-box";
 
 export const ViewMeta: FC<{ id: string; scopeIndex?: Record<string, any> }> = ({
   id,
