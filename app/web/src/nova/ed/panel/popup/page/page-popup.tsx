@@ -214,6 +214,7 @@ export const EdPopPage = () => {
                 await reloadPagePicker(p);
                 active.comp_id = "";
                 active.item_id = "";
+                p.ui.popup.page.open = null;
                 navigate(`/ed/${p.site.id}/${page.id}`);
               } else {
                 const found = pagePicker.tree.find(
