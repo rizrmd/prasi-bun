@@ -146,20 +146,16 @@ export const ViewMetaScript: FC<{
       children,
       props: {
         className,
-        onPointerOver: v.view.hover
-          ? (e: any) => {
-              e.stopPropagation();
-              e.preventDefault();
-              v.view.hover?.set(meta);
-            }
-          : undefined,
-        onClick: v.view.active
-          ? (e: any) => {
-              e.stopPropagation();
-              e.preventDefault();
-              v.view.active?.set(meta);
-            }
-          : undefined,
+        onPointerOver: (e: any) => {
+          e.stopPropagation();
+          e.preventDefault();
+          v.view.hover?.set(meta);
+        },
+        onClick: (e: any) => {
+          e.stopPropagation();
+          e.preventDefault();
+          v.view.active?.set(meta);
+        },
       },
       useEffect: useEffect,
       render: (jsx: ReactNode) => {
