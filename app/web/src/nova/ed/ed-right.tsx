@@ -1,9 +1,8 @@
 import { useGlobal } from "web-utils";
 import { EDGlobal, active } from "./logic/ed-global";
-import { EdSidePropComp } from "./panel/side/prop-comp";
 import { getMetaById } from "./logic/tree/build";
-import { EdSideStyle } from "./panel/side/side-style";
 import { EdSidePropInstance } from "./panel/side/prop-instance";
+import { EdSideStyle } from "./panel/side/side-style";
 
 export const EdRight = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -20,7 +19,7 @@ export const EdRight = () => {
         css`
           width: ${p.ui.layout.right}px;
         `,
-        "border-l"
+        "border-l flex flex-col"
       )}
     >
       {!meta ? (
