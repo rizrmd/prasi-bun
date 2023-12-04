@@ -7,7 +7,7 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { FC } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { EDGlobal, EdMeta } from "../../logic/ed-global";
 import { EdPropCompTreeItem, PropItem } from "./prop-comp/tree-item";
@@ -18,7 +18,7 @@ const propRef = {
 
 export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-
+  const local = useLocal({});
   const item = meta?.item as IItem;
   if (!item) return null;
   const TypedTree = DNDTree<PropItem>;
@@ -94,7 +94,13 @@ export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
                   });
                 });
               }}
-              render={EdPropCompTreeItem}
+              render={(node, params) => (
+                <EdPropCompTreeItem
+                  node={node}
+                  params={params}
+                  render={local.render}
+                />
+              )}
               rootId={"root"}
               classes={treeClasses}
               dropTargetOffset={10}
