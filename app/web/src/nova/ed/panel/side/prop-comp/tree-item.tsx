@@ -1,6 +1,9 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
+import { FC } from "react";
 import { MItem } from "../../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
+import { Popover } from "../../../../../utils/ui/popover";
+import { EdPropPopover, propPopover } from "./prop-popover";
 
 export type PropItem = {
   name: string;
@@ -9,8 +12,12 @@ export type PropItem = {
   prop: FNCompDef;
 };
 
-export const EdPropCompTreeItem: NodeRender<PropItem> = (node, params) => {
-  if (node.id === "root" || node.id === 'proot') {
+export const EdPropCompTreeItem: FC<{
+  node: Parameters<NodeRender<PropItem>>[0];
+  params: Parameters<NodeRender<PropItem>>[1];
+  render: () => void;
+}> = ({ node, params, render }) => {
+  if (node.id === "root" || node.id === "proot") {
     return <></>;
   }
   return (
@@ -34,9 +41,27 @@ export const EdPropCompTreeItem: NodeRender<PropItem> = (node, params) => {
           ></path>
         </svg>
       </div>
-      <div className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer">
-        {node.text}
-      </div>
+      {node.data && (
+        <Popover
+          placement="left-start"
+          autoFocus={false}
+          backdrop={false}
+          open={propPopover.name === node.text}
+          popoverClassName="bg-white shadow-lg border border-slate-300"
+          onOpenChange={(open) => {
+            if (!open) {
+              propPopover.name = "";
+            } else {
+              propPopover.name = node.text;
+            }
+            render();
+          }}
+          content={<EdPropPopover mprop={node.data.mprop} name={node.text} />}
+          className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer"
+        >
+          {node.text}
+        </Popover>
+      )}
     </div>
   );
 };
