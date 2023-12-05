@@ -8,18 +8,26 @@ import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 import { transform } from "esbuild";
 const decoder = new TextDecoder();
+
 export const code_edit: SAction["code"]["edit"] = async function (
   this: SyncConnection,
   arg
 ) {
+  const src = decoder.decode(await gunzipAsync(arg.value));
+
   if (arg.type === "adv") {
     const { item_id, mode, comp_id, page_id, value } = arg;
-    const src = decoder.decode(await gunzipAsync(value));
 
     let root = undefined as undefined | MRoot | MItem;
     let doc = undefined as undefined | Doc;
     if (page_id) {
       const ref = docs.page[page_id];
+      if (ref) {
+        root = ref.doc.getMap("map").get("root");
+        doc = ref.doc as Doc;
+      }
+    } else if (comp_id) {
+      const ref = docs.comp[comp_id];
       if (ref) {
         root = ref.doc.getMap("map").get("root");
         doc = ref.doc as Doc;
@@ -33,20 +41,45 @@ export const code_edit: SAction["code"]["edit"] = async function (
         const adv = mitem.get("adv");
 
         if (adv) {
-          doc?.transact(async () => {
+          const res = await transform(`render(${src})`, {
+            jsx: "transform",
+            format: "cjs",
+            loader: "tsx",
+            minify: true,
+            sourcemap: "inline",
+          });
+          doc?.transact(() => {
             adv.set(mode, src);
-
             if (mode === "js") {
-              const res = await transform(`render(${src})`, {
-                jsx: "transform",
-                format: "cjs",
-                loader: "tsx",
-                minify: true,
-                sourcemap: "inline",
-              });
               adv.set("jsBuilt", res.code);
             }
           });
+        }
+      }
+    }
+  } else {
+    const { comp_id, prop_kind, prop_name, value } = arg;
+    if (comp_id) {
+      const ref = docs.comp[comp_id];
+      if (ref) {
+        const root = ref.doc.getMap("map").get("root");
+        const doc = ref.doc as Doc;
+        if (root) {
+          const mprops = root.get("component")?.get("props");
+          const mprop = mprops?.get(prop_name);
+          if (mprop) {
+            const res = await transform(`return ${src}`, {
+              jsx: "transform",
+              format: "cjs",
+              loader: "tsx",
+            });
+            doc?.transact(() => {
+              if (prop_kind === "value") {
+                mprop.set("value", src);
+                mprop.set("valueBuilt", res.code.substring(6));
+              }
+            });
+          }
         }
       }
     }
