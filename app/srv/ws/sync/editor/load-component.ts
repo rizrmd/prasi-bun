@@ -12,8 +12,6 @@ export const loadComponent = async (id: string, sync: SyncConnection) => {
   const conf = sync.conf;
   if (!conf) return undefined;
 
-  console.log(id, sync.client_id);
-
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
       ignoreRemoteMapChanges: true,
@@ -30,7 +28,6 @@ export const loadComponent = async (id: string, sync: SyncConnection) => {
       snapshot.set("comp", id, "bin", bin);
 
       const sv_local = await gzipAsync(update);
-      console.log("comp on_update", id);
 
       user.active.findAll({ comp_id: id }).map((e) => {
         if (origin !== um) {
@@ -38,7 +35,6 @@ export const loadComponent = async (id: string, sync: SyncConnection) => {
         }
         const ws = conns.get(e.client_id)?.ws;
         if (ws) {
-          console.log("remote_svlocal", id, !!e);
           sendWS(ws, {
             type: SyncType.Event,
             event: "remote_svlocal",

@@ -65,6 +65,8 @@ export const page_load: SAction["page"]["load"] = async function (
     });
   };
 
+  user.active.delAll({ client_id: this.client_id });
+
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
 
