@@ -8,8 +8,8 @@ export const ScriptWorkbench = () => {
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
         <div className="flex p-2 border-b space-x-2">
-          {active.prop_name ? (
-            <div className="text-[12px]">{active.prop_name}</div>
+          {p.ui.popup.script.type === "prop" ? (
+            <></>
           ) : (
             <>
               {[

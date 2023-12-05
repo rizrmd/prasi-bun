@@ -9,8 +9,10 @@ import { FC } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
+import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { EDGlobal, EdMeta } from "../../logic/ed-global";
 import { EdPropCompTreeItem, PropItem } from "./prop-comp/tree-item";
+import { propPopover } from "./prop-comp/prop-popover";
 
 const propRef = {
   el: null as any,
@@ -111,7 +113,31 @@ export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
               dragPreviewRender={() => <></>}
             />
           </DndProvider>
-          <div className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer">
+          <div
+            className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer"
+            onClick={() => {
+              if (mprops) {
+                const indexes: (number | undefined)[] = [];
+                mprops.forEach((e) => indexes.push(e.get("idx")));
+                let idx: any = (indexes.sort().pop() || 0) + 1;
+                const name = `prop_${idx + 1}`;
+                const map = new Y.Map() as FMCompDef;
+                syncronize(map, {
+                  idx: idx,
+                  name,
+                  type: "string",
+                  value: '"hello"',
+                  valueBuilt: '"hello"',
+                  meta: {
+                    type: "text",
+                  },
+                });
+                mprops.set(name, map);
+                propPopover.name = name;
+                p.render();
+              }
+            }}
+          >
             + New Prop
           </div>
         </div>

@@ -35,6 +35,7 @@ export const ScriptMonaco = () => {
     meta = p.comp.list[active.comp_id].meta[active.item_id];
   }
 
+  let val = "";
   useEffect(() => {
     return () => {
       p.script.do_edit = async () => {};
@@ -43,11 +44,6 @@ export const ScriptMonaco = () => {
 
   useEffect(() => {
     if (local.monaco && local.editor) {
-      const val: string = (
-        typeof adv[p.ui.popup.script.mode] === "string"
-          ? adv[p.ui.popup.script.mode]
-          : ""
-      ) as any;
       local.monaco.editor.getModels().forEach((model) => {
         const uri = model.uri.toString();
         if (
@@ -73,24 +69,12 @@ export const ScriptMonaco = () => {
         local.render();
       });
     }
-  }, [active.item_id]);
+  }, [active.item_id, val]);
 
   if (!meta) return null;
 
   const item = meta.item;
   const adv = item.adv || {};
-  let val: string = (
-    typeof adv[p.ui.popup.script.mode] === "string"
-      ? adv[p.ui.popup.script.mode]
-      : ""
-  ) as any;
-
-  if (active.prop_name && item.type === "item" && item.component) {
-    const prop = item.component.props[active.prop_name];
-    if (prop) {
-      val = prop.value;
-    }
-  }
 
   const doEdit = async (newval: string, all?: boolean) => {
     if (local.editor && jscript.prettier.standalone) {
@@ -120,6 +104,14 @@ export const ScriptMonaco = () => {
 
   let mitem = meta.mitem;
 
+  if (p.ui.popup.script.type === "item") {
+    val = (
+      typeof adv[p.ui.popup.script.mode] === "string"
+        ? adv[p.ui.popup.script.mode]
+        : ""
+    ) as any;
+  }
+
   if (!mitem) {
     active.item_id = "";
     return <div>no mitem</div>;
@@ -133,6 +125,18 @@ export const ScriptMonaco = () => {
     if (!mitem) {
       active.item_id = "";
       return <div>no mitem</div>;
+    }
+  }
+
+  if (p.ui.popup.script.type === "prop") {
+    const mprops = mitem?.get("component")?.get("props");
+    if (mprops) {
+      const mprop = mprops.get(p.ui.popup.script.prop_name);
+      if (mprop) {
+        if (p.ui.popup.script.prop_kind === "value") {
+          val = mprop.get("value");
+        }
+      }
     }
   }
 

@@ -14,7 +14,6 @@ export const EdPopScript = () => {
         onOpenChange={(open) => {
           if (!open) {
             p.ui.popup.script.open = false;
-            active.prop_name = "";
             p.render();
           }
         }}
