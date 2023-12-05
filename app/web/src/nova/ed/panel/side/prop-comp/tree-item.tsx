@@ -3,7 +3,7 @@ import { FC } from "react";
 import { MItem } from "../../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { Popover } from "../../../../../utils/ui/popover";
-import { EdPropPopover, propPopover } from "./prop-popover";
+import { EdPropPopoverForm, propPopover } from "./prop-form";
 import { TypedMap } from "yjs-types";
 
 export type PropItem = {
@@ -18,11 +18,11 @@ export const EdPropCompTreeItem: FC<{
   params: Parameters<NodeRender<PropItem>>[1];
   render: () => void;
 }> = ({ node, params, render }) => {
-  if (node.id === "root" || node.id === "proot") {
+  if (node.id === "root") {
     return <></>;
   }
   return (
-    <div className="flex items-stretch border-b text-[14px]">
+    <div className="flex items-stretch border-b text-[14px] min-h-[27px]">
       <div
         ref={params.handleRef}
         className="cursor-pointer flex items-center justify-center text-slate-300 hover:bg-blue-100 hover:text-slate-600 border-r"
@@ -57,8 +57,10 @@ export const EdPropCompTreeItem: FC<{
             }
             render();
           }}
-          content={<EdPropPopover mprop={node.data.mprop} name={node.text} />}
-          className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer"
+          content={
+            <EdPropPopoverForm mprop={node.data.mprop} name={node.text} />
+          }
+          className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer items-center flex"
         >
           {node.text}
         </Popover>
@@ -70,13 +72,16 @@ export const EdPropCompTreeItem: FC<{
           e.stopPropagation();
           if (confirm("Are you sure ?")) {
             const mprop = node.data?.mprop;
-            if (mprop){
-            const parent = mprop.parent as TypedMap<Record<string, FMCompDef>>;
-            parent.forEach((m, idx) => {
-              if (mprop === m) {
-                parent.delete(idx);
-              }
-            });}
+            if (mprop) {
+              const parent = mprop.parent as TypedMap<
+                Record<string, FMCompDef>
+              >;
+              parent.forEach((m, idx) => {
+                if (mprop === m) {
+                  parent.delete(idx);
+                }
+              });
+            }
           }
         }}
       >

@@ -3,7 +3,7 @@ import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
-import { propPopover } from "../../side/prop-comp/prop-popover";
+import { propPopover } from "../../side/prop-comp/prop-form";
 import { ScriptWorkbench } from "./workbench";
 
 export const EdPopScript = () => {
