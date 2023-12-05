@@ -2,7 +2,8 @@ import { useGlobal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
-import { EDGlobal, active } from "../../../logic/ed-global";
+import { EDGlobal } from "../../../logic/ed-global";
+import { propPopover } from "../../side/prop-comp/prop-popover";
 import { ScriptWorkbench } from "./workbench";
 
 export const EdPopScript = () => {
@@ -14,6 +15,11 @@ export const EdPopScript = () => {
         onOpenChange={(open) => {
           if (!open) {
             p.ui.popup.script.open = false;
+
+            if (p.ui.popup.script.prop_name) {
+              propPopover.name = p.ui.popup.script.prop_name;
+            }
+
             p.render();
           }
         }}

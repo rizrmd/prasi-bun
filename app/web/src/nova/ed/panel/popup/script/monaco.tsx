@@ -133,8 +133,15 @@ export const ScriptMonaco = () => {
     if (mprops) {
       const mprop = mprops.get(p.ui.popup.script.prop_name);
       if (mprop) {
-        if (p.ui.popup.script.prop_kind === "value") {
+        const kind = p.ui.popup.script.prop_kind;
+        if (kind === "value") {
           val = mprop.get("value");
+        } else if (kind === "gen") {
+          val = mprop.get("gen") || "";
+        } else if (kind === "visible") {
+          val = mprop.get("visible") || "";
+        } else if (kind === "option") {
+          val = mprop.get("meta")?.get("options") || "";
         }
       }
     }
@@ -216,7 +223,6 @@ export const ScriptMonaco = () => {
             )
           );
           editor.setModel(model);
-
           await jsMount(editor, monaco, p);
           await monacoTypings(
             {

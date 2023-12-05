@@ -23,7 +23,9 @@ export const EdRight = () => {
       )}
     >
       {!meta ? (
-        <>Select an item</>
+        <div className="flex items-center justify-center text-[12px] flex-1">
+          Select an item
+        </div>
       ) : (
         <>
           {isComponent ? (

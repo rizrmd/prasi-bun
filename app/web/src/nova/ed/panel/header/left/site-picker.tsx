@@ -1,5 +1,5 @@
 import { useGlobal } from "web-utils";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import { TopBtn } from "../top-btn";
 
 export const EdSitePicker = () => {
@@ -8,6 +8,7 @@ export const EdSitePicker = () => {
     <TopBtn
       onClick={(e) => {
         p.ui.popup.site = (id) => {
+          active.comp_id = "";
           navigate(`/ed/${id}`);
         };
         p.render();

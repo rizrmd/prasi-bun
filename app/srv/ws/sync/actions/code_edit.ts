@@ -77,6 +77,17 @@ export const code_edit: SAction["code"]["edit"] = async function (
               if (prop_kind === "value") {
                 mprop.set("value", src);
                 mprop.set("valueBuilt", res.code.substring(6));
+              } else if (prop_kind === "gen") {
+                mprop.set("gen", src);
+                mprop.set("genBuilt", res.code.substring(6));
+              } else if (prop_kind === "visible") {
+                mprop.set("visible", src);
+              } else if (prop_kind === "option") {
+                const meta = mprop.get("meta");
+                if (meta) {
+                  meta.set("options", src);
+                  meta.set("optionsBuilt", res.code.substring(6));
+                }
               }
             });
           }
