@@ -51,6 +51,7 @@ export const EdTreeAction = ({
           )}
           onClick={() => {
             p.ui.popup.script.open = true;
+            p.ui.popup.script.type = "item";
             p.ui.popup.script.mode = (mode || "js") as any;
             p.render();
           }}

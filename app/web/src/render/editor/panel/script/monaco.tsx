@@ -1,8 +1,8 @@
 import type { Editor } from "@monaco-editor/react";
 import { ReactElement } from "react";
-import { jsMount } from "../../../../../utils/script/mount";
-import { monacoTypings } from "../../../../../utils/script/typings";
-import { Modal } from "../../../../../utils/ui/modal";
+import { jsMount } from "../../../../utils/script/mount";
+import { monacoTypings } from "../../../../utils/script/typings";
+import { Modal } from "../../../../utils/ui/modal";
 import { EdMonacoWrap } from "./init";
 
 const monacoState = {} as Record<string, any>;

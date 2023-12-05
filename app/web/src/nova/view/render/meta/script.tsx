@@ -1,5 +1,6 @@
 import hash_sum from "hash-sum";
-import { FC, ReactNode, Suspense, useEffect } from "react";
+import { FC, ReactNode, useEffect } from "react";
+import { useLocal } from "web-utils";
 import { produceCSS } from "../../../../utils/css/gen";
 import { createAPI, createDB } from "../../../../utils/script/init-api";
 import { IItem } from "../../../../utils/types/item";
@@ -12,7 +13,6 @@ import { createLocal } from "./script/create-local";
 import { createPassProp } from "./script/create-pass-prop";
 import { ErrorBox } from "./script/error-box";
 import { mergeScopeUpwards } from "./script/merge-upward";
-import { useLocal } from "web-utils";
 
 const renderLimit = {} as Record<
   string,

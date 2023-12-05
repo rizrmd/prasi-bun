@@ -8,14 +8,13 @@ import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { edUndoManager } from "./logic/ed-undo";
 import { EdPane } from "./panel/main/pane-resize";
+import { EdPopApi } from "./panel/popup/api/api-server";
 import { EdPopCode } from "./panel/popup/code/code";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
+import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
-import { EdScriptInit } from "./panel/script/monaco/init";
-import { EdPopApi } from "./panel/popup/api/api-server";
-import { EdPopComp } from "./panel/popup/comp/comp-popup";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -57,7 +56,6 @@ export const EdBase = () => {
         <EdPopPage />
         <EdPopCompGroup />
         <EdPopComp />
-        <EdScriptInit />
       </>
     </div>
   );

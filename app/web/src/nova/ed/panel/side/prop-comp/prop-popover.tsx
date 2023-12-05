@@ -58,6 +58,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
           type="text"
           className="p-1 outline-none border focus:border-blue-500"
           value={local.name}
+          autoFocus
           onChange={(e) => {
             local.name = e.currentTarget.value
               .toLowerCase()
@@ -100,7 +101,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
 
           <div
             className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-            onClick={createEditScript(p, "master-visible")}
+            onClick={createEditScript(p, "visible", mprop, name)}
           >
             EDIT CODE
           </div>
@@ -127,7 +128,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
             </div>
             <div
               className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px] flex "
-              onClick={createEditScript(p, "master-gen")}
+              onClick={createEditScript(p, "gen", mprop, name)}
             >
               EDIT CODE
             </div>
@@ -137,7 +138,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
             </div>
             <div
               className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-              onClick={createEditScript(p, "master-visible")}
+              onClick={createEditScript(p, "visible", mprop, name)}
             >
               EDIT CODE
             </div>
@@ -147,7 +148,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
             <div className="uppercase text-xs">VALUE</div>
             <div
               className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-              onClick={createEditScript(p, "master-value")}
+              onClick={createEditScript(p, "value", mprop, name)}
             >
               EDIT CODE
             </div>
@@ -190,7 +191,7 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
 
           <div
             className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-            onClick={createEditScript(p, "master-option")}
+            onClick={createEditScript(p, "option", mprop, name)}
           >
             EDIT CODE
           </div>

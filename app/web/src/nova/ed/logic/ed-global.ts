@@ -10,6 +10,7 @@ import { DComp, DPage } from "../../../utils/types/root";
 import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
 import { PageItem } from "../panel/popup/page/page-tree";
+import { FMCompDef } from "../../../utils/types/meta-fn";
 
 export const EmptySite = {
   id: "",
@@ -24,7 +25,7 @@ export const EmptySite = {
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
-
+export type PropFieldKind = "visible" | "gen" | "value" | "option";
 export type ISingleScope = {
   p: string[];
   n: string;
@@ -63,7 +64,6 @@ const target = {
 };
 export const active = {
   hover_id: "",
-  prop_name: "",
   text: { id: "", content: "" },
   get item_id() {
     if (target.active_id === false) {
@@ -234,6 +234,9 @@ export const EDGlobal = {
       script: {
         open: false,
         mode: "js" as "js" | "css" | "html",
+        type: "item" as "item" | "prop",
+        prop_kind: "" as PropFieldKind,
+        prop_name: "",
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {

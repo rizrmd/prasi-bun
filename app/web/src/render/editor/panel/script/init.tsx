@@ -1,7 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import { useLocal } from "web-utils";
-import { jscript } from "../../../../../utils/script/jscript";
-import { Loading } from "../../../../../utils/ui/loading";
+import { jscript } from "../../../../utils/script/jscript";
+import { Loading } from "../../../../utils/ui/loading";
 
 export const EdScriptInit = () => {
   const Editor = jscript.editor;
