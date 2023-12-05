@@ -2,7 +2,7 @@ import { FC } from "react";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { useGlobal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
-import { EdSidePropComp } from "./prop-comp";
+import { EdSidePropComp } from "./prop-master";
 
 export const EdSideStyle: FC<{ meta: EdMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");

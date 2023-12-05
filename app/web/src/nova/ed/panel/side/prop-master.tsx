@@ -11,8 +11,8 @@ import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { EDGlobal, EdMeta } from "../../logic/ed-global";
-import { EdPropCompTreeItem, PropItem } from "./prop-comp/tree-item";
-import { propPopover } from "./prop-comp/prop-form";
+import { EdPropCompTreeItem, PropItem } from "./prop-master/tree-item";
+import { propPopover } from "./prop-master/prop-form";
 
 const propRef = {
   el: null as any,
