@@ -234,7 +234,7 @@ export const EDGlobal = {
       script: {
         open: false,
         mode: "js" as "js" | "css" | "html",
-        type: "item" as "item" | "prop",
+        type: "item" as "item" | "prop-master" | "prop-instance",
         prop_kind: "" as PropFieldKind,
         prop_name: "",
       },

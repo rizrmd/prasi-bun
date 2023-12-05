@@ -1,6 +1,7 @@
 import { useGlobal } from "web-utils";
 import { ScriptMonaco } from "./monaco";
 import { EDGlobal, active } from "../../../logic/ed-global";
+import { IItem } from "../../../../../utils/types/item";
 
 export const ScriptWorkbench = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -8,8 +9,8 @@ export const ScriptWorkbench = () => {
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
         <div className="flex p-2 border-b space-x-2">
-          {p.ui.popup.script.type === "prop" ? (
-            <></>
+          {p.ui.popup.script.type === "prop-master" ? (
+            <CompTitle />
           ) : (
             <>
               {[
@@ -52,3 +53,43 @@ export const ScriptWorkbench = () => {
     </div>
   );
 };
+
+const CompTitle = () => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
+  const item = p.comp.list[active.comp_id].doc
+    .getMap("map")
+    .get("root")
+    ?.toJSON() as IItem;
+
+  if (item && item.component?.id) {
+    const props = item.component.props;
+    return (
+      <div className="flex text-xs space-x-1 items-center">
+        <div>{item.name}</div>
+        <ArrowRight />
+        <div>{p.ui.popup.script.prop_name}</div>
+        <ArrowRight />
+        <div>{p.ui.popup.script.prop_kind}</div>
+      </div>
+    );
+  }
+  return <></>;
+};
+
+const ArrowRight = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 15 15"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
+      fill="currentColor"
+      fillRule="evenodd"
+      clipRule="evenodd"
+    ></path>
+  </svg>
+);

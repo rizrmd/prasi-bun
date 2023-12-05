@@ -113,7 +113,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       }
     }
 
-    doc.transact(async () => {
+    doc.transact(() => {
       const sections = root.get("childs");
       if (sections) {
         sections.map((e) => {

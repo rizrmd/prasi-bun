@@ -3,6 +3,7 @@ import {
   EPage,
   ESite,
   IScopeComp,
+  PropFieldKind,
 } from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
@@ -105,10 +106,9 @@ export const SyncActions = {
           }
         | {
             type: "prop";
-            page_id?: string;
-            comp_id?: string;
-            item_id: string;
+            comp_id: string;
             prop_name: string;
+            prop_kind: PropFieldKind;
             value: Uint8Array;
           }
     ) => ({}) as boolean,

@@ -128,7 +128,7 @@ export const ScriptMonaco = () => {
     }
   }
 
-  if (p.ui.popup.script.type === "prop") {
+  if (p.ui.popup.script.type === "prop-master") {
     const mprops = mitem?.get("component")?.get("props");
     if (mprops) {
       const mprop = mprops.get(p.ui.popup.script.prop_name);
@@ -169,13 +169,23 @@ export const ScriptMonaco = () => {
               arg.page_id = p.page.cur.id;
             }
 
-            p.sync.code.edit({
-              type: "adv",
-              mode: type,
-              item_id: active.item_id,
-              value: compress(encode.encode(val || "")),
-              ...arg,
-            });
+            if (p.ui.popup.script.type === "prop-master") {
+              p.sync.code.edit({
+                type: "prop",
+                prop_kind: p.ui.popup.script.prop_kind,
+                prop_name: p.ui.popup.script.prop_name,
+                value: compress(encode.encode(val || "")),
+                ...arg,
+              });
+            } else {
+              p.sync.code.edit({
+                type: "adv",
+                mode: type,
+                item_id: active.item_id,
+                value: compress(encode.encode(val || "")),
+                ...arg,
+              });
+            }
           }
         }, 1000);
       }}
