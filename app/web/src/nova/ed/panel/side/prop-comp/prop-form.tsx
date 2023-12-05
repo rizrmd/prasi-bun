@@ -4,12 +4,16 @@ import { useGlobal, useLocal } from "web-utils";
 import { TypedMap } from "yjs-types";
 import { createEditScript } from "./edit-script";
 import { EDGlobal } from "../../../logic/ed-global";
+import { createId } from "@paralleldrive/cuid2";
+import { IItem, MItem } from "../../../../../utils/types/item";
+import { MContent } from "../../../../../utils/types/general";
+import { fillID } from "../../../logic/tree/fill-id";
 
 export const propPopover = {
   name: "",
 };
 
-export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
+export const EdPropPopoverForm: FC<{ mprop: FMCompDef; name: string }> = ({
   mprop,
   name,
 }) => {
@@ -43,7 +47,28 @@ export const EdPropPopover: FC<{ mprop: FMCompDef; name: string }> = ({
                 " px-2 cursor-pointer"
               )}
               onClick={() => {
-                mmeta.set("type", e.type as any);
+                if (e.type === "content-element") {
+                  mmeta.doc?.transact(() => {
+                    mmeta.set("type", e.type as any);
+                    if (!mprop.get("content")) {
+                      const json = {
+                        id: createId(),
+                        name: `jsx-content`,
+                        type: "item",
+                        dim: { w: "full", h: "full" },
+                        childs: [],
+                        adv: {
+                          css: "",
+                        },
+                      } as IItem;
+                      const map = new Y.Map() as MItem;
+                      syncronize(map as any, fillID(json));
+                      mprop.set("content", map);
+                    }
+                  });
+                } else {
+                  mmeta.set("type", e.type as any);
+                }
               }}
             >
               {e.label}

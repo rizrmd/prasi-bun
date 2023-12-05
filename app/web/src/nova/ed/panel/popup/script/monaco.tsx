@@ -137,11 +137,28 @@ export const ScriptMonaco = () => {
         if (kind === "value") {
           val = mprop.get("value");
         } else if (kind === "gen") {
-          val = mprop.get("gen") || "";
+          val =
+            mprop.get("gen") ||
+            `\
+async () => {
+  return \`""\`;
+}`;
         } else if (kind === "visible") {
-          val = mprop.get("visible") || "";
+          val = mprop.get("visible") || "true";
         } else if (kind === "option") {
-          val = mprop.get("meta")?.get("options") || "";
+          val =
+            mprop.get("meta")?.get("options") ||
+            `\
+[
+  {
+    label: "yes",
+    value: "y"
+  },
+  {
+    label: "no",
+    value: "n"
+  },
+]`;
         }
       }
     }

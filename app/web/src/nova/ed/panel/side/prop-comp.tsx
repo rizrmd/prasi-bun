@@ -12,7 +12,7 @@ import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { EDGlobal, EdMeta } from "../../logic/ed-global";
 import { EdPropCompTreeItem, PropItem } from "./prop-comp/tree-item";
-import { propPopover } from "./prop-comp/prop-popover";
+import { propPopover } from "./prop-comp/prop-form";
 
 const propRef = {
   el: null as any,
