@@ -7,6 +7,7 @@ import { IText } from "../../../../../utils/types/text";
 import { MContent } from "../../../../../utils/types/general";
 import { fillID } from "../../../logic/tree/fill-id";
 import { prepSection } from "./prep-section";
+import { IItem } from "../../../../../utils/types/item";
 
 export const EdAddText = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -37,7 +38,7 @@ export const EdAddText = () => {
           },
         } as IText;
 
-        let mitem = meta.mitem;
+        let mitem = meta.mitem as MContent;
         if (mitem) {
           if (
             meta.item.type === "text" ||
@@ -51,11 +52,40 @@ export const EdAddText = () => {
             if (!parent) {
               alert("Failed to add text!");
             } else {
-              mitem = parent.mitem;
+              mitem = parent.mitem as MContent;
             }
           }
 
           if (mitem) {
+            if (mitem.get("type") === "section") {
+              const json = {
+                id: createId(),
+                name: `New Item`,
+                type: "item",
+                dim: { w: "full", h: "full" },
+                childs: [],
+                adv: {
+                  css: "",
+                },
+              } as IItem;
+
+              if (mitem) {
+                const childs = mitem.get("childs");
+                if (childs) {
+                  const map = new Y.Map() as MContent;
+                  syncronize(map as any, fillID(json));
+                  const childs = mitem.get("childs");
+                  if (childs) {
+                    childs.push([map]);
+                  }
+
+                  active.item_id = map.get("id") || "";
+                  mitem = map;
+                  p.render();
+                }
+              }
+            }
+
             const childs = mitem.get("childs");
             if (childs) {
               const map = new Y.Map() as MContent;

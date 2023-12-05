@@ -3,11 +3,49 @@ import get from "lodash.get";
 import { MContent } from "../../../../../utils/types/general";
 import { EdMeta, PG, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
+import { fillID } from "../../../logic/tree/fill-id";
 
 export const nodeOnDrop: (
+  p: PG,
   tree: NodeModel<EdMeta>[],
   options: DropOptions<EdMeta>
-) => void = () => {};
+) => void = (p, tree, options) => {
+  const { dragSource, dropTarget, relativeIndex, dragSourceId, dropTargetId } =
+    options;
+
+  if (
+    dragSource?.data &&
+    dropTarget &&
+    typeof dragSourceId === "string" &&
+    typeof dropTargetId === "string"
+  ) {
+    let fromMeta = getMetaById(p, dragSourceId);
+    let toMeta = getMetaById(p, dropTargetId);
+    if (fromMeta && toMeta) {
+      let to = toMeta.parent_mcomp ? toMeta.parent_mcomp.mcomp : toMeta.mitem;
+      let from = fromMeta.mitem;
+
+      if (to) {
+        to.doc?.transact(() => {
+          if (to && from && typeof relativeIndex === "number") {
+            const toChilds = to.get("childs");
+            if (toChilds) {
+              const map = new Y.Map();
+              syncronize(map, fillID(from.toJSON() as any));
+              toChilds.insert(relativeIndex, [map]);
+            }
+
+            from.parent.forEach((e, idx) => {
+              if (from && e.get("id") === from.get("id")) {
+                from.parent.delete(idx);
+              }
+            });
+          }
+        });
+      }
+    }
+  }
+};
 
 export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
   const { dragSource, dragSourceId, dropTargetId, dropTarget } = arg;
