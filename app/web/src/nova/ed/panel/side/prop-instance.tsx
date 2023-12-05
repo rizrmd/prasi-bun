@@ -2,9 +2,27 @@ import { FC } from "react";
 import { useGlobal } from "web-utils";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { IItem } from "../../../../utils/types/item";
+import { FMCompDef } from "../../../../utils/types/meta-fn";
 
 export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+
+  const item = meta?.item as IItem;
+  if (!item) return null;
+
+  let filtered = [] as FMCompDef[];
+  const mprops = meta.mitem?.get("component")?.get("props");
+  if (mprops && meta.mitem) {
+    mprops.forEach((m, key) => {
+      filtered.push(m);
+    });
+
+    filtered = filtered.sort((a, b) => {
+      const aidx = a.get("idx") || 0;
+      const bidx = b.get("idx") || 0;
+      return aidx - bidx;
+    });
+  }
 
   return (
     <div className="flex flex-col text-[12px]">
