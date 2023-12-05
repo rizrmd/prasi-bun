@@ -22,7 +22,6 @@ export const EdTreeBody = () => {
 
   expandTreeHook(p, local);
 
-
   if (active.comp_id && local.comp_id !== active.comp_id) {
     local.comp_id = active.comp_id;
     const ref = p.comp.list[active.comp_id];
@@ -41,7 +40,6 @@ export const EdTreeBody = () => {
       tree = p.page.tree;
     }
   }
-
 
   if (tree.length === 0)
     return (
@@ -78,7 +76,6 @@ export const EdTreeBody = () => {
       </div>
     );
 
-
   return (
     <>
       <TypedTree
@@ -92,7 +89,7 @@ export const EdTreeBody = () => {
         sort={false}
         dropTargetOffset={10}
         render={nodeRender}
-        onDrop={nodeOnDrop}
+        onDrop={(tree, options) => nodeOnDrop(p, tree, options)}
         canDrop={(_, args) => {
           if (!args.dragSource?.data?.item) return false;
           return canDrop(p, args);
