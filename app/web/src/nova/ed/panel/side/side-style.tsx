@@ -16,7 +16,7 @@ export const EdSideStyle: FC<{ meta: EdMeta }> = ({ meta }) => {
 
   return (
     <div className="flex flex-col text-[12px]">
-      <div className="flex border-b p-1 h-[35px] items-center bg-slate-50 justify-between select-none">
+      <div className="flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none">
         <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
           {item.name}
         </div>
