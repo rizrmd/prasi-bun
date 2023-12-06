@@ -1,5 +1,5 @@
 import { dirAsync } from "fs-jetpack";
-import trim from "lodash/trim";
+import trim from "lodash.trim";
 import { dirname } from "path";
 import { apiContext } from "service-srv";
 import { g } from "utils/global";
