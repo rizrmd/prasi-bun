@@ -29,7 +29,7 @@ export const EdPropInstanceText: FC<{
     if (val) {
       try {
         eval(`local.value = ${valBuilt}`);
-      } catch (e) {}
+      } catch (e) { }
     } else {
       local.value = "";
     }
@@ -37,10 +37,11 @@ export const EdPropInstanceText: FC<{
   }, [val, valBuilt]);
 
   const label = (
-    <div className="pl-1 max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap">
+    <div className="pl-1 w-[70px] overflow-hidden text-ellipsis whitespace-nowrap">
       {name}
     </div>
   );
+  
   return (
     <div className="flex items-center">
       {name.length > 8 ? (
