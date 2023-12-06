@@ -15,6 +15,7 @@ import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
+import { EdMain } from "./panel/main/main";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -44,9 +45,14 @@ export const EdBase = () => {
       <div className="flex flex-1 items-stretch">
         <EdLeft />
         <EdPane type="left" />
-        <EdMid />
-        <EdPane type="right" />
-        <EdRight />
+        <div className="flex flex-1 flex-col items-stretch">
+          <EdMid />
+          <div className="flex flex-1 items-stretch">
+            <EdMain />
+            <EdPane type="right" />
+            <EdRight />
+          </div>
+        </div>
       </div>
       <>
         <EdPopCode />

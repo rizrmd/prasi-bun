@@ -51,7 +51,7 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
 
   return (
     <div className="flex flex-1 flex-col text-[12px]">
-      <div className="flex border-b p-1 h-[27px] items-center bg-slate-50 justify-between select-none">
+      <div className="flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none">
         <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
           {meta.item.name}
         </div>

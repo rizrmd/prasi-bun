@@ -53,7 +53,7 @@ export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
 
   return (
     <div className="flex flex-col text-[12px] flex-1">
-      <div className="flex border-b p-1 h-[35px] items-center bg-slate-50 justify-between select-none">
+      <div className="flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none">
         <div
           className="flex cursor-pointer items-center"
           onClick={() => {
