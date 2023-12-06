@@ -84,8 +84,7 @@ export const ViewMetaScript: FC<{
       js = item.adv.js;
     }
     console.warn(
-      `Maximum render limit (100 render in 100ms) reached in item [${
-        item.name
+      `Maximum render limit (100 render in 100ms) reached in item [${item.name
       }]:\n${js.length > 30 ? js.substring(0, 30) + "..." : js}`
     );
     return renderLimit[v.current.page_id][item.id].cache;
@@ -136,6 +135,7 @@ export const ViewMetaScript: FC<{
       }
     }
     const output = { jsx: null as any };
+
 
     args = {
       ...w.exports,
