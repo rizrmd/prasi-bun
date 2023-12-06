@@ -29,7 +29,8 @@ export const loadComponent = async (id: string, sync: SyncConnection) => {
 
       const sv_local = await gzipAsync(update);
 
-      user.active.findAll({ comp_id: id }).map((e) => {
+      const all = user.active.findAll({ comp_id: id });
+      all.map((e) => {
         if (origin !== um) {
           if (e.client_id === origin) return;
         }
