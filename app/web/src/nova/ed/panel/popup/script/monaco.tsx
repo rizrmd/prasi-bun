@@ -76,7 +76,8 @@ export const ScriptMonaco = () => {
   if (!meta) return null;
 
   const item = meta.item;
-  const adv = item.adv || {};
+  const adv = meta.mitem?.get("adv")?.toJSON() || {};
+  item.adv = adv;
 
   const doEdit = async (newval: string, all?: boolean) => {
     if (local.editor && jscript.prettier.standalone) {
