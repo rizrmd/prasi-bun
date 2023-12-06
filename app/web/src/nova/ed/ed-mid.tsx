@@ -5,7 +5,6 @@ import { EdAddText } from "./panel/header/mid/add-text";
 import { EdCompPicker } from "./panel/header/mid/comp-picker";
 import { EdPagePicker } from "./panel/header/mid/page-picker";
 import { TopBtn } from "./panel/header/top-btn";
-import { EdMain } from "./panel/main/main";
 
 export const EdMid: FC<{}> = () => {
   return (
@@ -15,12 +14,12 @@ export const EdMid: FC<{}> = () => {
           "h-[35px] border-b flex p-1 items-stretch text-[12px] justify-between"
         )}
       >
-        <div className="flex items-stretch flex-1 ">
+        <div className="flex items-stretch flex-1">
           <EdPagePicker />
         </div>
 
-        <div className="flex items-stretch flex-1 justify-center  ">
-          <div className="flex items-stretch ">
+        <div className="flex items-stretch flex-1 justify-center">
+          <div className="flex items-stretch">
             <div className="border-r border-r-slate-100 text-slate-400 text-[9px] flex items-center px-1 mr-1">
               ADD
             </div>

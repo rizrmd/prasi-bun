@@ -15,7 +15,11 @@ import { SyncConnection } from "../type";
 import { loadComponent } from "./load-component";
 import { extractMItemProps } from "./load-page-comp";
 import { ArgParentMComp, parseJs } from "./parser/parse-js";
+import { user } from "../entity/user";
 
+const defaultActive = {
+  select: "" as "" | "comp" | "item" | "section" | "text",
+};
 export const serverWalkLoad = async (
   mitem: MItem,
   scope_comps: IScopeComp,
@@ -35,6 +39,18 @@ export const serverWalkLoad = async (
       loaded.add(id);
       if (!docs.comp[id]) {
         await loadComponent(id, sync);
+      } else {
+        const conf = sync.conf;
+        if (conf) {
+          user.active.add({
+            ...defaultActive,
+            client_id: sync.client_id,
+            user_id: sync.user_id,
+            site_id: conf.site_id,
+            page_id: conf.page_id,
+            comp_id: comp.id,
+          });
+        }
       }
 
       const pcomp = docs.comp[id];

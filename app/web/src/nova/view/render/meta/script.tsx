@@ -136,7 +136,6 @@ export const ViewMetaScript: FC<{
     }
     const output = { jsx: null as any };
 
-
     args = {
       ...w.exports,
       ...finalScope,

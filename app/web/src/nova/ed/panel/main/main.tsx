@@ -43,23 +43,37 @@ export const EdMain = () => {
               p.page.render = render;
             }}
             hidden={(meta) => {
-              if (meta.item.hidden) return true
+              if (meta.item.hidden) return true;
               return false;
             }}
             hover={{
               get(meta) {
                 const item = meta.item;
 
-                if (item.originalId === active.hover_id || item.id === active.hover_id)
+                if (active.comp_id) {
+                  if (meta.parent_mcomp) {
+                    if (
+                      meta.parent_mcomp?.mcomp.get("component")?.get("id") !==
+                      active.comp_id
+                    )
+                      return false;
+                  }
+                }
+
+                if (
+                  item.originalId === active.hover_id ||
+                  item.id === active.hover_id
+                )
                   return true;
 
-                return false
+                return false;
               },
               set(meta) {
                 if (meta.parent_mcomp) {
-                  const id = meta.parent_mcomp.mitem.get('id');
+                  const id = meta.parent_mcomp.mitem.get("id");
                   if (active.instance.item_id !== id) {
-                    const original_id = meta.parent_mcomp.mitem.get('originalId');
+                    const original_id =
+                      meta.parent_mcomp.mitem.get("originalId");
 
                     if (active.comp_id && original_id) {
                       active.hover_id = original_id;
@@ -79,14 +93,14 @@ export const EdMain = () => {
                   const parent = meta.parent_mcomp;
                   if (parent) {
                     const mcomp = parent.mcomp;
-                    if (mcomp.get('component')?.get('id') === active.comp_id) {
+                    if (mcomp.get("component")?.get("id") === active.comp_id) {
                       active.hover_id = meta.item.originalId || meta.item.id;
                     }
                   } else {
                     active.hover_id = meta.item.id;
                   }
                 } else {
-                  active.hover_id = meta.item.id
+                  active.hover_id = meta.item.id;
                 }
 
                 p.render();
@@ -97,18 +111,32 @@ export const EdMain = () => {
               get(meta) {
                 const item = meta.item;
 
-                if (item.originalId === active.item_id || item.id === active.item_id)
+                if (active.comp_id) {
+                  if (meta.parent_mcomp) {
+                    if (
+                      meta.parent_mcomp?.mcomp.get("component")?.get("id") !==
+                      active.comp_id
+                    )
+                      return false;
+                  }
+                }
+                
+                if (
+                  item.originalId === active.item_id ||
+                  item.id === active.item_id
+                )
                   return true;
 
-                return false
+                return false;
               },
               set(meta) {
                 if (meta.parent_mcomp) {
-                  const id = meta.parent_mcomp.mitem.get('id');
+                  const id = meta.parent_mcomp.mitem.get("id");
                   if (active.instance.item_id !== id) {
-                    const original_id = meta.parent_mcomp.mitem.get('originalId');
+                    const original_id =
+                      meta.parent_mcomp.mitem.get("originalId");
 
-                    let active_id = ""
+                    let active_id = "";
                     if (active.comp_id && original_id) {
                       active_id = original_id;
                     } else if (id) {
@@ -119,7 +147,9 @@ export const EdMain = () => {
                       if (active.item_id !== active_id) {
                         active.item_id = active_id;
                       } else {
-                        const comp_id = meta.parent_mcomp.mcomp.get('component')?.get('id');
+                        const comp_id = meta.parent_mcomp.mcomp
+                          .get("component")
+                          ?.get("id");
                         if (comp_id) {
                           active.instance.item_id = active_id;
                           active.instance.comp_id = active.comp_id;
@@ -147,7 +177,7 @@ export const EdMain = () => {
                   const parent = meta.parent_mcomp;
                   if (parent) {
                     const mcomp = parent.mcomp;
-                    if (mcomp.get('component')?.get('id') === active.comp_id) {
+                    if (mcomp.get("component")?.get("id") === active.comp_id) {
                       active.item_id = meta.item.originalId || meta.item.id;
                     }
                   } else {
@@ -157,13 +187,12 @@ export const EdMain = () => {
                     active.instance.comp_id = "";
                   }
                 } else {
-                  active.item_id = meta.item.id
+                  active.item_id = meta.item.id;
                 }
 
                 p.render();
                 p.page.render();
                 focus();
-
               },
               text(meta) {
                 const { item } = meta;
@@ -172,33 +201,40 @@ export const EdMain = () => {
                   active.text.content = item.html || "";
                 }
 
-                return <div
-                  className={cx(`v-text-${item.id} v-text-${item.originalId} outline-none`)}
-                  ref={(ref) => {
-                    if (ref !== document.activeElement && ref) {
-                      const renaming = document.querySelector('.rename-item');
-                      const modals = document.querySelectorAll('[data-floating-ui-portal]');
-                      if (modals.length === 0 && !renaming) {
-                        ref.focus();
-                        setEndOfContenteditable(ref)
+                return (
+                  <div
+                    className={cx(
+                      `v-text-${item.id} v-text-${item.originalId} outline-none`
+                    )}
+                    ref={(ref) => {
+                      if (ref !== document.activeElement && ref) {
+                        const renaming = document.querySelector(".rename-item");
+                        const modals = document.querySelectorAll(
+                          "[data-floating-ui-portal]"
+                        );
+                        if (modals.length === 0 && !renaming) {
+                          ref.focus();
+                          setEndOfContenteditable(ref);
+                        }
                       }
-                    }
-                  }}
-                  contentEditable
-                  spellCheck={false}
-                  onInput={(e) => {
-                    const val = e.currentTarget.innerHTML;
-                    active.text.id = item.id;
-                    active.text.content = val;
-                  }}
-                  onBlur={() => {
-                    const meta = getMetaById(p, item.id);
-                    if (meta && meta.mitem && active.text.id === item.id) {
-                      meta.mitem.set('html', active.text.content)
-                    }
-                  }}
-                  dangerouslySetInnerHTML={{ __html: item.html || "" }}></div>
-              }
+                    }}
+                    contentEditable
+                    spellCheck={false}
+                    onInput={(e) => {
+                      const val = e.currentTarget.innerHTML;
+                      active.text.id = item.id;
+                      active.text.content = val;
+                    }}
+                    onBlur={() => {
+                      const meta = getMetaById(p, item.id);
+                      if (meta && meta.mitem && active.text.id === item.id) {
+                        meta.mitem.set("html", active.text.content);
+                      }
+                    }}
+                    dangerouslySetInnerHTML={{ __html: item.html || "" }}
+                  ></div>
+                );
+              },
             }}
           />
         )}
@@ -209,8 +245,8 @@ export const EdMain = () => {
 
 function setEndOfContenteditable(div: any) {
   let range: any, sel: any;
-  if (document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
-  {
+  if (document.createRange) {
+    //Firefox, Chrome, Opera, Safari, IE 9+
     range = document.createRange();
     range.selectNodeContents(div);
     sel = window.getSelection();

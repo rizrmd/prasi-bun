@@ -5,7 +5,7 @@ import {
   PlaceholderRender,
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { DEPTH_WIDTH } from "./node/item/indent";
@@ -13,7 +13,6 @@ import { expandTreeHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
 import { doTreeSearch } from "./search";
-import { getMetaById } from "../../logic/tree/build";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

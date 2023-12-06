@@ -184,6 +184,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
     await Promise.all(
       childs.map((m) => serverWalkLoad(m, scope_comps, sync, loaded))
     );
+
     childs.map((m, i) => {
       serverWalkMap(
         { sync, scope, scope_comps, note: "page-load" },

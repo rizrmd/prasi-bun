@@ -1,7 +1,7 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta, PG } from "../../logic/ed-global";
+import { EDGlobal, EdMeta, PG, active } from "../../logic/ed-global";
 import { fuzzy } from "../../../../utils/ui/fuzzy";
 
 export const EdTreeSearch = () => {
@@ -115,7 +115,13 @@ export const doTreeSearch = (p: PG) => {
 
   const search = p.ui.tree.search.toLowerCase();
   let i = 0;
-  for (const row of p.page.tree) {
+
+  let ptree = p.page.tree;
+  if (active.comp_id && p.comp.list[active.comp_id].tree) {
+    ptree = p.comp.list[active.comp_id].tree;
+  }
+
+  for (const row of ptree) {
     const item = row.data?.item;
     if (item) {
       const js = item.adv?.js;
