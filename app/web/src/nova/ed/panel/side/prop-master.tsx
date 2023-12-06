@@ -10,7 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
-import { EDGlobal, EdMeta } from "../../logic/ed-global";
+import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
 import { EdPropCompTreeItem, PropItem } from "./prop-master/tree-item";
 import { propPopover } from "./prop-master/prop-form";
 
@@ -54,17 +54,42 @@ export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
   return (
     <div className="flex flex-col text-[12px] flex-1">
       <div className="flex border-b p-1 h-[35px] items-center bg-slate-50 justify-between select-none">
-        <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
-          {item.name}
-        </div>
         <div
-          className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
+          className="flex cursor-pointer items-center"
           onClick={() => {
             p.ui.side.prop = false;
             p.render();
           }}
         >
-          Close
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 15 15"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 8.86462 3.84188L5.43521 7.49991L8.86462 11.1579C9.05348 11.3594 9.04327 11.6758 8.84182 11.8647C8.64036 12.0535 8.32394 12.0433 8.13508 11.8419L4.38508 7.84188C4.20477 7.64955 4.20477 7.35027 4.38508 7.15794L8.13508 3.15794C8.32394 2.95648 8.64036 2.94628 8.84182 3.13514Z"
+              fill="currentColor"
+              fillRule="evenodd"
+              clipRule="evenodd"
+            ></path>
+          </svg>
+          <div>Style</div>
+        </div>
+        <div
+          className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
+          onClick={() => {
+            if (active.comp_id) {
+              active.comp_id = active.instance.comp_id || "";
+              active.item_id = active.instance.item_id || "";
+              active.instance.comp_id = "";
+              active.instance.item_id = "";
+              p.render();
+            }
+          }}
+        >
+          Back to Instance
         </div>
       </div>
       <div className="flex flex-1 relative overflow-auto">
