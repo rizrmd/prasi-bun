@@ -71,23 +71,24 @@ export const ViewMetaScript: FC<{
     };
   }
 
-  if (renderLimit[v.current.page_id][item.id].ts - Date.now() < 100) {
+  if (Math.abs(renderLimit[v.current.page_id][item.id].ts - Date.now()) < 100) {
     renderLimit[v.current.page_id][item.id].count++;
+
+    if (renderLimit[v.current.page_id][item.id].count > 100) {
+      let js = "";
+      if (typeof item.adv?.js === "string") {
+        js = item.adv.js;
+      }
+      console.warn(
+        `Maximum render limit (100 render in 100ms) reached in item [${
+          item.name
+        }]:\n${js.length > 30 ? js.substring(0, 30) + "..." : js}`
+      );
+      return renderLimit[v.current.page_id][item.id].cache;
+    }
   } else {
     renderLimit[v.current.page_id][item.id].ts = Date.now();
     renderLimit[v.current.page_id][item.id].count = 1;
-  }
-
-  if (renderLimit[v.current.page_id][item.id].count > 100) {
-    let js = "";
-    if (typeof item.adv?.js === "string") {
-      js = item.adv.js;
-    }
-    console.warn(
-      `Maximum render limit (100 render in 100ms) reached in item [${item.name
-      }]:\n${js.length > 30 ? js.substring(0, 30) + "..." : js}`
-    );
-    return renderLimit[v.current.page_id][item.id].cache;
   }
 
   const children = <ViewMetaChildren key={item.id} meta={meta} />;

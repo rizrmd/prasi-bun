@@ -38,7 +38,9 @@ export const loadCompSnapshot = async (
       meta,
       tree,
       async on_update(bin, origin) {
-        if (origin === "sv_remote" || origin === "local") return;
+        if (origin === "sv_remote" || origin === "local") {
+          return;
+        }
 
         const res = await p.sync.yjs.sv_local(
           "comp",
