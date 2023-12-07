@@ -43,6 +43,7 @@ export const declareScope = async (
         delete e.s.s.props[e.name];
       }
     }
+
     existing[name] = arg;
   });
   spreadScope(p, s, (arg) => {
@@ -125,7 +126,8 @@ const spreadScope = (
     arg: { prev?: { comp_id: string; item_id: string } }
   ) => {
     let { prev } = arg;
-    for (const parent_id of parents) {
+    for (const _parent_id of parents) {
+      let parent_id = _parent_id;
       if (parent_id === "root") continue;
       let item = null as null | ISingleScope;
       const meta = p.page.meta[parent_id];
@@ -145,6 +147,9 @@ const spreadScope = (
             if (comp_id) {
               const scope = p.comp.list[comp_id].scope;
               item = scope[meta.item.originalId || meta.item.id];
+              if (item) {
+                parent_id = meta.item.originalId || meta.item.id;
+              }
             }
           }
 
@@ -156,6 +161,7 @@ const spreadScope = (
 
       if (item) {
         const scope = item.s;
+
         if (scope) {
           if (scope.local)
             each({

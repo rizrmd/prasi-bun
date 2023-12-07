@@ -24,9 +24,11 @@ export const expandTreeHook = (
     if (cur && cur.parent_item) {
       const id = cur.parent_item.mitem?.get("id");
       if (id) {
+        shouldOpen.add(id);
+
         let meta: EdMeta | undefined = getMetaById(p, id);
         while (meta) {
-          const id = cur.parent_item.mitem?.get("id");
+          const id = meta.parent_item.id;
           if (id && !shouldOpen.has(id)) {
             shouldOpen.add(id);
             meta = getMetaById(p, id);

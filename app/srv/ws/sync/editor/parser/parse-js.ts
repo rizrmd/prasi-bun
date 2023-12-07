@@ -62,17 +62,23 @@ export const parseJs = (
                   attr.value.expression.loc
                 ) {
                   const loc = attr.value.expression.loc as any;
-                  const start = attr.value.expression.properties[0].loc?.start;
-                  const end =
-                    attr.value.expression.properties[
-                      attr.value.expression.properties.length - 1
-                    ].loc?.end;
+                  const start = attr.value.expression.properties[0].loc
+                    ?.start as any;
+                  const end = attr.value.expression.properties[
+                    attr.value.expression.properties.length - 1
+                  ].loc?.end as any;
 
-                  if (typeof start === "number" && typeof end === "number") {
-                    local.value = code.substring(
-                      loc.start.index,
-                      loc.end.index
-                    );
+                  if (
+                    typeof start === "number" &&
+                    typeof end === "number" &&
+                    typeof loc.start.index === "number"
+                  ) {
+                    local.value = code.substring(start, end);
+                    local.index = loc.start.index;
+                  }
+
+                  if (typeof start === "object" && typeof end === "object") {
+                    local.value = `{${code.substring(start.index, end.index)}}`;
                     local.index = loc.start.index;
                   }
                 }

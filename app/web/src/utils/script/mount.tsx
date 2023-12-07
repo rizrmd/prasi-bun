@@ -68,6 +68,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
               let meta = p.page.meta[id];
               if (active.comp_id) {
                 meta = p.comp.list[active.comp_id].meta[id];
+                if (!meta) return false;
               }
 
               active.instance.comp_id = active.comp_id;
