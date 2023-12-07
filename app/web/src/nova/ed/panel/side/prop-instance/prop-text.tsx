@@ -29,7 +29,7 @@ export const EdPropInstanceText: FC<{
     if (val) {
       try {
         eval(`local.value = ${valBuilt}`);
-      } catch (e) { }
+      } catch (e) {}
     } else {
       local.value = "";
     }
@@ -41,7 +41,7 @@ export const EdPropInstanceText: FC<{
       {name}
     </div>
   );
-  
+
   return (
     <div className="flex items-center">
       {name.length > 8 ? (
@@ -52,7 +52,7 @@ export const EdPropInstanceText: FC<{
         label
       )}
       <AutoHeightTextarea
-        className="flex-1 outline-none border-l p-1 ml-1 overflow-hidden"
+        className="flex-1 outline-none border-l p-1 ml-1 overflow-hidden focus:bg-blue-50"
         value={local.value}
         spellCheck={false}
         onChange={(e) => {

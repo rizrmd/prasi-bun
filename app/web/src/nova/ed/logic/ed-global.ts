@@ -64,7 +64,7 @@ const target = {
 };
 export const active = {
   hover_id: "",
-  text: { id: "", content: "" },
+  text: { id: "", content: "", timeout: null as any, el: null as any },
   get item_id() {
     if (target.active_id === false) {
       target.active_id = localStorage.getItem("prasi-active-id") || "";

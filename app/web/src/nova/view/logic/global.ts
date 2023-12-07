@@ -25,7 +25,7 @@ export const ViewGlobal = {
       | {
           get: (meta: EdMeta) => boolean;
           set: (meta: EdMeta) => void;
-          text?: (meta: EdMeta) => ReactNode;
+          text?: (arg: { meta: EdMeta }) => ReactNode;
         },
     hover: undefined as
       | undefined
