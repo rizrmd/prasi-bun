@@ -2,13 +2,14 @@ import { NodeRender } from "@minoru/react-dnd-treeview";
 import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
 import { EDGlobal, EdMeta, active } from "../../../logic/ed-global";
+import { getMetaById } from "../../../logic/tree/build";
 import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
-import { useEffect } from "react";
-import { getMetaById } from "../../../logic/tree/build";
+
+const jsxPropLoadingRender = {} as Record<string, string>;
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -25,6 +26,29 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         <Loading backdrop={false} />
       </div>
     );
+  }
+
+  if (node.data?.jsx_prop_name) {
+    const meta = getMetaById(p, node.data?.parent_item.id);
+    if (meta) {
+      if (meta.propvis) {
+        if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
+      } else {
+        if (!jsxPropLoadingRender[meta.item.id]) {
+          jsxPropLoadingRender[meta.item.id] = node.data.jsx_prop_name;
+        }
+        if (jsxPropLoadingRender[meta.item.id] === node.data.jsx_prop_name) {
+          return (
+            <div
+              className={"relative border-b flex items-stretch min-h-[26px]"}
+            >
+              <Loading backdrop={false} />
+            </div>
+          );
+        }
+        return <></>;
+      }
+    }
   }
 
   return (
