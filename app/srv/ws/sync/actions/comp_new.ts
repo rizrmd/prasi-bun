@@ -65,7 +65,7 @@ export const comp_new: SAction["comp"]["new"] = async function (
   } else if (comp_id) {
     const doc = docs.comp[comp_id].doc;
     doc.transact(() => {
-      const root = doc.getMap("map").get("item");
+      const root = doc.getMap("map").get("root");
       if (root) {
         root.get("childs")?.forEach((e) => {
           walk(e);

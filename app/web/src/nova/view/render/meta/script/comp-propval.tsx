@@ -39,6 +39,7 @@ export const compPropVal = (
         const prop = props[name] || _prop;
 
         let value: any = null;
+
         if (prop.valueBuilt) {
           const fn = new Function(
             ...Object.keys(args),
@@ -60,9 +61,7 @@ export const compPropVal = (
                 prop.value
             );
           }
-        }
-
-        if (prop.meta?.type === "content-element") {
+        } else if (prop.meta?.type === "content-element") {
           if (!(typeof value === "object" && !!value && value._jsx)) {
             const id = `${meta.item.id}-${name}`;
             if (!jsxProps[id]) {
