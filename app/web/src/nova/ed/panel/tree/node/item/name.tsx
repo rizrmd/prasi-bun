@@ -2,6 +2,7 @@ import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, EdMeta } from "../../../../logic/ed-global";
+import { Tooltip } from "../../../../../../utils/ui/tooltip";
 
 export const EdTreeName = ({
   node,
@@ -71,7 +72,7 @@ export const EdTreeName = ({
             p.render();
           }}
         />
-      ) : ( 
+      ) : (
         <div className="flex flex-col">
           <Name name={node.text} is_jsx_prop={is_jsx_prop} />
           {/* <div className={"text-[9px] text-gray-500 -mt-1"}>{node.id} - {item.originalId}</div> */}
@@ -88,9 +89,12 @@ const Name: FC<{ name: string; is_jsx_prop: boolean }> = ({
   if (is_jsx_prop) {
     return (
       <div className="flex items-center space-x-1">
-        <div className="flex text-purple-500 border border-purple-400 items-center justify-center font-mono text-[6px] px-[2px]">
+        <Tooltip
+          content={`Type: JSX Prop`}
+          className="flex text-purple-500 border border-purple-400 items-center justify-center font-mono text-[6px] px-[2px]"
+        >
           P
-        </div>
+        </Tooltip>
         <div>{name}</div>
       </div>
     );
