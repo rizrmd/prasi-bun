@@ -47,6 +47,8 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
 
             if (type === "prop") {
               p.ui.popup.script.prop_name = path[1];
+              p.ui.popup.script.type = "prop-instance";
+              p.ui.popup.script.prop_kind = "value";
 
               if (
                 !prev_comp_id &&
@@ -62,6 +64,8 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
               }
 
               return false;
+            } else {
+              p.ui.popup.script.type = "item";
             }
 
             if (comp_id) {

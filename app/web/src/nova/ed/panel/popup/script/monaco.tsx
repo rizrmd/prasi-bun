@@ -131,7 +131,10 @@ export const ScriptMonaco = () => {
     }
   }
 
-  if (p.ui.popup.script.type === "prop-master") {
+  if (
+    p.ui.popup.script.type === "prop-master" ||
+    p.ui.popup.script.type === "prop-instance"
+  ) {
     const mprops = mitem?.get("component")?.get("props");
     if (mprops) {
       const mprop = mprops.get(p.ui.popup.script.prop_name);

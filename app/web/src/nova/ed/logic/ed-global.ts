@@ -128,6 +128,7 @@ export type EdMeta = {
   /** script related meta **/
   jsx_scope_id?: string;
   propval?: Record<string, any>;
+  propvis?: Record<string, boolean>;
   indexed_scope: Record<string, any>;
   memoize?: Record<
     string,

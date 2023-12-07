@@ -13,6 +13,7 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
   const local = useLocal({
     rightClickEvent: null as any,
     reset: { mprop: null as any, name: "" },
+    showJSX: false,
   });
 
   const item = meta?.item as IItem;
@@ -30,6 +31,15 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
   if (mprops && meta.mitem && mcprops) {
     mcprops.forEach((m, key) => {
       let mprop = mprops.get(key);
+
+      const type = m.get("meta")?.get("type") || "text";
+      if (meta.propvis) {
+        if (meta.propvis[key] === false) return;
+      }
+
+      if (!local.showJSX && type === "content-element") {
+        return;
+      }
 
       if (!mprop) {
         const json = m.toJSON();
