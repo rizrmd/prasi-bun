@@ -105,8 +105,31 @@ export const compPropVal = (
         }
 
         result[name] = value;
-        meta.propval = result;
       }
+      meta.propval = result;
+
+      const propvis: any = {};
+      for (const [name, _prop] of cprops) {
+        const prop = props[name] || _prop;
+        if (prop.visible) {
+          const finalArgs = { ...args, ...result };
+          try {
+            const fn = new Function(
+              ...Object.keys(finalArgs),
+              `return ${_prop.visible}`
+            );
+            propvis[name] = fn(...Object.values(finalArgs));
+          } catch (e) {
+            const cname = meta.item.name;
+            console.warn(e);
+            console.warn(
+              `ERROR in Component [${cname}], in prop [${name}]:\n ` +
+                prop.visible
+            );
+          }
+        }
+      }
+      meta.propvis = propvis;
     }
   }
 };

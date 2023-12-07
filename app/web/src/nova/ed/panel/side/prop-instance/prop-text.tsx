@@ -53,7 +53,7 @@ export const EdPropInstanceText: FC<{
       )}
       <AutoHeightTextarea
         className="flex-1 outline-none border-l p-1 ml-1 overflow-hidden focus:bg-blue-50"
-        value={local.value}
+        value={local.value || ""}
         spellCheck={false}
         onChange={(e) => {
           local.value = e.currentTarget.value;

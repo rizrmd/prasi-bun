@@ -16,7 +16,10 @@ export const EdPopScript = () => {
           if (!open) {
             p.ui.popup.script.open = false;
 
-            if (p.ui.popup.script.prop_name) {
+            if (
+              p.ui.popup.script.prop_name &&
+              p.ui.popup.script.type === "prop-master"
+            ) {
               propPopover.name = p.ui.popup.script.prop_name;
             }
 
