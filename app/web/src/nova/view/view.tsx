@@ -26,7 +26,7 @@ type ViewProp = {
   active?: {
     get: (item: EdMeta) => boolean;
     set: (item: EdMeta) => void;
-    text?: (item: EdMeta) => ReactNode
+    text?: (arg: { meta: EdMeta }) => ReactNode;
   };
 };
 
@@ -59,8 +59,9 @@ const BoxedView: FC<ViewProp> = ({
 
   v.script.api_url = api_url;
   if (hidden) v.view.hidden = hidden;
-  if (hover) v.view.hover = hover;
-  if (active) v.view.active = active;
+  if (hover && !v.view.hover) v.view.hover = hover;
+  if (active && !v.view.active) v.view.active = active;
+
   if (v.current.page_id !== page_id || v.current.site_id !== site_id) {
     v.status = "init";
   }

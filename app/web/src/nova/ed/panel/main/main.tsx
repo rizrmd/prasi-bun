@@ -1,10 +1,11 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../utils/ui/loading";
 import { View } from "../../../view/view";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { getMetaById } from "../../logic/tree/build";
 import { loadComponent } from "../../logic/tree/sync-walk";
 import { code } from "../popup/code/code";
+import { useEffect } from "react";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -51,10 +52,11 @@ export const EdMain = () => {
                 const item = meta.item;
 
                 if (active.comp_id) {
-                  if (meta.parent_mcomp) {
+                  const p = meta.parent_mcomp;
+                  if (p) {
                     if (
-                      meta.parent_mcomp?.mcomp.get("component")?.get("id") !==
-                      active.comp_id
+                      p.mitem.get("id") !== active.instance.item_id ||
+                      p.mcomp.get("component")?.get("id") !== active.comp_id
                     )
                       return false;
                   }
@@ -112,15 +114,16 @@ export const EdMain = () => {
                 const item = meta.item;
 
                 if (active.comp_id) {
-                  if (meta.parent_mcomp) {
+                  const p = meta.parent_mcomp;
+                  if (p) {
                     if (
-                      meta.parent_mcomp?.mcomp.get("component")?.get("id") !==
-                      active.comp_id
+                      p.mitem.get("id") !== active.instance.item_id ||
+                      p.mcomp.get("component")?.get("id") !== active.comp_id
                     )
                       return false;
                   }
                 }
-                
+
                 if (
                   item.originalId === active.item_id ||
                   item.id === active.item_id
@@ -194,46 +197,74 @@ export const EdMain = () => {
                 p.page.render();
                 focus();
               },
-              text(meta) {
+              text({ meta }) {
                 const { item } = meta;
+
+                useEffect(() => {
+                  return () => {
+                    active.text.id = "";
+                    p.render();
+                  };
+                }, []);
+
+                const updateWithTimeout = (timeout: number) => {
+                  return new Promise<void>((resolve) => {
+                    const saving = {
+                      id: active.text.id,
+                      content: active.text.content,
+                    };
+
+                    clearTimeout(active.text.timeout);
+                    active.text.timeout = setTimeout(() => {
+                      const meta = getMetaById(p, saving.id);
+                      if (meta && meta.mitem) {
+                        meta.mitem.set("html", saving.content);
+                      }
+                      resolve();
+                    }, timeout);
+                  });
+                };
+
                 if (active.text.id !== item.id) {
+                  clearTimeout(active.text.timeout);
                   active.text.id = item.id;
                   active.text.content = item.html || "";
+                  active.text.el = (
+                    <div
+                      className={cx(
+                        `v-text-${item.id} v-text-${item.originalId} outline-none`
+                      )}
+                      ref={(ref) => {
+                        if (ref !== document.activeElement && ref) {
+                          const renaming =
+                            document.querySelector(".rename-item");
+                          const modals = document.querySelectorAll(
+                            "[data-floating-ui-portal]"
+                          );
+                          if (modals.length === 0 && !renaming) {
+                            ref.focus();
+                            setEndOfContenteditable(ref);
+                          }
+                        }
+                      }}
+                      onPointerDownCapture={(e) => {
+                        e.stopPropagation();
+                      }}
+                      contentEditable
+                      spellCheck={false}
+                      onInput={(e) => {
+                        const val = e.currentTarget.innerHTML;
+                        item.html = val;
+                        active.text.id = item.id;
+                        active.text.content = val;
+                        updateWithTimeout(100);
+                      }}
+                      dangerouslySetInnerHTML={{ __html: item.html || "" }}
+                    ></div>
+                  );
                 }
 
-                return (
-                  <div
-                    className={cx(
-                      `v-text-${item.id} v-text-${item.originalId} outline-none`
-                    )}
-                    ref={(ref) => {
-                      if (ref !== document.activeElement && ref) {
-                        const renaming = document.querySelector(".rename-item");
-                        const modals = document.querySelectorAll(
-                          "[data-floating-ui-portal]"
-                        );
-                        if (modals.length === 0 && !renaming) {
-                          ref.focus();
-                          setEndOfContenteditable(ref);
-                        }
-                      }
-                    }}
-                    contentEditable
-                    spellCheck={false}
-                    onInput={(e) => {
-                      const val = e.currentTarget.innerHTML;
-                      active.text.id = item.id;
-                      active.text.content = val;
-                    }}
-                    onBlur={() => {
-                      const meta = getMetaById(p, item.id);
-                      if (meta && meta.mitem && active.text.id === item.id) {
-                        meta.mitem.set("html", active.text.content);
-                      }
-                    }}
-                    dangerouslySetInnerHTML={{ __html: item.html || "" }}
-                  ></div>
-                );
+                return active.text.el;
               },
             }}
           />
