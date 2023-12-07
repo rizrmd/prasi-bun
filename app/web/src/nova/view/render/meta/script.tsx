@@ -14,6 +14,10 @@ import { createPassProp } from "./script/create-pass-prop";
 import { ErrorBox } from "./script/error-box";
 import { mergeScopeUpwards } from "./script/merge-upward";
 
+const renderLimitConfig = {
+  maxCount: 30,
+  maxTime: 10,
+};
 const renderLimit = {} as Record<
   string,
   Record<string, { ts: number; count: number; cache: ReactNode }>
@@ -71,18 +75,25 @@ export const ViewMetaScript: FC<{
     };
   }
 
-  if (Math.abs(renderLimit[v.current.page_id][item.id].ts - Date.now()) < 100) {
+  if (
+    Math.abs(renderLimit[v.current.page_id][item.id].ts - Date.now()) <
+    renderLimitConfig.maxTime
+  ) {
     renderLimit[v.current.page_id][item.id].count++;
 
-    if (renderLimit[v.current.page_id][item.id].count > 100) {
+    if (
+      renderLimit[v.current.page_id][item.id].count > renderLimitConfig.maxCount
+    ) {
       let js = "";
       if (typeof item.adv?.js === "string") {
         js = item.adv.js;
       }
       console.warn(
-        `Maximum render limit (100 render in 100ms) reached in item [${
-          item.name
-        }]:\n${js.length > 30 ? js.substring(0, 30) + "..." : js}`
+        `Maximum render limit (${renderLimitConfig.maxCount} render in ${
+          renderLimitConfig.maxTime
+        }ms) reached in item [${item.name}]:\n${
+          js.length > 30 ? js.substring(0, 30) + "..." : js
+        }`
       );
       return renderLimit[v.current.page_id][item.id].cache;
     }

@@ -172,9 +172,7 @@ export const syncWalkMap = (
         }
 
         const old_id = item.id;
-
         mapItem(mcomp, item, ref_ids);
-        item.originalId = item.id;
         item.id = old_id;
 
         const meta: EdMeta = {
@@ -361,7 +359,7 @@ const mapItem = (
           val = e.toJSON() as any;
         }
       }
-      item[k] = val;
+      if (k !== "originalId") item[k] = val;
     } else {
       item[k] = [];
       const childs = e as unknown as TypedArray<{}>;
