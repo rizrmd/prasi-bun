@@ -71,10 +71,10 @@ export const EdTreeName = ({
             p.render();
           }}
         />
-      ) : (
+      ) : ( 
         <div className="flex flex-col">
           <Name name={node.text} is_jsx_prop={is_jsx_prop} />
-          <div className={"text-[9px] text-gray-500 -mt-1"}>{node.id} - {item.originalId}</div>
+          {/* <div className={"text-[9px] text-gray-500 -mt-1"}>{node.id} - {item.originalId}</div> */}
         </div>
       )}
     </div>

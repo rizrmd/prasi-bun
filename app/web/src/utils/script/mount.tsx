@@ -68,7 +68,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
               let meta = p.page.meta[id];
               if (active.comp_id) {
                 meta = p.comp.list[active.comp_id].meta[id];
-                if (!meta) return false;
+                return false;
               }
 
               active.instance.comp_id = active.comp_id;
@@ -81,6 +81,23 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
               }
               active.comp_id = comp_id;
             } else {
+              if (active.comp_id) {
+                let meta = p.comp.list[active.comp_id].meta[id];
+
+                if (!meta) {
+                  const _id = p.comp.list[active.comp_id].doc
+                    .getMap("map")
+                    .get("root")
+                    ?.get("id");
+
+                  if (_id) {
+                    active.item_id = _id;
+                    p.render();
+                  }
+                }
+                return false;
+              }
+
               active.item_id = id;
             }
             p.render();
