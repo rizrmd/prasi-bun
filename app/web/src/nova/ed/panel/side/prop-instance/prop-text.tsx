@@ -40,7 +40,7 @@ export const EdPropInstanceText: FC<{
     <div className="flex items-center min-h-[28px]">
       <EdPropLabel name={name} />
       <AutoHeightTextarea
-        className="flex-1 outline-none border-l p-1 ml-1 overflow-hidden focus:bg-blue-50"
+        className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}
         spellCheck={false}
         onChange={(e) => {

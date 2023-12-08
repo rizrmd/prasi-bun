@@ -5,15 +5,13 @@ import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, IScope, PG, active } from "../ed-global";
+import { EdMeta, IScope, PG } from "../ed-global";
 import { loadCompSnapshot } from "./sync-walk-comp";
 import {
   ensureMItemProps,
   ensureMProp,
   ensurePropContent,
 } from "./sync-walk-utils";
-import { treeRebuild } from "./build";
-import { waitUntil } from "web-utils";
 
 const comp_added = new Set<string>();
 
