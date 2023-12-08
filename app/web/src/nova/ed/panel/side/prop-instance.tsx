@@ -4,9 +4,10 @@ import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
+import { EdPropInstanceCode } from "./prop-instance/prop-code";
+import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
-import { Loading } from "../../../../utils/ui/loading";
 
 export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -33,8 +34,11 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
       let mprop = mprops.get(key);
 
       const type = m.get("meta")?.get("type") || "text";
+      const visible = mprop?.get("visible") || "";
       if (meta.propvis) {
         if (meta.propvis[key] === false) return;
+      } else if (visible) {
+        return;
       }
 
       if (!local.showJSX && type === "content-element") {
@@ -119,6 +123,13 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
           )}
           {filtered.map(({ name, mprop }) => {
             const type = mprop.get("meta")?.get("type") || "text";
+            let hasCode = false;
+
+            const value = mprop.get("value") || "";
+            if (!!value && ![`"`, "'", "`"].includes(value[0])) {
+              hasCode = true;
+            }
+
             return (
               <div
                 key={name}
@@ -130,12 +141,25 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
                   local.render();
                 }}
               >
-                <>
-                  {type === "text" && (
-                    <EdPropInstanceText mprop={mprop} name={name} />
-                  )}
-                  {type !== "text" && <div className="p-1">{name}</div>}
-                </>
+                {hasCode ? (
+                  <>
+                    <EdPropInstanceCode mprop={mprop} name={name} />
+                  </>
+                ) : (
+                  <>
+                    {type === "text" && (
+                      <EdPropInstanceText mprop={mprop} name={name} />
+                    )}
+                    {type === "option" && (
+                      <EdPropInstanceOptions mprop={mprop} name={name} />
+                    )}
+                    {type === "content-element" && (
+                      <div className="min-h-[28px] px-1 flex items-center">
+                        {name}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             );
           })}

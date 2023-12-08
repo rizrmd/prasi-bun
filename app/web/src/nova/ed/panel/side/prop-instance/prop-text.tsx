@@ -5,10 +5,10 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { FMCompDef } from "../../../../../utils/types/meta-fn";
 import { useGlobal, useLocal } from "web-utils";
+import { FMCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal } from "../../../logic/ed-global";
-import { Tooltip } from "../../../../../utils/ui/tooltip";
+import { EdPropLabel } from "./prop-label";
 
 export const EdPropInstanceText: FC<{
   name: string;
@@ -36,21 +36,9 @@ export const EdPropInstanceText: FC<{
     local.render();
   }, [val, valBuilt]);
 
-  const label = (
-    <div className="pl-1 w-[70px] overflow-hidden text-ellipsis whitespace-nowrap">
-      {name}
-    </div>
-  );
-
   return (
-    <div className="flex items-center">
-      {name.length > 8 ? (
-        <Tooltip content={name} placement="left" delay={100}>
-          {label}
-        </Tooltip>
-      ) : (
-        label
-      )}
+    <div className="flex items-center min-h-[28px]">
+      <EdPropLabel name={name} />
       <AutoHeightTextarea
         className="flex-1 outline-none border-l p-1 ml-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}

@@ -35,6 +35,7 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
       } else {
         if (!jsxPropLoadingRender[meta.item.id]) {
+          setTimeout(p.render, 500);
           jsxPropLoadingRender[meta.item.id] = node.data.jsx_prop_name;
         }
         if (jsxPropLoadingRender[meta.item.id] === node.data.jsx_prop_name) {
