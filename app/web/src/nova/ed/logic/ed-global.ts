@@ -158,6 +158,8 @@ export const EDGlobal = {
     siteTypes: {} as Record<string, string>,
     loaded: false,
     do_edit: async (newval: string, all?: boolean) => {},
+    db: null as any,
+    api: null as any,
   },
   page: {
     root_id: "root",
