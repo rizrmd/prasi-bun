@@ -10,6 +10,7 @@ import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 
 const jsxPropLoadingRender = {} as Record<string, string>;
+const jsxPropVisCache = {} as Record<string, any>;
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -32,22 +33,31 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
     const meta = getMetaById(p, node.data?.parent_item.id);
     if (meta) {
       if (meta.propvis) {
+        jsxPropVisCache[node.data.item.id] = meta.propvis;
         if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
       } else {
-        if (!jsxPropLoadingRender[meta.item.id]) {
-          setTimeout(p.render, 500);
-          jsxPropLoadingRender[meta.item.id] = node.data.jsx_prop_name;
+        if (jsxPropVisCache[node.data.item.id]) {
+          meta.propvis = jsxPropVisCache[node.data.item.id];
+          if (meta.propvis) {
+            if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
+          }
+        } else {
+          if (!jsxPropLoadingRender[meta.item.id]) {
+            setTimeout(p.render, 100);
+            setTimeout(p.render, 500);
+            jsxPropLoadingRender[meta.item.id] = node.data.jsx_prop_name;
+          }
+          if (jsxPropLoadingRender[meta.item.id] === node.data.jsx_prop_name) {
+            return (
+              <div
+                className={"relative border-b flex items-stretch min-h-[26px]"}
+              >
+                <Loading backdrop={false} />
+              </div>
+            );
+          }
+          return <></>;
         }
-        if (jsxPropLoadingRender[meta.item.id] === node.data.jsx_prop_name) {
-          return (
-            <div
-              className={"relative border-b flex items-stretch min-h-[26px]"}
-            >
-              <Loading backdrop={false} />
-            </div>
-          );
-        }
-        return <></>;
       }
     }
   }

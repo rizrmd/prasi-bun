@@ -1,18 +1,35 @@
 import { FC } from "react";
 import { FMCompDef } from "../../../../../utils/types/meta-fn";
 import { EdPropLabel } from "./prop-label";
+import { useGlobal } from "web-utils";
+import { EDGlobal, active } from "../../../logic/ed-global";
 
 export const EdPropInstanceCode: FC<{
   name: string;
   mprop: FMCompDef;
 }> = ({ name, mprop }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
   return (
     <div className="flex items-center min-h-[28px]">
       <EdPropLabel name={name} />
       <div className="flex-1 flex justify-end pr-1">
         <div
-          className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-          onClick={() => {}}
+          className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px] select-none"
+          onClick={() => {
+            p.ui.popup.script.prop_name = name;
+            p.ui.popup.script.type = "prop-instance";
+            p.ui.popup.script.prop_kind = "value";
+            p.ui.popup.script.open = true;
+
+            if (active.instance.item_id && active.comp_id) {
+              active.item_id = active.instance.item_id;
+              active.comp_id = active.instance.comp_id;
+              active.instance.item_id = "";
+              active.instance.comp_id = "";
+            }
+
+            p.render();
+          }}
         >
           EDIT CODE
         </div>
