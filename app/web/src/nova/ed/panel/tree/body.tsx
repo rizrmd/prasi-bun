@@ -19,6 +19,8 @@ export const EdTreeBody = () => {
   const local = useLocal({ tree: null as TreeMethods | null, comp_id: "" });
   const TypedTree = DNDTree<EdMeta>;
 
+  active.hover.renderTree = local.render;
+
   expandTreeHook(p, local);
 
   if (active.comp_id && local.comp_id !== active.comp_id) {
