@@ -67,6 +67,8 @@ export const EdMain = () => {
               },
               set(meta) {
                 const outer = getOuterItem(meta);
+                console.log(meta);
+
                 if (outer) {
                   active.item_id = outer.id;
                 }
@@ -154,6 +156,9 @@ export const EdMain = () => {
 
 const getOuterItem = (meta: EdMeta) => {
   let cur: undefined | EdMeta = meta;
+
+  if (cur.jsx_prop_name) return meta.item;
+
   while (cur.parent_mcomp) {
     cur = cur.parent_mcomp.meta;
   }

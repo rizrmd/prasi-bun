@@ -45,7 +45,7 @@ export const oldLoadCode = async (v: VG) => {
           exports: {} as any,
         },
       };
-      exec(site.js_compiled, scope);
+      await exec(site.js_compiled, scope);
       if (scope.module.exports) {
         for (const [k, v] of Object.entries(scope.module.exports)) {
           w.exports[k] = v;

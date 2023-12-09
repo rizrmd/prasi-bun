@@ -29,35 +29,12 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
     );
   }
 
-  if (node.data?.jsx_prop_name) {
+  if (node.data?.jsx_prop_root && node.data?.jsx_prop_name) {
     const meta = getMetaById(p, node.data?.parent_item.id);
     if (meta) {
       if (meta.propvis) {
         jsxPropVisCache[meta.item.id] = meta.propvis;
         if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
-      } else {
-        if (jsxPropVisCache[meta.item.id]) {
-          meta.propvis = jsxPropVisCache[meta.item.id];
-          if (meta.propvis) {
-            if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
-          }
-        } else {
-          if (!jsxPropLoadingRender[meta.item.id]) {
-            setTimeout(p.render, 100);
-            setTimeout(p.render, 500);
-            jsxPropLoadingRender[meta.item.id] = node.data.jsx_prop_name;
-          }
-          if (jsxPropLoadingRender[meta.item.id] === node.data.jsx_prop_name) {
-            return (
-              <div
-                className={"relative border-b flex items-stretch min-h-[26px]"}
-              >
-                <Loading backdrop={false} />
-              </div>
-            );
-          }
-          return <></>;
-        }
       }
     }
   }

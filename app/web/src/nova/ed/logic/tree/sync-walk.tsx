@@ -76,6 +76,7 @@ export const syncWalkMap = (
     parent_item: EdMeta["parent_item"];
     parent_mcomp?: EdMeta["parent_mcomp"];
     jsx_prop_name?: string;
+    jsx_prop_root?: boolean;
     skip_add_tree?: boolean;
     tree_root_id: string;
     each?: (meta: EdMeta) => void;
@@ -239,6 +240,7 @@ export const syncWalkMap = (
                         tree_root_id: arg.tree_root_id,
                         mitem: mcontent,
                         jsx_prop_name: k,
+                        jsx_prop_root: true,
                         parent_mcomp: { minstance, meta, mcomp },
                         parent_item: { id: item.id, mitem: mitem as MItem },
                         portal: arg.portal,
@@ -279,6 +281,7 @@ export const syncWalkMap = (
     is_layout: arg.is_layout,
     item,
     jsx_prop_name: arg.jsx_prop_name,
+    jsx_prop_root: arg.jsx_prop_root,
     mitem: mitem as MItem,
     parent_item,
     parent_mcomp: arg.parent_mcomp,
@@ -311,6 +314,7 @@ export const syncWalkMap = (
       is_layout: arg.is_layout,
       tree_root_id: arg.tree_root_id,
       mitem: e,
+      jsx_prop_name: arg.jsx_prop_name,
       parent_item: { id: item.id, mitem: mitem as MItem },
       parent_mcomp: arg.parent_mcomp,
       portal: arg.portal,
