@@ -47,6 +47,7 @@ export const ScriptMonaco = () => {
   }, []);
 
   useEffect(() => {
+    clearTimeout(scriptEdit.timeout);
     (async () => {
       const editor = local.editor;
       const monaco = local.monaco;

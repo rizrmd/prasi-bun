@@ -101,7 +101,6 @@ else metaOptions = resOpt;
                 local.render();
               }}
               onChange={(sel) => {
-                console.log(sel);
                 if (!sel) {
                   local.val = evalue;
                   local.isOpen = false;

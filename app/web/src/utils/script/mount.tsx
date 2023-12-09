@@ -47,6 +47,15 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
             const id = path[path.length - 1].replace(".d.ts", "");
 
             if (type === "prop") {
+              if (p.ui.popup.script.type === "item") {
+                p.ui.popup.script.open = false;
+                p.render();
+                setTimeout(() => {
+                  p.ui.popup.script.open = true;
+                  p.render();
+                }, 100);
+              }
+
               p.ui.popup.script.prop_name = path[1];
               p.ui.popup.script.type = "prop-instance";
               p.ui.popup.script.prop_kind = "value";
@@ -66,7 +75,16 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
 
               return false;
             } else {
-              p.ui.popup.script.type = "item";
+              if (p.ui.popup.script.type !== "item") {
+                p.ui.popup.script.open = false;
+                p.ui.popup.script.type = "item";
+                p.ui.popup.script.prop_name = "";
+                p.render();
+                setTimeout(() => {
+                  p.ui.popup.script.open = true;
+                  p.render();
+                }, 100);
+              }
             }
 
             if (comp_id) {

@@ -1,5 +1,5 @@
 import hash_sum from "hash-sum";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, isValidElement, useEffect } from "react";
 import { useLocal } from "web-utils";
 import { produceCSS } from "../../../../utils/css/gen";
 import { createAPI, createDB } from "../../../../utils/script/init-api";
@@ -170,8 +170,16 @@ export const ViewMetaScript: FC<{
       },
       useEffect: useEffect,
       render: (jsx: ReactNode) => {
-        output.jsx = jsx;
-        renderLimit[v.current.page_id][item.id].cache = output.jsx;
+        if (isValidElement(jsx)) {
+          // output.jsx = (
+          //   <>
+          //     <div className={"absolute bg-white px-1 z-10 text-[9px] text-gray-500 -mt-1"}>{item.id}</div>
+          //     {jsx}
+          //   </>
+          // );
+          output.jsx = jsx;
+          renderLimit[v.current.page_id][item.id].cache = output.jsx;
+        }
       },
     };
 

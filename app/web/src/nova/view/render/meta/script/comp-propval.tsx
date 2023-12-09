@@ -61,7 +61,8 @@ export const compPropVal = (
                 prop.value
             );
           }
-        } else if (prop.meta?.type === "content-element") {
+        }
+        if (prop.meta?.type === "content-element") {
           if (!(typeof value === "object" && !!value && value._jsx)) {
             const id = `${meta.item.id}-${name}`;
             if (!jsxProps[id]) {
@@ -79,14 +80,7 @@ export const compPropVal = (
                     let parent = v.meta[parent_id];
 
                     if (meta && parent) {
-                      if (v.scope) {
-                        while (parent) {
-                          if (v.scope[parent.item.id]) {
-                            v.scope[prop.content.id] = v.scope[parent.item.id];
-                          }
-                          parent = v.meta[parent.parent_item.id];
-                        }
-                      }
+                      meta.parent_item.id = parent_id;
 
                       return (
                         <ViewMeta
@@ -106,6 +100,7 @@ export const compPropVal = (
 
         result[name] = value;
       }
+
       meta.propval = result;
 
       const propvis: any = {};
