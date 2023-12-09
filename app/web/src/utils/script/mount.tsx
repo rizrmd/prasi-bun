@@ -39,6 +39,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
         if (p) {
           p.ui.popup.script.mode === "js";
           const cpath = r.path.substring(`scope~`.length).split("__");
+
           const [comp_id, prev_comp_id, prev_item_id] = cpath[0].split("~");
           if (cpath[1]) {
             const path = cpath[1].split("~");

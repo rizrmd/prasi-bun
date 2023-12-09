@@ -1,6 +1,6 @@
 import importModule from "../../../render/editor/tools/dynamic-import";
 import { devLoader } from "../../../render/live/dev-loader";
-import { createAPI, createDB } from "../../../utils/script/init-api";
+import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
 import { VG } from "./global";
 
 export const oldLoadCode = async (v: VG) => {
@@ -21,11 +21,12 @@ export const oldLoadCode = async (v: VG) => {
       }
     }
 
+    await initApi(site.config);
     await importModule(loader.npm(p, "site", site.id));
     if (site.js_compiled) {
       const config = site.config as any;
       const exec = (fn: string, scopes: any) => {
-        if (config.api_url) {
+        if (config.api_url && !scopes["api"]) {
           scopes["api"] = createAPI(config.api_url);
           scopes["db"] = createDB(config.api_url);
         }

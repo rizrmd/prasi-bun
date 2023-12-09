@@ -20,11 +20,6 @@ export const declareScope = async (
   if (!s) return;
   s.p.push(active_id);
 
-  monaco.editor.getModels().forEach((model) => {
-    if (model.uri.toString().startsWith("ts:scope~")) {
-      model.dispose();
-    }
-  });
 
   const existing: Record<string, IEachArgScope> = {};
 
@@ -143,7 +138,8 @@ const spreadScope = (
       if (!item) {
         if (meta) {
           if (meta.parent_mcomp) {
-            comp_id = meta.parent_mcomp.mitem.get("component")?.get("id") || "";
+            comp_id =
+              meta.parent_mcomp.meta.mitem?.get("component")?.get("id") || "";
             if (comp_id) {
               const scope = p.comp.list[comp_id].scope;
               item = scope[meta.item.originalId || meta.item.id];

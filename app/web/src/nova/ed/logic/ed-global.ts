@@ -119,7 +119,8 @@ export type EdMeta = {
     mitem?: MItem;
   };
   parent_mcomp?: {
-    mitem: MItem;
+    minstance: MItem;
+    meta: EdMeta;
     mcomp: MItem;
   };
   el?: ReactElement;

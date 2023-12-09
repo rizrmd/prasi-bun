@@ -45,32 +45,34 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               });
             }
 
-            sections.map((e) => {
-              if (p.page.root_id === "root") {
-                p.page.entry.push(e.get("id"));
-              }
-              syncWalkMap(
-                {
-                  note: "tree-rebuild layout",
-                  comps: p.comp.list,
-                  item_loading: p.ui.tree.item_loading,
-                  meta: p.page.meta,
-                  scope: p.page.scope,
-                },
-                {
-                  is_layout: true,
-                  mitem: e,
-                  parent_item: { id: p.page.root_id },
-                  tree_root_id: p.page.root_id,
-                  skip_add_tree: true,
-                  portal,
-                  each(meta) {
-                    if (meta.item.name === "content") {
-                      p.page.root_id = meta.item.id;
-                    }
-                  },
+            ldoc.doc.transact(() => {
+              sections.map((e) => {
+                if (p.page.root_id === "root") {
+                  p.page.entry.push(e.get("id"));
                 }
-              );
+                syncWalkMap(
+                  {
+                    note: "tree-rebuild layout",
+                    comps: p.comp.list,
+                    item_loading: p.ui.tree.item_loading,
+                    meta: p.page.meta,
+                    scope: p.page.scope,
+                  },
+                  {
+                    is_layout: true,
+                    mitem: e,
+                    parent_item: { id: p.page.root_id },
+                    tree_root_id: p.page.root_id,
+                    skip_add_tree: true,
+                    portal,
+                    each(meta) {
+                      if (meta.item.name === "content") {
+                        p.page.root_id = meta.item.id;
+                      }
+                    },
+                  }
+                );
+              });
             });
 
             for (const [k, portal_out] of Object.entries(portal.out)) {

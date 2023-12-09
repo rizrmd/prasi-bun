@@ -87,37 +87,38 @@ const walkCompTree = async (p: PG, mitem: MItem, comp_id: string) => {
     out: {} as Record<string, EdMeta>,
   };
   syncWalkLoad(p, mitem, (id) => loadComponent(p, id));
+  mitem.doc?.transact(() => {
+    syncWalkMap(
+      {
+        note: "walk-comp",
+        comps: p.comp.list,
+        item_loading: p.ui.tree.item_loading,
+        meta,
+        tree,
+        component_not_found(id) {
+          setTimeout(() => {
+            if (loadcomp.pending.has(id) || p.comp.list[id]) {
+              waitUntil(() => !loadcomp.pending.has(id)).then(async () => {
+                walkCompTree(p, mitem, comp_id);
 
-  syncWalkMap(
-    {
-      note: "walk-comp",
-      comps: p.comp.list,
-      item_loading: p.ui.tree.item_loading,
-      meta,
-      tree,
-      component_not_found(id) {
-        setTimeout(() => {
-          if (loadcomp.pending.has(id) || p.comp.list[id]) {
-            waitUntil(() => !loadcomp.pending.has(id)).then(async () => {
-              walkCompTree(p, mitem, comp_id);
-
-              const { tree, meta } = await walkCompTree(p, mitem, comp_id);
-              p.comp.list[comp_id].tree = tree;
-              p.comp.list[comp_id].meta = meta;
-              p.render();
-            });
-          }
-        }, 100);
+                const { tree, meta } = await walkCompTree(p, mitem, comp_id);
+                p.comp.list[comp_id].tree = tree;
+                p.comp.list[comp_id].meta = meta;
+                p.render();
+              });
+            }
+          }, 100);
+        },
       },
-    },
-    {
-      mitem,
-      is_layout: false,
-      parent_item: { id: "root" },
-      portal,
-      tree_root_id: "root",
-    }
-  );
+      {
+        mitem,
+        is_layout: false,
+        parent_item: { id: "root" },
+        portal,
+        tree_root_id: "root",
+      }
+    );
+  });
 
   return { tree, meta };
 };
