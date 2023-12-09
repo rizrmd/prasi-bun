@@ -81,7 +81,7 @@ export const syncWalkMap = (
     each?: (meta: EdMeta) => void;
   }
 ) => {
-  const { mitem, parent_item, parent_mcomp } = arg;
+  const { mitem, parent_item } = arg;
   if (typeof mitem.get !== "function") {
     return;
   }
@@ -98,8 +98,8 @@ export const syncWalkMap = (
   }
 
   let mapped = false;
-  if (parent_mcomp && id) {
-    const fcomp = parent_mcomp.mitem.get("component");
+  if (arg.parent_mcomp && id) {
+    const fcomp = arg.parent_mcomp.minstance.get("component");
     if (fcomp) {
       const ref_ids = fcomp.get("ref_ids");
 
@@ -162,14 +162,20 @@ export const syncWalkMap = (
     if (ref_comp && mitem_comp) {
       const mcomp = ref_comp.doc.getMap("map").get("root");
 
-      if (mcomp) {
-        let ref_ids: Record<string, string> = item_comp.ref_ids;
-        if (!ref_ids) {
-          mitem_comp.set("ref_ids", new Y.Map() as any);
-          ref_ids = {};
-        }
+      const minstance = arg.parent_mcomp
+        ? arg.parent_mcomp.minstance
+        : (mitem as MItem);
 
+      let mref_ids = minstance.get("component")?.get("ref_ids");
+
+      if (!mref_ids) {
+        minstance.get("component")?.set("ref_ids", new Y.Map() as any);
+        mref_ids = minstance.get("component")?.get("ref_ids");
+      }
+
+      if (mcomp) {
         const old_id = item.id;
+        const ref_ids = mref_ids?.toJSON() || {};
         mapItem(mcomp, item, ref_ids);
         item.id = old_id;
 
@@ -177,10 +183,11 @@ export const syncWalkMap = (
           item,
           mitem: mitem as MItem,
           parent_item,
-          parent_mcomp: parent_mcomp,
+          parent_mcomp: arg.parent_mcomp,
           indexed_scope: {},
           is_layout: arg.is_layout,
         };
+
         if (item.name.startsWith("⬅")) {
           arg.portal.in[item.name] = meta;
         }
@@ -232,7 +239,7 @@ export const syncWalkMap = (
                         tree_root_id: arg.tree_root_id,
                         mitem: mcontent,
                         jsx_prop_name: k,
-                        parent_mcomp: arg.parent_mcomp,
+                        parent_mcomp: { minstance, meta, mcomp },
                         parent_item: { id: item.id, mitem: mitem as MItem },
                         portal: arg.portal,
                         skip_add_tree: skip_tree_child,
@@ -254,7 +261,7 @@ export const syncWalkMap = (
             tree_root_id: arg.tree_root_id,
             mitem: e,
             parent_item: { id: item.id, mitem: mitem as MItem },
-            parent_mcomp: { mitem: mitem as MItem, mcomp },
+            parent_mcomp: { minstance, meta, mcomp },
             skip_add_tree: true,
             portal: arg.portal,
             each: arg.each,
@@ -274,7 +281,7 @@ export const syncWalkMap = (
     jsx_prop_name: arg.jsx_prop_name,
     mitem: mitem as MItem,
     parent_item,
-    parent_mcomp: parent_mcomp,
+    parent_mcomp: arg.parent_mcomp,
     indexed_scope: {},
   };
 

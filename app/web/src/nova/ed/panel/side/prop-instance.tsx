@@ -95,7 +95,7 @@ export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
         </div>
       </div>
 
-      <div className="flex flex-1 relative overflow-auto">
+      <div className="flex flex-1 relative overflow-y-auto overflow-x-hidden">
         <div className={cx("absolute inset-0")}>
           {local.rightClickEvent && (
             <Menu

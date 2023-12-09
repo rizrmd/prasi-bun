@@ -17,24 +17,10 @@ export const EdPropInstanceText: FC<{
   const p = useGlobal(EDGlobal, "EDITOR");
 
   const local = useLocal({
-    value: "",
+    value: mprop.get("value"),
     codeEditing: false,
     timeout: null as any,
   });
-
-  const val = mprop.get("value");
-  const valBuilt = mprop.get("valueBuilt");
-
-  useEffect(() => {
-    if (val) {
-      try {
-        eval(`local.value = ${valBuilt}`);
-      } catch (e) {}
-    } else {
-      local.value = "";
-    }
-    local.render();
-  }, [val, valBuilt]);
 
   return (
     <div className="flex items-center min-h-[28px]">

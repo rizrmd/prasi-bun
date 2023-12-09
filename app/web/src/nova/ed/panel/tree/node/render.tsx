@@ -33,11 +33,11 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
     const meta = getMetaById(p, node.data?.parent_item.id);
     if (meta) {
       if (meta.propvis) {
-        jsxPropVisCache[node.data.item.id] = meta.propvis;
+        jsxPropVisCache[meta.item.id] = meta.propvis;
         if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
       } else {
-        if (jsxPropVisCache[node.data.item.id]) {
-          meta.propvis = jsxPropVisCache[node.data.item.id];
+        if (jsxPropVisCache[meta.item.id]) {
+          meta.propvis = jsxPropVisCache[meta.item.id];
           if (meta.propvis) {
             if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
           }

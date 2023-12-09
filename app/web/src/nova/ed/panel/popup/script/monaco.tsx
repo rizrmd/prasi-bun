@@ -23,6 +23,8 @@ export const ScriptMonaco = () => {
     editor: null as null | MonacoEditor,
     monaco: null as null | Monaco,
     changeTimeout: 0 as any,
+    init: false,
+    value: "",
     historyOpen: false,
     idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
   });
@@ -45,33 +47,57 @@ export const ScriptMonaco = () => {
   }, []);
 
   useEffect(() => {
-    if (local.monaco && local.editor) {
-      local.monaco.editor.getModels().forEach((model) => {
-        const uri = model.uri.toString();
-        if (
-          uri.startsWith("inmemory://model") ||
-          uri.startsWith("ts:comp-") ||
-          uri.startsWith("ts:page-")
-        ) {
-          model.dispose();
-        }
-      });
+    (async () => {
+      const editor = local.editor;
+      const monaco = local.monaco;
+      if (monaco && editor) {
+        if (!local.init) {
+          if (p.ui.popup.script.mode === "js") {
+            monaco.editor.getModels().forEach((model) => {
+              model.dispose();
+            });
+            monaco.editor.getModels().forEach((model) => {
+              if (model.uri.toString().startsWith("inmemory://model")) {
+                model.dispose();
+              }
+            });
 
-      let model = local.monaco.editor.createModel(
-        val,
-        "typescript",
-        local.monaco.Uri.parse(
-          `ts:${
-            active.comp_id ? `comp-${active.comp_id}` : `page-${p.page.cur.id}`
-          }-${active.item_id}.tsx`
-        )
-      );
-      local.editor.setModel(model);
-      declareScope(p, local.editor, local.monaco).then(() => {
-        local.render();
-      });
-    }
-  }, [active.item_id, val]);
+            let model = monaco.editor.createModel(
+              val,
+              "typescript",
+              monaco.Uri.parse(
+                `ts:${
+                  active.comp_id
+                    ? `comp-${active.comp_id}`
+                    : `page-${p.page.cur.id}`
+                }-${active.item_id}.tsx`
+              )
+            );
+            editor.setModel(model);
+            await jsMount(editor, monaco, p);
+            await monacoTypings(
+              {
+                site_dts: p.site_dts,
+                script: {
+                  siteTypes: {},
+                },
+                site: p.site.config,
+              },
+              monaco,
+              { types: {}, values: {} }
+            );
+            declareScope(p, editor, monaco).then(() => {
+              local.render();
+            });
+          }
+
+          local.init = true;
+          local.value = val;
+          local.render();
+        }
+      }
+    })();
+  }, [active.item_id, local.monaco, local.editor]);
 
   if (!meta) return null;
 
@@ -121,9 +147,9 @@ export const ScriptMonaco = () => {
   } else if (
     item.type === "item" &&
     item.component?.id &&
-    meta.parent_mcomp?.mitem
+    meta.parent_mcomp?.meta.mitem
   ) {
-    mitem = meta.parent_mcomp?.mitem;
+    mitem = meta.parent_mcomp?.meta.mitem;
 
     if (!mitem) {
       active.item_id = "";
@@ -170,11 +196,8 @@ async () => {
     }
   }
 
-  if (!meta) return null;
-
   return (
     <Editor
-      value={val}
       options={{
         minimap: { enabled: false },
         wordWrap: "wordWrapColumn",
@@ -188,7 +211,10 @@ async () => {
       language={
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
+      value={local.value}
       onChange={(val) => {
+        local.value = val || "";
+        local.render();
         clearTimeout(scriptEdit.timeout);
         scriptEdit.timeout = setTimeout(() => {
           const meta = getMetaById(p, active.item_id);
@@ -222,46 +248,13 @@ async () => {
         }, 1000);
       }}
       onMount={async (editor, monaco) => {
+        local.monaco = monaco;
         local.editor = editor;
+        local.render();
         editor.focus();
         setTimeout(() => {
           editor.focus();
         }, 300);
-
-        const value = editor.getValue();
-        if (p.ui.popup.script.mode === "js") {
-          monaco.editor.getModels().forEach((model) => {
-            if (model.uri.toString().startsWith("inmemory://model")) {
-              model.dispose();
-            }
-          });
-
-          let model = monaco.editor.createModel(
-            value,
-            "typescript",
-            monaco.Uri.parse(
-              `ts:${
-                active.comp_id
-                  ? `comp-${active.comp_id}`
-                  : `page-${p.page.cur.id}`
-              }-${active.item_id}.tsx`
-            )
-          );
-          editor.setModel(model);
-          await jsMount(editor, monaco, p);
-          await monacoTypings(
-            {
-              site_dts: p.site_dts,
-              script: {
-                siteTypes: {},
-              },
-              site: p.site.config,
-            },
-            monaco,
-            { types: {}, values: {} }
-          );
-          await declareScope(p, editor, monaco);
-        }
       }}
     />
   );

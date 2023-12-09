@@ -92,7 +92,7 @@ export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
           Back to Instance
         </div>
       </div>
-      <div className="flex flex-1 relative overflow-auto">
+      <div className="flex flex-1 relative overflow-y-auto overflow-x-hidden">
         <div
           className={cx("absolute inset-0")}
           ref={(ref) => (propRef.el = ref)}
