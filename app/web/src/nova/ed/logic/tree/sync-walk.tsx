@@ -212,7 +212,7 @@ export const syncWalkMap = (
           string,
           FNCompDef
         >;
-
+        const propvis = {};
         if (mprops) {
           const mitem_comp = mitem.get("component");
           if (mitem_comp) {

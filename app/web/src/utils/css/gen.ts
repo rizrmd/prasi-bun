@@ -21,7 +21,7 @@ export const produceCSS = (
 ): string => {
   try {
     return cx([
-      item.name,
+      `s-${item.id}`,
       css`
         display: flex;
         position: relative;

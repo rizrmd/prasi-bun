@@ -9,8 +9,7 @@ import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 
-const jsxPropLoadingRender = {} as Record<string, string>;
-const jsxPropVisCache = {} as Record<string, any>;
+const jsxPropVis = {} as Record<string, string>;
 
 export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -30,11 +29,29 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
   }
 
   if (node.data?.jsx_prop_root && node.data?.jsx_prop_name) {
+    const prop_name = node.data?.jsx_prop_name;
     const meta = getMetaById(p, node.data?.parent_item.id);
-    if (meta) {
-      if (meta.propvis) {
-        jsxPropVisCache[meta.item.id] = meta.propvis;
-        if (meta.propvis[node.data.jsx_prop_name] === false) return <></>;
+
+    if (meta && prop_name && !active.comp_id) {
+      if (!meta.propvis) {
+        if (!meta.parent_mcomp) {
+          setTimeout(local.render, 100);
+          const id = meta.item.originalId || meta.item.id;
+          if (!jsxPropVis[id] || jsxPropVis[id] === prop_name) {
+            jsxPropVis[id] = prop_name;
+            return (
+              <div
+                className={"relative border-b flex items-stretch  min-h-[26px]"}
+              >
+                <Loading backdrop={false} />
+              </div>
+            );
+          } else {
+            return <></>;
+          }
+        }
+      } else {
+        if (meta.propvis[prop_name] === false) return <></>;
       }
     }
   }
@@ -61,7 +78,7 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         active.item_id === item.id
           ? ["bg-blue-100"]
           : [isComponent && `bg-purple-50`],
-        active.hover_id === item.id && "bg-blue-50"
+        active.hover.id === item.id && "bg-blue-50"
       )}
       onKeyDown={treeItemKeyMap(p, prm, item)}
       onContextMenu={(event) => {
@@ -80,12 +97,12 @@ export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
         p.page.render();
       }}
       onMouseOver={() => {
-        active.hover_id = item.id;
-        p.render();
-        p.page.render();
+        active.hover.id = item.id;
+        active.hover.renderTree();
+        active.hover.renderMain();
       }}
     >
-      {active.hover_id === item.id && (
+      {active.hover.id === item.id && (
         <div
           className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-300")}
         ></div>

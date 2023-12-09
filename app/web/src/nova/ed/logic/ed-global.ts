@@ -63,7 +63,7 @@ const target = {
   instance_item_id: false as any,
 };
 export const active = {
-  hover_id: "",
+  hover: { id: "", renderTree: () => {}, renderMain: () => {} },
   text: { id: "", content: "", timeout: null as any, el: null as any },
   get item_id() {
     if (target.active_id === false) {
