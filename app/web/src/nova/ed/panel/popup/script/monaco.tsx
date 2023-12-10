@@ -51,6 +51,7 @@ export const ScriptMonaco = () => {
     (async () => {
       const editor = local.editor;
       const monaco = local.monaco;
+
       if (monaco && editor) {
         if (!local.init) {
           if (p.ui.popup.script.mode === "js") {
@@ -87,9 +88,11 @@ export const ScriptMonaco = () => {
               monaco,
               { types: {}, values: {} }
             );
-            declareScope(p, editor, monaco).then(() => {
-              local.render();
-            });
+            if (meta) {
+              declareScope(p, meta, editor, monaco).then(() => {
+                local.render();
+              });
+            }
           }
 
           local.init = true;

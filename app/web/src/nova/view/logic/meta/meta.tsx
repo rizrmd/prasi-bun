@@ -1,0 +1,65 @@
+import { IItem, MItem } from "../../../../utils/types/item";
+import { genComp } from "./comp";
+import { applyRefIds } from "./ref-ids";
+import { simplify } from "./simplify";
+import { GenMetaArg, GenMetaP, IMeta } from "./types";
+
+export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
+  let wrapper = (fn: any) => {
+    fn();
+  };
+
+  if (arg.is_root && arg.mitem) {
+    const transact = arg.mitem.doc?.transact;
+    if (transact) {
+      wrapper = transact;
+    }
+  }
+
+  wrapper(() => {
+    const { parent } = arg;
+    const item = arg.item as IItem;
+    const mitem = arg.mitem as MItem;
+
+    const r = applyRefIds(item, mitem, parent);
+    if (item.type === "item" && item.component?.id) {
+      genComp(p, arg, r);
+      return;
+    }
+
+    const meta: IMeta = {
+      item: simplify(item),
+      parent: {
+        id: arg.parent?.item.id || "root",
+        instance_id: arg.parent?.instance?.id,
+        comp_id: arg.parent?.comp?.id,
+      },
+      scope: {},
+    };
+
+    if (p.on.visit) {
+      p.on.visit(meta);
+    }
+
+    p.meta[item.id] = meta;
+
+    if (item.childs) {
+      for (const [k, v] of Object.entries(item.childs)) {
+        const mchild = mitem.get("childs")?.get(k as unknown as number);
+        genMeta(p, {
+          item: v,
+          mitem: mchild,
+          is_root: false,
+          parent: {
+            item,
+            mitem: mitem,
+            comp: arg.parent?.comp,
+            mcomp: arg.parent?.mcomp,
+            instance: arg.parent?.instance,
+            minstance: arg.parent?.minstance,
+          },
+        });
+      }
+    }
+  });
+};
