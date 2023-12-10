@@ -11,7 +11,7 @@ export const createPassProp = (
   return (arg: Record<string, any> & { children: ReactNode; idx?: any }) => {
     const meta = v.meta[id];
 
-    if (meta && meta.item && meta.item.id) {
+    if (arg.idx &&meta && meta.item && meta.item.id) {
       let idx = arg.idx;
       if (!idx) {
         const narg: any = {};
@@ -21,6 +21,7 @@ export const createPassProp = (
           }
         }
         idx = hash_sum(narg);
+        arg.idx = idx;
       }
       meta.indexed_scope[idx] = {};
 
