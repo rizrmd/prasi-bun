@@ -4,10 +4,14 @@ import { IItem, MItem } from "../../../../utils/types/item";
 export type GenMetaP = {
   meta: Record<string, IMeta>;
   comps: Record<string, { comp: IItem; mcomp?: MItem }>;
-  on: {
-    load_component?: (id: string) => Promise<{ item: IItem; mcomp?: MItem }>;
+  on?: {
+    visit_component?: (id: string) => void;
     visit?: (meta: IMeta) => void;
+    item_exists?: (arg: { old: IMeta; new: IMeta }) => void;
+    item_new?: (arg: { new: IMeta }) => void;
   };
+  set_mitem?: boolean;
+  set_meta?: boolean;
 };
 
 export type GenMetaArg = {
@@ -27,10 +31,13 @@ export type GenMetaArg = {
 
 export type IMeta = {
   item: IItem;
+  mitem?: MItem;
   parent?: {
     id: string;
     instance_id?: string;
     comp_id?: string;
+    minstance?: MItem;
+    mcomp?: MItem;
   };
   jsx_prop?: {
     name: string;

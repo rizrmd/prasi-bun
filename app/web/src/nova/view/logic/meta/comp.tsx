@@ -13,16 +13,16 @@ export const genComp = (
   r: ReturnType<typeof applyRefIds>
 ) => {
   const { item } = arg;
-  const mitem = arg.mitem as MItem;
+  const mitem = arg.mitem as MItem | undefined;
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let pcomp = p.comps[item.component.id];
-    if (!pcomp && p.on.load_component) {
-      p.on.load_component(item.component.id);
+    if (!pcomp && p.on?.visit_component) {
+      p.on.visit_component(item.component.id);
       return;
     }
     if (pcomp) {
       const ref_ids = r?.ref_ids || item.component?.ref_ids || {};
-      let mref_ids = r?.mref_ids || mitem.get("component")?.get("ref_ids");
+      let mref_ids = r?.mref_ids || mitem?.get("component")?.get("ref_ids");
 
       if (!mref_ids && mitem) {
         mitem.get("component")?.set("ref_ids", new Y.Map() as any);
@@ -90,14 +90,26 @@ export const genComp = (
         }
       }
 
-      p.meta[item.id] = meta;
+      if (p.on) {
+        if (p.on.item_exists && p.meta[item.id]) {
+          p.on.item_exists({ old: p.meta[item.id], new: meta });
+        } else if (p.on.item_new && !p.meta[item.id]) {
+          p.on.item_new({ new: meta });
+        }
+      }
 
-      if (p.on.visit) {
+      if (item.id) {
+        if (p.set_meta !== false) {
+          p.meta[item.id] = meta;
+        }
+      }
+
+      if (p.on?.visit) {
         p.on.visit(meta);
       }
 
       for (const [k, v] of Object.entries(item.childs)) {
-        const mchild = mitem.get("childs")?.get(k as unknown as number);
+        const mchild = mitem?.get("childs")?.get(k as unknown as number);
         genMeta(p, {
           item: v,
           mitem: mchild,
