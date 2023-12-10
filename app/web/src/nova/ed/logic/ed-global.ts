@@ -11,6 +11,7 @@ import { ISection } from "../../../utils/types/section";
 import { IText, MText } from "../../../utils/types/text";
 import { PageItem } from "../panel/popup/page/page-tree";
 import { FMCompDef } from "../../../utils/types/meta-fn";
+import { IMeta } from "../../view/logic/meta/types";
 
 export const EmptySite = {
   id: "",
@@ -47,8 +48,9 @@ const EmptyPage = {
   name: "",
   url: "",
   snapshot: null as null | Uint8Array,
-  scope: {} as IScope,
-  scope_comps: {} as IScopeComp,
+  entry: [] as string[],
+  meta: {} as Record<string, IMeta>,
+  comps: {} as Record<string, { comp: IItem; snapshot: null | Uint8Array }>,
 };
 
 const EmptyComp = {

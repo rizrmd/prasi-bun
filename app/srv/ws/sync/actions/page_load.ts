@@ -1,7 +1,11 @@
-import { EdMeta } from "../../../../web/src/nova/ed/logic/ed-global";
+import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
+import { initLoadComp } from "../../../../web/src/nova/view/logic/meta/comp/init-load-comp";
+import { genMeta } from "../../../../web/src/nova/view/logic/meta/meta";
+import { GenMetaP } from "../../../../web/src/nova/view/logic/meta/types";
+import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
-import { serverWalkLoad, serverWalkMap } from "../editor/load-page";
+import { loadComponent } from "../editor/load-component";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -106,15 +110,14 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
-      const { scope, scope_comps } = await scanMeta(docs.page[id].doc, this);
+      const meta = await scanMeta(docs.page[id].doc, this);
 
       return {
         id: id,
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        scope,
-        scope_comps,
+        ...meta,
       };
     }
   } else if (snap && !ydoc) {
@@ -142,15 +145,14 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const { scope, scope_comps } = await scanMeta(docs.page[id].doc, this);
+    const meta = await scanMeta(docs.page[id].doc, this);
 
     return {
       id: id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      scope,
-      scope_comps,
+      ...meta,
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -163,39 +165,65 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const { scope, scope_comps } = await scanMeta(ydoc.doc, this);
+    const meta = await scanMeta(ydoc.doc, this);
     return {
       id: snap.id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      scope,
-      scope_comps,
+      ...meta,
     };
   }
 };
 
 const scanMeta = async (doc: DPage, sync: SyncConnection) => {
-  const scope = {};
-  const scope_comps = {};
-  const loaded = new Set<string>();
-  const childs = doc.getMap("map").get("root")?.get("childs");
-  if (childs) {
-    await Promise.all(
-      childs.map((m) => serverWalkLoad(m, scope_comps, sync, loaded))
-    );
+  const meta: EPage["meta"] = {};
+  const mcomps: GenMetaP["comps"] = {};
 
-    childs.map((m, i) => {
-      serverWalkMap(
-        { sync, scope, scope_comps, note: "page-load" },
-        {
-          mitem: m,
-          parent_item: { id: "root" },
-          parent_ids: ["root"],
+  const loading = {} as Record<string, Promise<void>>;
+  const mchilds = doc.getMap("map").get("root")?.get("childs");
+  const entry: string[] = [];
+  if (mchilds) {
+    const childs = mchilds.map((m) => m);
+    for (const mchild of childs) {
+      await initLoadComp(
+        { comps: mcomps, meta },
+        mchild.toJSON(),
+        async (comp_ids) => {
+          for (const id of comp_ids) {
+            if (!docs.comp[id]) {
+              if (typeof loading[id] === "undefined") {
+                loading[id] = new Promise<void>(async (resolve) => {
+                  await loadComponent(id, sync);
+                  resolve();
+                });
+              }
+              await loading[id];
+            }
+
+            if (docs.comp[id]) {
+              const mitem = docs.comp[id].doc.getMap("map").get("root");
+              mcomps[id] = { comp: mitem?.toJSON() as IItem, mcomp: mitem };
+            }
+          }
         }
       );
-    });
+    }
+
+    for (const mitem of childs) {
+      const item = mitem.toJSON() as IItem;
+      entry.push(item.id);
+      genMeta({ comps: mcomps, meta, set_mitem: false }, { item, mitem });
+    }
   }
 
-  return { scope, scope_comps };
+  const comps: EPage["comps"] = {};
+  for (const [id, v] of Object.entries(mcomps)) {
+    const snap = snapshot.get("comp", id);
+    if (snap) {
+      comps[id] = { comp: v.comp, snapshot: await gzipAsync(snap.bin) };
+    }
+  }
+
+  return { meta, comps, entry };
 };

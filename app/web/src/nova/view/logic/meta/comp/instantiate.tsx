@@ -1,7 +1,6 @@
+import { createId } from "@paralleldrive/cuid2";
 import { TypedMap } from "yjs-types";
 import { IItem } from "../../../../../utils/types/item";
-import { applyRefIds } from "../ref-ids";
-import { createId } from "@paralleldrive/cuid2";
 
 export const instantiate = (
   item: IItem,
@@ -34,7 +33,7 @@ const walkChild = (
 
   if (item.childs) {
     for (const child of item.childs) {
-      walkChild(item, ref_ids, mref_ids);
+      walkChild(child as IItem, ref_ids, mref_ids);
     }
   }
 };

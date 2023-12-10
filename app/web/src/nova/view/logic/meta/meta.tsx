@@ -19,7 +19,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
   wrapper(() => {
     const { parent } = arg;
     const item = arg.item as IItem;
-    const mitem = arg.mitem as MItem;
+    const mitem = arg.mitem as MItem | undefined;
 
     const r = applyRefIds(item, mitem, parent);
     if (item.type === "item" && item.component?.id) {
@@ -37,15 +37,29 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       scope: {},
     };
 
-    if (p.on.visit) {
+    if (p.set_mitem !== false && mitem) {
+      meta.mitem = mitem;
+    }
+
+    if (p.on?.visit) {
       p.on.visit(meta);
     }
 
-    p.meta[item.id] = meta;
-
+    if (p.on) {
+      if (p.on.item_exists && p.meta[item.id]) {
+        p.on.item_exists({ old: p.meta[item.id], new: meta });
+      } else if (p.on.item_new && !p.meta[item.id]) {
+        p.on.item_new({ new: meta });
+      }
+    }
+    if (item.id) {
+      if (p.set_meta !== false) {
+        p.meta[item.id] = meta;
+      }
+    }
     if (item.childs) {
       for (const [k, v] of Object.entries(item.childs)) {
-        const mchild = mitem.get("childs")?.get(k as unknown as number);
+        const mchild = mitem?.get("childs")?.get(k as unknown as number);
         genMeta(p, {
           item: v,
           mitem: mchild,
