@@ -17,7 +17,7 @@ export const cache = {
 };
 
 export type WSData = { url: URL };
- 
+
 export const createServer = async () => {
   g.router = createRouter({ strictTrailingSlash: false });
 
@@ -32,7 +32,7 @@ export const createServer = async () => {
       maxPayloadLength: 9999999,
       closeOnBackpressureLimit: true,
       drain(ws) {
-        console.log("Backpressure relieved...");
+        // console.log("Backpressure relieved...");
       },
       close(ws, code, reason) {
         const pathname = ws.data.url.pathname;

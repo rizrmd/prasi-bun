@@ -198,6 +198,8 @@ export const ViewMetaScript: FC<{
         console.warn(`Available var:`, args, `\n\n`);
       });
     }
+
+
     return output.jsx;
   }
 };
