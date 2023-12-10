@@ -31,6 +31,7 @@ export const mergeScopeUpwards = (
 
     if (indexedScope || cur.scope || cur.propval) {
       scope = { ...cur.scope, ...indexedScope, ...cur.propval };
+
       for (const [k, v] of Object.entries(scope)) {
         if (typeof finalScope[k] === "undefined") finalScope[k] = v;
       }

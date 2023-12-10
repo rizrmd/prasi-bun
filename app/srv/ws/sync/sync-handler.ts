@@ -85,13 +85,11 @@ export const syncHandler: WebSocketHandler<WSData> = {
             if (baseAction) {
               const action = baseAction.bind(conn);
 
-              ws.sendBinary(
-                packr.pack({
-                  type: SyncType.ActionResult,
-                  argid: msg.argid,
-                  val: await action(...msg.args),
-                })
-              );
+              sendWS(ws, {
+                type: SyncType.ActionResult,
+                argid: msg.argid,
+                val: await action(...msg.args),
+              });
             }
           }
         }
