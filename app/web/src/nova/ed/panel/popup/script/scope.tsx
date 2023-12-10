@@ -1,25 +1,47 @@
 import type { OnMount } from "@monaco-editor/react";
 import { deepClone } from "web-utils";
-import { EPage, ISingleScope, PG, active } from "../../../logic/ed-global";
+import {
+  EPage,
+  EdMeta,
+  ISingleScope,
+  PG,
+  active,
+} from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
 
 export const declareScope = async (
   p: PG,
+  meta: EdMeta,
   editor: MonacoEditor,
   monaco: Monaco
 ) => {
   let active_id = active.item_id;
-  let s = deepClone(p.page.scope[active_id]);
 
-  if (active.comp_id && p.comp.list[active.comp_id]) {
-    s = deepClone(p.comp.list[active.comp_id].scope[active.item_id]);
+  const root = active.comp_id
+    ? p.comp.list[active.comp_id].scope
+    : p.page.scope;
+
+  const meta_root = active.comp_id
+    ? p.comp.list[active.comp_id].meta
+    : p.page.meta;
+
+  if (!root) return;
+
+  let cur = meta;
+  while (!root[cur.item.id]) {
+    const parent = meta_root[cur.parent_item.id];
+    if (parent) {
+      cur = parent;
+    } else {
+      break;
+    }
   }
+  const s = root[cur.item.id];
 
   if (!s) return;
   s.p.push(active_id);
-
 
   const existing: Record<string, IEachArgScope> = {};
 
@@ -50,10 +72,10 @@ export const declareScope = async (
           arg.type
         }~${arg.name}~${arg.id}`,
         `\
-export const {};
-declare global {
-  const ${arg.name} = ${arg.value};
-}`
+  export const {};
+  declare global {
+    const ${arg.name} = ${arg.value};
+  }`
       );
     } else {
       addScope(
@@ -62,11 +84,11 @@ declare global {
           arg.type
         }~${arg.id}`,
         `\
-export const {};
-const __val = ${arg.value};
-declare global {
-  const ${arg.name}: typeof __val & { render: ()=>void };
-}`
+  export const {};
+  const __val = ${arg.value};
+  declare global {
+    const ${arg.name}: typeof __val & { render: ()=>void };
+  }`
       );
     }
   });
