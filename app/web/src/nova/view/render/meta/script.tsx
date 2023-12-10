@@ -199,7 +199,6 @@ export const ViewMetaScript: FC<{
       });
     }
 
-
     return output.jsx;
   }
 };
