@@ -31,13 +31,13 @@ export const diffLocal = (ws: any, msg: any) => {
           if (msg.id) {
             const page = eg.edit.page[msg.id].doc.getMap("map").toJSON();
             try {
-              await db.page.update({
-                where: { id: page.id },
-                data: {
-                  content_tree: page.content_tree,
-                  updated_at: new Date(),
-                },
-              });
+              // await db.page.update({
+              //   where: { id: page.id },
+              //   data: {
+              //     content_tree: page.content_tree,
+              //     updated_at: new Date(),
+              //   },
+              // });
               resolve();
             } catch (e) {
               console.error(e);
@@ -50,17 +50,17 @@ export const diffLocal = (ws: any, msg: any) => {
         }, 1500);
       } else if (msg.mode === "comp") {
         eg.edit.comp[msg.id].saveTimeout = setTimeout(async () => {
-          const comp = eg.edit.comp[msg.id].doc.getMap("map").toJSON();
-          await db.component.update({
-            where: {
-              id: msg.id,
-            },
-            data: {
-              name: comp.name,
-              content_tree: comp.content_tree,
-              updated_at: new Date(),
-            },
-          });
+          // const comp = eg.edit.comp[msg.id].doc.getMap("map").toJSON();
+          // await db.component.update({
+          //   where: {
+          //     id: msg.id,
+          //   },
+          //   data: {
+          //     name: comp.name,
+          //     content_tree: comp.content_tree,
+          //     updated_at: new Date(),
+          //   },
+          // });
         }, 1500);
       } else if (msg.mode === "site") {
         clearTimeout(eg.edit.site[msg.id].saveTimeout);
