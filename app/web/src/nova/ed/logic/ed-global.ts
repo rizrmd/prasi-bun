@@ -146,9 +146,9 @@ export const EDGlobal = {
         on_update?: (bin: Uint8Array, origin: any) => Promise<void>;
       }
     >,
-    scope: {} as IScope,
     building: false,
     meta: {} as Record<string, IMeta>,
+    smeta: {} as Record<string, ISimpleMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<IMeta>[],
     render: () => {},

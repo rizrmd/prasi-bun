@@ -1,16 +1,11 @@
-import { ReactNode, useEffect } from "react";
-import { useGlobal, useLocal } from "web-utils";
-import { Loading } from "../../../../utils/ui/loading";
-import { View } from "../../../view/view";
-import { EDGlobal, active } from "../../logic/ed-global";
-import { getMetaById } from "../../logic/tree/build";
-import { loadComponent } from "../../logic/tree/sync-walk";
-import { code } from "../popup/code/code";
-import { IMeta } from "../../../view/logic/meta/types";
+import { useGlobal } from "web-utils";
+import { Vi } from "../../../vi/vi";
+import { EDGlobal } from "../../logic/ed-global";
 
 export const EdMain = () => {
-  return <div className="flex-1"></div>;
-  // const p = useGlobal(EDGlobal, "EDITOR");
+  const p = useGlobal(EDGlobal, "EDITOR");
+  return <Vi ctx={{ meta: p.page.meta }} entry={p.page.entry} />;
+
   // const local = useLocal({
   //   el: null as ReactNode,
   // });

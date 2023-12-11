@@ -1,6 +1,8 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { IContent, MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
+import { ViContext } from "../../../vi/render/parts";
+import { ViRender } from "../../../vi/render/render";
 
 export type GenMetaP = {
   meta: Record<string, IMeta>;
@@ -59,7 +61,6 @@ export type IMeta = {
     name: string;
     is_root: boolean;
   };
-  fc?: FC<{ meta: IMeta }>;
   scope: {
     val?: any;
     def?: {
