@@ -28,6 +28,7 @@ export const ViRender: FC<{
       : meta.item.childs?.map((item) => {
           if (!item) return null;
           const { id } = item;
+
           return (
             <ErrorBox key={id}>
               <ViRender ctx={ctx} meta={ctx.meta[id]} />
@@ -36,9 +37,5 @@ export const ViRender: FC<{
         });
   }
 
-  return (
-    <div {...parts.props} className={parts.className}>
-      {renderChild}
-    </div>
-  );
+  return <div {...parts.props}>{renderChild}</div>;
 };

@@ -19,7 +19,13 @@ export const viParts = (meta: IMeta, arg?: ViParts) => {
   const props: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
-  > = {};
+  > = {
+    className: produceCSS(item, {
+      mode: arg?.mode || "desktop",
+      hover: arg?.hover,
+      active: arg?.active,
+    }),
+  };
 
   let shouldRenderChild = true;
   if (content.type === "text") {
@@ -28,11 +34,6 @@ export const viParts = (meta: IMeta, arg?: ViParts) => {
   }
 
   return {
-    className: produceCSS(item, {
-      mode: arg?.mode || "desktop",
-      hover: arg?.hover,
-      active: arg?.active,
-    }),
     shouldRenderChild,
     props,
   };
