@@ -4,7 +4,7 @@ import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
 import { applyRefIds } from "./ref-ids";
-import { simplify } from "./simplify";
+import { simplifyItem } from "./simplify";
 import { GenMetaArg, GenMetaP, IMeta } from "./types";
 
 export const genComp = (
@@ -32,7 +32,7 @@ export const genComp = (
       instantiate(item, pcomp.comp, ref_ids, mref_ids);
 
       const meta: IMeta = {
-        item: simplify(item),
+        item: simplifyItem(item),
         parent: {
           id: arg.parent.item.id,
           instance_id: arg.parent?.instance?.id,

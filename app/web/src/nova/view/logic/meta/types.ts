@@ -10,6 +10,7 @@ export type GenMetaP = {
     item_exists?: (arg: { old: IMeta; new: IMeta }) => void;
     item_new?: (arg: { new: IMeta }) => void;
   };
+  smeta?: Record<string, ISimpleMeta>;
   set_mitem?: boolean;
   set_meta?: boolean;
 };
@@ -27,6 +28,20 @@ export type GenMetaArg = {
     instance?: IItem;
     minstance?: MItem;
   };
+};
+
+export type ISimpleMeta = {
+  id: string;
+  comp?: {
+    id: string;
+    ref_ids: Record<string, string>;
+  };
+  parent?: {
+    id: string;
+    instance_id?: string;
+    comp_id?: string;
+  };
+  scope: IMeta["scope"]["def"];
 };
 
 export type IMeta = {
