@@ -204,7 +204,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
 
             if (docs.comp[id]) {
               const mitem = docs.comp[id].doc.getMap("map").get("root");
-              mcomps[id] = { comp: mitem?.toJSON() as IItem, mcomp: mitem };
+              mcomps[id] = { comp: mitem?.toJSON() as IItem };
             }
           }
         }
@@ -214,7 +214,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
     for (const mitem of childs) {
       const item = mitem.toJSON() as IItem;
       entry.push(item.id);
-      genMeta({ comps: mcomps, meta, set_mitem: false }, { item, mitem });
+      genMeta({ comps: mcomps, meta }, { item });
     }
   }
 

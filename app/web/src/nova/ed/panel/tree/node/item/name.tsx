@@ -20,9 +20,8 @@ export const EdTreeName = ({
   }, [p.ui.tree.rename_id]);
 
   const item = node.data?.item;
-  const mitem = node.data?.mitem;
 
-  if (!item || !mitem) return <></>;
+  if (!item) return <></>;
   const is_jsx_prop = !!node.data?.jsx_prop;
 
   const isRenaming = p.ui.tree.rename_id === item.id;
@@ -43,7 +42,6 @@ export const EdTreeName = ({
           }}
           onBlur={() => {
             item.name = local.rename;
-            mitem.set("name", item.name);
             p.ui.tree.rename_id = "";
             p.render();
           }}
@@ -54,7 +52,6 @@ export const EdTreeName = ({
                 local.rename = item.name;
               } else {
                 item.name = local.rename;
-                mitem.set("name", item.name);
               }
 
               p.ui.tree.rename_id = "";

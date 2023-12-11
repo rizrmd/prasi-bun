@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { IContent } from "../../../../utils/types/general";
-import { IItem } from "../../../../utils/types/item";
+import { IItem, MItem } from "../../../../utils/types/item";
 
 export type GenMetaP = {
   meta: Record<string, IMeta>;
@@ -42,6 +42,7 @@ export type ISimpleMeta = {
 
 export type IMeta = {
   item: IItem;
+  mitem?: MItem;
   parent?: {
     id: string;
     instance_id?: string;
