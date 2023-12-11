@@ -1,6 +1,7 @@
 import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
 import { initLoadComp } from "../../../../web/src/nova/view/logic/meta/comp/init-load-comp";
 import { genMeta } from "../../../../web/src/nova/view/logic/meta/meta";
+import { simplifyMeta } from "../../../../web/src/nova/view/logic/meta/simplify";
 import { GenMetaP } from "../../../../web/src/nova/view/logic/meta/types";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
@@ -177,7 +178,7 @@ export const page_load: SAction["page"]["load"] = async function (
 };
 
 const scanMeta = async (doc: DPage, sync: SyncConnection) => {
-  const meta: EPage["meta"] = {};
+  const meta: GenMetaP["meta"] = {};
   const mcomps: GenMetaP["comps"] = {};
 
   const loading = {} as Record<string, Promise<void>>;
@@ -221,9 +222,9 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
   for (const [id, v] of Object.entries(mcomps)) {
     const snap = snapshot.get("comp", id);
     if (snap) {
-      comps[id] = { comp: v.comp, snapshot: await gzipAsync(snap.bin) };
+      comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
     }
   }
 
-  return { meta, comps, entry };
+  return { meta: simplifyMeta(meta), comps, entry };
 };

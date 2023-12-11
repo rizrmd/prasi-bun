@@ -3,13 +3,15 @@ import { TypedMap } from "yjs-types";
 import { IContent, MContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
 import set from "lodash.set";
+import { ISimpleMeta } from "./types";
 
 const timeouts = {} as Record<string, any>;
 
 export const applyRefIds = (
   item: IContent,
   mitem?: MContent,
-  parent?: { instance?: IItem; minstance?: MContent }
+  parent?: { instance?: IItem; minstance?: MContent },
+  smeta?: Record<string, ISimpleMeta>
 ) => {
   const instance = parent?.instance;
 
