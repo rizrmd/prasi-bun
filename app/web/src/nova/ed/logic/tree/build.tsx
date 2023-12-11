@@ -1,7 +1,6 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { viEvalComp } from "../../../vi/render/comp";
-import { ViRender } from "../../../vi/render/render";
-import { ViScript } from "../../../vi/render/script";
+import { viEvalProps } from "../../../vi/render/comp";
+import { viEvalScript } from "../../../vi/render/script";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -34,29 +33,27 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
     if (item) {
+      p.page;
       genMeta(
         {
           comps: p.comp.loaded,
           meta,
-          on: !is_layout
-            ? {
-                visit(meta) {
-                  pushTreeNode(p, meta);
+          smeta: p.page.smeta,
+          on: {
+            async visit(meta) {
+              if (!is_layout) {
+                pushTreeNode(p, meta);
 
-                  if (!meta.item.adv?.js && !meta.item.component?.id) {
-                    meta.fc = ViRender;
-                  } else {
-                    if (meta.item.component?.id) {
-                      viEvalComp(meta);
-                    }
+                if (meta.item.component?.props) {
+                  viEvalProps({ meta: p.page.meta, tick: 0 }, meta);
+                }
 
-                    if (meta.item.adv?.js) {
-                      meta.fc = ViScript;
-                    }
-                  }
-                },
+                if (meta.item.adv?.jsBuilt) {
+                  viEvalScript({ meta: p.page.meta, tick: 0 }, meta);
+                }
               }
-            : undefined,
+            },
+          },
         },
         { item, mitem }
       );
