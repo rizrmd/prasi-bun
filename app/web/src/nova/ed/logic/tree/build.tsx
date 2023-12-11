@@ -16,7 +16,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       if (icomp) {
         p.comp.loaded[k] = {
           comp: icomp,
-          mcomp,
         };
       }
     }
@@ -38,9 +37,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           meta,
           smeta: p.page.smeta,
           on: {
-            async visit(meta) {
+            async visit(m) {
               if (!is_layout) {
-                pushTreeNode(p, meta);
+                pushTreeNode(p, m, meta);
 
                 // if (meta.item.component?.props) {
                 //   viEvalProps({ meta: p.page.meta, tick: 0 }, meta);
@@ -80,15 +79,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         p.page.meta = { ...p.site.layout.meta, ...meta };
       }
     }
-  }
-};
-
-export const getMRoot = (p: PG) => {
-  const root = p.page.doc?.getMap("map").get("root");
-  if (root) {
-    return p.page.root_id === "root"
-      ? root
-      : p.page.meta[p.page.root_id].mitem?.get("childs")?.get(0);
   }
 };
 

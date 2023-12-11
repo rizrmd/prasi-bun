@@ -1,6 +1,31 @@
 import { IMeta, PG } from "../../ed-global";
 
-export const pushTreeNode = (p: PG, meta: IMeta) => {
+export const pushTreeNode = (
+  p: PG,
+  meta: IMeta,
+  metas: Record<string, IMeta>
+) => {
+  if (meta.parent?.id === "root") {
+    p.page.doc
+      ?.getMap("map")
+      .get("root")
+      ?.get("childs")
+      ?.forEach((mitem) => {
+        if (mitem.get("id") === meta.item.id) {
+          meta.mitem = mitem;
+        }
+      });
+  } else {
+    const parent = metas[meta.parent?.id || ""];
+    if (parent && parent.mitem) {
+      parent.mitem.get("childs")?.forEach((mitem) => {
+        if (mitem.get("id") === meta.item.id) {
+          meta.mitem = mitem;
+        }
+      });
+    }
+  }
+
   if (!meta.parent?.comp_id) {
     p.page.tree.push({
       id: meta.item.id,
