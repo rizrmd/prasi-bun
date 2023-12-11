@@ -1,6 +1,4 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { viEvalProps } from "../../../vi/render/comp";
-import { viEvalScript } from "../../../vi/render/script";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -44,18 +42,18 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (!is_layout) {
                 pushTreeNode(p, meta);
 
-                if (meta.item.component?.props) {
-                  viEvalProps({ meta: p.page.meta, tick: 0 }, meta);
-                }
+                // if (meta.item.component?.props) {
+                //   viEvalProps({ meta: p.page.meta, tick: 0 }, meta);
+                // }
 
-                if (meta.item.adv?.jsBuilt) {
-                  viEvalScript({ meta: p.page.meta, tick: 0 }, meta);
-                }
+                // if (meta.item.adv?.jsBuilt) {
+                //   viEvalScript({ meta: p.page.meta, tick: 0 }, meta);
+                // }
               }
             },
           },
         },
-        { item, mitem }
+        { item }
       );
     }
   }

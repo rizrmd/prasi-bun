@@ -1,5 +1,3 @@
-import { MItem } from "../../../../utils/types/item";
-import { evalPropVis } from "./comp/eval-prop-vis";
 import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
@@ -13,7 +11,6 @@ export const genComp = (
   r: ReturnType<typeof applyRefIds>
 ) => {
   const { item } = arg;
-  const mitem = arg.mitem as MItem | undefined;
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let pcomp = p.comps[item.component.id];
     if (p.on?.visit_component) {
@@ -26,18 +23,11 @@ export const genComp = (
 
     if (pcomp) {
       const ref_ids = r?.ref_ids || item.component?.ref_ids || {};
-      let mref_ids = r?.mref_ids || mitem?.get("component")?.get("ref_ids");
 
-      if (!mref_ids && mitem) {
-        mitem.get("component")?.set("ref_ids", new Y.Map() as any);
-        mref_ids = mitem.get("component")?.get("ref_ids");
-      }
-
-      instantiate(item, pcomp.comp, ref_ids, mref_ids);
+      instantiate(item, pcomp.comp, ref_ids);
 
       const meta: IMeta = {
         item: simplifyItemChild(item),
-        mitem,
         parent: {
           id: arg.parent.item.id,
           instance_id: arg.parent?.instance?.id,
@@ -50,26 +40,16 @@ export const genComp = (
         },
       };
 
-      const props = {} as Record<string, { value: any; visible?: string }>;
-
       walkProp({
         item,
-        mitem: mitem,
         pcomp,
-        each(name, prop, mprop) {
+        each(name, prop) {
           if (meta.scope.def?.props) {
             meta.scope.def.props[name] = {
               value: prop.valueBuilt,
-              type: {
-                "": "text",
-                "content-element": "jsx",
-                option: "opt",
-                text: "text",
-              }[prop.meta?.type || ""] as any,
               visible: false,
             };
           }
-          props[name] = { value: prop.valueBuilt, visible: prop.visible };
           const comp_id = item.component?.id;
           if (
             prop.meta?.type === "content-element" &&
@@ -78,7 +58,6 @@ export const genComp = (
           ) {
             genMeta(p, {
               item: prop.content,
-              mitem: mprop?.get("content"),
               is_root: false,
               jsx_prop: {
                 is_root: true,
@@ -87,25 +66,13 @@ export const genComp = (
               },
               parent: {
                 item,
-                mitem: mitem,
                 comp: pcomp.comp,
-                mcomp: pcomp.mcomp,
                 instance: arg.parent?.instance || item,
-                minstance: arg.parent?.minstance || mitem,
               },
             });
           }
         },
       });
-
-      const vis = evalPropVis(props);
-      if (vis && meta.scope.def?.props) {
-        for (const [k, v] of Object.entries(vis)) {
-          if (meta.scope.def.props[k]) {
-            meta.scope.def.props[k].visible = v === false;
-          }
-        }
-      }
 
       if (p.on) {
         if (p.on.item_exists && p.meta[item.id]) {
@@ -126,18 +93,13 @@ export const genComp = (
       }
 
       for (const [k, v] of Object.entries(item.childs)) {
-        const mchild = mitem?.get("childs")?.get(k as unknown as number);
         genMeta(p, {
           item: v,
-          mitem: mchild,
           is_root: false,
           parent: {
             item,
-            mitem: mitem,
             comp: pcomp.comp,
-            mcomp: pcomp.mcomp,
             instance: arg.parent?.instance || item,
-            minstance: arg.parent?.minstance || mitem,
           },
         });
       }
