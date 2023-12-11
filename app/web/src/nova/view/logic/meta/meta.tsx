@@ -1,4 +1,4 @@
-import { IItem, MItem } from "../../../../utils/types/item";
+import { IItem } from "../../../../utils/types/item";
 import { genComp } from "./comp";
 import { applyRefIds } from "./ref-ids";
 import { simplifyItemChild } from "./simplify";
@@ -9,19 +9,11 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     fn();
   };
 
-  if (arg.is_root && arg.mitem) {
-    const transact = arg.mitem.doc?.transact;
-    if (transact) {
-      wrapper = transact;
-    }
-  }
-
   wrapper(() => {
     const { parent } = arg;
     const item = arg.item as IItem;
-    const mitem = arg.mitem as MItem | undefined;
 
-    const r = applyRefIds(item, mitem, parent, p.smeta);
+    const r = applyRefIds(item, parent);
     if (item.type === "item" && item.component?.id) {
       genComp(p, arg, r);
       return;
@@ -37,10 +29,6 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       },
       scope: {},
     };
-
-    if (p.set_mitem !== false && mitem) {
-      meta.mitem = mitem;
-    }
 
     if (p.on?.visit) {
       p.on.visit(meta);
@@ -60,19 +48,14 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     }
 
     if (item.childs) {
-      for (const [k, v] of Object.entries(item.childs)) {
-        const mchild = mitem?.get("childs")?.get(k as unknown as number);
+      for (const [_, v] of Object.entries(item.childs)) {
         genMeta(p, {
           item: v,
-          mitem: mchild,
           is_root: false,
           parent: {
             item,
-            mitem: mitem,
             comp: arg.parent?.comp,
-            mcomp: arg.parent?.mcomp,
             instance: arg.parent?.instance,
-            minstance: arg.parent?.minstance,
           },
         });
       }
