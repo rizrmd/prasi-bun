@@ -59,12 +59,19 @@ export type IMeta = {
   };
   jsx_prop?: {
     name: string;
+    comp_id: string;
     is_root: boolean;
+  };
+  script?: {
+    el: ReactNode;
   };
   scope: {
     val?: any;
     def?: {
-      props?: Record<string, { value: string; visible: boolean }>;
+      props?: Record<
+        string,
+        { value: string; type: "jsx" | "text" | "opt"; visible: boolean }
+      >;
       local?: {
         name: string;
         idx: number;
