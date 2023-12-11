@@ -37,6 +37,7 @@ export const genComp = (
 
       const meta: IMeta = {
         item: simplifyItemChild(item),
+        mitem,
         parent: {
           id: arg.parent.item.id,
           instance_id: arg.parent?.instance?.id,
