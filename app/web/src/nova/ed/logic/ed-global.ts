@@ -1,17 +1,18 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { page } from "dbgen";
-import { FC, ReactElement } from "react";
 import { deepClone } from "web-utils";
 import { SAction } from "../../../../../srv/ws/sync/actions";
 import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
-import { IItem, MItem } from "../../../utils/types/item";
+import { IItem } from "../../../utils/types/item";
 import { DComp, DPage } from "../../../utils/types/root";
-import { ISection } from "../../../utils/types/section";
-import { IText, MText } from "../../../utils/types/text";
-import { PageItem } from "../panel/popup/page/page-tree";
-import { FMCompDef } from "../../../utils/types/meta-fn";
-import { IMeta, ISimpleMeta } from "../../view/logic/meta/types";
+import {
+  GenMetaP,
+  IMeta as LogicMeta,
+  ISimpleMeta,
+} from "../../view/logic/meta/types";
+
+export type IMeta = LogicMeta;
 
 export const EmptySite = {
   id: "",
@@ -20,7 +21,7 @@ export const EmptySite = {
   config: { api_url: "" },
   js: "",
   js_compiled: "",
-  layout: { snapshot: null as null | Uint8Array, id: "" },
+  layout: { id: "", meta: {} as Record<string, IMeta>, entry: [] as string[] },
 };
 
 export type ESite = typeof EmptySite;
@@ -113,38 +114,6 @@ export const active = {
   },
 };
 
-export type EdMeta = {
-  item: IItem | IText | ISection;
-  mitem?: MItem | MText;
-  parent_item: {
-    id: string;
-    mitem?: MItem;
-  };
-  parent_mcomp?: {
-    minstance: MItem;
-    meta: EdMeta;
-    mcomp: MItem;
-  };
-  el?: ReactElement;
-  is_layout?: boolean;
-  jsx_prop_name?: string;
-  jsx_prop_root?: boolean;
-  /** script related meta **/
-  jsx_scope_id?: string;
-  propval?: Record<string, any>;
-  propvis?: Record<string, boolean>;
-  indexed_scope: Record<string, any>;
-  memoize?: Record<
-    string,
-    {
-      Local: FC<any>;
-      PassProp: FC<any>;
-    }
-  >;
-  scope?: Record<string, any>;
-  render?: () => void;
-};
-
 export const EDGlobal = {
   mode: "" as "desktop" | "mobile",
   user: { id: "", username: "", client_id: "" },
@@ -179,23 +148,23 @@ export const EDGlobal = {
     >,
     scope: {} as IScope,
     building: false,
-    meta: {} as Record<string, EdMeta>,
+    meta: {} as Record<string, IMeta>,
     entry: [] as string[],
-    tree: [] as NodeModel<EdMeta>[],
+    tree: [] as NodeModel<IMeta>[],
     render: () => {},
   },
   comp: {
     doc: null as null | DComp,
     item: null as null | IItem,
-    tree: [] as NodeModel<EdMeta>[],
+    tree: [] as NodeModel<IMeta>[],
+    loaded: {} as GenMetaP["comps"],
     list: {} as Record<
       string,
       {
         comp: EComp;
         doc: DComp;
-        scope: IScope;
-        tree: NodeModel<EdMeta>[];
-        meta: Record<string, EdMeta>;
+        tree: NodeModel<IMeta>[];
+        meta: Record<string, IMeta>;
         on_update: (bin: Uint8Array, origin: any) => Promise<void>;
       }
     >,

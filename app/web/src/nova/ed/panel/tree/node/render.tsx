@@ -1,7 +1,7 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
 import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
-import { EDGlobal, EdMeta, active } from "../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
@@ -11,7 +11,7 @@ import { treeItemKeyMap } from "./key-map";
 
 const jsxPropVis = {} as Record<string, string>;
 
-export const nodeRender: NodeRender<EdMeta> = (node, prm) => {
+export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     rightClick: null as null | React.MouseEvent<HTMLDivElement, MouseEvent>,

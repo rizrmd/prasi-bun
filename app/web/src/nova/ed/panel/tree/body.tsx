@@ -7,7 +7,7 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../logic/ed-global";
 import { DEPTH_WIDTH } from "./node/item/indent";
 import { expandTreeHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
@@ -17,7 +17,7 @@ import { doTreeSearch } from "./search";
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ tree: null as TreeMethods | null, comp_id: "" });
-  const TypedTree = DNDTree<EdMeta>;
+  const TypedTree = DNDTree<IMeta>;
 
   active.hover.renderTree = local.render;
 
@@ -31,7 +31,7 @@ export const EdTreeBody = () => {
     }
   }
 
-  let tree: NodeModel<EdMeta>[] = [];
+  let tree: NodeModel<IMeta>[] = [];
   if (p.ui.tree.search) {
     tree = doTreeSearch(p);
   } else {
@@ -114,7 +114,7 @@ const treeClasses = {
   `,
 };
 
-export const DragPreview: DragPreviewRender<EdMeta> = (props) => {
+export const DragPreview: DragPreviewRender<IMeta> = (props) => {
   const item = props.item;
 
   return (
@@ -127,8 +127,8 @@ export const DragPreview: DragPreviewRender<EdMeta> = (props) => {
 };
 
 export const Placeholder: FC<{
-  node: Parameters<PlaceholderRender<EdMeta>>[0];
-  params: Parameters<PlaceholderRender<EdMeta>>[1];
+  node: Parameters<PlaceholderRender<IMeta>>[0];
+  params: Parameters<PlaceholderRender<IMeta>>[1];
 }> = ({ params }) => {
   return (
     <div

@@ -2,7 +2,7 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { compress, decompress } from "wasm-gzip";
 import { MItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
-import { EdMeta, IScope, PG, active } from "../ed-global";
+import { IMeta, IScope, PG, active } from "../ed-global";
 import { treeRebuild } from "./build";
 import {
   loadComponent,
@@ -15,8 +15,7 @@ import { waitUntil } from "web-utils";
 export const loadCompSnapshot = async (
   p: PG,
   id_comp: string,
-  snapshot: Uint8Array,
-  scope: IScope
+  snapshot: Uint8Array
 ) => {
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
@@ -29,7 +28,6 @@ export const loadCompSnapshot = async (
     p.comp.list[id_comp] = {
       comp: { id: id_comp, snapshot },
       doc,
-      scope: scope,
     } as any;
 
     const { tree, meta } = await walkCompTree(p, mitem, id_comp);
@@ -80,11 +78,11 @@ export const loadCompSnapshot = async (
 };
 
 const walkCompTree = async (p: PG, mitem: MItem, comp_id: string) => {
-  const tree: NodeModel<EdMeta>[] = [];
+  const tree: NodeModel<IMeta>[] = [];
   const meta = {};
   const portal = {
-    in: {} as Record<string, EdMeta>,
-    out: {} as Record<string, EdMeta>,
+    in: {} as Record<string, IMeta>,
+    out: {} as Record<string, IMeta>,
   };
   syncWalkLoad(p, mitem, (id) => loadComponent(p, id));
   mitem.doc?.transact(() => {

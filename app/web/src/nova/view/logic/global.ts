@@ -1,12 +1,12 @@
 import { ReactElement, ReactNode } from "react";
-import { EdMeta, IScope } from "../../ed/logic/ed-global";
+import { IMeta, IScope } from "../../ed/logic/ed-global";
 
 export const ViewGlobal = {
   mode: "" as "desktop" | "mobile",
   status: "init" as "init" | "load-code" | "loading-code" | "ready" | "rebuild",
   current: { site_id: "", page_id: "" },
   layout: { show: false },
-  meta: {} as Record<string, EdMeta>,
+  meta: {} as Record<string, IMeta>,
   scope: null as null | IScope,
   entry: [] as string[],
   body_cache: null as null | ReactElement,
@@ -19,17 +19,17 @@ export const ViewGlobal = {
     api: null as any,
   },
   view: {
-    hidden: undefined as undefined | ((meta: EdMeta) => boolean),
+    hidden: undefined as undefined | ((meta: IMeta) => boolean),
     active: undefined as
       | undefined
       | {
-          get: (meta: EdMeta) => boolean;
-          set: (meta: EdMeta) => void;
-          text?: (arg: { meta: EdMeta }) => ReactNode;
+          get: (meta: IMeta) => boolean;
+          set: (meta: IMeta) => void;
+          text?: (arg: { meta: IMeta }) => ReactNode;
         },
     hover: undefined as
       | undefined
-      | { get: (meta: EdMeta) => boolean; set: (meta: EdMeta) => void },
+      | { get: (meta: IMeta) => boolean; set: (meta: IMeta) => void },
   },
 };
 

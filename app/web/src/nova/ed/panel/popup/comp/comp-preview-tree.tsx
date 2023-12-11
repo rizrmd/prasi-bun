@@ -6,17 +6,17 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { FC, useEffect } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { EDGlobal, EdMeta } from "../../../logic/ed-global";
+import { EDGlobal, IMeta } from "../../../logic/ed-global";
 import { compPicker } from "./comp-reload";
 import { nodeRender } from "../../tree/node/render";
 import { useGlobal, useLocal } from "web-utils";
 
-export const EdCompPreviewTree: FC<{ tree: NodeModel<EdMeta>[] }> = ({
+export const EdCompPreviewTree: FC<{ tree: NodeModel<IMeta>[] }> = ({
   tree,
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ ref: null as any });
-  const TypedTree = DNDTree<EdMeta>;
+  const TypedTree = DNDTree<IMeta>;
 
   useEffect(() => {
     if (local.ref) local.ref.openAll();

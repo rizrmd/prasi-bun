@@ -47,14 +47,15 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     return;
   }
 
-  p.page.scope = remotePage.scope || {};
-  if (remotePage.scope_comps) {
-    for (const [id_comp, c] of Object.entries(remotePage.scope_comps)) {
+  if (remotePage.comps) {
+    for (const [id_comp, c] of Object.entries(remotePage.comps)) {
       if (c && c.snapshot) {
-        await loadCompSnapshot(p, id_comp, c.snapshot, c.scope);
+        await loadCompSnapshot(p, id_comp, c.snapshot);
       }
     }
   }
+
+  p.page.entry = remotePage.entry;
 
   p.page.cur = remotePage;
   if (remotePage.snapshot) {

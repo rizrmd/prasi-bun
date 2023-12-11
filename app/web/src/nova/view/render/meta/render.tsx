@@ -1,11 +1,11 @@
 import { FC } from "react";
 import { produceCSS } from "../../../../utils/css/gen";
-import { EdMeta } from "../../../ed/logic/ed-global";
+import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../../logic/global";
 import { ViewMetaChildren } from "./children";
 
 export const ViewMetaRender: FC<{
-  meta: EdMeta;
+  meta: IMeta;
   v: VG;
   props?: any;
   className?: string;

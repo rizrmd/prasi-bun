@@ -3,13 +3,13 @@ import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
-import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../logic/ed-global";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 
-export const EdSidePropInstance: FC<{ meta: EdMeta }> = ({ meta }) => {
+export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     rightClickEvent: null as any,

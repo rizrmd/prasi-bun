@@ -7,7 +7,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
-import { EDGlobal, EdMeta, active } from "../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { declareScope } from "./scope";
 
@@ -32,7 +32,7 @@ export const ScriptMonaco = () => {
   const Editor = jscript.editor;
   if (!Editor) return null;
 
-  let meta: EdMeta | null = p.page.meta[active.item_id];
+  let meta: IMeta | null = p.page.meta[active.item_id];
   if (active.comp_id) {
     if (p.comp.list[active.comp_id]) {
       meta = p.comp.list[active.comp_id].meta[active.item_id];

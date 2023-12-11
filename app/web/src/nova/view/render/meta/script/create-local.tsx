@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { deepClone } from "web-utils";
-import { EdMeta } from "../../../../ed/logic/ed-global";
+import { IMeta } from "../../../../ed/logic/ed-global";
 import { VG } from "../../../logic/global";
 import { modifyChildScopeIndex } from "./mod-scope-index";
 
@@ -31,7 +31,7 @@ export const createLocal = (
     deps?: any[];
     cache?: boolean;
   }) => {
-    const meta = v.meta[id] as EdMeta;
+    const meta = v.meta[id] as IMeta;
     const [_, set] = useState({});
 
     let scope = null as any;

@@ -1,6 +1,6 @@
 import { useErrorBoundary, withErrorBoundary } from "react-use-error-boundary";
 import { useGlobal, useLocal } from "web-utils";
-import { EdMeta } from "../../../../ed/logic/ed-global";
+import { IMeta } from "../../../../ed/logic/ed-global";
 import { ViewGlobal } from "../../../logic/global";
 
 export const ErrorBox = withErrorBoundary(
@@ -11,7 +11,7 @@ export const ErrorBox = withErrorBoundary(
     silent,
   }: {
     children: any;
-    meta?: EdMeta;
+    meta?: IMeta;
     id?: string;
     silent?: boolean;
   }) => {

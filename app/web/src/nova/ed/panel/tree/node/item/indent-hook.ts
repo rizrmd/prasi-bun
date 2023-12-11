@@ -1,6 +1,6 @@
 import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
-import { EdMeta, PG, active } from "../../../../logic/ed-global";
+import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { getMetaById } from "../../../../logic/tree/build";
 
 export const expandTreeHook = (
@@ -26,7 +26,7 @@ export const expandTreeHook = (
       if (id) {
         shouldOpen.add(id);
 
-        let meta: EdMeta | undefined = getMetaById(p, id);
+        let meta: IMeta | undefined = getMetaById(p, id);
         while (meta) {
           const id = meta.parent_item.id;
           if (id && !shouldOpen.has(id)) {

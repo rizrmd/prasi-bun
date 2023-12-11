@@ -3,7 +3,7 @@
 // import { IContent } from "../../../../utils/types/general";
 // import { IItem } from "../../../../utils/types/item";
 // import { FNComponent } from "../../../../utils/types/meta-fn";
-// import { EdMeta, PG } from "../ed-global";
+// import { IMeta, PG } from "../ed-global";
 
 // export const walkLoad = async (
 //   p: { map: PG["comp"]["map"] },
@@ -48,7 +48,7 @@
 
 // export const walkMap = (
 //   p: {
-//     meta: Record<string, EdMeta>;
+//     meta: Record<string, IMeta>;
 //     comps: Record<string, { id: string; item: IItem }>;
 //   },
 //   arg: {
@@ -56,10 +56,10 @@
 //     item: IContent;
 //     parent_item: { id: string };
 //     portal: {
-//       in: Record<string, EdMeta>;
-//       out: Record<string, EdMeta>;
+//       in: Record<string, IMeta>;
+//       out: Record<string, IMeta>;
 //     };
-//     each?: (meta: EdMeta) => void;
+//     each?: (meta: IMeta) => void;
 //     parent_comp?: { id: string; comp_id: string };
 //   }
 // ) => {
@@ -112,7 +112,7 @@
 //       item = deepClone(mcomp);
 //       item.id = original_id;
 
-//       const meta: EdMeta = {
+//       const meta: IMeta = {
 //         item,
 //         parent_item,
 //         idexed_scope: {},
@@ -156,7 +156,7 @@
 //     return;
 //   }
 
-//   const meta: EdMeta = {
+//   const meta: IMeta = {
 //     item,
 //     parent_item,
 //     idexed_scope: {},

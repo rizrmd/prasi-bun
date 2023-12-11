@@ -1,4 +1,4 @@
-import { EdMeta, IScope, PG } from "../../ed/logic/ed-global";
+import { IMeta, IScope, PG } from "../../ed/logic/ed-global";
 
 export type VLoad =
   | { mode: "page"; page_id: string }
@@ -7,7 +7,7 @@ export type VLoad =
       mode: "tree_meta";
       entry: string[];
       scope?: IScope;
-      meta: Record<string, EdMeta>;
+      meta: Record<string, IMeta>;
     };
 
 export type VLoadComponent = {

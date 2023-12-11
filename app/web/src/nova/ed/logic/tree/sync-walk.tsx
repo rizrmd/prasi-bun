@@ -5,7 +5,7 @@ import { MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef, FNComponent } from "../../../../utils/types/meta-fn";
 import { MSection } from "../../../../utils/types/section";
-import { EdMeta, IScope, PG } from "../ed-global";
+import { IMeta, IScope, PG } from "../ed-global";
 import { loadCompSnapshot } from "./sync-walk-comp";
 import {
   ensureMItemProps,
@@ -60,9 +60,9 @@ export const syncWalkMap = (
   p: {
     note?: string;
     item_loading: PG["ui"]["tree"]["item_loading"];
-    tree?: NodeModel<EdMeta>[];
+    tree?: NodeModel<IMeta>[];
     comps: PG["comp"]["list"];
-    meta: Record<string, EdMeta>;
+    meta: Record<string, IMeta>;
     component_not_found?: (comp_id: string) => void;
     scope?: null | IScope;
   },
@@ -70,16 +70,16 @@ export const syncWalkMap = (
     is_layout: boolean;
     mitem: MItem | MSection;
     portal: {
-      in: Record<string, EdMeta>;
-      out: Record<string, EdMeta>;
+      in: Record<string, IMeta>;
+      out: Record<string, IMeta>;
     };
-    parent_item: EdMeta["parent_item"];
-    parent_mcomp?: EdMeta["parent_mcomp"];
+    parent_item: IMeta["parent_item"];
+    parent_mcomp?: IMeta["parent_mcomp"];
     jsx_prop_name?: string;
     jsx_prop_root?: boolean;
     skip_add_tree?: boolean;
     tree_root_id: string;
-    each?: (meta: EdMeta) => void;
+    each?: (meta: IMeta) => void;
   }
 ) => {
   const { mitem, parent_item } = arg;
@@ -180,7 +180,7 @@ export const syncWalkMap = (
         mapItem(mcomp, item, ref_ids);
         item.id = old_id;
 
-        const meta: EdMeta = {
+        const meta: IMeta = {
           item,
           mitem: mitem as MItem,
           parent_item,
@@ -277,7 +277,7 @@ export const syncWalkMap = (
     return;
   }
 
-  const meta: EdMeta = {
+  const meta: IMeta = {
     is_layout: arg.is_layout,
     item,
     jsx_prop_name: arg.jsx_prop_name,

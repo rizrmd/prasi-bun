@@ -1,7 +1,7 @@
 import { IItem } from "../../../../utils/types/item";
 import { IMeta, ISimpleMeta } from "./types";
 
-export const simplifyItem = (item: IItem) => {
+export const simplifyItemChild = (item: IItem) => {
   const newitem = {} as any;
   for (const [k, v] of Object.entries(item)) {
     if (k === "childs") {

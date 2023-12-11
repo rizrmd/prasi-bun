@@ -1,14 +1,14 @@
 import { DropOptions, NodeModel } from "@minoru/react-dnd-treeview";
 import get from "lodash.get";
 import { MContent } from "../../../../../utils/types/general";
-import { EdMeta, PG, active } from "../../../logic/ed-global";
+import { IMeta, PG, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
 
 export const nodeOnDrop: (
   p: PG,
-  tree: NodeModel<EdMeta>[],
-  options: DropOptions<EdMeta>
+  tree: NodeModel<IMeta>[],
+  options: DropOptions<IMeta>
 ) => void = (p, tree, options) => {
   const { dragSource, dropTarget, relativeIndex, dragSourceId, dropTargetId } =
     options;
@@ -47,7 +47,7 @@ export const nodeOnDrop: (
   }
 };
 
-export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
+export const canDrop = (p: PG, arg: DropOptions<IMeta>) => {
   const { dragSource, dragSourceId, dropTargetId, dropTarget } = arg;
   try {
     const parentSource: MContent | undefined = get(
@@ -69,7 +69,7 @@ export const canDrop = (p: PG, arg: DropOptions<EdMeta>) => {
       const to = dropTarget.data.item.type;
 
       if (from === "section" || from === "item") {
-        let parent: EdMeta | undefined = dropTarget.data;
+        let parent: IMeta | undefined = dropTarget.data;
         while (parent) {
           if (parent.item.id === dragSource.data.item.id) {
             return false;
