@@ -1,8 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
-import { TypedMap } from "yjs-types";
 import { IContent, MContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
-import set from "lodash.set";
 import { ISimpleMeta } from "./types";
 
 const timeouts = {} as Record<string, any>;
@@ -25,28 +23,19 @@ export const applyRefIds = (
       if (!ref_ids[item.id]) {
         ref_ids[item.id] = createId();
 
-        if (mitem) {
-          const mitemcomp = mitem.get("component");
-          if (mitemcomp) {
-            const mref_ids = new Y.Map() as any;
-            syncronize(mref_ids, ref_ids);
-            mitemcomp.set("ref_ids", mref_ids);
-          }
-        }
-
-        if (parentcomp) {
-          clearTimeout(timeouts[instance.id]);
-          timeouts[instance.id] = setTimeout(() => {
-            if (mref_ids) {
-              const mref_ids = new Y.Map() as any;
-              syncronize(mref_ids, ref_ids);
-              const parentcomp = parent?.minstance?.get("component");
-              if (parentcomp) {
-                parentcomp.set("ref_ids", mref_ids);
-              }
-            }
-          }, 50);
-        }
+        // if (parentcomp) {
+        //   clearTimeout(timeouts[instance.id]);
+        //   timeouts[instance.id] = setTimeout(() => {
+        //     if (mref_ids) {
+        //       const mref_ids = new Y.Map() as any;
+        //       syncronize(mref_ids, ref_ids);
+        //       const parentcomp = parent?.minstance?.get("component");
+        //       if (parentcomp) {
+        //         parentcomp.set("ref_ids", mref_ids);
+        //       }
+        //     }
+        //   }, 50);
+        // }
       }
 
       if (ref_ids[item.id]) {
