@@ -9,9 +9,14 @@ export const instantiate = (
   mref_ids?: Record<string, string> & TypedMap<Record<string, string>>
 ) => {
   const newitem = structuredClone(comp);
+  if (newitem.component) {
+    newitem.component.ref_ids = {};
+  }
+
   if (item.id) {
     newitem.id = item.id;
   }
+  
   if (item.component) {
     newitem.component = item.component;
   }

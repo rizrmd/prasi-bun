@@ -23,8 +23,15 @@ export const EdRight = () => {
       )}
     >
       {!meta ? (
-        <div className="flex items-center justify-center text-[12px] flex-1">
-          Select an item
+        <div className="flex py-[100px] items-center text-[12px] flex-1 flex-col">
+          <img
+            draggable={false}
+            src="/img/empty.png"
+            className={css`
+              width: 50px;
+            `}
+          />
+          <div className="mt-[20px] text-[12px]">— Select an Item —</div>
         </div>
       ) : (
         <>
