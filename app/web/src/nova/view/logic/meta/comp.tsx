@@ -60,17 +60,29 @@ export const genComp = (
           if (meta.scope.def?.props) {
             meta.scope.def.props[name] = {
               value: prop.valueBuilt,
-              visible: true,
+              type: {
+                "": "text",
+                "content-element": "jsx",
+                option: "opt",
+                text: "text",
+              }[prop.meta?.type || ""] as any,
+              visible: false,
             };
           }
           props[name] = { value: prop.valueBuilt, visible: prop.visible };
-          if (prop.meta?.type === "content-element" && prop.content) {
+          const comp_id = item.component?.id;
+          if (
+            prop.meta?.type === "content-element" &&
+            prop.content &&
+            comp_id
+          ) {
             genMeta(p, {
               item: prop.content,
               mitem: mprop?.get("content"),
               is_root: false,
               jsx_prop: {
                 is_root: true,
+                comp_id,
                 name,
               },
               parent: {
@@ -90,7 +102,7 @@ export const genComp = (
       if (vis && meta.scope.def?.props) {
         for (const [k, v] of Object.entries(vis)) {
           if (meta.scope.def.props[k]) {
-            meta.scope.def.props[k].visible = !!v;
+            meta.scope.def.props[k].visible = v === false;
           }
         }
       }

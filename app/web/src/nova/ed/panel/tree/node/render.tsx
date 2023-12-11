@@ -28,36 +28,29 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     );
   }
 
-  if (
-    node.data?.jsx_prop?.name &&
-    node.data?.jsx_prop?.name &&
-    node.data?.parent?.instance_id
-  ) {
-    const prop_name = node.data?.jsx_prop?.name;
-    const meta = getMetaById(p, node.data.parent.instance_id);
+  if (node.data?.jsx_prop?.is_root) {
+    let hide = true;
+    const comp = p.comp.loaded[node.data.jsx_prop.comp_id];
+    if (comp) {
+      const prop_name = node.data?.jsx_prop?.name;
+      const cprop = comp.comp.component?.props[prop_name];
+      if (cprop && node.data.parent?.instance_id) {
+        const meta = getMetaById(p, node.data.parent.instance_id);
+        if (meta && prop_name) {
+          const props = meta.scope.def?.props;
+          if (props) {
+            const prop = props[prop_name];
+            if (prop && prop.visible === true) {
+              hide = false;
+            }
+          }
+        }
+      }
+    }
 
-    // if (meta && prop_name && !active.comp_id) {
-    //   if (!meta.propvis) {
-    //     if (!meta.parent_mcomp) {
-    //       setTimeout(local.render, 100);
-    //       const id = meta.item.originalId || meta.item.id;
-    //       if (!jsxPropVis[id] || jsxPropVis[id] === prop_name) {
-    //         jsxPropVis[id] = prop_name;
-    //         return (
-    //           <div
-    //             className={"relative border-b flex items-stretch  min-h-[26px]"}
-    //           >
-    //             <Loading backdrop={false} />
-    //           </div>
-    //         );
-    //       } else {
-    //         return <></>;
-    //       }
-    //     }
-    //   } else {
-    //     if (meta.propvis[prop_name] === false) return <></>;
-    //   }
-    // }
+    if (hide) {
+      return <></>;
+    }
   }
 
   return (

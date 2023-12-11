@@ -2,6 +2,7 @@ import { FC, ReactNode } from "react";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViContext, viParts } from "./parts";
 import { ViScript } from "./script";
+import { ErrorBox } from "../utils/error-box";
 
 export const ViRender: FC<{
   ctx: ViContext;
@@ -11,7 +12,11 @@ export const ViRender: FC<{
   if (!meta) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-    return <ViScript ctx={ctx} meta={meta} />;
+    return (
+      <ErrorBox>
+        <ViScript ctx={ctx} meta={meta} />
+      </ErrorBox>
+    );
   }
 
   const parts = viParts(meta);
@@ -23,7 +28,11 @@ export const ViRender: FC<{
       : meta.item.childs?.map((item) => {
           if (!item) return null;
           const { id } = item;
-          return <ViRender key={id} ctx={ctx} meta={ctx.meta[id]} />;
+          return (
+            <ErrorBox key={id}>
+              <ViRender ctx={ctx} meta={ctx.meta[id]} />
+            </ErrorBox>
+          );
         });
   }
 
