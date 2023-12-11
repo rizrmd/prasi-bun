@@ -1,7 +1,7 @@
 import { createAPI, createDB } from "../../../../../utils/script/init-api";
 import { IItem } from "../../../../../utils/types/item";
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
-import { EdMeta } from "../../../../ed/logic/ed-global";
+import { IMeta } from "../../../../ed/logic/ed-global";
 import { VG } from "../../../logic/global";
 import { extractNavigate, preload } from "../../../logic/router";
 import { ViewMeta } from "../meta";
@@ -10,7 +10,7 @@ import { mergeScopeUpwards } from "./merge-upward";
 const jsxProps = {} as Record<string, any>;
 export const compPropVal = (
   v: VG,
-  meta: EdMeta,
+  meta: IMeta,
   scopeIndex?: Record<string, any>
 ) => {
   let props = {} as Record<string, FNCompDef>;
@@ -76,7 +76,7 @@ export const compPropVal = (
                   scopeIndex?: Record<string, any>;
                 }) => {
                   if (prop.content) {
-                    const meta = v.meta[prop.content.id] as EdMeta;
+                    const meta = v.meta[prop.content.id] as IMeta;
                     let parent = v.meta[parent_id];
 
                     if (meta && parent) {

@@ -1,13 +1,13 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
 import { useGlobal } from "web-utils";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
-import { EDGlobal, EdMeta, active } from "../../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
 
 export const EdTreeAction = ({
   node,
   prm,
 }: {
-  node: NodeModel<EdMeta>;
+  node: NodeModel<IMeta>;
   prm: RenderParams;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");

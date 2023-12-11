@@ -3,7 +3,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../../../utils/types/item";
 import { FNComponent } from "../../../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../../../utils/ui/context-menu";
-import { EDGlobal, EdMeta, active } from "../../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
 import { edActionAttach } from "./action/attach";
 import { edActionClone } from "./action/clone";
 import { edActionCopy } from "./action/copy";
@@ -24,7 +24,7 @@ export const EdTreeCtxMenu = ({
   onClose,
 }: {
   event: React.MouseEvent<HTMLDivElement, MouseEvent>;
-  node: NodeModel<EdMeta>;
+  node: NodeModel<IMeta>;
   prm: RenderParams;
   onClose: () => void;
 }) => {

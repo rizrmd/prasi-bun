@@ -1,7 +1,7 @@
 import { FC, ReactNode, Suspense } from "react";
 import { useGlobal } from "web-utils";
 import { Loading } from "../../utils/ui/loading";
-import { EdMeta } from "../ed/logic/ed-global";
+import { IMeta } from "../ed/logic/ed-global";
 import { ViewGlobal } from "./logic/global";
 import { vInit } from "./logic/init";
 import { newLoadCode } from "./logic/load-code-new";
@@ -21,12 +21,12 @@ type ViewProp = {
   layout?: { show: boolean };
   isEditor?: boolean;
   bind?: (arg: { render: () => void }) => void;
-  hidden?: (item: EdMeta) => boolean;
-  hover?: { get: (item: EdMeta) => boolean; set: (meta: EdMeta) => void };
+  hidden?: (item: IMeta) => boolean;
+  hover?: { get: (item: IMeta) => boolean; set: (meta: IMeta) => void };
   active?: {
-    get: (item: EdMeta) => boolean;
-    set: (item: EdMeta) => void;
-    text?: (arg: { meta: EdMeta }) => ReactNode;
+    get: (item: IMeta) => boolean;
+    set: (item: IMeta) => void;
+    text?: (arg: { meta: IMeta }) => ReactNode;
   };
 };
 

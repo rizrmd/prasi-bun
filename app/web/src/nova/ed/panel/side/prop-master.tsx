@@ -10,7 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
-import { EDGlobal, EdMeta, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../logic/ed-global";
 import { EdPropCompTreeItem, PropItem } from "./prop-master/tree-item";
 import { propPopover } from "./prop-master/prop-form";
 
@@ -18,7 +18,7 @@ const propRef = {
   el: null as any,
 };
 
-export const EdSidePropComp: FC<{ meta: EdMeta }> = ({ meta }) => {
+export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({});
   const item = meta?.item as IItem;

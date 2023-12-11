@@ -2,7 +2,7 @@ import type { OnMount } from "@monaco-editor/react";
 import { deepClone } from "web-utils";
 import {
   EPage,
-  EdMeta,
+  IMeta,
   ISingleScope,
   PG,
   active,
@@ -13,7 +13,7 @@ export type MonacoEditor = Parameters<OnMount>[0];
 
 export const declareScope = async (
   p: PG,
-  meta: EdMeta,
+  meta: IMeta,
   editor: MonacoEditor,
   monaco: Monaco
 ) => {

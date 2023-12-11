@@ -1,7 +1,7 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, EdMeta, PG, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { fuzzy } from "../../../../utils/ui/fuzzy";
 
 export const EdTreeSearch = () => {
@@ -100,7 +100,7 @@ export const EdTreeSearch = () => {
 };
 
 export const doTreeSearch = (p: PG) => {
-  let tree: Record<string, { idx: number; node: NodeModel<EdMeta> }> = {};
+  let tree: Record<string, { idx: number; node: NodeModel<IMeta> }> = {};
 
   if (p.ui.tree.search_mode.Name) {
     const found = fuzzy(p.page.tree, "text", p.ui.tree.search);

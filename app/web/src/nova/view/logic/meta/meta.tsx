@@ -1,7 +1,7 @@
 import { IItem, MItem } from "../../../../utils/types/item";
 import { genComp } from "./comp";
 import { applyRefIds } from "./ref-ids";
-import { simplifyItem } from "./simplify";
+import { simplifyItemChild } from "./simplify";
 import { GenMetaArg, GenMetaP, IMeta } from "./types";
 
 export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
@@ -28,7 +28,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     }
 
     const meta: IMeta = {
-      item: simplifyItem(item),
+      item: simplifyItemChild(item),
       parent: {
         id: arg.parent?.item.id || "root",
         instance_id: arg.parent?.instance?.id,

@@ -1,11 +1,11 @@
 import { FC, Fragment, ReactNode } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EdMeta } from "../../../ed/logic/ed-global";
+import { IMeta } from "../../../ed/logic/ed-global";
 import { ViewGlobal } from "../../logic/global";
 import { ViewMeta } from "./meta";
 
 export const ViewMetaChildren: FC<{
-  meta: EdMeta;
+  meta: IMeta;
   className?: string;
 }> = ({ meta, className }) => {
   const v = useGlobal(ViewGlobal, "VIEW");

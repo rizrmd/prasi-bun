@@ -1,11 +1,11 @@
-import { EdMeta } from "../../../../ed/logic/ed-global";
+import { IMeta } from "../../../../ed/logic/ed-global";
 import { VG } from "../../../logic/global";
 
 export const mergeScopeUpwards = (
   v: VG,
   id: string,
   scopeIndex?: Record<string, any>,
-  each?: (meta: EdMeta, values: Record<string, any>) => boolean
+  each?: (meta: IMeta, values: Record<string, any>) => boolean
 ) => {
   const meta = v.meta[id];
 

@@ -1,12 +1,12 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
-import { EDGlobal, EdMeta } from "../../../../logic/ed-global";
+import { EDGlobal, IMeta } from "../../../../logic/ed-global";
 import { useGlobal } from "web-utils";
 export const DEPTH_WIDTH = 5;
 export const EdTreeIndent = ({
   node,
   prm,
 }: {
-  node: NodeModel<EdMeta>;
+  node: NodeModel<IMeta>;
   prm: RenderParams;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");

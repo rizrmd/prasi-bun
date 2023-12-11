@@ -4,7 +4,7 @@ import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
 import { applyRefIds } from "./ref-ids";
-import { simplifyItem } from "./simplify";
+import { simplifyItemChild } from "./simplify";
 import { GenMetaArg, GenMetaP, IMeta } from "./types";
 
 export const genComp = (
@@ -16,10 +16,14 @@ export const genComp = (
   const mitem = arg.mitem as MItem | undefined;
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let pcomp = p.comps[item.component.id];
-    if (!pcomp && p.on?.visit_component) {
+    if (p.on?.visit_component) {
       p.on.visit_component(item.component.id);
+    }
+
+    if (!pcomp) {
       return;
     }
+
     if (pcomp) {
       const ref_ids = r?.ref_ids || item.component?.ref_ids || {};
       let mref_ids = r?.mref_ids || mitem?.get("component")?.get("ref_ids");
@@ -32,7 +36,7 @@ export const genComp = (
       instantiate(item, pcomp.comp, ref_ids, mref_ids);
 
       const meta: IMeta = {
-        item: simplifyItem(item),
+        item: simplifyItemChild(item),
         parent: {
           id: arg.parent.item.id,
           instance_id: arg.parent?.instance?.id,

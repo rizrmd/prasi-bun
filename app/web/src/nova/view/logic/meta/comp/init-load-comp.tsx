@@ -13,8 +13,9 @@ export const initLoadComp = async (
       ...p,
       on: {
         visit_component: async (id) => {
-          comp_ids.push(id);
-          return { item: null as any };
+          if (!p.comps[id]) {
+            comp_ids.push(id);
+          }
         },
       },
       set_meta: false,
