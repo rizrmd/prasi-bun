@@ -1,4 +1,7 @@
 import { IItem, MItem } from "../../../../utils/types/item";
+import { viEvalComp } from "../../../vi/render/comp";
+import { ViRender } from "../../../vi/render/render";
+import { ViScript } from "../../../vi/render/script";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -39,6 +42,18 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             ? {
                 visit(meta) {
                   pushTreeNode(p, meta);
+
+                  if (!meta.item.adv?.js && !meta.item.component?.id) {
+                    meta.fc = ViRender;
+                  } else {
+                    if (meta.item.component?.id) {
+                      viEvalComp(meta);
+                    }
+
+                    if (meta.item.adv?.js) {
+                      meta.fc = ViScript;
+                    }
+                  }
                 },
               }
             : undefined,

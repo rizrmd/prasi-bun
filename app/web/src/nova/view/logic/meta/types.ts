@@ -1,3 +1,4 @@
+import { FC } from "react";
 import { IContent, MContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 
@@ -58,6 +59,7 @@ export type IMeta = {
     name: string;
     is_root: boolean;
   };
+  fc?: FC<{ meta: IMeta }>;
   scope: {
     val?: any;
     def?: {
