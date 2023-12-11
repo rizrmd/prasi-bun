@@ -1,7 +1,7 @@
-import { deepClone } from "web-utils";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { PG, active } from "../ed-global";
+import { pushTreeNode } from "./build/push-tree";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const is_layout =
@@ -27,6 +27,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   mroot?.get("childs")?.forEach((m) => mitems.push(m));
 
   const meta = {};
+  p.page.tree = [];
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
     if (item) {
@@ -37,9 +38,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           on: !is_layout
             ? {
                 visit(meta) {
-                  if (meta.jsx_prop) {
-                    console.log(meta.parent);
-                  }
+                  pushTreeNode(p, meta);
                 },
               }
             : undefined,
