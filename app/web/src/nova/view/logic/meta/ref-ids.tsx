@@ -45,7 +45,7 @@ export const applyRefIds = (
                 parentcomp.set("ref_ids", mref_ids);
               }
             }
-          }, 500);
+          }, 50);
         }
       }
 

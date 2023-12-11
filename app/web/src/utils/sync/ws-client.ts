@@ -66,8 +66,10 @@ export type ClientEventObject = Parameters<typeof clientStartSync>[0]["events"];
 export type ClientEvent = keyof ClientEventObject;
 
 const sendWs = (ws: WebSocket, msg: any) => {
-  if (WS_CONFIG.debug) console.log(`%c⬆`, "color:blue", msg);
-  ws.send(packr.pack(msg));
+  const raw = packr.pack(msg);
+  if (WS_CONFIG.debug)
+    console.log(`%c⬆`, "color:blue", formatBytes(raw.length, 0), msg);
+  ws.send(raw);
 };
 
 export const clientStartSync = async (arg: {
@@ -192,7 +194,8 @@ const connect = (
           ws.onmessage = async (e) => {
             const raw = e.data as Blob;
             const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
-            if (WS_CONFIG.debug) console.log(`%c⬇`, `color:red`, msg);
+            if (WS_CONFIG.debug)
+              console.log(`%c⬇`, `color:red`, formatBytes(raw.size, 0), msg);
 
             if (msg.type === SyncType.ClientID) {
               conf.client_id = msg.client_id;
@@ -271,3 +274,12 @@ const doAction = async <T>(arg: {
     }
   }
 };
+
+function formatBytes(bytes: number, decimals: number) {
+  if (bytes == 0) return "0 Bytes";
+  var k = 1024,
+    dm = decimals || 2,
+    sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+    i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}

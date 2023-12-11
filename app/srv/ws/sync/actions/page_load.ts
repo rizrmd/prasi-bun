@@ -219,12 +219,12 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
   }
 
   const comps: EPage["comps"] = {};
-  for (const [id, v] of Object.entries(mcomps)) {
-    const snap = snapshot.get("comp", id);
-    if (snap) {
-      comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
-    }
-  }
+  // for (const [id, v] of Object.entries(mcomps)) {
+  //   const snap = snapshot.get("comp", id);
+  //   if (snap) {
+  //     comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
+  //   }
+  // }
 
   return { meta: simplifyMeta(meta), comps, entry };
 };
