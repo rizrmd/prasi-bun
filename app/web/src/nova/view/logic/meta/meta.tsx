@@ -29,6 +29,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
 
     const meta: IMeta = {
       item: simplifyItemChild(item),
+      jsx_prop: arg.jsx_prop,
       parent: {
         id: arg.parent?.item.id || "root",
         instance_id: arg.parent?.instance?.id,

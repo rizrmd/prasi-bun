@@ -37,6 +37,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           on: !is_layout
             ? {
                 visit(meta) {
+                  if (meta.jsx_prop) {
+                    console.log(meta.parent);
+                  }
                 },
               }
             : undefined,
