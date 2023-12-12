@@ -4,7 +4,14 @@ import { EDGlobal } from "../../logic/ed-global";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  return <Vi ctx={{ meta: p.page.meta, tick: 0 }} entry={p.page.entry} />;
+  return (
+    <Vi
+      meta={p.page.meta}
+      api_url={p.site.config.api_url}
+      site_id={p.site.id}
+      entry={p.page.entry}
+    />
+  );
 
   // const local = useLocal({
   //   el: null as ReactNode,

@@ -1,25 +1,30 @@
 import { FC } from "react";
 import { useGlobal, useLocal } from "web-utils";
+import { Loading } from "../../utils/ui/loading";
 import { ViGlobal } from "./render/global";
 import { ViRender } from "./render/render";
 import { ErrorBox } from "./utils/error-box";
 
 export const ViRoot: FC<{
-  ctx: typeof ViGlobal;
   entry: string[];
-}> = ({ ctx, entry }) => {
+}> = ({ entry }) => {
   const vi = useGlobal(ViGlobal, "VI");
   const local = useLocal({ tick: Date.now() });
 
-  if (ctx.meta !== vi.meta) {
-    vi.meta = ctx.meta;
+  vi.tick = local.tick;
+
+  if (vi.status === "init") {
+    return (
+      <div className="flex flex-1 flex-col relative">
+        <Loading backdrop={false} />
+      </div>
+    );
   }
-  ctx.tick = local.tick;
 
   return (
     <div className="flex flex-1 flex-col relative">
       {entry.map((id) => {
-        const meta = ctx.meta[id];
+        const meta = vi.meta[id];
         if (meta) {
           if (Element) {
             return (
