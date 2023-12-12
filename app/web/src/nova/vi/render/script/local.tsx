@@ -1,6 +1,4 @@
-import { ReactNode } from "react";
-import { useGlobal } from "web-utils";
-import { ViGlobal } from "../global";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 
 export const createViLocal = (meta: IMeta) => {
@@ -8,18 +6,38 @@ export const createViLocal = (meta: IMeta) => {
     children: ReactNode;
     name: string;
     value: T;
-    hook: (local: T) => void;
-    effect: (local: T) => void | Promise<void>;
+    hook?: (local: T) => void;
+    effect?: (local: T) => void | Promise<void>;
   }) => {
-    // const vi = useGlobal(ViGlobal, "VI");
     const { children } = arg;
+    const ref = useRef<any>(arg.value);
+    const [_, set] = useState({});
+    const render = () => {
+      set({});
+    };
+    const local = ref.current;
+    local.render = render;
 
     if (!meta.scope.val) {
       meta.scope.val = {};
     }
     const val = meta.scope.val;
+    val[arg.name] = local;
 
-    val[arg.name] = arg.value;
+    if (arg.hook) {
+      arg.hook(local);
+    }
+
+    useEffect(() => {
+      const fn = async () => {
+        if (arg.effect) {
+          await arg.effect(local);
+        }
+      };
+
+      fn();
+      return () => {};
+    }, []);
 
     return children;
   };
