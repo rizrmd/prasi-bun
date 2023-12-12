@@ -32,9 +32,13 @@ export const simplifyMeta = (allmeta: Record<string, IMeta>) => {
             instance_id: meta.parent.instance_id,
           }
         : undefined,
-      comp: meta.item.component?.id
-        ? { id: meta.item.component.id, ref_ids: meta.item.component.ref_ids }
-        : undefined,
+      comp:
+        meta.item.component && meta.instances
+          ? {
+              id: meta.item.component.id,
+              instances: meta.instances,
+            }
+          : undefined,
       scope: meta.scope.def,
     };
   }

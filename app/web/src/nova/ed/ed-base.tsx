@@ -16,6 +16,8 @@ import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { EdMain } from "./panel/main/main";
+import { ViGlobal } from "../vi/render/global";
+import { viLoad } from "../vi/load/load";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

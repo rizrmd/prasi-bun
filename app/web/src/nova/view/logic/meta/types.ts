@@ -24,8 +24,8 @@ export type GenMetaArg = {
   jsx_prop?: IMeta["jsx_prop"];
   parent?: {
     item: IItem;
+    instance_id?: string;
     comp?: IItem;
-    instance?: IItem;
   };
 };
 
@@ -33,7 +33,7 @@ export type ISimpleMeta = {
   id: string;
   comp?: {
     id: string;
-    ref_ids: Record<string, string>;
+    instances: Record<string, Record<string, string>>;
   };
   parent?: {
     id: string;
@@ -51,6 +51,7 @@ export type IMeta = {
     instance_id?: string;
     comp_id?: string;
   };
+  instances?: Record<string, Record<string, string>>;
   jsx_prop?: {
     name: string;
     comp_id: string;

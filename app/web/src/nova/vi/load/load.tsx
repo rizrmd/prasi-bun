@@ -1,4 +1,3 @@
-import { createAPI } from "../../../utils/script/init-api";
 import { VG } from "../render/global";
 import { viLoadLegacy } from "./load-legacy";
 

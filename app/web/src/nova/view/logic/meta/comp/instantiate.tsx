@@ -1,15 +1,17 @@
-import { createId } from "@paralleldrive/cuid2";
+import { deepClone } from "web-utils";
 import { IItem } from "../../../../../utils/types/item";
+import { createId } from "@paralleldrive/cuid2";
+import { FNComponent } from "../../../../../utils/types/meta-fn";
 
-export const instantiate = (
-  item: IItem,
-  comp: IItem,
-  ref_ids: Record<string, string>
-) => {
-  const newitem = structuredClone(comp);
-  if (newitem.component) {
-    newitem.component.ref_ids = {};
-  }
+export const instantiate = (arg: {
+  item: IItem;
+  comp: IItem;
+  ids: Record<string, string>;
+}) => {
+  const { item, comp, ids } = arg;
+  const newitem = deepClone(comp);
+
+  walkChild(newitem, ids);
 
   if (item.id) {
     newitem.id = item.id;
@@ -18,8 +20,6 @@ export const instantiate = (
   if (item.component) {
     newitem.component = item.component;
   }
-
-  walkChild(newitem, ref_ids);
 
   for (const key of Object.keys(item)) {
     delete (item as any)[key];
@@ -30,16 +30,19 @@ export const instantiate = (
   }
 };
 
-const walkChild = (item: IItem, ref_ids: Record<string, string>) => {
-  if (!ref_ids[item.id]) {
-    ref_ids[item.id] = createId();
+const walkChild = (
+  item: IItem,
+  ids: Exclude<FNComponent["ref_ids"], undefined>
+) => {
+  if (!ids[item.id]) {
+    ids[item.id] = createId();
   }
 
-  item.id = ref_ids[item.id];
+  item.id = ids[item.id];
 
   if (item.childs) {
     for (const child of item.childs) {
-      walkChild(child as IItem, ref_ids);
+      walkChild(child as IItem, ids);
     }
   }
 };

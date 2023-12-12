@@ -24,7 +24,7 @@ export type FNComponent = {
   name: string;
   updated_at?: number;
   props: Record<string, FNCompDef>;
-  ref_ids: Record<string, string>;
+  ref_ids?: Record<string, string>;
 };
 
 export type FNCompDef = {
