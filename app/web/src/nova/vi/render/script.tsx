@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ErrorBox } from "../utils/error-box";
@@ -41,8 +41,9 @@ export const viEvalScript = (vi: VG, meta: IMeta) => {
   }
   const script = meta.script;
 
+  const exports = (window as any).exports;
   const arg = {
-    ...scope,
+    useEffect,
     children,
     props: parts.props,
     Local: script.Local,
@@ -52,6 +53,8 @@ export const viEvalScript = (vi: VG, meta: IMeta) => {
     render: (jsx: ReactNode) => {
       script.result = jsx;
     },
+    ...exports,
+    ...scope,
   };
 
   const fn = new Function(
