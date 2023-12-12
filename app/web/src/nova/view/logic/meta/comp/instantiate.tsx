@@ -30,7 +30,7 @@ export const instantiate = (arg: {
   }
 };
 
-const walkChild = (
+export const walkChild = (
   item: IItem,
   ids: Exclude<FNComponent["ref_ids"], undefined>
 ) => {

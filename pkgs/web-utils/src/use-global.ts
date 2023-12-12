@@ -7,10 +7,6 @@ import {
   useState,
 } from "react";
 
-const w = window as unknown as {
-  globalValueID: WeakMap<any, string>;
-};
-
 export const GlobalContext = createContext({
   global: {},
   render: () => {},
@@ -25,8 +21,12 @@ export const useGlobal = <T extends object>(
   effectOrID?:
     | (() => Promise<void | (() => void)> | void | (() => void))
     | string,
-  id?: string
+  id?: string 
 ): T & { render: (reset?: boolean) => void } => {
+  const w = window as unknown as {
+    globalValueID: WeakMap<any, string>;
+  };
+
   if (!w.globalValueID) w.globalValueID = new WeakMap();
 
   let _id = (typeof effectOrID === "string" ? effectOrID : id) as string;

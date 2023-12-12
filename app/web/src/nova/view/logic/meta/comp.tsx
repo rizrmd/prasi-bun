@@ -1,4 +1,4 @@
-import { instantiate } from "./comp/instantiate";
+import { instantiate, walkChild } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
 import { simplifyItemChild } from "./simplify";
@@ -53,6 +53,12 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         scope: {},
       };
 
+      if (item.id) {
+        if (p.set_meta !== false) {
+          p.meta[item.id] = meta;
+        }
+      }
+
       walkProp({
         item,
         pcomp,
@@ -63,6 +69,8 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
             prop.content &&
             comp_id
           ) {
+            walkChild(prop.content, instance);
+
             genMeta(p, {
               item: prop.content,
               is_root: false,
@@ -73,6 +81,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
               },
               parent: {
                 item,
+                instance_id: item.id,
                 comp: pcomp.comp,
               },
             });
@@ -88,17 +97,12 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         }
       }
 
-      if (item.id) {
-        if (p.set_meta !== false) {
-          p.meta[item.id] = meta;
-        }
-      }
-
       if (p.on?.visit) {
         p.on.visit(meta);
       }
 
       for (const child of Object.values(item.childs)) {
+        if (child.name.startsWith('jsx:')) continue;
         genMeta(p, {
           item: child,
           is_root: false,

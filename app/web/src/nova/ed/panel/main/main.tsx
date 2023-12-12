@@ -1,7 +1,6 @@
 import { useGlobal } from "web-utils";
 import { Vi } from "../../../vi/vi";
 import { EDGlobal } from "../../logic/ed-global";
-import { ViGlobal } from "../../../vi/render/global";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -12,6 +11,8 @@ export const EdMain = () => {
       api_url={p.site.config.api_url}
       site_id={p.site.id}
       entry={p.page.entry}
+      api={p.script.api}
+      db={p.script.db}
     />
   );
 

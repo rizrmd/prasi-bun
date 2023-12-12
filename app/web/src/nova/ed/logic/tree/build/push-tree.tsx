@@ -26,19 +26,23 @@ export const pushTreeNode = (
     }
   }
 
-  if (!meta.parent?.comp_id) {
-    p.page.tree.push({
-      id: meta.item.id,
-      parent: meta.parent?.id || "root",
-      text: meta.item.name,
-      data: meta,
-    });
-  } else if (meta.jsx_prop) {
-    p.page.tree.push({
-      id: meta.item.id,
-      parent: meta.parent?.instance_id || "root",
-      text: meta.item.name,
-      data: meta,
-    });
+  if (p.page.tree.find((t) => t.id === meta.item.id)) {
+    console.log(meta.item.id, meta.item.name);
+  } else {
+    if (!meta.parent?.comp_id) {
+      p.page.tree.push({
+        id: meta.item.id,
+        parent: meta.parent?.id || "root",
+        text: meta.item.name,
+        data: meta,
+      });
+    } else if (meta.jsx_prop) {
+      p.page.tree.push({
+        id: meta.item.id,
+        parent: meta.parent?.instance_id || "root",
+        text: meta.item.name,
+        data: meta,
+      });
+    }
   }
 };

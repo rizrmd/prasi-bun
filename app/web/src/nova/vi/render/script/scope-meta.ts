@@ -39,16 +39,10 @@ const getScopeMeta = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   return scope_meta;
 };
 
-const getScopeValue = (
-  scope_meta: ReturnType<typeof getScopeMeta>,
-  meta: IMeta
-) => {
+const getScopeValue = (scope_meta: ReturnType<typeof getScopeMeta>) => {
   const scope: any = {};
 
   for (const [varname, s] of Object.entries(scope_meta)) {
-    if (meta.item.name === "section") {
-      console.log(varname, s.meta.scope);
-    }
     if (s.meta.scope.val) {
       scope[varname] = s.meta.scope.val[varname];
     }
@@ -60,5 +54,5 @@ const getScopeValue = (
 export const getScope = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   const scope_meta = getScopeMeta(vi, meta);
 
-  return getScopeValue(scope_meta, meta);
+  return getScopeValue(scope_meta);
 };
