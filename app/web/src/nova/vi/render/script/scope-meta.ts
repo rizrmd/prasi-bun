@@ -1,7 +1,7 @@
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 
-const getScopeMeta = (vi: VG, meta: IMeta) => {
+const getScopeMeta = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   let cur = meta;
 
   const scopes_meta: IMeta[] = [];
@@ -39,10 +39,16 @@ const getScopeMeta = (vi: VG, meta: IMeta) => {
   return scope_meta;
 };
 
-const getScopeValue = (scope_meta: ReturnType<typeof getScopeMeta>) => {
+const getScopeValue = (
+  scope_meta: ReturnType<typeof getScopeMeta>,
+  meta: IMeta
+) => {
   const scope: any = {};
 
   for (const [varname, s] of Object.entries(scope_meta)) {
+    if (meta.item.name === "section") {
+      console.log(varname, s.meta.scope);
+    }
     if (s.meta.scope.val) {
       scope[varname] = s.meta.scope.val[varname];
     }
@@ -51,8 +57,8 @@ const getScopeValue = (scope_meta: ReturnType<typeof getScopeMeta>) => {
   return scope;
 };
 
-export const getScope = (vi: VG, meta: IMeta) => {
+export const getScope = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   const scope_meta = getScopeMeta(vi, meta);
 
-  return getScopeValue(scope_meta);
+  return getScopeValue(scope_meta, meta);
 };

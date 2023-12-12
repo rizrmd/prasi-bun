@@ -24,7 +24,7 @@ export const viParts = (meta: IMeta, arg?: ViParts) => {
   };
 
   let shouldRenderChild = true;
-  if (content.type === "text") {
+  if (content.type === "text" && !item.adv?.jsBuilt) {
     props.dangerouslySetInnerHTML = { __html: item.html || "" };
     shouldRenderChild = false;
   }

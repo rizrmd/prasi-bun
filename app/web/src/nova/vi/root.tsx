@@ -13,7 +13,7 @@ export const ViRoot: FC<{
 
   vi.tick = local.tick;
 
-  if (vi.status === "init") {
+  if (vi.status !== "ready") {
     return (
       <div className="flex flex-1 flex-col relative">
         <Loading backdrop={false} />
