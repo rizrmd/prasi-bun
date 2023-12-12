@@ -1,18 +1,20 @@
 import { FC, ReactNode, Suspense } from "react";
+import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
-import { ViContext, viParts } from "./parts";
-import { ViScript } from "./script";
 import { ErrorBox } from "../utils/error-box";
+import { ViGlobal } from "./global";
+import { viParts } from "./parts";
+import { ViScript } from "./script";
 
 export const ViRender: FC<{
-  ctx: ViContext;
   meta: IMeta;
   children?: ReactNode;
-}> = ({ meta, children, ctx }) => {
+}> = ({ meta, children }) => {
+  const vi = useGlobal(ViGlobal, "VI");
   if (!meta) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-    return <ViScript ctx={ctx} meta={meta} />;
+    return <ViScript meta={meta} />;
   }
 
   const parts = viParts(meta);
@@ -28,7 +30,7 @@ export const ViRender: FC<{
           return (
             <ErrorBox key={id}>
               <Suspense>
-                <ViRender ctx={ctx} meta={ctx.meta[id]} />
+                <ViRender meta={vi.meta[id]} />
               </Suspense>
             </ErrorBox>
           );

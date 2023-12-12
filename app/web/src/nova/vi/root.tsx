@@ -1,14 +1,19 @@
 import { FC } from "react";
-import { ViContext } from "./render/parts";
+import { useGlobal, useLocal } from "web-utils";
+import { ViGlobal } from "./render/global";
 import { ViRender } from "./render/render";
-import { useLocal } from "web-utils";
 import { ErrorBox } from "./utils/error-box";
 
 export const ViRoot: FC<{
-  ctx: ViContext;
+  ctx: typeof ViGlobal;
   entry: string[];
 }> = ({ ctx, entry }) => {
+  const vi = useGlobal(ViGlobal, "VI");
   const local = useLocal({ tick: Date.now() });
+
+  if (ctx.meta !== vi.meta) {
+    vi.meta = ctx.meta;
+  }
   ctx.tick = local.tick;
 
   return (
@@ -19,7 +24,7 @@ export const ViRoot: FC<{
           if (Element) {
             return (
               <ErrorBox key={meta.item.id}>
-                <ViRender ctx={ctx} meta={meta} />
+                <ViRender meta={meta} />
               </ErrorBox>
             );
           }

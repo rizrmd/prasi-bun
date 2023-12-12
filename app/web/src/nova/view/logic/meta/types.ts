@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
 import { IContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
+import { createViLocal } from "../../../vi/render/script/local";
+import { createViPassProp } from "../../../vi/render/script/passprop";
 
 export type GenMetaP = {
   meta: Record<string, IMeta>;
@@ -55,7 +57,9 @@ export type IMeta = {
     is_root: boolean;
   };
   script?: {
-    el: ReactNode;
+    result: ReactNode;
+    Local: ReturnType<typeof createViLocal>;
+    PassProp: ReturnType<typeof createViPassProp>;
   };
   scope: {
     val?: any;

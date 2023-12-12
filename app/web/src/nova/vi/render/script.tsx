@@ -1,23 +1,24 @@
 import { FC, ReactNode } from "react";
+import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
-import { ViContext, viParts } from "./parts";
-import { ViRender } from "./render";
-import { ViLocal } from "./script/local";
-import { ViPassProp } from "./script/passprop";
-import { viScopeUpward } from "./script/upward";
 import { ErrorBox } from "../utils/error-box";
+import { VG, ViGlobal } from "./global";
+import { viParts } from "./parts";
+import { ViRender } from "./render";
+import { createViLocal } from "./script/local";
+import { createViPassProp } from "./script/passprop";
+import { getScope } from "./script/scope-meta";
 
-export const ViScript: FC<{ ctx: ViContext; meta: IMeta }> = ({
-  ctx,
-  meta,
-}) => {
-  viEvalScript(ctx, meta);
+export const ViScript: FC<{ meta: IMeta }> = ({ meta }) => {
+  const vi = useGlobal(ViGlobal, "VI");
 
-  if (meta.script) return meta.script.el;
+  viEvalScript(vi, meta);
+
+  if (meta.script) return meta.script.result;
   return null;
 };
 
-export const viEvalScript = (ctx: ViContext, meta: IMeta) => {
+export const viEvalScript = (vi: VG, meta: IMeta) => {
   const childs = meta.item.childs;
   const parts = viParts(meta);
 
@@ -26,24 +27,30 @@ export const viEvalScript = (ctx: ViContext, meta: IMeta) => {
     children =
       Array.isArray(childs) &&
       childs.map(({ id }) => {
-        return <ViRender key={id} ctx={ctx} meta={ctx.meta[id]} />;
+        return <ViRender key={id} meta={vi.meta[id]} />;
       });
   }
 
-  const scope = viScopeUpward(ctx, meta);
+  const scope = getScope(vi, meta);
+  if (!meta.script) {
+    meta.script = {
+      result: null,
+      Local: createViLocal(meta),
+      PassProp: createViPassProp(meta),
+    };
+  }
+  const script = meta.script;
 
   const arg = {
     ...scope,
     children,
     props: parts.props,
-    Local: ViLocal,
-    PassProp: ViPassProp,
+    Local: script.Local,
+    PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
     render: (jsx: ReactNode) => {
-      meta.script = {
-        el: jsx,
-      };
+      script.result = jsx;
     },
   };
 

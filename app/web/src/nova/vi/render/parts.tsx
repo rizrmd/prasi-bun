@@ -2,10 +2,6 @@ import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { IMeta } from "../../ed/logic/ed-global";
 
-export type ViContext = {
-  meta: Record<string, IMeta>;
-  tick: number;
-};
 export type ViParts = {
   mode: "mobile" | "desktop";
   hover?: boolean;
