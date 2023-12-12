@@ -5,7 +5,9 @@ import { ErrorBox } from "./utils/error-box";
 export const Vi: typeof ViRoot = (props) => {
   return (
     <ErrorBox>
-      <Suspense>{/* <ViRoot {...props} /> */}</Suspense>
+      <Suspense>
+        <ViRoot {...props} />
+      </Suspense>
     </ErrorBox>
   );
 };

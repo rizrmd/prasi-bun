@@ -7,6 +7,7 @@ import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { loadComponent } from "../editor/load-component";
+import { parseJs } from "../editor/parser/parse-js";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -214,7 +215,20 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
     for (const mitem of childs) {
       const item = mitem.toJSON() as IItem;
       entry.push(item.id);
-      genMeta({ comps: mcomps, meta }, { item });
+      genMeta(
+        {
+          comps: mcomps,
+          meta,
+          on: {
+            visit(meta) {
+              if (typeof meta.item.adv?.js === "string") {
+                meta.scope.def = parseJs(meta.item.adv.js);
+              }
+            },
+          },
+        },
+        { item }
+      );
     }
   }
 

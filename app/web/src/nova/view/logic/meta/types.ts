@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
 import { IContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 
@@ -58,15 +59,6 @@ export type IMeta = {
   };
   scope: {
     val?: any;
-    def?: {
-      props?: Record<string, { value: string; visible: boolean }>;
-      local?: {
-        name: string;
-        idx: number;
-        idxval: Record<string, number>;
-        src: string;
-      };
-      pass?: Record<string, { src: string; idx: number }>;
-    };
+    def?: ReturnType<typeof parseJs>;
   };
 };
