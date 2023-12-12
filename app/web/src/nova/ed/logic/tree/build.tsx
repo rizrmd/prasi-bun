@@ -1,6 +1,7 @@
 import { IItem, MItem } from "../../../../utils/types/item";
+import { viEvalScript } from "../../../vi/render/script";
 import { genMeta } from "../../../view/logic/meta/meta";
-import { PG, active } from "../ed-global";
+import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
@@ -25,7 +26,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   const mitems: MItem[] = [];
   mroot?.get("childs")?.forEach((m) => mitems.push(m));
 
-  const meta = {};
+  const meta: Record<string, IMeta> = {};
   p.page.tree = [];
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
@@ -40,14 +41,10 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             async visit(m) {
               if (!is_layout) {
                 pushTreeNode(p, m, meta);
+              }
 
-                // if (meta.item.component?.props) {
-                //   viEvalProps({ meta: p.page.meta, tick: 0 }, meta);
-                // }
-
-                // if (meta.item.adv?.jsBuilt) {
-                //   viEvalScript({ meta: p.page.meta, tick: 0 }, meta);
-                // }
+              if (m.item.adv?.jsBuilt) {
+                viEvalScript({ meta: p.page.meta }, m);
               }
             },
           },
@@ -63,11 +60,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     let root_id = "root";
     if (p.site.layout && p.site.layout.meta) {
       for (const [_, v] of Object.entries(p.site.layout.meta)) {
-        if (v.item.component?.id) {
-          if (v.item.name === "content") {
-            root_id = v.item.id;
-            break;
-          }
+        if (v.item.name === "content") {
+          root_id = v.item.id;
+          break;
         }
       }
 
@@ -76,7 +71,16 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       if (p.site.layout && p.site.layout.id === p.page.cur.id) {
         p.page.meta = meta;
       } else {
-        p.page.meta = { ...p.site.layout.meta, ...meta };
+        if (root_id !== "root") {
+          for (const m of Object.values(meta)) {
+            if (m.parent?.id === "root") {
+              m.parent.id = root_id;
+            }
+          }
+          p.page.meta = { ...p.site.layout.meta, ...meta };
+        } else {
+          p.page.meta = meta;
+        }
       }
     }
   }

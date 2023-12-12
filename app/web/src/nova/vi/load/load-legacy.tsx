@@ -2,7 +2,7 @@ import importModule from "../../../render/editor/tools/dynamic-import";
 import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
 import { VG } from "../render/global";
 
-export const viLoadOld = async (vi: VG) => {
+export const viLoadLegacy = async (vi: VG) => {
   const site = await db.site.findFirst({
     where: { id: vi.site.id },
     include: { component_site: true },

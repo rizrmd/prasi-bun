@@ -18,7 +18,7 @@ export const ViScript: FC<{ meta: IMeta }> = ({ meta }) => {
   return null;
 };
 
-export const viEvalScript = (vi: VG, meta: IMeta) => {
+export const viEvalScript = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   const childs = meta.item.childs;
   const parts = viParts(meta);
 
@@ -32,6 +32,7 @@ export const viEvalScript = (vi: VG, meta: IMeta) => {
   }
 
   const scope = getScope(vi, meta);
+
   if (!meta.script) {
     meta.script = {
       result: null,
