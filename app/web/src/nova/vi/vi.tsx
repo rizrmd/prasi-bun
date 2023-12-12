@@ -11,13 +11,17 @@ export const Vi: FC<{
   entry: string[];
   api_url: string;
   site_id: string;
-}> = ({ meta, entry, api_url, site_id }) => {
+  api?: any;
+  db?: any;
+}> = ({ meta, entry, api_url, site_id, api, db }) => {
   const vi = useGlobal(ViGlobal, "VI");
   if (vi.meta !== meta) {
     vi.meta = meta;
   }
 
   if (vi.status === "init") {
+    vi.site.db = db;
+    vi.site.api = api;
     viLoad(vi, { api_url, site_id });
   }
 

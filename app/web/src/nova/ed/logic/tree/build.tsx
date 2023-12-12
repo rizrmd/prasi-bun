@@ -1,5 +1,4 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { viEvalScript } from "../../../vi/render/script";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -31,7 +30,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
     if (item) {
-      p.page;
       genMeta(
         {
           comps: p.comp.loaded,
@@ -43,9 +41,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 pushTreeNode(p, m, meta);
               }
 
-              if (m.item.adv?.jsBuilt) {
-                viEvalScript({ meta: p.page.meta }, m);
-              }
+              // if (m.item.adv?.jsBuilt) {
+              //   viEvalScript({ meta: p.page.meta }, m);
+              // }
             },
           },
         },

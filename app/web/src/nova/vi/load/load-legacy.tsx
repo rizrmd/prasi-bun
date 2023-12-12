@@ -1,8 +1,27 @@
 import importModule from "../../../render/editor/tools/dynamic-import";
 import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
-import { VG } from "../render/global";
 
-export const viLoadLegacy = async (vi: VG) => {
+export const viLoadLegacy = async (vi: {
+  site: {
+    id: string;
+    api_url: string;
+    api: {
+      get: () => any;
+      set: (val: any) => void;
+    };
+    db: {
+      get: () => any;
+      set: (val: any) => void;
+    };
+  };
+  render: any;
+}) => {
+  const w = window as any;
+
+  if (!w.exports) {
+    w.exports = {};
+  }
+
   const site = await db.site.findFirst({
     where: { id: vi.site.id },
     include: { component_site: true },
@@ -20,16 +39,20 @@ export const viLoadLegacy = async (vi: VG) => {
 
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);
-    vi.site.db = createDB(vi.site.api_url);
-    vi.site.api = createAPI(vi.site.api_url);
+    if (!vi.site.db.get()) {
+      vi.site.db.set(createDB(vi.site.api_url));
+    }
+    if (!vi.site.api.get()) {
+      vi.site.api.set(createAPI(vi.site.api_url));
+    }
 
     const w = window as any;
     if (site.js_compiled) {
       const config = site.config as any;
       const exec = (fn: string, scopes: any) => {
         if (config.api_url && !scopes["api"]) {
-          scopes["api"] = vi.site.api;
-          scopes["db"] = vi.site.db;
+          scopes["api"] = vi.site.api.get();
+          scopes["db"] = vi.site.db.get();
         }
         scopes.params = w.params;
         scopes.module = {};
