@@ -20,6 +20,14 @@ export const instantiate = (
   }
 
   walkChild(newitem, ref_ids);
+
+  for (const key of Object.keys(item)) {
+    delete (item as any)[key];
+  }
+
+  for (const [k, v] of Object.entries(newitem)) {
+    (item as any)[k] = v;
+  }
 };
 
 const walkChild = (item: IItem, ref_ids: Record<string, string>) => {

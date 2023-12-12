@@ -19,6 +19,13 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       return;
     }
 
+    let scope: IMeta["scope"] = {};
+    if (p.smeta) {
+      if (p.smeta[item.id] && p.smeta[item.id].scope) {
+        scope.def = p.smeta[item.id].scope;
+      }
+    }
+
     const meta: IMeta = {
       item: simplifyItemChild(item),
       jsx_prop: arg.jsx_prop,
@@ -27,7 +34,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
         instance_id: arg.parent?.instance?.id,
         comp_id: arg.parent?.comp?.id,
       },
-      scope: {},
+      scope,
     };
 
     if (p.on?.visit) {

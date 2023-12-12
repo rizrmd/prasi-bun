@@ -2,6 +2,7 @@ import { FC } from "react";
 import { ViContext } from "./render/parts";
 import { ViRender } from "./render/render";
 import { useLocal } from "web-utils";
+import { ErrorBox } from "./utils/error-box";
 
 export const ViRoot: FC<{
   ctx: ViContext;
@@ -16,7 +17,11 @@ export const ViRoot: FC<{
         const meta = ctx.meta[id];
         if (meta) {
           if (Element) {
-            return <ViRender key={meta.item.id} ctx={ctx} meta={meta} />;
+            return (
+              <ErrorBox key={meta.item.id}>
+                <ViRender ctx={ctx} meta={meta} />
+              </ErrorBox>
+            );
           }
         }
         return null;

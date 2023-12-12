@@ -1,30 +1,7 @@
 import recast from "recast";
 import babel from "recast/parsers/babel-ts";
-import { IItem, MItem } from "../../../../../web/src/utils/types/item";
-import { EdMeta } from "../../../../../web/src/nova/ed/logic/ed-global";
 
-export type ArgParentMComp = EdMeta["parent_mcomp"] & {
-  id: string;
-  parent_ids: string[];
-  jsx_props: Record<
-    string,
-    {
-      id: string;
-      mitem: MItem;
-      parent_mcomp?: ArgParentMComp;
-      parent_ids: string[];
-    }
-  >;
-};
-
-export const parseJs = (
-  code: string,
-  arg: {
-    item: IItem;
-    content_scope?: Record<string, string>;
-  }
-) => {
-  const { item } = arg;
+export const parseJs = (code: string) => {
   const local = { name: "", value: "", index: 0 };
   const passprop: Record<string, { value: string; index: number }> = {};
   const result = {} as {

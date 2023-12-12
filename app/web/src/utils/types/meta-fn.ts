@@ -12,10 +12,10 @@ export type FNLayout = {
 export type FMLayout = TypedMap<FNLayout>;
 
 export type FNAdv = {
-  js?: Y.Text | string;
+  js?: string;
   jsBuilt?: string;
-  css?: Y.Text | string;
-  html?: Y.Text | string;
+  css?: string;
+  html?: string;
 };
 
 export type FMAdv = TypedMap<FNAdv>;

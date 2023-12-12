@@ -7,7 +7,7 @@ export const ErrorBox = withErrorBoundary(
     children,
     meta,
     id,
-    silent,
+    silent = true,
   }: {
     children: any;
     meta?: IMeta;

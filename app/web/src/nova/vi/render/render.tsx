@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, Suspense } from "react";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViContext, viParts } from "./parts";
 import { ViScript } from "./script";
@@ -12,11 +12,7 @@ export const ViRender: FC<{
   if (!meta) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-    return (
-      <ErrorBox>
-        <ViScript ctx={ctx} meta={meta} />
-      </ErrorBox>
-    );
+    return <ViScript ctx={ctx} meta={meta} />;
   }
 
   const parts = viParts(meta);
@@ -31,7 +27,9 @@ export const ViRender: FC<{
 
           return (
             <ErrorBox key={id}>
-              <ViRender ctx={ctx} meta={ctx.meta[id]} />
+              <Suspense>
+                <ViRender ctx={ctx} meta={ctx.meta[id]} />
+              </Suspense>
             </ErrorBox>
           );
         });

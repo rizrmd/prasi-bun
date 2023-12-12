@@ -4,12 +4,14 @@ import { ViContext } from "../parts";
 export const viScopeUpward = (ctx: ViContext, meta: IMeta) => {
   let cur = meta;
 
-  // while (cur.parent) {
-  //   if (cur.scope.def) {
-  //     console.log(cur.item.id, cur.item.name, cur.scope);
-  //   }
-  //   cur = ctx.meta[cur.parent.id];
-  // }
+  if (cur && cur.parent) {
+    while (cur.parent) {
+      console.log(cur.scope);
+
+      if (!ctx.meta[cur.parent.id]) break;
+      cur = ctx.meta[cur.parent.id];
+    }
+  }
 
   return {};
 };
