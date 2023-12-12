@@ -1,15 +1,10 @@
 import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
-import { applyRefIds } from "./ref-ids";
 import { simplifyItemChild } from "./simplify";
 import { GenMetaArg, GenMetaP, IMeta } from "./types";
 
-export const genComp = (
-  p: GenMetaP,
-  arg: GenMetaArg,
-  r: ReturnType<typeof applyRefIds>
-) => {
+export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
   const { item } = arg;
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let pcomp = p.comps[item.component.id];
@@ -22,34 +17,46 @@ export const genComp = (
     }
 
     if (pcomp) {
-      const ref_ids = r?.ref_ids || item.component?.ref_ids || {};
+      let smeta_instances: IMeta["instances"] = undefined;
+      if (p.smeta && p.smeta[item.id]) {
+        const smeta = p.smeta[item.id];
+        if (smeta && smeta.comp) {
+          smeta_instances = smeta.comp.instances;
+        }
+      }
 
-      instantiate(item, pcomp.comp, ref_ids);
+      let instance = {};
+      let instances: IMeta["instances"] = undefined;
+
+      if (!smeta_instances) {
+        const parent_instance = getParentInstance(p, arg, item.id);
+        instance = parent_instance || {};
+        instances = !parent_instance ? { [item.id]: instance } : undefined;
+      } else {
+        instance = smeta_instances[item.id];
+        instances = smeta_instances;
+      }
+
+      instantiate({
+        item,
+        comp: pcomp.comp,
+        ids: instance,
+      });
 
       const meta: IMeta = {
         item: simplifyItemChild(item),
         parent: {
           id: arg.parent.item.id,
-          instance_id: arg.parent?.instance?.id,
           comp_id: arg.parent?.comp?.id,
         },
-        scope: {
-          def: {
-            props: {},
-          },
-        },
+        instances,
+        scope: {},
       };
 
       walkProp({
         item,
         pcomp,
         each(name, prop) {
-          if (meta.scope.def?.props) {
-            meta.scope.def.props[name] = {
-              value: prop.valueBuilt,
-              visible: false,
-            };
-          }
           const comp_id = item.component?.id;
           if (
             prop.meta?.type === "content-element" &&
@@ -67,7 +74,6 @@ export const genComp = (
               parent: {
                 item,
                 comp: pcomp.comp,
-                instance: arg.parent?.instance || item,
               },
             });
           }
@@ -92,17 +98,30 @@ export const genComp = (
         p.on.visit(meta);
       }
 
-      for (const [k, v] of Object.entries(item.childs)) {
+      for (const child of Object.values(item.childs)) {
         genMeta(p, {
-          item: v,
+          item: child,
           is_root: false,
           parent: {
             item,
+            instance_id: item.id,
             comp: pcomp.comp,
-            instance: arg.parent?.instance || item,
           },
         });
       }
+    }
+  }
+};
+
+const getParentInstance = (p: GenMetaP, arg: GenMetaArg, id: string) => {
+  if (arg.parent?.instance_id && p.meta[arg.parent?.instance_id]) {
+    const parent_instance = p.meta[arg.parent?.instance_id];
+    if (parent_instance.instances) {
+      if (!parent_instance.instances[id]) {
+        parent_instance.instances[id] = {};
+      }
+
+      return parent_instance.instances[id];
     }
   }
 };
