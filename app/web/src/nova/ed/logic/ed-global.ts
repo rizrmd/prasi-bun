@@ -8,9 +8,9 @@ import { IItem } from "../../../utils/types/item";
 import { DComp, DPage } from "../../../utils/types/root";
 import {
   GenMetaP,
-  IMeta as LogicMeta,
   ISimpleMeta,
-} from "../../view/logic/meta/types";
+  IMeta as LogicMeta,
+} from "../../vi/utils/types";
 
 export type IMeta = LogicMeta;
 
