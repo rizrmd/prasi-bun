@@ -41,11 +41,14 @@ export const cssFont = (
       `
         color: ${font.color};
       `,
-    `
-      word-break: ${
-        font.whitespace === "whitespace-normal" ? "break-word" : "normal"
-      };
+    font.whitespace === "whitespace-normal" &&
+      `
+      word-break: break-word;
     `,
+    font.whitespace === "whitespace-nowrap" &&
+      `
+        white-space: nowrap;
+      `,
     font.color &&
       `
         color: ${font.color};

@@ -69,6 +69,33 @@ export const viEvalScript = (
     ...exports,
     ...scope,
   };
+
+  if (meta.item.adv?.js?.includes("Table")) {
+    // meta.item.adv.jsBuilt = `render(
+    //   React.createElement(
+    //     React.Fragment,
+    //     null,
+    //     React.createElement(TableVirtuoso, {
+    //       style: { height: "100%" },
+    //       data: isEditor ? [list.items[0]] : list.items,
+    //       overscan: 500,
+    //       endReached: typeof end_scroll == "function" ? end_scroll : void 0,
+    //       components: {
+    //         Table: ({ style: e, ...t }) => {
+    //           React.createElement("table", {
+    //             ...t,
+    //             style: { ...e, width: "100%" },
+    //           })
+    //         },
+    //       },
+    //       itemContent: local.renderRow,
+    //     })
+    //   )
+    // );
+    // `;
+    // scope.list.items = [];
+    console.log(scope.list);
+  }
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
