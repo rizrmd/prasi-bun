@@ -11,10 +11,16 @@ export const createViPassProp = (
     if (!meta.scope.val) {
       meta.scope.val = {};
     }
-    
+
     for (const [k, v] of Object.entries(arg)) {
       if (k !== "children") {
-        meta.scope.val[k] = v;
+        delete meta.scope.val[k];
+        meta.scope.val = {
+          ...meta.scope.val,
+          get [k]() {
+            return v;
+          },
+        };
       }
     }
 

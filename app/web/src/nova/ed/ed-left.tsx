@@ -11,7 +11,13 @@ import { EdTreeSearch } from "./panel/tree/search";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ tree: null as any });
+  const local = useLocal({ tree: null as any, timeout: null as any });
+
+  if (!local.tree) {
+    clearTimeout(local.timeout);
+    local.timeout = setTimeout(local.render, 100);
+  }
+
   return (
     <div
       className={cx(

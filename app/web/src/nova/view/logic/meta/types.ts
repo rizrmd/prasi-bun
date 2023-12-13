@@ -66,4 +66,5 @@ export type IMeta = {
     val?: any;
     def?: ReturnType<typeof parseJs>;
   };
+  render?: () => void;
 };
