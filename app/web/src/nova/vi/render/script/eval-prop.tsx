@@ -1,7 +1,6 @@
 import { IMeta } from "../../../ed/logic/ed-global";
-import { invalidKeyword } from "../../../ed/panel/side/prop-master/prop-form";
 import { VG } from "../global";
-import { getScopeMeta, getScopeValue } from "./scope-meta";
+import { viScriptArg } from "./arg";
 
 export const viEvalProps = (
   vi: { meta: VG["meta"] },
@@ -21,42 +20,57 @@ export const viEvalProps = (
     const arg = {
       ...exports,
       ...scope,
-      isEditor: true,
+      ...viScriptArg(),
     };
 
     meta.scope.def.props = {};
     let fails = new Set<string>();
-    for (const [name, prop] of Object.entries(meta.item.component.props)) {
-      try {
-        const fn = new Function(
-          ...Object.keys(arg),
-          `// [${meta.item.name}] ${name}: ${meta.item.id} 
-  return ${prop.valueBuilt || ""}
-    `
-        );
-        meta.scope.def.props[name] = prop.value;
-        meta.scope.val[name] = fn(...Object.values(arg));
-        scope[name] = meta.scope.val[name];
-        arg[name] = scope[name];
-      } catch (e) {
-        fails.add(name);
-      }
-    }
-
-    if (fails.size > 0) {
+    if (!!meta.item.component.props) {
       for (const [name, prop] of Object.entries(meta.item.component.props)) {
-        if (fails.has(name) && !invalidKeyword.includes(name)) {
+        try {
           const fn = new Function(
             ...Object.keys(arg),
             `// [${meta.item.name}] ${name}: ${meta.item.id} 
   return ${prop.valueBuilt || ""}
     `
           );
-          meta.scope.def.props[name] = prop.value;
-          meta.scope.val[name] = fn(...Object.values(arg));
-          scope[name] = meta.scope.val[name];
-          arg[name] = scope[name];
+
+          meta.scope.def.props[name] = { name, value: prop.valueBuilt };
+          let val = fn(...Object.values(arg));
+
+          if (typeof val === "function") {
+            meta.scope.def.props[name].fn = val;
+            val = (...args: any[]) => {
+              return meta.scope.def?.props?.[name].fn(...args);
+            };
+          }
+
+          meta.scope.val[name] = val;
+          scope[name] = val;
+          arg[name] = val;
+        } catch (e) {
+          fails.add(name);
         }
+      }
+    }
+  }
+};
+
+export const updatePropScope = (meta: IMeta, scope: any) => {
+  if (meta.scope.def?.props) {
+    for (const prop of Object.values(meta.scope.def.props)) {
+      if (prop.fn) {
+        const all_scope = {
+          ...scope,
+          ...meta.scope.val,
+        };
+        const fn = new Function(
+          ...Object.keys(all_scope),
+          `// [${meta.item.name}] ${prop.name}: ${meta.item.id} 
+  return ${prop.value || ""}
+    `
+        );
+        prop.fn = fn(...Object.values(all_scope));
       }
     }
   }

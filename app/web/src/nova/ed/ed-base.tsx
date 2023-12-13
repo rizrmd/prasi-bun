@@ -7,6 +7,7 @@ import { EDGlobal } from "./logic/ed-global";
 import { edInit } from "./logic/ed-init";
 import { edRoute } from "./logic/ed-route";
 import { edUndoManager } from "./logic/ed-undo";
+import { EdMain } from "./panel/main/main";
 import { EdPane } from "./panel/main/pane-resize";
 import { EdPopApi } from "./panel/popup/api/api-server";
 import { EdPopCode } from "./panel/popup/code/code";
@@ -15,9 +16,6 @@ import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
-import { EdMain } from "./panel/main/main";
-import { ViGlobal } from "../vi/render/global";
-import { viLoad } from "../vi/load/load";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

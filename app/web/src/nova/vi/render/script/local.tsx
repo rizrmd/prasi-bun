@@ -1,7 +1,9 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
+import { updatePropScope } from "./eval-prop";
+import { VG } from "../global";
 
-export const createViLocal = (meta: IMeta) => {
+export const createViLocal = (meta: IMeta, scope: any) => {
   return <T extends Record<string, any>>(arg: {
     children: ReactNode;
     name: string;
@@ -23,6 +25,7 @@ export const createViLocal = (meta: IMeta) => {
     }
     const val = meta.scope.val;
     val[arg.name] = local;
+    updatePropScope(meta, scope);
 
     if (arg.hook) {
       arg.hook(local);

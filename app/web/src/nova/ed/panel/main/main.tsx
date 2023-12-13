@@ -3,8 +3,8 @@ import { Vi } from "../../../vi/vi";
 import { EDGlobal } from "../../logic/ed-global";
 
 export const EdMain = () => {
+  // return <div className="flex flex-1 flex-col relative"></div>;
   const p = useGlobal(EDGlobal, "EDITOR");
-
   return (
     <Vi
       meta={p.page.meta}
