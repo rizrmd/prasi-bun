@@ -8,12 +8,13 @@ import { ViRender } from "./render";
 import { createViLocal } from "./script/local";
 import { createViPassProp } from "./script/passprop";
 import { getScopeMeta, getScopeValue } from "./script/scope-meta";
-import { viEvalProps } from "./script/eval-prop";
+import { updatePropScope, viEvalProps } from "./script/eval-prop";
+import { viScriptArg } from "./script/arg";
 
 export const ViScript: FC<{ meta: IMeta }> = ({ meta }) => {
   const vi = useGlobal(ViGlobal, "VI");
 
-  const scope_meta = getScopeMeta(vi, meta);
+  const scope_meta = getScopeMeta({ meta: vi.meta }, meta);
   const scope = getScopeValue(scope_meta);
 
   if (meta.item.component?.id) {
@@ -46,8 +47,8 @@ export const viEvalScript = (
   if (!meta.script) {
     meta.script = {
       result: null,
-      Local: createViLocal(meta),
-      PassProp: createViPassProp(meta),
+      Local: createViLocal(meta, scope),
+      PassProp: createViPassProp(vi, meta, scope),
     };
   }
   const script = meta.script;
@@ -57,7 +58,6 @@ export const viEvalScript = (
     useEffect,
     children,
     props: parts.props,
-    isEditor: true,
     Local: script.Local,
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
@@ -65,10 +65,10 @@ export const viEvalScript = (
     render: (jsx: ReactNode) => {
       script.result = jsx;
     },
+    ...viScriptArg(),
     ...exports,
     ...scope,
   };
-
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
@@ -76,4 +76,6 @@ ${meta.item.adv?.jsBuilt || ""}
   `
   );
   fn(...Object.values(arg));
+
+  updatePropScope(meta, scope);
 };

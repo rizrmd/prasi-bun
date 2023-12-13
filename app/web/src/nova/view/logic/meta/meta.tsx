@@ -24,7 +24,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     parent: {
       id: arg.parent?.item.id || "root",
       instance_id: arg.parent?.instance_id,
-      comp_id: arg.parent?.comp?.id,
+      comp_id: arg.parent?.comp?.component?.id,
     },
     scope,
   };

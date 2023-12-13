@@ -35,6 +35,5 @@ export const viLoad = (vi: VG, arg: { site_id: string; api_url: string }) => {
     });
   } else {
     vi.status = "ready";
-    vi.render();
   }
 };
