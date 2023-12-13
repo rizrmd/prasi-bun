@@ -28,6 +28,11 @@ export const viParts = (meta: IMeta, arg?: ViParts) => {
     props.dangerouslySetInnerHTML = { __html: item.html || "" };
     shouldRenderChild = false;
   }
+  
+  if (content.adv?.html && !content.adv?.js) {
+    props.dangerouslySetInnerHTML = { __html: content.adv.html };
+    shouldRenderChild = false;
+  }
 
   return {
     shouldRenderChild,

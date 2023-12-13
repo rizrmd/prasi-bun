@@ -5,19 +5,16 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { useLocal } from "web-utils";
 import { FMCompDef } from "../../../../../utils/types/meta-fn";
-import { EDGlobal } from "../../../logic/ed-global";
 import { EdPropLabel } from "./prop-label";
 
 export const EdPropInstanceText: FC<{
   name: string;
   mprop: FMCompDef;
 }> = ({ name, mprop }) => {
-  const p = useGlobal(EDGlobal, "EDITOR");
-
   const local = useLocal({
-    value: mprop.get("value"),
+    value: unquote(mprop.get("value")),
     codeEditing: false,
     timeout: null as any,
   });
@@ -43,6 +40,18 @@ export const EdPropInstanceText: FC<{
       />
     </div>
   );
+};
+
+const unquote = (text: string) => {
+  const str = text.trim();
+  const first = str[0];
+
+  if (['"', "'", "`"].includes(first)) {
+    if (first === str[str.length - 1]) {
+      return str.slice(1, -1);
+    }
+  }
+  return str;
 };
 
 export function AutoHeightTextarea({
