@@ -35,9 +35,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
       const type = m.get("meta")?.get("type") || "text";
       const visible = mprop?.get("visible") || "";
-      if (meta.propvis) {
-        if (meta.propvis[key] === false) return;
-      } else if (visible) {
+      if (visible) {
         return;
       }
 
@@ -127,6 +125,9 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
             const value = mprop.get("value") || "";
             if (!!value && ![`"`, "'", "`"].includes(value[0])) {
+              hasCode = true;
+            }
+            if (value.length > 100) {
               hasCode = true;
             }
 

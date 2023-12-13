@@ -62,20 +62,20 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       }
 
       p.page.root_id = root_id;
+    }
 
-      if (p.site.layout && p.site.layout.id === p.page.cur.id) {
-        p.page.meta = meta;
-      } else {
-        if (root_id !== "root") {
-          for (const m of Object.values(meta)) {
-            if (m.parent?.id === "root") {
-              m.parent.id = root_id;
-            }
+    if (p.site.layout && p.site.layout.id === p.page.cur.id) {
+      p.page.meta = meta;
+    } else {
+      if (root_id !== "root") {
+        for (const m of Object.values(meta)) {
+          if (m.parent?.id === "root") {
+            m.parent.id = root_id;
           }
-          p.page.meta = { ...p.site.layout.meta, ...meta };
-        } else {
-          p.page.meta = meta;
         }
+        p.page.meta = { ...p.site.layout.meta, ...meta };
+      } else {
+        p.page.meta = meta;
       }
     }
   }

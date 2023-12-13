@@ -14,9 +14,17 @@ export const ViRender: FC<{
   if (!meta) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-    return <ViScript meta={meta} />;
+    return <ViScript meta={meta}>{children}</ViScript>;
   }
 
+  return <ViChild meta={meta}>{children}</ViChild>;
+};
+
+export const ViChild: FC<{
+  meta: IMeta;
+  children?: ReactNode;
+}> = ({ meta, children }) => {
+  const vi = useGlobal(ViGlobal, "VI");
   const parts = viParts(meta);
   let renderChild = undefined;
 
@@ -37,5 +45,5 @@ export const ViRender: FC<{
         });
   }
 
-  return <div {...parts.props}>{renderChild}</div>;
+  return <div {...parts.props} children={renderChild} />;
 };
