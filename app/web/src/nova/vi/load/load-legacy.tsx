@@ -35,15 +35,18 @@ export const viLoadLegacy = async (vi: {
       }
     }
 
+    let api_url = vi.site.api_url;
+    if (!api_url) api_url = ((site.config as any) || {}).api_url || "";
+
     await initApi(site.config);
 
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);
     if (!vi.site.db.get()) {
-      vi.site.db.set(createDB(vi.site.api_url));
+      vi.site.db.set(createDB(api_url));
     }
     if (!vi.site.api.get()) {
-      vi.site.api.set(createAPI(vi.site.api_url));
+      vi.site.api.set(createAPI(api_url));
     }
 
     const w = window as any;

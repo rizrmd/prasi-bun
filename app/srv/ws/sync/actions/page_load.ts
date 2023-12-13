@@ -222,7 +222,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
           on: {
             visit(meta) {
               if (typeof meta.item.adv?.js === "string") {
-                meta.scope.def = parseJs(meta.item.adv.js);
+                meta.scope.def = parseJs(meta);
               }
             },
           },

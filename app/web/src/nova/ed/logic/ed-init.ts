@@ -2,6 +2,7 @@ import init from "wasm-gzip";
 import { PG } from "./ed-global";
 import { jscript } from "../../../utils/script/jscript";
 import { viLoadLegacy } from "../../vi/load/load-legacy";
+import { treeRebuild } from "./tree/build";
 
 export const edInit = async (p: PG) => {
   p.status = "ready";
@@ -34,5 +35,7 @@ export const edInit = async (p: PG) => {
   });
 
   p.script.loaded = true;
+
+  treeRebuild(p);
   p.render();
 };

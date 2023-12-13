@@ -7,18 +7,30 @@ import { viParts } from "./parts";
 import { ViRender } from "./render";
 import { createViLocal } from "./script/local";
 import { createViPassProp } from "./script/passprop";
-import { getScope } from "./script/scope-meta";
+import { getScopeMeta, getScopeValue } from "./script/scope-meta";
+import { viEvalProps } from "./script/eval-prop";
 
 export const ViScript: FC<{ meta: IMeta }> = ({ meta }) => {
   const vi = useGlobal(ViGlobal, "VI");
 
-  viEvalScript(vi, meta);
+  const scope_meta = getScopeMeta(vi, meta);
+  const scope = getScopeValue(scope_meta);
+
+  if (meta.item.component?.id) {
+    viEvalProps(vi, meta, scope);
+  }
+
+  viEvalScript(vi, meta, scope);
 
   if (meta.script) return meta.script.result;
   return null;
 };
 
-export const viEvalScript = (vi: { meta: VG["meta"] }, meta: IMeta) => {
+export const viEvalScript = (
+  vi: { meta: VG["meta"] },
+  meta: IMeta,
+  scope: any
+) => {
   const childs = meta.item.childs;
   const parts = viParts(meta);
 
@@ -30,8 +42,6 @@ export const viEvalScript = (vi: { meta: VG["meta"] }, meta: IMeta) => {
         return <ViRender key={id} meta={vi.meta[id]} />;
       });
   }
-
-  const scope = getScope(vi, meta);
 
   if (!meta.script) {
     meta.script = {
@@ -47,6 +57,7 @@ export const viEvalScript = (vi: { meta: VG["meta"] }, meta: IMeta) => {
     useEffect,
     children,
     props: parts.props,
+    isEditor: true,
     Local: script.Local,
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
@@ -60,7 +71,7 @@ export const viEvalScript = (vi: { meta: VG["meta"] }, meta: IMeta) => {
 
   const fn = new Function(
     ...Object.keys(arg),
-    `// [${meta.item.type}] ${meta.item.name}: ${meta.item.id} 
+    `// ${meta.item.name}: ${meta.item.id} 
 ${meta.item.adv?.jsBuilt || ""}
   `
   );

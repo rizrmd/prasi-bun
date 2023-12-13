@@ -93,7 +93,7 @@ export const EdPropPopoverForm: FC<{ mprop: FMCompDef; name: string }> = ({
           onBlur={() => {
             if (local.name !== name) {
               const keys = Object.keys(mprop.parent?.toJSON());
-              if ([...keys, ...keywords].includes(local.name)) {
+              if ([...keys, ...invalidKeyword].includes(local.name)) {
                 alert(`Cannot use "${local.name}" as name`);
                 local.name = name;
                 local.render();
@@ -226,7 +226,7 @@ export const EdPropPopoverForm: FC<{ mprop: FMCompDef; name: string }> = ({
   );
 };
 
-const keywords = [
+export const invalidKeyword = [
   "await",
   "break",
   "case",
@@ -273,4 +273,5 @@ const keywords = [
   "while",
   "with",
   "yield",
+  "key",
 ];

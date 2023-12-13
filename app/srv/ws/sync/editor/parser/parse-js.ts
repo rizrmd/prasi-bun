@@ -1,13 +1,16 @@
 import recast from "recast";
 import babel from "recast/parsers/babel-ts";
+import { IMeta } from "../../../../../web/src/nova/ed/logic/ed-global";
 
-export const parseJs = (code: string) => {
+export const parseJs = (meta: IMeta) => {
+  const code = meta.item.adv?.js;
+  if (!code) return undefined;
   const local = { name: "", value: "", index: 0 };
   const passprop: Record<string, { value: string; index: number }> = {};
   const result = {} as {
-    local: typeof local | undefined;
-    passprop: typeof passprop | undefined;
-    props: Record<string, { name: string; value: string }>;
+    local?: typeof local | undefined;
+    passprop?: typeof passprop | undefined;
+    props?: Record<string, { name: string; value: string }>;
   };
 
   try {
