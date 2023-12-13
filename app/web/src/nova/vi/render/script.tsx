@@ -1,5 +1,5 @@
 import { FC, ReactNode, useEffect } from "react";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ErrorBox } from "../utils/error-box";
 import { VG, ViGlobal } from "./global";
@@ -13,6 +13,8 @@ import { viScriptArg } from "./script/arg";
 
 export const ViScript: FC<{ meta: IMeta }> = ({ meta }) => {
   const vi = useGlobal(ViGlobal, "VI");
+  const local = useLocal({});
+  meta.render = local.render;
 
   const scope_meta = getScopeMeta({ meta: vi.meta }, meta);
   const scope = getScopeValue(scope_meta);
@@ -70,32 +72,16 @@ export const viEvalScript = (
     ...scope,
   };
 
-  if (meta.item.adv?.js?.includes("Table")) {
-    // meta.item.adv.jsBuilt = `render(
-    //   React.createElement(
-    //     React.Fragment,
-    //     null,
-    //     React.createElement(TableVirtuoso, {
-    //       style: { height: "100%" },
-    //       data: isEditor ? [list.items[0]] : list.items,
-    //       overscan: 500,
-    //       endReached: typeof end_scroll == "function" ? end_scroll : void 0,
-    //       components: {
-    //         Table: ({ style: e, ...t }) => {
-    //           React.createElement("table", {
-    //             ...t,
-    //             style: { ...e, width: "100%" },
-    //           })
-    //         },
-    //       },
-    //       itemContent: local.renderRow,
-    //     })
-    //   )
-    // );
-    // `;
-    // scope.list.items = [];
-    console.log(scope.list);
+  if (meta.item.adv?.js?.includes("table-card")) {
+    console.log(scope);
+    // const scope = meta.scope.val;
+    // if (scope) {
+    //   if (scope.local.renderRow.toString().includes("table-card")) {
+    //     console.log(meta.item.name, scope.local.renderRow);
+    //   }
+    // }
   }
+
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 

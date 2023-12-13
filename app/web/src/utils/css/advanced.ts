@@ -15,7 +15,6 @@ export const cssAdv = (
         css`
           ${adv.css}
         `,
-        "cel",
         mode
       );
     }

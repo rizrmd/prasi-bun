@@ -1,10 +1,4 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { viEvalScript } from "../../../vi/render/script";
-import { viEvalProps } from "../../../vi/render/script/eval-prop";
-import {
-  getScopeMeta,
-  getScopeValue,
-} from "../../../vi/render/script/scope-meta";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";

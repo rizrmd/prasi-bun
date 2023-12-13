@@ -3,7 +3,6 @@ import { PG } from "./ed-global";
 import { loadSite } from "./ed-site";
 import { treeRebuild } from "./tree/build";
 import { loadCompSnapshot } from "./tree/sync-walk-comp";
-import { viLoadLegacy } from "../../vi/load/load-legacy";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
@@ -114,30 +113,6 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
       await treeRebuild(p, { note: note + " page-init" });
     }
   }
-
-  await viLoadLegacy({
-    site: {
-      api_url: p.site.config.api_url,
-      id: p.site.id,
-      api: {
-        get() {
-          return p.script.api;
-        },
-        set(val) {
-          p.script.api = val;
-        },
-      },
-      db: {
-        get() {
-          return p.script.db;
-        },
-        set(val) {
-          p.script.db = val;
-        },
-      },
-    },
-    render: () => {},
-  });
 
   p.status = "ready";
   p.render();
