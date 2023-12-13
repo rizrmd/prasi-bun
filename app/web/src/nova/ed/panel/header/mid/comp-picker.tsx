@@ -7,7 +7,6 @@ import { ISection, MSection } from "../../../../../utils/types/section";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
-import { loadComponent } from "../../../logic/tree/sync-walk";
 import { TopBtn } from "../top-btn";
 
 export const EdCompPicker = () => {
@@ -19,7 +18,7 @@ export const EdCompPicker = () => {
         p.ui.popup.comp.open = async (comp_id) => {
           let comp_ref = p.comp.list[comp_id];
           if (!comp_ref) {
-            await loadComponent(p, comp_id);
+            // await loadComponent(p, comp_id);
             comp_ref = p.comp.list[comp_id];
           }
 
