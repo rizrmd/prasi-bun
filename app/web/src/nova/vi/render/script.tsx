@@ -72,16 +72,6 @@ export const viEvalScript = (
     ...scope,
   };
 
-  if (meta.item.adv?.js?.includes("table-card")) {
-    console.log(scope);
-    // const scope = meta.scope.val;
-    // if (scope) {
-    //   if (scope.local.renderRow.toString().includes("table-card")) {
-    //     console.log(meta.item.name, scope.local.renderRow);
-    //   }
-    // }
-  }
-
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
