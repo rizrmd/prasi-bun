@@ -1,5 +1,5 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { genMeta } from "../../../view/logic/meta/meta";
+import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
 

@@ -1,8 +1,8 @@
 import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
-import { initLoadComp } from "../../../../web/src/nova/view/logic/meta/comp/init-load-comp";
-import { genMeta } from "../../../../web/src/nova/view/logic/meta/meta";
-import { simplifyMeta } from "../../../../web/src/nova/view/logic/meta/simplify";
-import { GenMetaP } from "../../../../web/src/nova/view/logic/meta/types";
+import { initLoadComp } from "../../../../web/src/nova/vi/meta/comp/init-comp-load";
+import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
+import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
+import { GenMetaP } from "../../../../web/src/nova/vi/utils/types";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
