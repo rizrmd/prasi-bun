@@ -6,7 +6,6 @@ import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";
 import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
-import { evalCJS } from "../../view/logic/load-code-new";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 
@@ -187,4 +186,21 @@ export const edInitSync = (p: PG) => {
     return false;
   }
   return true;
+};
+
+export const evalCJS = (src: string) => {
+  if (src) {
+    const module = { exports: { __esModule: true as true | undefined } };
+    eval(`try {
+        ${src}
+      } catch(e) {
+        console.error(e);
+      }`);
+    const result = { ...module.exports };
+    if (result.__esModule) {
+      delete result.__esModule;
+    }
+    return result;
+  }
+  return {};
 };

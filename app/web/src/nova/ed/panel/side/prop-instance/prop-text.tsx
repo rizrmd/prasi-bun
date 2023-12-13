@@ -13,11 +13,18 @@ export const EdPropInstanceText: FC<{
   name: string;
   mprop: FMCompDef;
 }> = ({ name, mprop }) => {
+  const val = mprop.get("value");
+
   const local = useLocal({
-    value: unquote(mprop.get("value")),
+    value: unquote(val),
     codeEditing: false,
     timeout: null as any,
   });
+
+  useEffect(() => {
+    local.value = unquote(val);
+    local.render();
+  }, [val]);
 
   return (
     <div className="flex items-center min-h-[28px]">
