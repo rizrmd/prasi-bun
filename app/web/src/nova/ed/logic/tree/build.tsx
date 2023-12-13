@@ -1,4 +1,10 @@
 import { IItem, MItem } from "../../../../utils/types/item";
+import { viEvalScript } from "../../../vi/render/script";
+import { viEvalProps } from "../../../vi/render/script/eval-prop";
+import {
+  getScopeMeta,
+  getScopeValue,
+} from "../../../vi/render/script/scope-meta";
 import { genMeta } from "../../../view/logic/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -27,6 +33,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
   const meta: Record<string, IMeta> = {};
   p.page.tree = [];
+
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
     if (item) {
@@ -40,10 +47,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (!is_layout) {
                 pushTreeNode(p, m, meta);
               }
-
-              // if (m.item.adv?.jsBuilt) {
-              //   viEvalScript({ meta: p.page.meta }, m);
-              // }
             },
           },
         },

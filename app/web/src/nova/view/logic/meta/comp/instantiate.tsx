@@ -17,8 +17,12 @@ export const instantiate = (arg: {
     newitem.id = item.id;
   }
 
-  if (item.component) {
-    newitem.component = item.component;
+  if (newitem.component && item.component) {
+    for (const k of Object.keys(newitem.component.props)) {
+      if (item.component.props[k]) {
+        newitem.component.props[k] = item.component.props[k];
+      }
+    }
   }
 
   for (const key of Object.keys(item)) {

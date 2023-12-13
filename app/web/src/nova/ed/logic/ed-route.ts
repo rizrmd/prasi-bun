@@ -56,6 +56,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   }
 
   p.page.entry = remotePage.entry;
+
   p.page.smeta = remotePage.meta;
 
   p.page.cur = remotePage;

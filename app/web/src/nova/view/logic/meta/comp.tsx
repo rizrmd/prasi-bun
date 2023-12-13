@@ -47,11 +47,16 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         item: simplifyItemChild(item),
         parent: {
           id: arg.parent.item.id,
-          comp_id: arg.parent?.comp?.id,
+          comp_id: arg.parent?.comp?.component?.id,
+          instance_id: arg.parent?.instance_id,
         },
         instances,
         scope: {},
       };
+
+      if (p.smeta?.[item.id]) {
+        meta.scope.def = p.smeta[item.id].scope;
+      }
 
       if (item.id) {
         if (p.set_meta !== false) {
@@ -102,7 +107,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       }
 
       for (const child of Object.values(item.childs)) {
-        if (child.name.startsWith('jsx:')) continue;
+        if (child.name.startsWith("jsx:")) continue;
         genMeta(p, {
           item: child,
           is_root: false,

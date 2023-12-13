@@ -4,11 +4,6 @@ import { simplifyItemChild } from "./simplify";
 import { GenMetaArg, GenMetaP, IMeta } from "./types";
 
 export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
-  // let wrapper = (fn: any) => {
-  //   fn();
-  // };
-
-  // wrapper(() => {
   const item = arg.item as IItem;
 
   if (item.type === "item" && item.component?.id) {
@@ -64,5 +59,4 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       });
     }
   }
-  // });
 };
