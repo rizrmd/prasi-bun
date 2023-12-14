@@ -239,6 +239,6 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
       comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
     }
   }
-
+ 
   return { meta: simplifyMeta(meta), comps, entry };
 };
