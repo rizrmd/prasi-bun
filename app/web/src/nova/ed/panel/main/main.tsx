@@ -1,21 +1,21 @@
 import { useGlobal, useLocal } from "web-utils";
 import { Vi } from "../../../vi/vi";
-import { EDGlobal } from "../../logic/ed-global";
+import { EDGlobal, active } from "../../logic/ed-global";
 
 export const EdMain = () => {
-  const local = useLocal({
-    hover_id: "",
-  });
   // return <div className="flex flex-1 flex-col relative"></div>;
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({});
+  active.hover.renderMain = local.render;
+
   return (
     <div className="flex flex-1 relative overflow-auto">
       <div
         className={cx(
           "absolute inset-0 flex",
-          local.hover_id &&
+          active.hover.id &&
             css`
-              .s-${local.hover_id} {
+              .s-${active.hover.id} {
                 &::after {
                   content: " ";
                   pointer-events: none;
@@ -38,14 +38,39 @@ export const EdMain = () => {
           api={p.script.api}
           db={p.script.db}
           visit={(meta, parts) => {
+            parts.props.className = cx(
+              parts.props.className,
+              active.item_id === meta.item.id &&
+                css`
+                  &::after {
+                    content: " ";
+                    pointer-events: none;
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    border: 2px solid #1c88f3;
+                  }
+                `
+            );
             parts.props.onPointerOver = (e) => {
               e.stopPropagation();
-              local.hover_id = meta.item.id;
-              local.render();
+              active.hover.id = meta.item.id;
+              active.hover.renderMain();
+              active.hover.renderTree();
             };
             parts.props.onPointerLeave = (e) => {
-              local.hover_id = "";
-              local.render();
+              e.stopPropagation();
+              active.hover.id = "";
+              active.hover.renderMain();
+              active.hover.renderTree();
+            };
+            parts.props.onPointerDown = (e) => {
+              e.stopPropagation();
+              active.item_id = meta.item.id;
+              active.hover.id = "";
+              p.render();
             };
           }}
         />
