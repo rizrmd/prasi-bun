@@ -15,6 +15,24 @@ type CompilerOptions = Parameters<
 
 export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   const m = monaco as any;
+
+  if (editor.getModel()) {
+    const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
+    const { highlighter } = jsxHgController.highlighterBuilder({
+      editor: editor,
+    });
+
+    if (typeof editor.getModel === "function") {
+      highlighter();
+    }
+    editor.onDidChangeModelContent(() => {
+      if (typeof editor.getModel === "function") {
+        try {
+          highlighter();
+        } catch (e) {}
+      }
+    });
+  }
   if (!m.customJSMounted) {
     m.customJSMounted = true;
   } else {
@@ -267,24 +285,6 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   );
 
   setTimeout(() => {
-    if (editor.getModel()) {
-      const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
-      const { highlighter } = jsxHgController.highlighterBuilder({
-        editor: editor,
-      });
-
-      if (typeof editor.getModel === "function") {
-        highlighter();
-      }
-      editor.onDidChangeModelContent(() => {
-        if (typeof editor.getModel === "function") {
-          try {
-            highlighter();
-          } catch (e) {}
-        }
-      });
-    }
-
     editor.getAction("editor.action.formatDocument")?.run();
   }, 100);
 };

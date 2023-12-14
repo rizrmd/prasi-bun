@@ -17,7 +17,6 @@ export const user = {
       page_id: string;
       comp_id?: string;
       client_id: string;
-      select: "" | "comp" | "item" | "section" | "text";
     },
     "client_id"
   >("client_id"),

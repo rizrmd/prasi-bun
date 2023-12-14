@@ -8,6 +8,7 @@ import { EmptySite, PG } from "./ed-global";
 import { treeRebuild } from "./tree/build";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
+import { updateComponentMeta } from "./comp/load";
 
 const decoder = new TextDecoder();
 
@@ -172,9 +173,20 @@ export const edInitSync = (p: PG) => {
               sv,
               diff
             );
+
             if (res) {
               Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
-              await treeRebuild(p, { note: "sv_remote" });
+              if (data.type === "page") {
+                await treeRebuild(p, { note: "sv_remote" });
+              } else {
+                const updated = updateComponentMeta(p, doc, data.id);
+                if (updated) {
+                  p.comp.list[data.id].meta = updated.meta;
+                  p.comp.list[data.id].tree = updated.tree;
+                }
+                await treeRebuild(p, { note: "sv_remote" });
+              }
+              p.render();
             }
           }
         },

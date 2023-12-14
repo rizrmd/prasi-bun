@@ -1,7 +1,7 @@
 import type { Monaco, OnMount } from "@monaco-editor/react";
 import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
@@ -10,6 +10,7 @@ import { monacoTypings } from "../../../../../utils/script/typings";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { declareScope } from "./scope";
+import { edMonacoDefaultVal } from "./default-val";
 
 const scriptEdit = {
   timeout: null as any,
@@ -17,7 +18,7 @@ const scriptEdit = {
 
 const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
-export const ScriptMonaco = () => {
+export const EdScriptMonaco: FC<{}> = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     editor: null as null | MonacoEditor,
@@ -26,6 +27,7 @@ export const ScriptMonaco = () => {
     init: false,
     value: "",
     historyOpen: false,
+    mode: "",
     idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
   });
 
@@ -53,6 +55,11 @@ export const ScriptMonaco = () => {
       const monaco = local.monaco;
 
       if (monaco && editor) {
+        if (local.mode !== p.ui.popup.script.mode) {
+          local.init = false;
+          local.mode = p.ui.popup.script.mode;
+        }
+
         if (!local.init) {
           if (p.ui.popup.script.mode === "js") {
             monaco.editor.getModels().forEach((model) => {
@@ -101,7 +108,7 @@ export const ScriptMonaco = () => {
         }
       }
     })();
-  }, [active.item_id, local.monaco, local.editor]);
+  }, [active.item_id, local.monaco, local.editor, p.ui.popup.script.mode]);
 
   if (!meta) return null;
 
@@ -110,40 +117,44 @@ export const ScriptMonaco = () => {
   item.adv = adv;
 
   const doEdit = async (newval: string, all?: boolean) => {
-    if (local.editor && jscript.prettier.standalone) {
-      const text = trim(
-        await jscript.prettier.standalone.format(
-          all
-            ? newval
-            : local.editor?.getValue().replace(/\{\s*children\s*\}/gi, newval)
-        ),
-        "; \n"
-      );
+    if (local.editor) {
+      const prettier = jscript.prettier.standalone;
+      const prettier_ts = jscript.prettier.ts;
+      const prettier_estree = jscript.prettier.estree;
 
-      local.editor.executeEdits(null, [
-        {
-          range: {
-            startLineNumber: 0,
-            startColumn: 0,
-            endColumn: Number.MAX_SAFE_INTEGER,
-            endLineNumber: Number.MAX_SAFE_INTEGER,
+      if (prettier && prettier_estree && prettier_ts) {
+        const text = trim(
+          await prettier.format(
+            all
+              ? newval
+              : local.editor
+                  ?.getValue()
+                  .replace(/\{\s*children\s*\}/gi, newval),
+            {
+              parser: "typescript",
+              plugins: [prettier_ts, prettier_estree],
+            }
+          ),
+          "; \n"
+        );
+
+        local.editor.executeEdits(null, [
+          {
+            range: {
+              startLineNumber: 0,
+              startColumn: 0,
+              endColumn: Number.MAX_SAFE_INTEGER,
+              endLineNumber: Number.MAX_SAFE_INTEGER,
+            },
+            text,
           },
-          text,
-        },
-      ]);
+        ]);
+      }
     }
   };
   p.script.do_edit = doEdit;
 
   let mitem = meta.mitem;
-
-  if (p.ui.popup.script.type === "item") {
-    val = (
-      typeof adv[p.ui.popup.script.mode] === "string"
-        ? adv[p.ui.popup.script.mode]
-        : ""
-    ) as any;
-  }
 
   if (!mitem) {
     active.item_id = "";
@@ -155,44 +166,7 @@ export const ScriptMonaco = () => {
     }
   }
 
-  if (
-    p.ui.popup.script.type === "prop-master" ||
-    p.ui.popup.script.type === "prop-instance"
-  ) {
-    const mprops = mitem?.get("component")?.get("props");
-    if (mprops) {
-      const mprop = mprops.get(p.ui.popup.script.prop_name);
-      if (mprop) {
-        const kind = p.ui.popup.script.prop_kind;
-        if (kind === "value") {
-          val = mprop.get("value");
-        } else if (kind === "gen") {
-          val =
-            mprop.get("gen") ||
-            `\
-async () => {
-  return \`""\`;
-}`;
-        } else if (kind === "visible") {
-          val = mprop.get("visible") || "true";
-        } else if (kind === "option") {
-          val =
-            mprop.get("meta")?.get("options") ||
-            `\
-[
-  {
-    label: "yes",
-    value: "y"
-  },
-  {
-    label: "no",
-    value: "n"
-  },
-]`;
-        }
-      }
-    }
-  }
+  val = edMonacoDefaultVal(p, adv, mitem);
 
   return (
     <Editor

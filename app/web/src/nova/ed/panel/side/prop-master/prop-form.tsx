@@ -13,10 +13,11 @@ export const propPopover = {
   name: "",
 };
 
-export const EdPropPopoverForm: FC<{ mprop: FMCompDef; name: string }> = ({
-  mprop,
-  name,
-}) => {
+export const EdPropPopoverForm: FC<{
+  mprop: FMCompDef;
+  name: string;
+  closing: boolean;
+}> = ({ mprop, name, closing }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const mmeta = mprop.get("meta");
   const local = useLocal({
@@ -28,7 +29,8 @@ export const EdPropPopoverForm: FC<{ mprop: FMCompDef; name: string }> = ({
   return (
     <div
       className={cx(
-        "flex text-sm flex-col items-stretch space-y-1 py-1 w-[300px]"
+        "flex text-sm flex-col items-stretch space-y-1 py-1 w-[300px]",
+        closing && "hidden"
       )}
     >
       <div className="px-2 py-1 flex space-x-1">

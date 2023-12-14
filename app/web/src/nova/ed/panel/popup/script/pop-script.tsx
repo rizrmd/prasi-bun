@@ -4,7 +4,7 @@ import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal } from "../../../logic/ed-global";
 import { propPopover } from "../../side/prop-master/prop-form";
-import { ScriptWorkbench } from "./workbench";
+import { EdScriptWorkbench } from "./workbench";
 
 export const EdPopScript = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -80,7 +80,7 @@ export const EdPopScript = () => {
             )}
           >
             {!jscript.editor && <Loading note={"js-editor"} backdrop={false} />}
-            {jscript.editor && <ScriptWorkbench />}
+            {jscript.editor && <EdScriptWorkbench />}
           </div>
         </div>
       </Modal>
