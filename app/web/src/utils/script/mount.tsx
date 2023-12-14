@@ -27,7 +27,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
     jsxFragmentFactory: "React.Fragment",
     target: monaco.languages.typescript.ScriptTarget.ES2015,
     allowNonTsExtensions: true,
-    lib: ["esnext"],
+    lib: ["esnext", "dom"],
     module: monaco.languages.typescript.ModuleKind.ESNext,
     esModuleInterop: true,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
@@ -38,88 +38,122 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
       openCodeEditor(source, r, selectionOrPosition) {
         if (p) {
           p.ui.popup.script.mode === "js";
-          const cpath = r.path.substring(`scope~`.length).split("__");
+          const cpath =
+            r.path.substring(`scope~`.length).split("__").pop() || "";
 
-          const [comp_id, prev_comp_id, prev_item_id] = cpath[0].split("~");
-          if (cpath[1]) {
-            const path = cpath[1].split("~");
-            const type = path[0] as "prop" | "passprop" | "local";
-            const id = path[path.length - 1].replace(".d.ts", "");
-
-            if (type === "prop") {
-              p.ui.popup.script.open = false;
-              p.render();
-
-              setTimeout(() => {
-                p.ui.popup.script.type = "item";
-                p.ui.popup.script.prop_name = path[1];
-                p.ui.popup.script.type = "prop-instance";
-                p.ui.popup.script.prop_kind = "value";
-                p.ui.popup.script.open = true;
-
-                if (
-                  !prev_comp_id &&
-                  !prev_item_id &&
-                  active.instance.item_id &&
-                  active.comp_id
-                ) {
-                  active.item_id = active.instance.item_id;
-                  active.comp_id = active.instance.comp_id;
-                  active.instance.item_id = "";
-                  active.instance.comp_id = "";
-                }
-
-                p.render();
-              }, 100);
-
-              return false;
-            } else {
+          let arg = {
+            type: "" as "prop" | "item",
+            item_id: "" as string | undefined,
+            comp_id: "",
+            instance_id: "",
+          };
+          try {
+            arg = JSON.parse(cpath.substring(0, cpath.length - 5) || "{}");
+          } catch (e) {}
+          if (arg.type) {
+            if (arg.type === "item") {
               p.ui.popup.script.open = false;
               p.ui.popup.script.type = "item";
               p.ui.popup.script.prop_name = "";
               p.render();
-              setTimeout(() => {
-                if (comp_id) {
-                  let meta = p.page.meta[id];
-                  if (active.comp_id) {
-                    meta = p.comp.list[active.comp_id].meta[id];
-                    return false;
-                  }
-
-                  active.instance.comp_id = active.comp_id;
-                  active.instance.item_id = active.item_id;
-
-                  if (meta && meta.item.originalId) {
-                    active.item_id = meta.item.originalId;
-                  } else {
-                    active.item_id = id;
-                  }
-                  active.comp_id = comp_id;
-                } else {
-                  if (active.comp_id) {
-                    let meta = p.comp.list[active.comp_id].meta[id];
-
-                    if (!meta) {
-                      const _id = p.comp.list[active.comp_id].doc
-                        .getMap("map")
-                        .get("root")
-                        ?.get("id");
-
-                      if (_id) {
-                        active.item_id = _id;
-                        p.render();
-                      }
-                    }
-                    return false;
-                  }
-
-                  active.item_id = id;
-                }
-                p.ui.popup.script.open = true;
-                p.render();
-              }, 100);
+            } else {
+              p.ui.popup.script.open = false;
+              p.render();
             }
+
+            setTimeout(() => {
+              p.ui.popup.script.open = true;
+
+              if (arg.type === "item") {
+                if (arg.item_id) {
+                  active.item_id = arg.item_id;
+                  p.render();
+                }
+              } else if (arg.type === "prop") {
+              }
+            }, 100);
           }
+
+          // const [comp_id, prev_comp_id, prev_item_id] = cpath[0].split("~");
+          // if (cpath[1]) {
+          //   const path = cpath[1].split("~");
+          //   const type = path[0] as "prop" | "passprop" | "local";
+          //   const id = path[path.length - 1].replace(".d.ts", "");
+
+          //   if (type === "prop") {
+          //     p.ui.popup.script.open = false;
+          //     p.render();
+
+          //     setTimeout(() => {
+          //       p.ui.popup.script.type = "item";
+          //       p.ui.popup.script.prop_name = path[1];
+          //       p.ui.popup.script.type = "prop-instance";
+          //       p.ui.popup.script.prop_kind = "value";
+          //       p.ui.popup.script.open = true;
+
+          //       if (
+          //         !prev_comp_id &&
+          //         !prev_item_id &&
+          //         active.instance.item_id &&
+          //         active.comp_id
+          //       ) {
+          //         active.item_id = active.instance.item_id;
+          //         active.comp_id = active.instance.comp_id;
+          //         active.instance.item_id = "";
+          //         active.instance.comp_id = "";
+          //       }
+
+          //       p.render();
+          //     }, 100);
+
+          //     return false;
+          //   } else {
+          //     p.ui.popup.script.open = false;
+          //     p.ui.popup.script.type = "item";
+          //     p.ui.popup.script.prop_name = "";
+          //     p.render();
+          //     setTimeout(() => {
+          //       if (comp_id) {
+          //         let meta = p.page.meta[id];
+          //         if (active.comp_id) {
+          //           meta = p.comp.list[active.comp_id].meta[id];
+          //           return false;
+          //         }
+
+          //         active.instance.comp_id = active.comp_id;
+          //         active.instance.item_id = active.item_id;
+
+          //         if (meta && meta.item.originalId) {
+          //           active.item_id = meta.item.originalId;
+          //         } else {
+          //           active.item_id = id;
+          //         }
+          //         active.comp_id = comp_id;
+          //       } else {
+          //         if (active.comp_id) {
+          //           let meta = p.comp.list[active.comp_id].meta[id];
+
+          //           if (!meta) {
+          //             const _id = p.comp.list[active.comp_id].doc
+          //               .getMap("map")
+          //               .get("root")
+          //               ?.get("id");
+
+          //             if (_id) {
+          //               active.item_id = _id;
+          //               p.render();
+          //             }
+          //           }
+          //           return false;
+          //         }
+
+          //         active.item_id = id;
+          //       }
+          //       p.ui.popup.script.open = true;
+          //       p.render();
+          //     }, 100);
+          // }
+          // }
         }
 
         return false;

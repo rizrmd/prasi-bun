@@ -148,13 +148,7 @@ export const ScriptMonaco = () => {
   if (!mitem) {
     active.item_id = "";
     return <div>no mitem</div>;
-  } else if (
-    item.type === "item" &&
-    item.component?.id &&
-    meta.parent_mcomp?.meta.mitem
-  ) {
-    mitem = meta.parent_mcomp?.meta.mitem;
-
+  } else if (item.type === "item" && item.component?.id) {
     if (!mitem) {
       active.item_id = "";
       return <div>no mitem</div>;
