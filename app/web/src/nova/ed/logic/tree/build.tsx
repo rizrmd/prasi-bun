@@ -40,6 +40,24 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
             async visit(m) {
               if (!is_layout) {
                 pushTreeNode(p, m, meta, p.page.tree);
+
+                if (m.parent) {
+                  if (m.parent.id === "root") {
+                    if (m.item.id === item.id) {
+                      m.mitem = mitem;
+                    }
+                  } else {
+                    const parent = meta[m.parent.id];
+
+                    if (parent.mitem) {
+                      parent.mitem.get("childs")?.forEach((child) => {
+                        if (child.get("id") === m.item.id) {
+                          m.mitem = child;
+                        }
+                      });
+                    }
+                  }
+                }
               }
             },
           },

@@ -50,7 +50,7 @@ export const loadCompSnapshot = async (
       doc.off("update", p.comp.list[id_comp].on_update);
     }
 
-    const meta = {};
+    const meta: Record<string, IMeta> = {};
     const tree: NodeModel<IMeta>[] = [];
     const item = mitem.toJSON() as IItem;
     p.comp.loaded[id_comp] = {
@@ -63,6 +63,24 @@ export const loadCompSnapshot = async (
         on: {
           visit(m) {
             pushTreeNode(p, m, meta, tree);
+
+            if (m.parent) {
+              if (m.parent.id === "root") {
+                if (m.item.id === item.id) {
+                  m.mitem = mitem;
+                }
+              } else {
+                const parent = meta[m.parent.id];
+
+                if (parent.mitem) {
+                  parent.mitem.get("childs")?.forEach((child) => {
+                    if (child.get("id") === m.item.id) {
+                      m.mitem = child;
+                    }
+                  });
+                }
+              }
+            }
           },
         },
         note: "load-comp",
