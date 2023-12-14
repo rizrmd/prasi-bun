@@ -12,7 +12,7 @@ export const initLoadComp = async (
     {
       ...p,
       on: {
-        visit_component: async (id) => {
+        visit_component: (id) => {
           if (!p.comps[id]) {
             comp_ids.add(id);
           }

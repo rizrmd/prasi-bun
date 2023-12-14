@@ -10,7 +10,7 @@ type EmptySnapshot = {
   name: string;
   ts: number;
 };
-type CompSnapshot = {
+export type CompSnapshot = {
   type: "comp";
   id: string;
   bin: Uint8Array;

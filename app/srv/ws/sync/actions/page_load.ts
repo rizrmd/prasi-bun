@@ -11,7 +11,7 @@ import { parseJs } from "../editor/parser/parse-js";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
-import { snapshot } from "../entity/snapshot";
+import { CompSnapshot, snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
@@ -181,6 +181,7 @@ export const page_load: SAction["page"]["load"] = async function (
 const scanMeta = async (doc: DPage, sync: SyncConnection) => {
   const meta: GenMetaP["meta"] = {};
   const mcomps: GenMetaP["comps"] = {};
+  const msnap: Record<string, CompSnapshot> = {};
 
   const loading = {} as Record<string, Promise<void>>;
   const mchilds = doc.getMap("map").get("root")?.get("childs");
@@ -203,6 +204,11 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
               await loading[id];
             } else {
               userSyncComponent(sync, id);
+            }
+
+            const snap = snapshot.get("comp", id);
+            if (snap) {
+              msnap[id] = snap;
             }
 
             if (docs.comp[id]) {
@@ -235,11 +241,8 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
   }
 
   const comps: EPage["comps"] = {};
-  for (const [id, v] of Object.entries(mcomps)) {
-    const snap = snapshot.get("comp", id);
-    if (snap) {
-      comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
-    }
+  for (const [id, snap] of Object.entries(msnap)) {
+    comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
   }
 
   return { meta: simplifyMeta(meta), comps, entry };

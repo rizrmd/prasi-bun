@@ -71,7 +71,7 @@ export const loadComponent = async (comp_id: string, sync: SyncConnection) => {
       const bin = Y.encodeStateAsUpdate(doc);
       await attachOnUpdate(doc, um);
 
-      snapshot.update({
+      await snapshot.update({
         bin,
         id: comp_id,
         type: "comp",
