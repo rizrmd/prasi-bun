@@ -9,7 +9,14 @@ export const EdMain = () => {
   active.hover.renderMain = local.render;
 
   return (
-    <div className="flex flex-1 relative overflow-auto">
+    <div
+      className={cx(
+        "flex flex-1 relative overflow-auto",
+        css`
+          contain: content;
+        `
+      )}
+    >
       <div
         className={cx(
           "absolute inset-0 flex",
