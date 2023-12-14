@@ -16,12 +16,14 @@ export type GenMetaP = {
   };
   smeta?: Record<string, ISimpleMeta>;
   set_meta?: boolean;
+  note?: string;
 };
 
 export type GenMetaArg = {
   item: IContent;
   is_root?: boolean;
   jsx_prop?: IMeta["jsx_prop"];
+  ignore_first_component?: boolean;
   parent?: {
     item: IItem;
     instance_id?: string;

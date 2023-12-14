@@ -26,6 +26,8 @@ export const ViChild: FC<{
 }> = ({ meta, children }) => {
   const vi = useGlobal(ViGlobal, "VI");
   const parts = viParts(meta);
+  if (vi.visit) vi.visit(meta, parts);
+  
   let renderChild = undefined;
 
   if (parts.shouldRenderChild) {
