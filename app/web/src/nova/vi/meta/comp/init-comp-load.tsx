@@ -7,14 +7,14 @@ export const initLoadComp = async (
   item: IItem,
   load: (comp_ids: string[]) => Promise<void>
 ) => {
-  const comp_ids: string[] = [];
+  const comp_ids = new Set<string>();
   genMeta(
     {
       ...p,
       on: {
         visit_component: async (id) => {
           if (!p.comps[id]) {
-            comp_ids.push(id);
+            comp_ids.add(id);
           }
         },
       },
@@ -23,8 +23,8 @@ export const initLoadComp = async (
     { item }
   );
 
-  if (comp_ids.length > 0) {
-    await load(comp_ids);
+  if (comp_ids.size > 0) {
+    await load([...comp_ids]);
     await initLoadComp(p, item, load);
   }
 };

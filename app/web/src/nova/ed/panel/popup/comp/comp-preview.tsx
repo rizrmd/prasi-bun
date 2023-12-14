@@ -4,9 +4,9 @@ import { produceCSS } from "../../../../../utils/css/gen";
 import { IItem } from "../../../../../utils/types/item";
 import { IText } from "../../../../../utils/types/text";
 import { EDGlobal, PG, active } from "../../../logic/ed-global";
-// import { loadComponent } from "../../../logic/tree/sync-walk";
 import { EdCompPreviewTree } from "./comp-preview-tree";
 import { compPicker, reloadCompPicker } from "./comp-reload";
+import { loadComponent } from "../../../logic/comp/load";
 
 export const EdCompPreview = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -19,9 +19,9 @@ export const EdCompPreview = () => {
 
   useEffect(() => {
     if (!p.comp.list[comp_id] && !!comp_id) {
-      // loadComponent(p, comp_id).then(() => {
-      //   p.render();
-      // });
+      loadComponent(p, comp_id).then(() => {
+        p.render();
+      });
     }
   }, [comp_id]);
 
