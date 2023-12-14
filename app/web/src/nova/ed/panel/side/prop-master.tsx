@@ -26,7 +26,15 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const TypedTree = DNDTree<PropItem>;
 
   let filtered = [] as NodeModel<PropItem>[];
-  const mprops = meta.mitem?.get("component")?.get("props");
+  let mprops = meta.mitem?.get("component")?.get("props");
+  if (!mprops) {
+    const mcomp = meta.mitem?.get("component");
+    if (mcomp) {
+      mcomp.set("props", new Y.Map() as any);
+      mprops = mcomp.get("props");
+    }
+  }
+
   if (mprops && meta.mitem) {
     mprops.forEach((m, key) => {
       filtered.push({
@@ -139,13 +147,13 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
             />
           </DndProvider>
           <div
-            className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer"
+            className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none"
             onClick={() => {
               if (mprops) {
                 const indexes: (number | undefined)[] = [];
                 mprops.forEach((e) => indexes.push(e.get("idx")));
                 let idx: any = (indexes.sort().pop() || 0) + 1;
-                const name = `prop_${idx + 1}`;
+                const name = `prop_${indexes.length === 0 ? 1 : idx + 1}`;
                 const map = new Y.Map() as FMCompDef;
                 syncronize(map, {
                   idx: idx,

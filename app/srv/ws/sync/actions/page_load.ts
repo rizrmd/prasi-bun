@@ -6,7 +6,7 @@ import { GenMetaP } from "../../../../web/src/nova/vi/utils/types";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
-import { loadComponent } from "../editor/load-component";
+import { loadComponent, userSyncComponent } from "../editor/load-component";
 import { parseJs } from "../editor/parser/parse-js";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
@@ -201,6 +201,8 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
                 });
               }
               await loading[id];
+            } else {
+              userSyncComponent(sync, id);
             }
 
             if (docs.comp[id]) {
@@ -239,6 +241,6 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
       comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
     }
   }
- 
+
   return { meta: simplifyMeta(meta), comps, entry };
 };

@@ -5,6 +5,7 @@ import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { Popover } from "../../../../../utils/ui/popover";
 import { EdPropPopoverForm, propPopover } from "./prop-form";
 import { TypedMap } from "yjs-types";
+import { useLocal } from "web-utils";
 
 export type PropItem = {
   name: string;
@@ -18,6 +19,7 @@ export const EdPropCompTreeItem: FC<{
   params: Parameters<NodeRender<PropItem>>[1];
   render: () => void;
 }> = ({ node, params, render }) => {
+  const local = useLocal({ closing: false });
   if (node.id === "root") {
     return <></>;
   }
@@ -51,14 +53,24 @@ export const EdPropCompTreeItem: FC<{
           popoverClassName="bg-white shadow-lg border border-slate-300"
           onOpenChange={(open) => {
             if (!open) {
-              propPopover.name = "";
+              local.closing = true;
+              local.render();
+              setTimeout(() => {
+                propPopover.name = "";
+                render();
+              });
             } else {
+              local.closing = false;
               propPopover.name = node.text;
+              render();
             }
-            render();
           }}
           content={
-            <EdPropPopoverForm mprop={node.data.mprop} name={node.text} />
+            <EdPropPopoverForm
+              closing={local.closing}
+              mprop={node.data.mprop}
+              name={node.text}
+            />
           }
           className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer items-center flex"
         >

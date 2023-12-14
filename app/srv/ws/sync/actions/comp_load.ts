@@ -12,7 +12,6 @@ export const comp_load: SAction["comp"]["load"] = async function (
 ) {
   const result: Record<string, IScopeComp> = {};
   for (const id of ids) {
-    const root = await loadComponent(id, this);
   }
   return result;
 };
