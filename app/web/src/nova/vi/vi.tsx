@@ -2,9 +2,10 @@ import { FC, Suspense } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../ed/logic/ed-global";
 import { viLoad } from "./load/load";
-import { ViGlobal } from "./render/global";
+import { VG, ViGlobal } from "./render/global";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
+import { viParts } from "./render/parts";
 
 export const Vi: FC<{
   meta: Record<string, IMeta>;
@@ -13,11 +14,13 @@ export const Vi: FC<{
   site_id: string;
   api?: any;
   db?: any;
-}> = ({ meta, entry, api_url, site_id, api, db }) => {
+  visit?: VG["visit"];
+}> = ({ meta, entry, api_url, site_id, api, db, visit }) => {
   const vi = useGlobal(ViGlobal, "VI");
   if (vi.meta !== meta) {
     vi.meta = meta;
   }
+  vi.visit = visit;
 
   if (vi.status === "init") {
     vi.site.db = db;

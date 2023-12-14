@@ -39,7 +39,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           on: {
             async visit(m) {
               if (!is_layout) {
-                pushTreeNode(p, m, meta);
+                pushTreeNode(p, m, meta, p.page.tree);
               }
             },
           },

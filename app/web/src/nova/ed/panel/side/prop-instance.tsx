@@ -23,6 +23,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   let filtered = [] as { mprop: FMCompDef; name: string }[];
   const mprops = meta.mitem?.get("component")?.get("props");
   const comp_id = meta.mitem?.get("component")?.get("id") || "";
+
+  if (!p.comp.list[comp_id]) return null;
   const mcprops = p.comp.list[comp_id].doc
     .getMap("map")
     .get("root")
@@ -73,7 +75,10 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             const item = meta.item as IItem;
 
             const comp_id = item.component?.id;
+
             if (comp_id) {
+              if (!p.comp.list[comp_id]) return;
+
               active.instance.item_id = item.id;
               active.instance.comp_id = active.comp_id;
 

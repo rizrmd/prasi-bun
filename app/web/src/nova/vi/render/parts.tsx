@@ -1,6 +1,7 @@
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { IMeta } from "../../ed/logic/ed-global";
+import { VG } from "./global";
 
 export type ViParts = {
   mode: "mobile" | "desktop";
@@ -28,7 +29,7 @@ export const viParts = (meta: IMeta, arg?: ViParts) => {
     props.dangerouslySetInnerHTML = { __html: item.html || "" };
     shouldRenderChild = false;
   }
-  
+
   if (content.adv?.html && !content.adv?.js) {
     props.dangerouslySetInnerHTML = { __html: content.adv.html };
     shouldRenderChild = false;

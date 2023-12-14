@@ -10,12 +10,13 @@ import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
 
 export const viEvalScript = (
-  vi: { meta: VG["meta"] },
+  vi: { meta: VG["meta"]; visit?: VG["visit"] },
   meta: IMeta,
   scope: any
 ) => {
   const childs = meta.item.childs;
   const parts = viParts(meta);
+  if (vi.visit) vi.visit(meta, parts);
 
   let children = undefined;
   if (parts.shouldRenderChild) {

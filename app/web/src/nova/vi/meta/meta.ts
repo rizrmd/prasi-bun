@@ -7,8 +7,10 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
   const item = arg.item as IItem;
 
   if (item.type === "item" && item.component?.id) {
-    genComp(p, arg);
-    return;
+    if (arg.ignore_first_component !== true) {
+      genComp(p, arg);
+      return;
+    }
   }
 
   let scope: IMeta["scope"] = {};

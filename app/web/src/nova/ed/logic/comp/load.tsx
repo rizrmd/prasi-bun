@@ -1,6 +1,10 @@
 import { compress, decompress } from "wasm-gzip";
+import { IItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
-import { PG } from "../ed-global";
+import { genMeta } from "../../../vi/meta/meta";
+import { IMeta, PG } from "../ed-global";
+import { NodeModel } from "@minoru/react-dnd-treeview";
+import { pushTreeNode } from "../tree/build/push-tree";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -46,13 +50,31 @@ export const loadCompSnapshot = async (
       doc.off("update", p.comp.list[id_comp].on_update);
     }
 
+    const meta = {};
+    const tree: NodeModel<IMeta>[] = [];
+    const item = mitem.toJSON() as IItem;
+    p.comp.loaded[id_comp] = {
+      comp: item,
+    };
+    genMeta(
+      {
+        comps: p.comp.loaded,
+        meta,
+        on: {
+          visit(m) {
+            pushTreeNode(p, m, meta, tree);
+          },
+        },
+        note: "load-comp",
+      },
+      { item, ignore_first_component: true }
+    );
+
     p.comp.list[id_comp] = {
       comp: { id: id_comp, snapshot },
       doc,
-    } as any;
-
-    p.comp.list[id_comp] = {
-      ...p.comp.list[id_comp],
+      meta,
+      tree,
       async on_update(bin, origin) {
         if (origin === "sv_remote" || origin === "local") {
           return;
