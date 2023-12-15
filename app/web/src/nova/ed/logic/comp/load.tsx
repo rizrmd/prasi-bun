@@ -5,6 +5,7 @@ import { DComp } from "../../../../utils/types/root";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG } from "../ed-global";
 import { pushTreeNode } from "../tree/build/push-tree";
+import { treeRebuild } from "../tree/build";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -90,6 +91,7 @@ export const loadCompSnapshot = async (
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;
               }
+              await treeRebuild(p, { note: "comp-update" });
               p.render();
             }
           },

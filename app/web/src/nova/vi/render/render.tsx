@@ -38,7 +38,7 @@ export const ViChild: FC<{
           const { id } = item;
 
           return (
-            <ErrorBox key={id}>
+            <ErrorBox key={id} meta={meta}>
               <Suspense>
                 <ViRender meta={vi.meta[id]} />
               </Suspense>

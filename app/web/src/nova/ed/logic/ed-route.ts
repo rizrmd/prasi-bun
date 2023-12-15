@@ -47,7 +47,6 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     return;
   }
 
-  console.log(page_id, remotePage.comps);
   if (remotePage.comps) {
     for (const [id_comp, c] of Object.entries(remotePage.comps)) {
       if (c && c.snapshot) {
@@ -57,7 +56,6 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   }
 
   p.page.entry = remotePage.entry;
-
   p.page.smeta = remotePage.meta;
 
   p.page.cur = remotePage;
