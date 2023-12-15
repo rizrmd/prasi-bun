@@ -1,6 +1,7 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
-import { EDGlobal, IMeta } from "../../../../logic/ed-global";
 import { useGlobal } from "web-utils";
+import { IContent } from "../../../../../../utils/types/general";
+import { EDGlobal, IMeta } from "../../../../logic/ed-global";
 export const DEPTH_WIDTH = 5;
 export const EdTreeIndent = ({
   node,
@@ -10,7 +11,7 @@ export const EdTreeIndent = ({
   prm: RenderParams;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const item = node.data?.item;
+  const item = node.data?.item as IContent;
   if (!item) return <></>;
   const isComponent = item.type === "item" && item.component?.id;
 

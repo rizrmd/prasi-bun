@@ -1,19 +1,18 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
+import { createId } from "@paralleldrive/cuid2";
 import { FC } from "react";
 import { useGlobal } from "web-utils";
+import { syncronize } from "y-pojo";
 import { IContent, MContent } from "../../../../../utils/types/general";
 import { IItem, MItem } from "../../../../../utils/types/item";
 import { FNAdv } from "../../../../../utils/types/meta-fn";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { editComp } from "../../../logic/comp";
 import { EditorGlobal, NodeMeta, PG } from "../../../logic/global";
+import { findDefaultJSX } from "../../../logic/tree-logic";
 import { fillID } from "../../../tools/fill-id";
 import { newMap } from "../../../tools/yjs-tools";
-import { createId } from "@paralleldrive/cuid2";
-import { syncronize } from "y-pojo";
-import { findDefaultJSX, rebuildTree } from "../../../logic/tree-logic";
 
-import * as Y from "yjs";
 export const ETreeItemAction: FC<{
   item: IContent;
   mode: "mobile" | "desktop";
