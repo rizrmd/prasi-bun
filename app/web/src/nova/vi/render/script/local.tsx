@@ -2,7 +2,11 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { updatePropScope } from "./eval-prop";
 
-export const createViLocal = (meta: IMeta, scope: any) => {
+export const createViLocal = (
+  meta: IMeta,
+  scope: any,
+  init_local_effect: any
+) => {
   return <T extends Record<string, any>>(arg: {
     children: ReactNode;
     name: string;
@@ -20,6 +24,7 @@ export const createViLocal = (meta: IMeta, scope: any) => {
     }
     const val = meta.scope.val;
     val[arg.name] = local;
+
     updatePropScope(meta, scope);
 
     if (arg.hook) {
@@ -27,13 +32,20 @@ export const createViLocal = (meta: IMeta, scope: any) => {
     }
 
     useEffect(() => {
-      const fn = async () => {
-        if (arg.effect) {
-          await arg.effect(local);
+      let should_run = !init_local_effect[meta.item.id];
+      if (should_run) {
+        if (typeof init_local_effect === "object") {
+          init_local_effect[meta.item.id] = true;
         }
-      };
+        const fn = async () => {
+          if (arg.effect) {
+            await arg.effect(local);
+          }
+        };
 
-      fn();
+        fn();
+      }
+
       return () => {};
     }, []);
 

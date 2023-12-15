@@ -21,7 +21,7 @@ export const ErrorBox = withErrorBoundary(
 
     if (meta && local.meta !== meta) {
       local.meta = meta;
-      resetError();
+      setTimeout(resetError);
     }
 
     let _meta = meta;

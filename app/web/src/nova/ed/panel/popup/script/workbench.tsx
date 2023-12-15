@@ -1,7 +1,7 @@
 import { useGlobal } from "web-utils";
-import { EdScriptMonaco } from "./monaco";
-import { EDGlobal, active } from "../../../logic/ed-global";
 import { IItem } from "../../../../../utils/types/item";
+import { EDGlobal, active } from "../../../logic/ed-global";
+import { EdScriptMonaco } from "./monaco";
 import { EdScriptSnippet } from "./snippet";
 
 export const EdScriptWorkbench = () => {
@@ -10,9 +10,9 @@ export const EdScriptWorkbench = () => {
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
         <div className="flex border-b">
-          {p.ui.popup.script.type === "prop-master" ? (
-            <CompTitle />
-          ) : (
+          {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
+          {p.ui.popup.script.type === "prop-instance" && <CompTitleInstance />}
+          {p.ui.popup.script.type === "item" && (
             <>
               <div className="flex p-2 space-x-1">
                 {[
@@ -46,7 +46,8 @@ export const EdScriptWorkbench = () => {
                   );
                 })}
               </div>
-              {p.ui.popup.script.mode === "js" && <EdScriptSnippet />}
+              {p.ui.popup.script.mode === "js" &&
+                p.ui.popup.script.type === "item" && <EdScriptSnippet />}
             </>
           )}
         </div>
@@ -58,7 +59,27 @@ export const EdScriptWorkbench = () => {
   );
 };
 
-const CompTitle = () => {
+const CompTitleInstance = () => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
+  const item = p.page.meta[active.item_id].item as IItem;
+
+  if (item && item.component?.id) {
+    const props = item.component.props;
+    return (
+      <div className="flex text-xs p-2 space-x-1 items-center">
+        <div>{item.name}</div>
+        <ArrowRight />
+        <div>{p.ui.popup.script.prop_name}</div>
+        <ArrowRight />
+        <div>{p.ui.popup.script.prop_kind}</div>
+      </div>
+    );
+  }
+  return <></>;
+};
+
+const CompTitleMaster = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
   const item = p.comp.list[active.comp_id].doc
@@ -69,7 +90,7 @@ const CompTitle = () => {
   if (item && item.component?.id) {
     const props = item.component.props;
     return (
-      <div className="flex text-xs space-x-1 items-center">
+      <div className="flex text-xs p-2 space-x-1 items-center">
         <div>{item.name}</div>
         <ArrowRight />
         <div>{p.ui.popup.script.prop_name}</div>

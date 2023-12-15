@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { active } from "./logic/ed-global";
 import { EdAddItem } from "./panel/header/mid/add-item";
 import { EdAddSection } from "./panel/header/mid/add-section";
 import { EdAddText } from "./panel/header/mid/add-text";
@@ -23,7 +24,7 @@ export const EdMid: FC<{}> = () => {
             <div className="border-r border-r-slate-100 text-slate-400 text-[9px] flex items-center px-1 mr-1">
               ADD
             </div>
-            <EdAddSection />
+            {!active.comp_id && <EdAddSection />}
             <EdAddItem />
             <EdAddText />
             <EdCompPicker />

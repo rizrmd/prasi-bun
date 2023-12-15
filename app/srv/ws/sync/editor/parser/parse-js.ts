@@ -10,7 +10,7 @@ export const parseJs = (meta: IMeta) => {
   const result = {} as {
     local?: typeof local | undefined;
     passprop?: typeof passprop | undefined;
-    props?: Record<string, { name: string; value: string; fn?: any }>;
+    props?: Record<string, { value: string; fn?: any }>;
   };
 
   try {

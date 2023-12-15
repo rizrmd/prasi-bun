@@ -2,6 +2,7 @@ import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { getMetaById } from "../../../../logic/tree/build";
+import { IContent } from "../../../../../../utils/types/general";
 
 export const expandTreeHook = (
   p: PG,
@@ -21,14 +22,14 @@ export const expandTreeHook = (
     );
 
     const cur = getMetaById(p, active.item_id);
-    if (cur && cur.parent_item) {
-      const id = cur.parent_item.mitem?.get("id");
+    if (cur && cur.parent?.id) {
+      const id = cur.parent.id;
       if (id) {
         shouldOpen.add(id);
 
         let meta: IMeta | undefined = getMetaById(p, id);
         while (meta) {
-          const id = meta.parent_item.id;
+          const id = meta.parent?.id;
           if (id && !shouldOpen.has(id)) {
             shouldOpen.add(id);
             meta = getMetaById(p, id);
@@ -52,7 +53,7 @@ export const expandTreeHook = (
       local.render();
       if (active.item_id) {
         const meta = getMetaById(p, active.item_id);
-        if (meta && meta.item.type !== "text") {
+        if (meta && (meta.item as IContent).type !== "text") {
           setTimeout(() => {
             const el = document.getElementsByClassName(active.item_id);
             if (el.length > 0) {

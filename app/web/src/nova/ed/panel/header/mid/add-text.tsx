@@ -4,7 +4,7 @@ import { EDGlobal, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { createId } from "@paralleldrive/cuid2";
 import { IText } from "../../../../../utils/types/text";
-import { MContent } from "../../../../../utils/types/general";
+import { IContent, MContent } from "../../../../../utils/types/general";
 import { fillID } from "../../../logic/tree/fill-id";
 import { prepSection } from "./prep-section";
 import { IItem } from "../../../../../utils/types/item";
@@ -40,14 +40,15 @@ export const EdAddText = () => {
 
         let mitem = meta.mitem as MContent;
         if (mitem) {
+          const item = meta.item as IContent;
           if (
-            meta.item.type === "text" ||
-            (meta.item.type === "item" && meta.item.component?.id)
+            item.type === "text" ||
+            (item.type === "item" && item.component?.id)
           ) {
-            const parent_id = meta.parent_item.id;
+            const parent_id = meta.parent?.id || "root";
             const parent = getMetaById(
               p,
-              parent_id === "root" ? meta.item.id : parent_id
+              parent_id === "root" ? item.id : parent_id
             );
             if (!parent) {
               alert("Failed to add text!");
