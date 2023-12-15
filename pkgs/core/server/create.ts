@@ -64,6 +64,7 @@ export const createServer = async () => {
     } as WebSocketHandler<WSData>,
     async fetch(req, server) {
       const url = new URL(req.url);
+
       const response = async () => {
         if (wsHandler[url.pathname]) {
           if (
@@ -90,6 +91,7 @@ export const createServer = async () => {
         const webPath = "app/static";
         try {
           const found = cache.static[url.pathname];
+
           if (found && g.mode === "prod") {
             return responseCached(req, found);
           }
@@ -100,7 +102,7 @@ export const createServer = async () => {
             file.type !== "application/octet-stream" // is not directory
           ) {
             if (g.mode === "dev") {
-              return new Response(file as any);
+              return new Response(file);
             }
 
             if (!cache.static[url.pathname]) {

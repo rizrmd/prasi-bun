@@ -54,7 +54,9 @@ export const serveAPI = async (url: URL, req: Request) => {
               }
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          g.log.error({ pathname: url.pathname, error: e });
+        }
       }
     }
 
