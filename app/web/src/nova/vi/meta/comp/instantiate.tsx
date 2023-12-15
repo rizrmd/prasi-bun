@@ -38,6 +38,10 @@ export const walkChild = (
   item: IItem,
   ids: Exclude<FNComponent["ref_ids"], undefined>
 ) => {
+  if (!item.originalId) {
+    item.originalId = item.id;
+  }
+
   if (!ids[item.id]) {
     ids[item.id] = createId();
   }
