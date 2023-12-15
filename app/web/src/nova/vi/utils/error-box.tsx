@@ -14,10 +14,15 @@ export const ErrorBox = withErrorBoundary(
     id?: string;
     silent?: boolean;
   }) => {
-    const local = useLocal({ retrying: false });
+    const local = useLocal({ retrying: false, meta });
     const [error, resetError] = useErrorBoundary((error, errorInfo) => {
       if (silent !== true) console.warn(error);
     });
+
+    if (meta && local.meta !== meta) {
+      local.meta = meta;
+      resetError();
+    }
 
     let _meta = meta;
 

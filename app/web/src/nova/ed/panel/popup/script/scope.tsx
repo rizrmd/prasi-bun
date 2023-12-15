@@ -30,13 +30,18 @@ export const declareScope = async (
     }
   }
 
-  for (const p of parents) {
-    const def = p.scope.def;
+  for (const m of parents) {
+    if (active.comp_id && m.parent?.id === "root" && active.instance) {
+      const meta = p.page.meta[active.instance.item_id];
+      console.log(meta.scope.val);
+    }
+
+    const def = m.scope.def;
     if (def) {
       if (def.local) {
         addScope({
           monaco,
-          loc: { item_id: p.item.id, type: "item" },
+          loc: { item_id: m.item.id, type: "item" },
           source: `\
 export const {};
 declare global {
