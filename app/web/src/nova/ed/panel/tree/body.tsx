@@ -16,27 +16,19 @@ import { doTreeSearch } from "./search";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ tree: null as TreeMethods | null, comp_id: "" });
+  const local = useLocal({ tree: null as TreeMethods | null });
   const TypedTree = DNDTree<IMeta>;
 
   active.hover.renderTree = local.render;
 
   expandTreeHook(p, local);
 
-  if (active.comp_id && local.comp_id !== active.comp_id) {
-    local.comp_id = active.comp_id;
-    const ref = p.comp.list[active.comp_id];
-    if (ref) {
-      p.comp.tree = ref.tree;
-    }
-  }
-
   let tree: NodeModel<IMeta>[] = [];
   if (p.ui.tree.search) {
     tree = doTreeSearch(p);
   } else {
     if (!!active.comp_id) {
-      tree = p.comp.tree;
+      tree = p.comp.list[active.comp_id]?.tree || [];
     } else {
       tree = p.page.tree;
     }

@@ -156,7 +156,6 @@ export const EDGlobal = {
   comp: {
     doc: null as null | DComp,
     item: null as null | IItem,
-    tree: [] as NodeModel<IMeta>[],
     loaded: {} as GenMetaP["comps"],
     list: {} as Record<
       string,
