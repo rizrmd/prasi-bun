@@ -63,7 +63,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
             type: "" as "prop" | "item",
             item_id: "" as string | undefined,
             comp_id: "",
-            instance_id: "",
+            prop_name: "",
           };
           try {
             arg = JSON.parse(cpath.substring(0, cpath.length - 5) || "{}");
@@ -88,6 +88,12 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
                   p.render();
                 }
               } else if (arg.type === "prop") {
+                active.comp_id = arg.comp_id;
+                p.ui.popup.script.prop_name = arg.prop_name;
+                p.ui.popup.script.type = "prop-instance";
+                p.ui.popup.script.prop_kind = "value";
+                p.ui.popup.script.open = true;
+                p.render();
               }
             }, 100);
           }

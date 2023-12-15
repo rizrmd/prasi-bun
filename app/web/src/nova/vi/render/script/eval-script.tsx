@@ -10,7 +10,11 @@ import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
 
 export const viEvalScript = (
-  vi: { meta: VG["meta"]; visit?: VG["visit"] },
+  vi: {
+    meta: VG["meta"];
+    visit?: VG["visit"];
+    script?: { init_local_effect: any };
+  },
   meta: IMeta,
   scope: any
 ) => {
@@ -30,7 +34,7 @@ export const viEvalScript = (
   if (!meta.script) {
     meta.script = {
       result: null,
-      Local: createViLocal(meta, scope),
+      Local: createViLocal(meta, scope, vi.script?.init_local_effect),
       PassProp: createViPassProp(vi, meta, scope),
     };
   }

@@ -33,7 +33,8 @@ export const declareScope = async (
   for (const m of parents) {
     if (active.comp_id && m.parent?.id === "root" && active.instance) {
       const meta = p.page.meta[active.instance.item_id];
-      console.log(meta.scope.val);
+      if (!m.scope.def) m.scope.def = {};
+      m.scope.def.props = meta.scope?.def?.props;
     }
 
     const def = m.scope.def;
@@ -48,6 +49,23 @@ declare global {
   const ${def.local.name} = ${def.local.value};
 }`,
         });
+      } else if (def.props) {
+        Object.keys(def.props).map((e) => {
+          addScope({
+            monaco,
+            loc: {
+              item_id: m.item.id,
+              type: "prop",
+              comp_id: m.parent?.comp_id,
+              prop_name: e,
+            },
+            source: `\
+export const {};
+declare global {
+  const ${e} = null as any;
+}`,
+          });
+        });
       }
     }
   }
@@ -55,7 +73,12 @@ declare global {
 
 const addScope = (arg: {
   monaco: Monaco;
-  loc: { item_id: string; type: "prop" | "item" };
+  loc: {
+    item_id: string;
+    type: "prop" | "item";
+    comp_id?: string;
+    prop_name?: string;
+  };
   source: string;
 }) => {
   const { monaco, source } = arg;

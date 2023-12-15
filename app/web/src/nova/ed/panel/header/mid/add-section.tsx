@@ -3,7 +3,6 @@ import { useGlobal } from "web-utils";
 import { MContent } from "../../../../../utils/types/general";
 import { ISection } from "../../../../../utils/types/section";
 import { EDGlobal, active } from "../../../logic/ed-global";
-import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
 

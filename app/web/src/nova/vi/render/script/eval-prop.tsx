@@ -35,7 +35,7 @@ export const viEvalProps = (
     `
           );
 
-          meta.scope.def.props[name] = { name, value: prop.valueBuilt };
+          meta.scope.def.props[name] = { value: prop.valueBuilt };
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
@@ -58,7 +58,7 @@ export const viEvalProps = (
 
 export const updatePropScope = (meta: IMeta, scope: any) => {
   if (meta.scope.def?.props) {
-    for (const prop of Object.values(meta.scope.def.props)) {
+    for (const [name, prop] of Object.entries(meta.scope.def.props)) {
       if (prop.fn) {
         const all_scope = {
           ...scope,
@@ -66,7 +66,7 @@ export const updatePropScope = (meta: IMeta, scope: any) => {
         };
         const fn = new Function(
           ...Object.keys(all_scope),
-          `// [${meta.item.name}] ${prop.name}: ${meta.item.id} 
+          `// [${meta.item.name}] ${name}: ${meta.item.id} 
   return ${prop.value || ""}
     `
         );

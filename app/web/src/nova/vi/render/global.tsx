@@ -11,6 +11,9 @@ export const ViGlobal = {
     api: null as any,
     db: null as any,
   },
+  script: {
+    init_local_effect: undefined as undefined | Record<string, boolean>,
+  },
   visit: undefined as
     | undefined
     | ((meta: IMeta, parts: ReturnType<typeof viParts>) => void),

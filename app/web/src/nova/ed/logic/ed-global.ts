@@ -128,11 +128,12 @@ export const EDGlobal = {
   site: deepClone(EmptySite),
   site_dts: "",
   script: {
-    siteTypes: {} as Record<string, string>,
+    site_types: {} as Record<string, string>,
     loaded: false,
     do_edit: async (newval: string, all?: boolean) => {},
     db: null as any,
     api: null as any,
+    init_local_effect: {} as Record<string, boolean>,
   },
   page: {
     root_id: "root",

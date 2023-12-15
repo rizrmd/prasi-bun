@@ -88,7 +88,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               {
                 site_dts: p.site_dts,
                 script: {
-                  siteTypes: {},
+                  siteTypes: p.script.site_types,
                 },
                 site: p.site.config,
               },

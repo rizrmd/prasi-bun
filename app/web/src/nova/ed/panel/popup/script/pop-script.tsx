@@ -2,9 +2,10 @@ import { useGlobal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, active } from "../../../logic/ed-global";
 import { propPopover } from "../../side/prop-master/prop-form";
 import { EdScriptWorkbench } from "./workbench";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdPopScript = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -14,16 +15,21 @@ export const EdPopScript = () => {
         open={p.ui.popup.script.open}
         onOpenChange={(open) => {
           if (!open) {
-            p.ui.popup.script.open = false;
+            const script = p.ui.popup.script;
+            if (script) {
+              script.open = false;
 
-            if (
-              p.ui.popup.script.prop_name &&
-              p.ui.popup.script.type === "prop-master"
-            ) {
-              propPopover.name = p.ui.popup.script.prop_name;
+              if (script.prop_name && script.type === "prop-master") {
+                propPopover.name = script.prop_name;
+              }
+
+              if (script.type === "item") {
+                delete p.script.init_local_effect[active.item_id];
+                treeRebuild(p, { note: "script-close" });
+              }
+
+              p.render();
             }
-
-            p.render();
           }
         }}
       >
