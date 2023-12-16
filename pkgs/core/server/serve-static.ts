@@ -2,7 +2,10 @@ import { dir } from "dir";
 import { inspectTreeAsync } from "fs-jetpack";
 import { InspectTreeResult } from "fs-jetpack/types";
 import { join } from "path";
+import { watch } from "fs";
+
 import mime from "mime";
+import { g } from "utils/global";
 
 const webPath = "app/static";
 const cache = {
@@ -16,26 +19,39 @@ export const serveStatic = {
       list: InspectTreeResult,
       parent?: InspectTreeResult[]
     ) => {
-      for (const item of list.children) {
-        if (item.type === "file") {
-          const path = join(
-            ...(parent || [{ name: "static" }]).map((e) => e.name),
-            item.name
-          );
-          const file = await Bun.file(dir.path(`app/${path}`));
+      if (list.type === "dir") {
+        for (const item of list.children) {
+          await walk(item, [...(parent || []), list]);
+        }
+      } else {
+        const path = join(...(parent || []).map((e) => e.name), list.name);
+        const file = Bun.file(dir.path(`app/${path}`));
+        if (await file.exists()) {
+          cache.static[path.substring("static".length)] = {
+            type: mime.getType(path) || "application/octet-stream",
+            content: await file.arrayBuffer(),
+          };
+        }
+      } 
+    };
+    if (list) {
+      await walk(list);
+    }
+
+    if (g.mode === "dev") {
+      watch(dir.path(`app/static`), async (_, filename) => {
+        if (filename) {
+          const path = join("static", filename);
+          const file = Bun.file(dir.path(`app/${path}`));
+          console.log(_, filename);
           if (await file.exists()) {
-            cache.static[path.substring("static".length)] = {
+            cache.static[`/${filename}`] = {
               type: mime.getType(path) || "application/octet-stream",
               content: await file.arrayBuffer(),
             };
           }
-        } else {
-          await walk(item, parent ? [...parent, list] : [list]);
         }
-      }
-    };
-    if (list) {
-      await walk(list);
+      });
     }
   },
   exists: (url: URL) => {

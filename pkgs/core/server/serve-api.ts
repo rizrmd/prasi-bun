@@ -9,7 +9,6 @@ export const serveAPI = {
     for (const route of Object.values(g.api)) {
       g.router.insert(route.url.replace(/\*/gi, "**"), route);
     }
-    await prepareApiRoutes();
   },
   serve: async (url: URL, req: Request) => {
     let found = g.router.lookup(url.pathname);
@@ -81,6 +80,7 @@ export const serveAPI = {
       if (finalResponse) {
         return createResponse(current.res, finalResponse);
       }
+
       if (
         (current.res as any)._status &&
         (current.res as any)._status !== current.res.status

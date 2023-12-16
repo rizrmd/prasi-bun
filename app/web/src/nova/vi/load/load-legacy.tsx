@@ -1,5 +1,5 @@
 import importModule from "../../../render/editor/tools/dynamic-import";
-import { initApi } from "../../../utils/script/init-api";
+import { viScriptArg } from "../render/script/arg";
 
 export const viLoadLegacy = async (vi: {
   site: {
@@ -38,7 +38,7 @@ export const viLoadLegacy = async (vi: {
     let api_url = vi.site.api_url;
     if (!api_url) api_url = ((site.config as any) || {}).api_url || "";
 
-    await initApi(site.config);
+    // await initApi(site.config);
 
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);
@@ -62,6 +62,7 @@ export const viLoadLegacy = async (vi: {
         return res;
       };
       const scope = {
+        ...viScriptArg(),
         types: {},
         exports: w.exports,
         load: importModule,
