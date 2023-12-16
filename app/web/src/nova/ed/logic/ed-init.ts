@@ -1,6 +1,6 @@
 import init from "wasm-gzip";
 import { jscript } from "../../../utils/script/jscript";
-import { dbClient } from "../../vi/load/db/client-db";
+import { dbClient } from "../../../base/load/db/client-db";
 import { PG } from "./ed-global";
 import { fetchViaProxy } from "../../vi/load/proxy";
 

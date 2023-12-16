@@ -6,6 +6,7 @@ import { registerMobile } from "./render/live/logic/mobile";
 import { reloadDBAPI } from "./utils/script/init-api";
 import { w } from "./utils/types/general";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
+import { dbClient } from "./base/load/db/client-db";
 
 const start = async () => {
   const base = `${location.protocol}//${location.host}`;
@@ -13,12 +14,11 @@ const start = async () => {
     root: null as null | ReactRoot,
   };
   w.mobile = registerMobile();
-
-  // sworkerRegister(react);
+  w.db = dbClient("prasi", location.origin);
+  sworkerRegister(react);
   defineReact();
   await defineWindow(false);
-  // await reloadDBAPI(base, "prod");
-  // sworkerAddCache(base);
+  sworkerAddCache(base);
 
   const el = document.getElementById("root");
 

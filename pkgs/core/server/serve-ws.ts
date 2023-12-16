@@ -1,9 +1,9 @@
 import { WebSocketHandler } from "bun";
 import { WSData } from "./create";
 
-export const serveWS: () => Promise<WebSocketHandler<WSData>> = async () => {
-  const { wsHandler } = await import("../../../app/srv/ws/handler");
-
+export const serveWS: (
+  wsHandler: Record<string, WebSocketHandler<WSData>>
+) => Promise<WebSocketHandler<WSData>> = async (wsHandler) => {
   return {
     maxPayloadLength: 9999999,
     closeOnBackpressureLimit: true,
