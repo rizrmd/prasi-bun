@@ -1,7 +1,7 @@
-import { spawn, spawnSync } from "bun";
+import { spawn } from "bun";
 import { existsAsync, readAsync } from "fs-jetpack";
-import { dir } from "../utils/dir";
-import { g } from "../utils/global";
+import { dir } from "../../utils/dir";
+import { g } from "../../utils/global";
 
 export const prepareAPITypes = async () => {
   const out: string[] = [];

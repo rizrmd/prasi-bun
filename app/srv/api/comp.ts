@@ -1,4 +1,4 @@
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 
 export const _ = {
   url: "/_web/comp/:id",

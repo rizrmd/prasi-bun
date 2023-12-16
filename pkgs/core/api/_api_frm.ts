@@ -1,4 +1,4 @@
-import { apiContext } from "../server/api-ctx";
+import { apiContext } from "../server/api/api-ctx";
 import { g } from "../utils/global";
 
 export const _ = {

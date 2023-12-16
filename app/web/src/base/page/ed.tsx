@@ -7,6 +7,19 @@ import { Loading } from "../../utils/ui/loading";
 export default page({
   url: "/ed/:site_id/:page_id",
   component: ({}) => {
+    console.log("momoka");
+    setTimeout(() => {
+      (async () => {
+        console.log(
+          await fetch("/moka", {
+            method: "POST",
+            body: "{}",
+          })
+        );
+      })();
+    }, 2000);
+    return <>uwuw</>;
+
     const p = useGlobal(EDGlobal, "EDITOR");
 
     const w = window as any;

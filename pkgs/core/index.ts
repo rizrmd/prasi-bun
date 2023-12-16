@@ -1,7 +1,5 @@
 import { parcelBuild } from "utils/parcel";
-import { generateAPIFrm } from "./server/api-frm";
-import { prepareApiRoutes } from "./server/api-scan";
-import { prepareAPITypes } from "./server/prep-api-ts";
+import { prepareAPITypes } from "./server/api/prep-api-ts";
 import { startDevWatcher } from "./utils/dev-watcher";
 import { ensureNotRunning } from "./utils/ensure";
 import { g } from "./utils/global";
@@ -55,13 +53,10 @@ if (!g.apiPrepared) {
   await syncActionDefinition();
   g.log.info("WS Action defined");
 
-  await generateAPIFrm();
   await prepareAPITypes();
   g.log.info("API Prepared");
   g.apiPrepared = true;
 }
-
-await prepareApiRoutes();
 
 if (!g.parcel) {
   await parcelBuild();

@@ -1,8 +1,8 @@
 import { file } from "bun";
 import { inspectAsync, listAsync } from "fs-jetpack";
 import { join } from "path";
-import { dir } from "../utils/dir";
-import { g } from "../utils/global";
+import { dir } from "../../utils/dir";
+import { g } from "../../utils/global";
 import { parseArgs } from "./parse-args";
 
 export const prepareApiRoutes = async () => {

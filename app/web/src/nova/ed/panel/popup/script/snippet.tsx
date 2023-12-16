@@ -16,7 +16,6 @@ export const EdScriptSnippet: FC<{}> = ({}) => {
           font-size: 12px;
         `)}
         onClick={() => {
-          console.log(p.script.do_edit);
           p.script.do_edit(
             `\
 <div {...props}>

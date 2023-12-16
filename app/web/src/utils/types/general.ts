@@ -27,6 +27,7 @@ export const w = window as unknown as {
   prasiApi: Record<string, PrasiAPI>;
   loadedFonts: string[];
   prasiApiDbPull: boolean;
+  mobile?: any;
   params: any;
   editorGlbDefault: string;
   ts: number;

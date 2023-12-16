@@ -1,4 +1,4 @@
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../../pkgs/core/server/api/api-ctx";
 import { user } from "dbgen";
 import { session } from "utils/session";
 

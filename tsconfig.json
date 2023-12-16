@@ -31,7 +31,7 @@
         "./node_modules/.prisma/client/index.d.ts"
       ],
       "service-srv": [
-        "./pkgs/core/server/api-ctx.ts"
+        "./pkgs/core/server/api/api-ctx.ts"
       ],
       "utils/*": [
         "./pkgs/core/utils/*"
