@@ -15,6 +15,8 @@ const start = async () => {
   };
   w.mobile = registerMobile();
   w.db = dbClient("prasi", location.origin);
+  w.serverurl = base;
+
   sworkerRegister(react);
   defineReact();
   await defineWindow(false);

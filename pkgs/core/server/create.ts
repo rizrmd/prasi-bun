@@ -46,7 +46,10 @@ export const createServer = async () => {
         return serveStatic.serve(url);
       }
 
-      await serveAPI.serve(url, req);
+      const api_response = await serveAPI.serve(url, req);
+      if (api_response) {
+        return api_response;
+      }
 
       return serveStatic.serve(url);
     },

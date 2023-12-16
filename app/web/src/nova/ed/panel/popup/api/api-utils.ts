@@ -1,4 +1,3 @@
-import { createAPI, initApi } from "../../../../../utils/script/init-api";
 import { PG } from "../../../logic/ed-global";
 
 export const dev = JSON.parse(localStorage.getItem("prasi-dev") || "{}") as {
@@ -51,8 +50,8 @@ export const checkAPI = async (p: PG) => {
 
   try {
     if (!apiRef[url]) {
-      await initApi({ api_url: url }, "dev");
-      apiRef[url] = createAPI(url);
+      // await initApi({ api_url: url }, "dev");
+      // apiRef[url] = createAPI(url);
     }
     const capi = apiRef[url];
     let res = await capi._deploy({

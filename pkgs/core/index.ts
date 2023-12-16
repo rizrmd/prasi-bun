@@ -9,6 +9,7 @@ import { syncActionDefinition } from "utils/sync-def";
 import { user } from "../../app/srv/ws/sync/entity/user";
 import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
 import { initSrv } from "../../app/srv/init";
+import { prepareApiRoutes } from "./server/api/api-scan";
 
 g.status = "init";
 
@@ -52,7 +53,7 @@ if (!g.apiPrepared) {
   await initSrv();
   await syncActionDefinition();
   g.log.info("WS Action defined");
-
+  await prepareApiRoutes();
   await prepareAPITypes();
   g.log.info("API Prepared");
   g.apiPrepared = true;
