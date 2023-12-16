@@ -1,8 +1,7 @@
-import { createRouter } from "radix3";
 import { g } from "../utils/global";
-import { serveWS } from "./serve-ws";
-import { serveStatic } from "./serve-static";
 import { serveAPI } from "./serve-api";
+import { serveStatic } from "./serve-static";
+import { serveWS } from "./serve-ws";
 
 export const cache = {
   static: {} as Record<
@@ -20,14 +19,28 @@ export type WSData = { url: URL };
 export const createServer = async () => {
   await serveAPI.init();
   await serveStatic.init();
+  const { wsHandler } = await import("../../../app/srv/ws/handler");
 
   g.server = Bun.serve({
     port: g.port,
     maxRequestBodySize: 9999999,
     development: true,
-    websocket: await serveWS(),
+    websocket: await serveWS(wsHandler),
     async fetch(req, server) {
       const url = new URL(req.url);
+
+      if (wsHandler[url.pathname]) {
+        if (
+          server.upgrade(req, {
+            data: {
+              url: new URL(req.url),
+            },
+          })
+        ) {
+          return;
+        }
+        return new Response("Upgrade failed :(", { status: 500 });
+      }
 
       if (serveStatic.exists(url)) {
         return serveStatic.serve(url);
