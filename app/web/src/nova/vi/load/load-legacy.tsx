@@ -1,5 +1,5 @@
 import importModule from "../../../render/editor/tools/dynamic-import";
-import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
+import { initApi } from "../../../utils/script/init-api";
 
 export const viLoadLegacy = async (vi: {
   site: {
@@ -43,10 +43,8 @@ export const viLoadLegacy = async (vi: {
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);
     if (!vi.site.db.get()) {
-      vi.site.db.set(createDB(api_url));
     }
     if (!vi.site.api.get()) {
-      vi.site.api.set(createAPI(api_url));
     }
 
     const w = window as any;
