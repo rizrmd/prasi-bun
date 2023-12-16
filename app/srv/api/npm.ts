@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { dir } from "dir";
 import { readAsync } from "fs-jetpack";
 import mime from "mime-types";
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { glb } from "../global";
 import { g } from "utils/global";
 

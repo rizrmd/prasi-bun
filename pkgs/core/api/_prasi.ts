@@ -1,5 +1,5 @@
 import { readAsync } from "fs-jetpack";
-import { apiContext } from "../server/api-ctx";
+import { apiContext } from "../server/api/api-ctx";
 import { g } from "../utils/global";
 import { dir } from "../utils/dir";
 

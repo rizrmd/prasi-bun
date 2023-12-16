@@ -1,6 +1,6 @@
 import { dir } from "dir";
 import { stat } from "fs/promises";
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
 
 export const _ = {

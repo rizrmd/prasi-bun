@@ -1,5 +1,5 @@
 import { dir } from "dir";
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
 
 export const _ = {

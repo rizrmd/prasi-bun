@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { dir } from "dir";
 import { readAsync } from "fs-jetpack";
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 const cache = {
   md5: "",
   content: null as any,

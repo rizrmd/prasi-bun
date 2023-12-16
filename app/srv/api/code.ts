@@ -1,7 +1,7 @@
 import { dirAsync } from "fs-jetpack";
 import trim from "lodash.trim";
 import { dirname } from "path";
-import { apiContext } from "service-srv";
+import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
 import { baseTypings } from "../../web/src/utils/script/types/base";
 

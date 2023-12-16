@@ -2,7 +2,7 @@ import mp from "@surfy/multipart-parser";
 
 import { writeAsync } from "fs-jetpack";
 import { g } from "utils/global";
-import { apiContext } from "../server/api-ctx";
+import { apiContext } from "../server/api/api-ctx";
 import { dir } from "../utils/dir";
 export const _ = {
   url: "/_upload",

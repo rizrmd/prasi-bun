@@ -1,8 +1,7 @@
-import { WebSocketHandler } from "bun";
-import { lookup } from "mime-types";
 import { createRouter } from "radix3";
-import { dir } from "../utils/dir";
 import { g } from "../utils/global";
+import { serveWS } from "./serve-ws";
+import { serveStatic } from "./serve-static";
 import { serveAPI } from "./serve-api";
 
 export const cache = {
@@ -19,127 +18,24 @@ export const cache = {
 export type WSData = { url: URL };
 
 export const createServer = async () => {
-  g.router = createRouter({ strictTrailingSlash: false });
+  await serveAPI.init();
+  await serveStatic.init();
 
-  for (const route of Object.values(g.api)) {
-    g.router.insert(route.url.replace(/\*/gi, "**"), route);
-  }
-
-  const { wsHandler } = await import("../../../app/srv/ws/handler");
   g.server = Bun.serve({
     port: g.port,
-    websocket: {
-      maxPayloadLength: 9999999,
-      closeOnBackpressureLimit: true,
-      drain(ws) {
-        // console.log("Backpressure relieved...");
-      },
-      close(ws, code, reason) {
-        const pathname = ws.data.url.pathname;
-        if (wsHandler[pathname]) {
-          const close = wsHandler[pathname].close;
-          if (close) {
-            close(ws, code, reason);
-          }
-        }
-      },
-      message(ws, message) {
-        const pathname = ws.data.url.pathname;
-        if (wsHandler[pathname]) {
-          const msg = wsHandler[pathname].message;
-          if (msg) {
-            msg(ws, message);
-          }
-        }
-      },
-      open(ws) {
-        const pathname = ws.data.url.pathname;
-        if (wsHandler[pathname]) {
-          const open = wsHandler[pathname].open;
-          if (open) {
-            open(ws);
-          }
-        }
-      },
-    } as WebSocketHandler<WSData>,
+    maxRequestBodySize: 9999999,
+    development: true,
+    websocket: await serveWS(),
     async fetch(req, server) {
       const url = new URL(req.url);
 
-      const response = async () => {
-        if (wsHandler[url.pathname]) {
-          if (
-            server.upgrade(req, {
-              data: {
-                url: new URL(req.url),
-              },
-            })
-          ) {
-            return;
-          }
-          return new Response("Upgrade failed :(", { status: 500 });
-        }
+      if (serveStatic.exists(url)) {
+        return serveStatic.serve(url);
+      }
 
-        try {
-          const api = await serveAPI(url, req);
-          if (api) {
-            return api;
-          }
-        } catch (e) {
-          g.log.error(e);
-        }
+      await serveAPI.serve(url, req);
 
-        const webPath = "app/static";
-        try {
-          const found = cache.static[url.pathname];
-
-          if (found && g.mode === "prod") {
-            return responseCached(req, found);
-          }
-
-          const file = Bun.file(dir.path(`${webPath}${url.pathname}`));
-          if (
-            (await file.exists()) &&
-            file.type !== "application/octet-stream" // is not directory
-          ) {
-            if (g.mode === "dev") {
-              return new Response(file);
-            }
-
-            if (!cache.static[url.pathname]) {
-              cache.static[url.pathname] = {
-                type: lookup(url.pathname) || "text/plain",
-                content: await file.arrayBuffer(),
-              };
-            }
-
-            const filebr = Bun.file(dir.path(`${webPath}-br${url.pathname}`));
-            if (
-              (await filebr.exists()) &&
-              filebr.type !== "application/octet-stream" // is not directory
-            ) {
-              cache.static[url.pathname].br = await filebr.arrayBuffer();
-            }
-
-            const found = cache.static[url.pathname];
-            if (found) {
-              return responseCached(req, found);
-            }
-          }
-        } catch (e) {
-          g.log.error(e);
-        }
-
-        try {
-          return new Response(
-            Bun.file(dir.path(`${webPath}/index.html`)) as any
-          );
-        } catch (e) {
-          g.log.error(e);
-          return new Response("Loading...");
-        }
-      };
-      const res = await response();
-      return res;
+      return serveStatic.serve(url);
     },
   });
 
@@ -148,17 +44,4 @@ export const createServer = async () => {
   } else {
     g.log.info(`Started at port: ${g.server.port}`);
   }
-};
-
-const responseCached = (req: Request, found: (typeof cache.static)[string]) => {
-  if (req.headers.get("accept-encoding")?.includes("br") && found.br) {
-    const res = new Response(found.br);
-    res.headers.set("content-type", found.type);
-    res.headers.set("content-encoding", "br");
-    return res;
-  }
-  const res = new Response(found.content);
-  res.headers.set("content-type", found.type);
-
-  return res;
 };
