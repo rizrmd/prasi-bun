@@ -2,7 +2,6 @@ import hash_sum from "hash-sum";
 import { fetchViaProxy } from "../../../nova/vi/load/proxy";
 
 export const dbClient = (name: string, dburl: string) => {
-  console.log(dburl);
   return new Proxy(
     {},
     {

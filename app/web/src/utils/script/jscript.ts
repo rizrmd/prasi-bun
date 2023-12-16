@@ -1,5 +1,4 @@
 import type { Editor as MonacoEditor } from "@monaco-editor/react";
-import type { BuildOptions } from "esbuild-wasm";
 import type Prettier from "prettier/standalone";
 import type estree from "prettier/plugins/estree";
 import type ts from "prettier/plugins/typescript";
@@ -60,7 +59,7 @@ export const jscript = {
 
         if (enabled?.esbuild !== false) {
           this.build = async (entry, src, files, verbose?: boolean) => {
-            const options: BuildOptions = {
+            const options = {
               entryPoints: [entry],
               jsx: "transform",
               bundle: true,
