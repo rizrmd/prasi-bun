@@ -13,7 +13,7 @@ export const edInit = async (p: PG) => {
   w.db = dbClient("prasi", `${cur.protocol}//${cur.host}`);
 
   await init();
-  jscript.init(p.render);
+  jscript.init(p.render, { esbuild: false });
 
   p.script.loaded = true;
   p.render();

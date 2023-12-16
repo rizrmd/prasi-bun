@@ -52,17 +52,24 @@ export const fetchViaProxy = async (
       body,
       headers,
     });
-    return res.json();
+    const raw = await res.text();
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      return raw;
+    }
   } else {
-    const res = await fetch(`/_proxy`, {
-      method: "POST",
-      body: JSON.stringify({
-        url,
-        body,
-        headers,
-      }),
-      headers: { "content-type": "application/json" },
-    });
-    return res.json();
+    console.log(url);
+    return null;
+    // const res = await fetch(`/_proxy`, {
+    //   method: "POST",
+    //   body: JSON.stringify({
+    //     url,
+    //     body,
+    //     headers,
+    //   }),
+    //   headers: { "content-type": "application/json" },
+    // });
+    // return res.json();
   }
 };
