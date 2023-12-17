@@ -58,7 +58,7 @@ effect={async (local) => {
           );
         }}
       >
-        &lt;Passprop/&gt;
+        &lt;PassProp/&gt;
       </Button>
     </div>
   );
