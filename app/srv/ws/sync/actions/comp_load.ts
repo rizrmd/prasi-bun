@@ -40,5 +40,3 @@ export const comp_load: SAction["comp"]["load"] = async function (
   }
   return result;
 };
-
-const scanMeta = async (id: string, doc: DComp, sync: SyncConnection) => {};

@@ -95,7 +95,11 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         p.page.render();
         if ((item as IContent).type === "text") {
           setTimeout(() => {
-            (document.querySelector(".el-active") as any)?.focus();
+            if (document.activeElement?.tagName === "INPUT") {
+              return;
+            }
+            const el_active = document.querySelector(".el-active") as any;
+            if (el_active) el_active.focus();
           }, 100);
         }
       }}

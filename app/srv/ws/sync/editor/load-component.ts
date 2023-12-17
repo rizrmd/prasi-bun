@@ -1,3 +1,5 @@
+import { IItem } from "../../../../web/src/utils/types/item";
+import { DComp } from "../../../../web/src/utils/types/root";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
@@ -9,7 +11,6 @@ import { SyncConnection, SyncType } from "../type";
 export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   let snap = snapshot.get("comp", comp_id);
   let ydoc = docs.comp[comp_id];
-  const conf = sync?.conf;
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
@@ -21,6 +22,21 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
 
   const attachOnUpdate = async (doc: Y.Doc, um: Y.UndoManager) => {
     snapshot.set("comp", comp_id, "id_doc", um.doc.clientID);
+
+    const mitem = (doc as DComp).getMap("map").get("root");
+    if (mitem) {
+      const item = mitem.toJSON() as IItem;
+      if (!item.component) {
+        const component = new Y.Map();
+        syncronize(component, { id: comp_id, props: {} });
+        mitem.set("component", component as any);
+      } else if (item.component.id !== comp_id) {
+        const mcomp = mitem.get("component");
+        if (mcomp && mcomp.get("id") !== comp_id) {
+          mcomp.set("id", comp_id);
+        }
+      }
+    }
 
     doc.on("update", async (update: Uint8Array, origin: any) => {
       const bin = Y.encodeStateAsUpdate(doc);

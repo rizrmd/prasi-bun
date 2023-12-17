@@ -4,6 +4,9 @@ import { IMeta, PG, active } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
 
 type MPIVParam = Parameters<Exclude<VG["visit"], undefined>>;
+
+const text_edit = { timeout: null as any };
+
 export const mainPerItemVisit = (
   p: PG,
   meta: MPIVParam[0],
@@ -12,45 +15,55 @@ export const mainPerItemVisit = (
   if ((meta.item as IContent).type === "text" && !meta.item.adv?.jsBuilt) {
     parts.props.spellCheck = false;
     parts.props.contentEditable = true;
-    parts.props.dangerouslySetInnerHTML = {
-      __html: meta.item.html || "&nbsp;",
-    };
     parts.props.onFocus = (e) => {
-      if (![meta.item.originalId, meta.item.id].includes(active.item_id)) {
+      p.page.prevent_rebuild = true;
+      p.render();
+      const is_active = ![meta.item.originalId, meta.item.id].includes(
+        active.item_id
+      );
+      if (is_active) {
         e.currentTarget.blur();
       }
     };
-
     parts.props.onBlur = (e) => {
-      e.stopPropagation();
-      const val = e.currentTarget.innerHTML;
-      if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
-        const comp = p.comp.list[active.comp_id];
-        const m = comp.meta[meta.item.originalId || meta.item.id];
-        if (m && m.mitem) {
-          m.item.html = val;
-          m.mitem.set("html", val);
-        }
-        return;
-      }
+      p.page.prevent_rebuild = false;
+      p.render();
+    };
 
-      let mitem = meta.mitem;
-      if (mitem) {
-        meta.item.html = val;
-        mitem.set("html", val);
-      }
+    parts.props.onInput = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const val = e.currentTarget.innerHTML;
+      clearTimeout(text_edit.timeout);
+      text_edit.timeout = setTimeout(() => {
+        if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
+          const comp = p.comp.list[active.comp_id];
+          const m = comp.meta[meta.item.originalId || meta.item.id];
+          if (m && m.mitem) {
+            m.item.html = val;
+            m.mitem.set("html", val);
+          }
+          return;
+        }
+
+        let mitem = meta.mitem;
+        if (mitem) {
+          meta.item.html = val;
+          mitem.set("html", val);
+        }
+      }, 500);
     };
   }
 
-  let isActive: boolean = active.item_id === meta.item.id;
+  let is_active: boolean = active.item_id === meta.item.id;
   if (active.comp_id) {
-    isActive = active.item_id === meta.item.originalId;
+    is_active = active.item_id === meta.item.originalId;
   }
 
   parts.props.className = cx(
     parts.props.className,
-    isActive && "el-active",
-    isActive &&
+    is_active && "el-active",
+    is_active &&
       css`
         &::after {
           content: " ";
@@ -123,14 +136,3 @@ const getOuterMeta = (p: { meta: Record<string, IMeta> }, meta: IMeta) => {
 
   if (cur) return cur;
 };
-function setEndOfContenteditable(div: any) {
-  let range: any, sel: any;
-  if (document.createRange) {
-    //Firefox, Chrome, Opera, Safari, IE 9+
-    range = document.createRange();
-    range.selectNodeContents(div);
-    sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-}
