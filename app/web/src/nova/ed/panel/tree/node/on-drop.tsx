@@ -1,6 +1,6 @@
 import { DropOptions, NodeModel } from "@minoru/react-dnd-treeview";
 import get from "lodash.get";
-import { MContent } from "../../../../../utils/types/general";
+import { IContent, MContent } from "../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
@@ -22,7 +22,12 @@ export const nodeOnDrop: (
     let fromMeta = getMetaById(p, dragSourceId);
     let toMeta = getMetaById(p, dropTargetId);
     if (fromMeta && toMeta) {
-      let to = toMeta.parent_mcomp ? toMeta.parent_mcomp.mcomp : toMeta.mitem;
+      const pmeta = active.comp_id
+        ? p.comp.list[active.comp_id].meta
+        : p.page.meta;
+      let to = toMeta.parent?.instance_id
+        ? pmeta[toMeta.parent.instance_id].mitem
+        : toMeta.mitem;
       let from = fromMeta.mitem;
 
       if (to) {
@@ -59,22 +64,26 @@ export const canDrop = (p: PG, arg: DropOptions<IMeta>) => {
     }
 
     if (dropTargetId === "root") {
-      const ds = get(dragSource, "data.item");
+      const ds = get(dragSource, "data.item") as IContent;
       if (ds && ds.type === "section") {
         return true;
       }
       return false;
     } else if (dragSource?.data && dropTarget?.data) {
-      const from = dragSource.data.item.type;
-      const to = dropTarget.data.item.type;
+      const from = (dragSource.data.item as IContent).type;
+      const to = (dropTarget.data.item as IContent).type;
 
       if (from === "section" || from === "item") {
-        let parent: IMeta | undefined = dropTarget.data;
-        while (parent) {
-          if (parent.item.id === dragSource.data.item.id) {
+        let parentMeta: IMeta | undefined = dropTarget.data;
+        while (parentMeta) {
+          if (parentMeta.item.id === dragSource.data.item.id) {
             return false;
           }
-          parent = getMetaById(p, parent.parent_item.id);
+          if (parentMeta.parent?.id) {
+            parentMeta = getMetaById(p, parentMeta.parent.id);
+          } else {
+            break;
+          }
         }
       }
 

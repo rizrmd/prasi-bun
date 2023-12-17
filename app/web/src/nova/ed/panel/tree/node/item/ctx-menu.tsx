@@ -16,6 +16,7 @@ import { edActionPaste } from "./action/paste";
 import { edActionRename } from "./action/rename";
 import { edActionUnwrap } from "./action/unwrap";
 import { edActionWrap } from "./action/wrap";
+import { IContent } from "../../../../../../utils/types/general";
 
 export const EdTreeCtxMenu = ({
   node,
@@ -49,7 +50,7 @@ export const EdTreeCtxMenu = ({
         .catch(() => {});
     }
   });
-  const item = node.data?.item;
+  const item = node.data?.item as IContent;
   const type = item?.type;
   const comp = (item as IItem).component as FNComponent | undefined;
   const isComponent = comp?.id;
@@ -90,13 +91,11 @@ export const EdTreeCtxMenu = ({
         label={item.hidden ? "Unhide" : "Hide"}
         onClick={() => edActionHide(p, item)}
       />
-      {!isComponent && (
-        <MenuItem
-          label="Rename"
-          hotKey={"↵"}
-          onClick={() => edActionRename(p, item)}
-        />
-      )}
+      <MenuItem
+        label="Rename"
+        hotKey={"↵"}
+        onClick={() => edActionRename(p, item)}
+      />
       <MenuItem
         label="Cut"
         // hotKey={<HotKey shortcut={"X"} />}

@@ -1,7 +1,7 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, IMeta } from "../../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
 
 export const EdTreeName = ({
@@ -43,10 +43,31 @@ export const EdTreeName = ({
           onBlur={() => {
             item.name = local.rename;
 
-            const mitem = node.data?.mitem;
-            if (mitem) {
-              mitem.set("name", item.name);
+            let mitem = node.data?.mitem;
+            if (item.component?.id) {
+              const comp = p.comp.list[item.component.id];
+              mitem = comp?.doc.getMap("map").get("root");
             }
+ 
+            if (mitem) {
+              mitem.doc?.transact(() => {
+                if (mitem) {
+                  mitem.set("name", item.name);
+
+                  if (active.comp_id === item.component?.id) {
+                    db.component.update({
+                      where: {
+                        id: active.comp_id,
+                      },
+                      data: {
+                        name: item.name,
+                      },
+                    });
+                  }
+                }
+              });
+            }
+
             p.ui.tree.rename_id = "";
             p.render();
           }}
