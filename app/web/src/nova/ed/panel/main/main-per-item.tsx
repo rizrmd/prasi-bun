@@ -114,15 +114,44 @@ export const mainPerItemVisit = (
       },
       meta
     );
+    let found = false;
+    if (m) {
+      if (m.item.component?.id && active.comp_id !== m.item.component.id) {
+        if (active.item_id === m.item.id) {
+          active.comp_id = m.item.component.id;
+          found = true;
+        } else {
+        }
+      } else {
+        if (active.comp_id && m && m.parent?.instance_id) {
+          const meta = p.page.meta[m.parent.instance_id];
+          const comp_id = meta.item.component?.id;
+          if (meta.item.originalId && comp_id) {
+            if (active.item_id === meta.item.originalId) {
+              if (comp_id) {
+                active.instance.item_id = meta.item.originalId;
+                active.instance.comp_id = active.comp_id;
 
-    if (
-      m &&
-      active.item_id === m.item.id &&
-      m.item.component?.id &&
-      active.comp_id !== m.item.component.id
-    ) {
-      active.comp_id = m.item.component.id;
-    } else {
+                active.comp_id = comp_id || "";
+                const root = p.comp.list[comp_id].tree.find(
+                  (e) => e.parent === "root"
+                );
+                if (root && typeof root.id === "string") {
+                  active.item_id = root.id || "";
+                }
+
+                p.render();
+              }
+            } else {
+              active.item_id = meta.item.originalId;
+              found = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (!found) {
       if (active.comp_id) {
         if (meta.item.component?.id === active.comp_id) {
           active.item_id = meta.item.id;
