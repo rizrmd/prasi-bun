@@ -23,21 +23,6 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   const attachOnUpdate = async (doc: Y.Doc, um: Y.UndoManager) => {
     snapshot.set("comp", comp_id, "id_doc", um.doc.clientID);
 
-    const mitem = (doc as DComp).getMap("map").get("root");
-    if (mitem) {
-      const item = mitem.toJSON() as IItem;
-      if (!item.component) {
-        const component = new Y.Map();
-        syncronize(component, { id: comp_id, props: {} });
-        mitem.set("component", component as any);
-      } else if (item.component.id !== comp_id) {
-        const mcomp = mitem.get("component");
-        if (mcomp && mcomp.get("id") !== comp_id) {
-          mcomp.set("id", comp_id);
-        }
-      }
-    }
-
     doc.on("update", async (update: Uint8Array, origin: any) => {
       const bin = Y.encodeStateAsUpdate(doc);
       snapshot.set("comp", comp_id, "bin", bin);
@@ -71,6 +56,11 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   if (!snap && !ydoc) {
     const comp = await db.component.findFirst({ where: { id: comp_id } });
     if (comp) {
+      const item = comp.content_tree as IItem;
+      if (item && item.component?.id !== comp.id) {
+        item.component = { id: comp.id, props: {} };
+      }
+
       const doc = new Y.Doc();
       let root = doc.getMap("map");
       syncronize(root, { id: comp_id, root: comp.content_tree });

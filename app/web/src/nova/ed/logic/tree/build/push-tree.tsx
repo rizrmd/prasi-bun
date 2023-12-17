@@ -1,5 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { IMeta, PG } from "../../ed-global";
+import { IMeta, PG, active } from "../../ed-global";
 
 export const pushTreeNode = (
   p: PG,
@@ -29,7 +29,7 @@ export const pushTreeNode = (
   }
 
   if (tree.find((t) => t.id === meta.item.id)) {
-    console.log(meta.item.id, meta.item.name);
+    console.warn("Double Tree Item: ", meta.item.id, meta.item.name);
   } else {
     if (!meta.parent?.comp_id) {
       tree.push({

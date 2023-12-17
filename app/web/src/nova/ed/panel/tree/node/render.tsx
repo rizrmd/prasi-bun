@@ -10,8 +10,6 @@ import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 import { IContent } from "../../../../../utils/types/general";
 
-const jsxPropVis = {} as Record<string, string>;
-
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({

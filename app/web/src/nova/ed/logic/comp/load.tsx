@@ -6,6 +6,7 @@ import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG } from "../ed-global";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
+import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -49,7 +50,7 @@ export const loadCompSnapshot = async (
       doc.off("update", p.comp.list[comp_id].on_update);
     }
 
-    const updated = updateComponentMeta(p, doc, comp_id);
+    const updated = await updateComponentMeta(p, doc, comp_id);
     if (updated) {
       const { meta, tree } = updated;
       if (p.comp.list[comp_id]) {
@@ -84,7 +85,7 @@ export const loadCompSnapshot = async (
                 comp_id,
                 Buffer.from(compress(diff_local))
               );
-              const updated = updateComponentMeta(p, doc, comp_id);
+              const updated = await updateComponentMeta(p, doc, comp_id);
               if (updated) {
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;
@@ -101,7 +102,11 @@ export const loadCompSnapshot = async (
   }
 };
 
-export const updateComponentMeta = (p: PG, doc: DComp, comp_id: string) => {
+export const updateComponentMeta = async (
+  p: PG,
+  doc: DComp,
+  comp_id: string
+) => {
   const mitem = doc.getMap("map").get("root");
   if (!mitem) return;
 
@@ -111,6 +116,26 @@ export const updateComponentMeta = (p: PG, doc: DComp, comp_id: string) => {
   p.comp.loaded[comp_id] = {
     comp: item,
   };
+
+  await initLoadComp(
+    {
+      comps: p.comp.loaded,
+      meta,
+      set_meta: false,
+    },
+    item,
+    async (comp_ids: string[]) => {
+      const comps = await p.sync.comp.load(comp_ids, true);
+      let result = Object.entries(comps);
+
+      for (const [id_comp, comp] of result) {
+        if (comp && comp.snapshot) {
+          await loadCompSnapshot(p, id_comp, comp.snapshot);
+        }
+      }
+    }
+  );
+
   genMeta(
     {
       comps: p.comp.loaded,
@@ -138,9 +163,10 @@ export const updateComponentMeta = (p: PG, doc: DComp, comp_id: string) => {
           }
         },
       },
-      note: "load-comp",
+      note: "load-comp-scan-meta",
     },
     { item, ignore_first_component: true }
   );
+
   return { meta, tree };
 };
