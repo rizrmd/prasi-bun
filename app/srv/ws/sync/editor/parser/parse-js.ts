@@ -10,7 +10,7 @@ export const parseJs = (meta: IMeta) => {
   const result = {} as {
     local?: typeof local | undefined;
     passprop?: typeof passprop | undefined;
-    props?: Record<string, { value: string; fn?: any }>;
+    props?: Record<string, { value: string; fn?: any; visible?: boolean }>;
   };
 
   try {
@@ -71,7 +71,7 @@ export const parseJs = (meta: IMeta) => {
                 attr.name.type === "JSXIdentifier"
               ) {
                 passprop[attr.name.name] = {
-                  value: '0',
+                  value: "0",
                   index: 0,
                 };
                 // if (attr.value) {

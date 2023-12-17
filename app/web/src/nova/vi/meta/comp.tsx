@@ -42,7 +42,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         comp: pcomp.comp,
         ids: instance,
       });
-
       const meta: IMeta = {
         item: simplifyItemChild(item),
         parent: {
@@ -108,6 +107,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
 
       for (const child of Object.values(item.childs)) {
         if (child.name.startsWith("jsx:")) continue;
+
         genMeta(p, {
           item: child,
           is_root: false,

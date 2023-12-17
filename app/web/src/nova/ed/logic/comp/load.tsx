@@ -4,8 +4,8 @@ import { IItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG } from "../ed-global";
-import { pushTreeNode } from "../tree/build/push-tree";
 import { treeRebuild } from "../tree/build";
+import { pushTreeNode } from "../tree/build/push-tree";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -78,18 +78,18 @@ export const loadCompSnapshot = async (
                 decompress(res.sv)
               );
               Y.applyUpdate(doc as any, decompress(res.diff), "local");
+
               await p.sync.yjs.diff_local(
                 "comp",
                 comp_id,
                 Buffer.from(compress(diff_local))
               );
               const updated = updateComponentMeta(p, doc, comp_id);
-
               if (updated) {
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;
               }
-              await treeRebuild(p, { note: "comp-update" });
+              treeRebuild(p, { note: "load-comp" });
               p.render();
             }
           },
