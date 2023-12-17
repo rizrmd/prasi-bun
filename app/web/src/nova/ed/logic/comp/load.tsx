@@ -12,7 +12,7 @@ export const loadcomp = {
   pending: new Set<string>(),
 };
 
-export const loadComponent = async (p: PG, id_comp: string) => {
+export const loadComponent = async (p: PG, id_comp: string, sync?: boolean) => {
   return new Promise<boolean>((resolve) => {
     if (p.comp.list[id_comp]) {
       resolve(true);
@@ -22,14 +22,12 @@ export const loadComponent = async (p: PG, id_comp: string) => {
     loadcomp.pending.add(id_comp);
     clearTimeout(loadcomp.timeout);
     loadcomp.timeout = setTimeout(async () => {
-      const comps = await p.sync.comp.load([...loadcomp.pending]);
+      const comps = await p.sync.comp.load([...loadcomp.pending], sync);
       let result = Object.entries(comps);
 
       for (const [id_comp, comp] of result) {
-        for (const cur of Object.values(comp)) {
-          if (cur && cur.snapshot) {
-            await loadCompSnapshot(p, id_comp, cur.snapshot);
-          }
+        if (comp && comp.snapshot) {
+          await loadCompSnapshot(p, id_comp, comp.snapshot);
         }
       }
       loadcomp.pending.clear();

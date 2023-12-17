@@ -19,7 +19,7 @@ export const EdCompPreview = () => {
 
   useEffect(() => {
     if (!p.comp.list[comp_id] && !!comp_id) {
-      loadComponent(p, comp_id).then(() => {
+      loadComponent(p, comp_id, false).then(() => {
         p.render();
       });
     }

@@ -8,6 +8,7 @@ import { EDGlobal, active } from "../../../logic/ed-global";
 import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
+import { loadComponent } from "../../../logic/comp/load";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -18,13 +19,13 @@ export const EdCompPicker = () => {
         p.ui.popup.comp.open = async (comp_id) => {
           let comp_ref = p.comp.list[comp_id];
           if (!comp_ref) {
-            // await loadComponent(p, comp_id);
+            await loadComponent(p, comp_id);
             comp_ref = p.comp.list[comp_id];
           }
 
           if (!comp_ref) {
             alert("Cannot load component!");
-            return;
+            return; 
           }
 
           const comp = comp_ref.doc
