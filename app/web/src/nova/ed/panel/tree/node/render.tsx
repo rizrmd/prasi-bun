@@ -8,6 +8,7 @@ import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
+import { IContent } from "../../../../../utils/types/general";
 
 const jsxPropVis = {} as Record<string, string>;
 
@@ -92,6 +93,11 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         p.ui.tree.search = "";
         p.render();
         p.page.render();
+        if ((item as IContent).type === "text") {
+          setTimeout(() => {
+            (document.querySelector(".el-active") as any)?.focus();
+          }, 100);
+        }
       }}
       onMouseOver={() => {
         active.hover.id = item.id;
