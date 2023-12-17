@@ -31,7 +31,6 @@ export const SiteManager = () => {
       },
     });
 
-    console.log(orgs);
     if (orgs) {
       orgs.push({
         org: {

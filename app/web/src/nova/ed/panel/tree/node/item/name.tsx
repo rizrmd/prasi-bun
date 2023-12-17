@@ -42,6 +42,11 @@ export const EdTreeName = ({
           }}
           onBlur={() => {
             item.name = local.rename;
+
+            const mitem = node.data?.mitem;
+            if (mitem) {
+              mitem.set("name", item.name);
+            }
             p.ui.tree.rename_id = "";
             p.render();
           }}

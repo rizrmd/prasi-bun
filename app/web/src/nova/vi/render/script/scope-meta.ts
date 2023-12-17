@@ -21,21 +21,22 @@ export const getScopeMeta = (
     }
   }
 
-  for (const meta of scopes_meta) {
-    const def = meta.scope.def;
+  for (const m of scopes_meta) {
+    const def = m.scope.def;
     if (def) {
       if (def.passprop) {
         for (const p of Object.keys(def.passprop)) {
-          scope_meta[p] = { type: "passprop", meta };
+          console.log(meta.item.name, p, def.passprop)
+          scope_meta[p] = { type: "passprop", meta: m };
         }
       }
       if (def.props) {
         for (const p of Object.keys(def.props)) {
-          scope_meta[p] = { type: "jsxprop", meta };
+          scope_meta[p] = { type: "jsxprop", meta: m };
         }
       }
       if (def.local) {
-        scope_meta[def.local.name] = { type: "local", meta };
+        scope_meta[def.local.name] = { type: "local", meta: m };
       }
     }
   }
@@ -54,7 +55,3 @@ export const getScopeValue = (scope_meta: ReturnType<typeof getScopeMeta>) => {
 
   return scope;
 };
-
-// export const getScope = (vi: { meta: VG["meta"] }, meta: IMeta) => {
-
-// };
