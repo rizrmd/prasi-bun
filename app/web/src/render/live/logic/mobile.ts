@@ -1,4 +1,4 @@
-import { w } from "../../../utils/script/init-api";
+import { w } from "../../../utils/types/general";
 import { PG } from "./global";
 
 type NOTIF_ARG = {

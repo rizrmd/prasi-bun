@@ -1,12 +1,12 @@
 import { Root as ReactRoot, createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
+import { apiProxy } from "./base/load/api/api-proxy";
+import { dbProxy } from "./base/load/db/db-proxy";
 import { Root } from "./base/root";
 import "./index.css";
 import { registerMobile } from "./render/live/logic/mobile";
-import { reloadDBAPI } from "./utils/script/init-api";
-import { w } from "./utils/types/general";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
-import { dbClient } from "./base/load/db/client-db";
+import { w } from "./utils/types/general";
 
 const start = async () => {
   const base = `${location.protocol}//${location.host}`;
@@ -14,7 +14,12 @@ const start = async () => {
     root: null as null | ReactRoot,
   };
   w.mobile = registerMobile();
-  w.db = dbClient("prasi", location.origin);
+
+  const cur = new URL(location.href);
+  const base_url = `${cur.protocol}//${cur.host}`;
+  w.db = dbProxy(base_url);
+  w.api = apiProxy(base_url);
+
   w.serverurl = base;
 
   sworkerRegister(react);

@@ -119,7 +119,7 @@ export const EdPopUser = ({
                 </div>
               ))}
             </div>
-            {user.all.length > 0 && onAdd && (
+            {Array.isArray(user.all) && user.all.length > 0 && onAdd && (
               <Select
                 options={user.all
                   .filter((e) => {

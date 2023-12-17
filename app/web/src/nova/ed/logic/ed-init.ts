@@ -1,16 +1,17 @@
 import init from "wasm-gzip";
 import { jscript } from "../../../utils/script/jscript";
-import { dbClient } from "../../../base/load/db/client-db";
+import { dbProxy } from "../../../base/load/db/db-proxy";
 import { PG } from "./ed-global";
-import { fetchViaProxy } from "../../vi/load/proxy";
+import { fetchViaProxy } from "../../../base/load/proxy";
+import { ApiProxy, apiProxy } from "../../../base/load/api/api-proxy";
 
-let w = window as unknown as { db: ReturnType<typeof dbClient> };
+let w = window as unknown as {
+  db: ReturnType<typeof dbProxy>;
+  api: ApiProxy;
+};
 
 export const edInit = async (p: PG) => {
   p.status = "ready";
-
-  const cur = new URL(location.href);
-  w.db = dbClient("prasi", `${cur.protocol}//${cur.host}`);
 
   await init();
   jscript.init(p.render, { esbuild: false });

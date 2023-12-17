@@ -2,8 +2,8 @@ import { apiContext } from "../server/api/api-ctx";
 import { DBArg, execQuery } from "../utils/query";
 
 export const _ = {
-  url: "/_dbs/:dbName/:action",
-  async api(dbName: any, action?: string) {
+  url: "/_dbs/:action",
+  async api(action?: string) {
     const { req, res } = apiContext(this);
 
     try {

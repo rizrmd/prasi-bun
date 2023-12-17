@@ -1,7 +1,8 @@
 import Downshift from "downshift";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { createAPI, createDB } from "../../../../../utils/script/init-api";
+import { apiProxy } from "../../../../../base/load/api/api-proxy";
+import { dbProxy } from "../../../../../base/load/db/db-proxy";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal } from "../../../logic/ed-global";
 import { EdPropLabel } from "./prop-label";
@@ -27,8 +28,8 @@ export const EdPropInstanceOptions: FC<{
     if (!local.loaded) {
       try {
         if (p.site.config.api_url) {
-          if (!p.script.db) p.script.db = createDB(p.site.config.api_url);
-          if (!p.script.api) p.script.api = createAPI(p.site.config.api_url);
+          if (!p.script.db) p.script.db = dbProxy(p.site.config.api_url);
+          if (!p.script.api) p.script.api = apiProxy(p.site.config.api_url);
         }
 
         const args = {

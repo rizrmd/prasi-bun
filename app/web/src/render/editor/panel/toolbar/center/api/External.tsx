@@ -2,7 +2,6 @@ import { useGlobal } from "web-utils";
 import { EditorGlobal } from "../../../../logic/global";
 import { ExternalDeploy } from "./ExternalDeploy";
 import { w } from "../../../../logic/init";
-import { reloadDBAPI } from "../../../../../../utils/script/init-api";
 
 export const ExternalAPI = ({
   status,
@@ -88,11 +87,9 @@ export const ExternalAPI = ({
             if (w.externalAPI.mode === "dev") {
               p.site.api_url = w.externalAPI.devUrl;
               checkApi();
-              await reloadDBAPI(w.externalAPI.devUrl, "dev");
             } else {
               p.site.api_url = w.externalAPI.prodUrl;
               checkApi();
-              await reloadDBAPI(w.externalAPI.prodUrl, "dev");
             }
           }}
         >

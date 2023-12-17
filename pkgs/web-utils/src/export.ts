@@ -7,7 +7,4 @@ export * from "./page";
 export * from "./global";
 export * from "./define-react";
 export * from "./define-window";
-export * from './client-api';
-export * from './client-frame';
-export * from './client-db';
 export const React = _React;

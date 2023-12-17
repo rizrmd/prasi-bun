@@ -5,7 +5,6 @@ import trim from "lodash.trim";
 import { EditorGlobal } from "../../../../logic/global";
 import { Loading } from "../../../../../../utils/ui/loading";
 import { w } from "../../../../../../utils/types/general";
-import { reloadDBAPI } from "../../../../../../utils/script/init-api";
 
 export const InternalAPI: FC<{
   close: () => void;
@@ -178,10 +177,6 @@ export const InternalAPI: FC<{
                         config.api_url = `https://${p.site.api_prasi.port}.prasi.world`;
 
                         const base = trim(config.api_url, "/");
-
-                        try {
-                          await reloadDBAPI(base);
-                        } catch (e) {}
                       }
                     } catch (e) {
                       console.log(e);
@@ -198,16 +193,7 @@ export const InternalAPI: FC<{
 
           <div
             className={cx("cursor-pointer hover:underline")}
-            onClick={async () => {
-              local.clearingCache = true;
-              local.render();
-              try {
-                await reloadDBAPI(p.site.api_url, "dev");
-              } catch (e) {}
-              local.clearingCache = false;
-              local.render();
-              alert("API Cache Cleared");
-            }}
+            onClick={async () => {}}
           >
             {local.clearingCache ? "Clearing Cache..." : "Clear API Cache"}
           </div>

@@ -3,9 +3,9 @@ import { formatDistance } from "date-fns/esm";
 import trim from "lodash.trim";
 import { useEffect } from "react";
 import { deepClone, useGlobal, useLocal } from "web-utils";
-import { createAPI } from "../../../../../../utils/script/init-api";
 import { AutoHeightTextarea } from "../../../../../../utils/ui/auto-textarea";
 import { EditorGlobal } from "../../../../logic/global";
+import { apiProxy } from "../../../../../../base/load/api/api-proxy";
 
 const server = {
   status: "ready" as
@@ -40,7 +40,7 @@ export const ExternalDeploy = () => {
       try {
         const url = p.site.api_url;
 
-        local.api = createAPI(url);
+        local.api = apiProxy(url);
         let res = await local.api._deploy({
           type: "check",
           id_site: p.site.id,

@@ -43,7 +43,6 @@ export const serveStatic = {
         if (filename) {
           const path = join("static", filename);
           const file = Bun.file(dir.path(`app/${path}`));
-          console.log(_, filename);
           if (await file.exists()) {
             cache.static[`/${filename}`] = {
               type: mime.getType(path) || "application/octet-stream",

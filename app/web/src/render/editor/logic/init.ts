@@ -1,17 +1,12 @@
 import get from "lodash.get";
-import {
-  createAPI,
-  createDB,
-  initApi,
-  reloadDBAPI,
-} from "../../../utils/script/init-api";
+import { apiProxy } from "../../../base/load/api/api-proxy";
+import { dbProxy } from "../../../base/load/db/db-proxy";
+import { jscript } from "../../../utils/script/jscript";
+import { devLoader } from "../../live/dev-loader";
 import { LSite } from "../../live/logic/global";
 import { validateLayout } from "../../live/logic/layout";
 import importModule from "../tools/dynamic-import";
 import { EditorGlobal, PG } from "./global";
-import { devLoader } from "../../live/dev-loader";
-import { jscript } from "../../../utils/script/jscript";
-import { deepClone } from "web-utils";
 
 export const w = window as unknown as {
   basepath: string;
@@ -121,7 +116,7 @@ export const initEditor = async (p: PG, site_id: string) => {
       prodUrl: localStorage.getItem(`prasi-ext-prod-url-${p.site.id}`) || "",
     };
 
-    p.site.api_url = await initApi(site.config);
+    p.site.api_url = site.config.api_url;
 
     if (w.externalAPI.prodUrl !== p.site.api_url) {
       w.externalAPI.prodUrl = p.site.api_url;
@@ -129,7 +124,6 @@ export const initEditor = async (p: PG, site_id: string) => {
     }
     if (w.externalAPI.mode === "dev" && w.externalAPI.devUrl) {
       p.site.api_url = w.externalAPI.devUrl;
-      await reloadDBAPI(w.externalAPI.devUrl);
     }
 
     w.apiurl = p.site.api_url;
@@ -173,8 +167,8 @@ export const execSiteJS = (p: PG) => {
     };
 
     const fn = p.site.js_compiled;
-    scope["api"] = createAPI(p.site.api_url);
-    scope["db"] = createDB(p.site.api_url);
+    scope["api"] = apiProxy(p.site.api_url);
+    scope["db"] = dbProxy(p.site.api_url);
     const f = new Function(...Object.keys(scope), fn);
     try {
       const res = f(...Object.values(scope));

@@ -1,6 +1,7 @@
 import { FC, ReactNode, Suspense, useEffect } from "react";
 import { deepClone } from "web-utils";
-import { createAPI, createDB } from "../../../utils/script/init-api";
+import { apiProxy } from "../../../base/load/api/api-proxy";
+import { dbProxy } from "../../../base/load/db/db-proxy";
 import { ErrorBox } from "../elements/e-error";
 import { ItemMeta, PG } from "./global";
 
@@ -30,8 +31,8 @@ export const treeScopeEval = (
 
   // prepare args
   if (p.site.api_url) {
-    if (!p.script.db) p.script.db = createDB(p.site.api_url);
-    if (!p.script.api) p.script.api = createAPI(p.site.api_url);
+    if (!p.script.db) p.script.db = dbProxy(p.site.api_url);
+    if (!p.script.api) p.script.api = apiProxy(p.site.api_url);
   }
   const w = window as any;
 
