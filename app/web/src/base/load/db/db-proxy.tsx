@@ -80,7 +80,7 @@ const cachedQueryResult: Record<
 
 export const fetchSendDb = async (params: any, dburl: string) => {
   const base = new URL(dburl);
-  base.pathname = `/_dbs/`;
+  base.pathname = `/_dbs`;
   if (params.table) {
     base.pathname += `/${params.table}`;
   }

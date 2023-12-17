@@ -38,7 +38,7 @@ export const _ = {
         where: { id_site: site.id },
       });
 
-      if (cgroups) {
+      if (Array.isArray(cgroups)) {
         site.cgroup_ids = [];
         for (const id of cgroups.map((c) => c.use_id_site)) {
           site.cgroup_ids.push(id);

@@ -40,7 +40,9 @@ export const ToolbarCenter = () => {
       try {
         local.apiStatus = "starting";
         local.render();
-        await fetch(p.site.api_url + "/_prasi/_");
+        if (p.site.api_url) {
+          await fetch(p.site.api_url + "/_prasi/_");
+        }
         local.apiStatus = "started";
         local.render();
       } catch (e) {

@@ -22,7 +22,6 @@ export const SiteManager = () => {
   });
 
   const reloadSites = async () => {
-
     const orgs = await db.org_user.findMany({
       where: {
         id_user: p.session.data.user.id,
@@ -32,6 +31,7 @@ export const SiteManager = () => {
       },
     });
 
+    console.log(orgs);
     if (orgs) {
       orgs.push({
         org: {

@@ -29,7 +29,7 @@ export const devLoader: Loader = {
       select: { use_id_site: true },
     });
 
-    if (cgroups) {
+    if (Array.isArray(cgroups)) {
       site.cgroup_ids = [];
       for (const id of cgroups.map((c: any) => c.use_id_site)) {
         site.cgroup_ids.push(id);
@@ -46,7 +46,7 @@ export const devLoader: Loader = {
       select: { content_tree: true, id: true },
     });
 
-    if (layout) {
+    if (layout && layout.content_tree) {
       const childs = (layout.content_tree as any).childs;
       if (childs && childs.length > 0) {
         site.layout = childs[0];
