@@ -1,5 +1,6 @@
 import { component, page } from "dbgen";
 import {
+  EComp,
   EPage,
   ESite,
   IScopeComp,
@@ -45,7 +46,8 @@ export const SyncActions = {
       ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>
       ({}) as Record<string, { id: string; name: string; comps: string[] }>,
-    load: async (ids: string[]) => ({}) as Record<string, IScopeComp>,
+    load: async (ids: string[], sync?: boolean) =>
+      ({}) as Record<string, EComp>,
   },
   page: {
     list: async (id_site: string) =>

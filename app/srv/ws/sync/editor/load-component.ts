@@ -6,12 +6,10 @@ import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
 import { SyncConnection, SyncType } from "../type";
 
-export const loadComponent = async (comp_id: string, sync: SyncConnection) => {
+export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   let snap = snapshot.get("comp", comp_id);
   let ydoc = docs.comp[comp_id];
-  const conf = sync.conf;
-
-  if (!conf) return undefined;
+  const conf = sync?.conf;
 
   const createUndoManager = async (root: Y.Map<any>) => {
     const um = new Y.UndoManager(root, {
@@ -80,14 +78,16 @@ export const loadComponent = async (comp_id: string, sync: SyncConnection) => {
         id_doc: doc.clientID,
       });
 
-      user.active.add({
-        ...defaultActive,
-        client_id: sync.client_id,
-        user_id: sync.user_id,
-        site_id: conf.site_id,
-        page_id: conf.page_id,
-        comp_id: comp.id,
-      });
+      if (sync && sync.conf) {
+        user.active.add({
+          ...defaultActive,
+          client_id: sync.client_id,
+          user_id: sync.user_id,
+          site_id: sync.conf.site_id,
+          page_id: sync.conf.page_id,
+          comp_id: comp.id,
+        });
+      }
 
       return {
         id: comp_id,
@@ -110,14 +110,16 @@ export const loadComponent = async (comp_id: string, sync: SyncConnection) => {
       um,
     };
 
-    user.active.add({
-      ...defaultActive,
-      client_id: sync.client_id,
-      user_id: sync.user_id,
-      site_id: conf.site_id,
-      page_id: conf.page_id,
-      comp_id: comp_id,
-    });
+    if (sync && sync.conf) {
+      user.active.add({
+        ...defaultActive,
+        client_id: sync.client_id,
+        user_id: sync.user_id,
+        site_id: sync.conf.site_id,
+        page_id: sync.conf.page_id,
+        comp_id: comp_id,
+      });
+    }
 
     return {
       id: comp_id,
@@ -125,14 +127,16 @@ export const loadComponent = async (comp_id: string, sync: SyncConnection) => {
       snapshot: await gzipAsync(snap.bin),
     };
   } else if (snap && ydoc) {
-    user.active.add({
-      ...defaultActive,
-      client_id: sync.client_id,
-      user_id: sync.user_id,
-      site_id: conf.site_id,
-      page_id: conf.page_id,
-      comp_id: comp_id,
-    });
+    if (sync && sync.conf) {
+      user.active.add({
+        ...defaultActive,
+        client_id: sync.client_id,
+        user_id: sync.user_id,
+        site_id: sync.conf.site_id,
+        page_id: sync.conf.page_id,
+        comp_id: comp_id,
+      });
+    }
 
     return {
       id: snap.id,
