@@ -105,19 +105,30 @@ export const mainPerItemVisit = (
       meta
     );
 
-    if (active.comp_id) {
-      if (m && m.parent?.comp_id === active.comp_id) {
-        if (m.item.originalId) {
-          active.item_id = m.item.originalId;
-        }
-      } else if (meta.parent?.comp_id === active.comp_id) {
-        active.item_id = meta.item.originalId || meta.item.id;
-      } else {
-        active.comp_id = "";
-      }
+    if (
+      m &&
+      active.item_id === m.item.id &&
+      m.item.component?.id &&
+      active.comp_id !== m.item.component.id
+    ) {
+      active.comp_id = m.item.component.id;
     } else {
-      if (m) {
-        active.item_id = m.item.id;
+      if (active.comp_id) {
+        if (meta.item.component?.id === active.comp_id) {
+          active.item_id = meta.item.id;
+        } else if (m && m.parent?.comp_id === active.comp_id) {
+          if (m.item.originalId) {
+            active.item_id = m.item.originalId;
+          }
+        } else if (meta.parent?.comp_id === active.comp_id) {
+          active.item_id = meta.item.originalId || meta.item.id;
+        } else {
+          active.comp_id = "";
+        }
+      } else {
+        if (m) {
+          active.item_id = m.item.id;
+        }
       }
     }
     active.hover.id = "";

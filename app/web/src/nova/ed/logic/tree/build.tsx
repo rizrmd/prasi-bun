@@ -35,6 +35,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     if (item) {
       genMeta(
         {
+          note: "tree-rebuild",
           comps: p.comp.loaded,
           meta,
           smeta: p.page.smeta,

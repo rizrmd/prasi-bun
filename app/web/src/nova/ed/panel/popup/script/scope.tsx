@@ -33,8 +33,10 @@ export const declareScope = async (
   for (const m of parents) {
     if (active.comp_id && m.parent?.id === "root" && active.instance) {
       const meta = p.page.meta[active.instance.item_id];
-      if (!m.scope.def) m.scope.def = {};
-      m.scope.def.props = meta.scope?.def?.props;
+      if (meta) {
+        if (!m.scope.def) m.scope.def = {};
+        m.scope.def.props = meta.scope?.def?.props;
+      }
     }
 
     const def = m.scope.def;
