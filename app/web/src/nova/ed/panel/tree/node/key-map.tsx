@@ -158,8 +158,12 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
       let found = null as HTMLInputElement | null;
 
       const meta = getMetaById(p, item.id);
-      if (meta) {
-        meta.parent_item.mitem?.get("childs")?.forEach((e) => {
+      const pmeta = active.comp_id
+        ? p.comp.list[active.comp_id].meta
+        : p.page.meta;
+      if (meta && meta.parent?.id) {
+        const parent = pmeta[meta.parent.id];
+        parent?.mitem?.get("childs")?.forEach((e) => {
           if (e.get("id") === item.id) {
             found = document.querySelector(`.tree-${last}`);
           }
@@ -169,7 +173,7 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
         });
 
         if (!found) {
-          last = meta.parent_item.mitem?.get("id") || "";
+          last = meta.parent.id;
           found = document.querySelector(`.tree-${last}`);
         }
       }
@@ -184,13 +188,15 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
 
     if (e.key.length === 1 && !e.altKey && !e.metaKey && !e.shiftKey) {
       const meta = getMetaById(p, item.id);
-      if (meta && meta.item.type === 'text') {
+      if (meta && (meta.item as IContent).type === "text") {
         setTimeout(() => {
-          const vtext = document.querySelector(`.v-text-${item.id}`) as HTMLInputElement;
+          const vtext = document.querySelector(
+            `.v-text-${item.id}`
+          ) as HTMLInputElement;
           if (vtext) {
-            vtext.focus()
+            vtext.focus();
           }
-        })
+        });
       } else {
         p.ui.tree.search_ref?.focus();
       }
