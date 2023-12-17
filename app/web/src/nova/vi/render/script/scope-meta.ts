@@ -26,7 +26,6 @@ export const getScopeMeta = (
     if (def) {
       if (def.passprop) {
         for (const p of Object.keys(def.passprop)) {
-          console.log(meta.item.name, p, def.passprop)
           scope_meta[p] = { type: "passprop", meta: m };
         }
       }
