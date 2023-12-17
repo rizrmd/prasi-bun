@@ -84,7 +84,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
                 name,
               },
               parent: {
-                item,
+                item: meta.item,
                 instance_id: item.id,
                 comp: pcomp.comp,
               },

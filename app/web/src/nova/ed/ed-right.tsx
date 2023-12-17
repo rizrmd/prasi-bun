@@ -12,7 +12,7 @@ export const EdRight = () => {
     meta?.item.type === "item" &&
     meta?.item.component?.id &&
     meta?.item.component.id !== active.comp_id;
-  const showProp = isComponent && p.ui.side.prop;
+
   return (
     <div
       className={cx(

@@ -142,6 +142,13 @@ export const updateComponentMeta = async (
       meta,
       on: {
         visit(m) {
+          if (m.item.originalId) {
+            m.item.id = m.item.originalId;
+            meta[m.item.id] = m;
+            delete meta[m.item.originalId];
+            delete m.item.originalId;
+          }
+
           pushTreeNode(p, m, meta, tree);
 
           if (m.parent) {
@@ -151,11 +158,18 @@ export const updateComponentMeta = async (
               }
             } else {
               const parent = meta[m.parent.id];
-
-              if (parent.mitem) {
+              if (parent && parent.mitem) {
                 parent.mitem.get("childs")?.forEach((child) => {
-                  if (child.get("id") === m.item.id) {
-                    m.mitem = child;
+                  const cid = child.get("id");
+                  if (cid) {
+                    if (
+                      cid === m.item.id ||
+                      (m.instances &&
+                        m.instances[cid] &&
+                        m.instances[cid][m.item.id])
+                    ) {
+                      m.mitem = child;
+                    }
                   }
                 });
               }
