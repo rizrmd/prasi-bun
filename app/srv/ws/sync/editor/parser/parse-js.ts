@@ -80,6 +80,12 @@ export const parseJs = (meta: IMeta) => {
                       value: code.substring(loc.start.index, loc.end.index),
                       index: loc.start.index,
                     };
+                  } else if (attr.value.loc) {
+                    const loc = attr.value.loc as any;
+                    passprop[attr.name.name] = {
+                      value: code.substring(loc.start.index, loc.end.index),
+                      index: loc.start.index,
+                    };
                   }
                 }
               }

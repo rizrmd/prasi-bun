@@ -4,7 +4,21 @@ import { loadApiProxyDef } from "./api-proxy-def";
 
 export type ApiProxy<T extends Record<string, any> = {}> = any;
 
+const apiProxyPending: Record<string, Promise<void>> = {};
+
 export const apiProxy = (api_url: string) => {
+  if (!w.prasiApi) {
+    w.prasiApi = {};
+  }
+
+  const base = new URL(api_url);
+  const base_url = `${base.protocol}//${base.host}`;
+  if (!w.prasiApi[base_url]) {
+    if (!apiProxyPending[base_url]) {
+      apiProxyPending[base_url] = loadApiProxyDef(base_url, false);
+    }
+  }
+
   return new Proxy(
     {},
     {
@@ -16,20 +30,12 @@ export const apiProxy = (api_url: string) => {
           ) {
             return new Promise<any>(async (resolve, reject) => {
               try {
-                let base_url = api_url;
-                if (typeof this?.api_url === "string") {
-                  base_url = this.api_url;
+                let api_def = w.prasiApi[base_url];
+
+                if (!api_def) {
+                  await apiProxyPending[base_url];
                 }
 
-                if (!w.prasiApi) {
-                  w.prasiApi = {};
-                }
-
-                if (!w.prasiApi[base_url]) {
-                  await loadApiProxyDef(base_url, false);
-                }
-
-                const api_def = w.prasiApi[base_url];
                 if (api_def) {
                   if (!api_def.apiEntry) api_def.apiEntry = {};
                   if (api_def.apiEntry && !api_def.apiEntry[actionName]) {

@@ -39,6 +39,26 @@ effect={async (local) => {
         }}
       >
         &lt;Local/&gt;
+      </Button>{" "}
+      <Button
+        className={cx(css`
+          width: auto !important;
+          padding-left: 5px;
+          padding-right: 5px;
+          font-size: 12px;
+        `)}
+        onClick={() => {
+          p.script.do_edit(
+            `\
+<PassProp idx={0}>
+{children}
+</PassProp>
+    `,
+            false
+          );
+        }}
+      >
+        &lt;Passprop/&gt;
       </Button>
     </div>
   );

@@ -19,43 +19,48 @@ export const monacoTypings = async (
   if (!map.has(prop.values)) {
     map.set(prop.values, true);
   } else {
-    return;
+    return; 
   }
 
-  if (w.prasiApi[p.site.api_url] && w.prasiApi[p.site.api_url].prismaTypes) {
-    const prisma = w.prasiApi[p.site.api_url].prismaTypes;
+  const prasi_api = w.prasiApi[p.site.api_url];
+  if (prasi_api) {
+    if (prasi_api && prasi_api.prismaTypes) {
+      const prisma = prasi_api.prismaTypes;
 
-    register(
-      monaco,
-      `\
+      if (prisma) {
+        register(
+          monaco,
+          `\
 declare module "ts:runtime/index" {
   ${prisma["runtime/index.d.ts"]}
 }`,
-      `ts:runtime/index.d.ts`
-    );
+          `ts:runtime/index.d.ts`
+        );
 
-    register(
-      monaco,
-      `\
+        register(
+          monaco,
+          `\
 declare module "ts:runtime/library" {
   ${prisma["runtime/library.d.ts"]}
 }`,
-      `ts:runtime/library.d.ts`
-    );
+          `ts:runtime/library.d.ts`
+        );
 
-    register(
-      monaco,
-      `\
+        register(
+          monaco,
+          `\
 declare module "ts:prisma" {
   ${prisma["prisma.d.ts"].replace(
     `import * as runtime from './runtime/library';`,
     `import * as runtime from 'ts:runtime/library';`
   )}
 }`,
-      `ts:prisma.d.ts`
-    );
-
-    register(monaco, w.prasiApi[p.site.api_url].apiTypes, "ts:api.d.ts");
+          `ts:prisma.d.ts`
+        );
+      }
+      const api_types = prasi_api.apiTypes;
+      if (api_types) register(monaco, api_types, "ts:api.d.ts");
+    }
   }
 
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([

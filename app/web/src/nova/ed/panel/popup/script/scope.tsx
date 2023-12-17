@@ -42,12 +42,34 @@ export const declareScope = async (
       if (def.local) {
         addScope({
           monaco,
-          loc: { item_id: m.item.id, type: "item" },
+          loc: {
+            item_id: m.item.id,
+            comp_id: m.parent?.comp_id,
+            type: "item",
+          },
           source: `\
 export const {};
 declare global {
   const ${def.local.name} = ${def.local.value};
 }`,
+        });
+      } else if (def.passprop) {
+        Object.keys(def.passprop).map((e) => {
+          if (e !== "idx" && e !== "key") {
+            addScope({
+              monaco,
+              loc: {
+                item_id: m.item.id,
+                comp_id: m.parent?.comp_id,
+                type: "item",
+              },
+              source: `\
+export const {};
+declare global {
+  const ${e} = null as any;
+}`,
+            });
+          }
         });
       } else if (def.props) {
         Object.keys(def.props).map((e) => {
