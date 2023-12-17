@@ -17,21 +17,35 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     showJSX: false,
   });
 
-  const item = meta?.item as IItem;
-  if (!item) return null;
+  let _meta = meta;
+  if (active.comp_id) {
+    if (
+      p.comp.list[active.comp_id] &&
+      p.comp.list[active.comp_id].meta &&
+      meta.item.originalId
+    ) {
+      const m = p.comp.list[active.comp_id].meta[meta.item.originalId];
+      if (m) {
+        _meta = m;
+      }
+    }
+  }
+
+  const item = _meta?.item as IItem;
+  if (!item) return <>Warning: Item not found</>;
 
   let filtered = [] as { mprop: FMCompDef; name: string }[];
-  const mprops = meta.mitem?.get("component")?.get("props");
-  const comp_id = meta.mitem?.get("component")?.get("id") || "";
+  const mprops = _meta.mitem?.get("component")?.get("props");
+  const comp_id = _meta.mitem?.get("component")?.get("id") || "";
 
-  if (!p.comp.list[comp_id]) return null;
+  if (!p.comp.list[comp_id]) return <>Warning: Component not found</>;
   const mcprops = p.comp.list[comp_id].doc
     .getMap("map")
     .get("root")
     ?.get("component")
     ?.get("props");
 
-  if (mprops && meta.mitem && mcprops) {
+  if (mprops && _meta.mitem && mcprops) {
     mcprops.forEach((m, key) => {
       let mprop = mprops.get(key);
 
@@ -67,12 +81,12 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     <div className="flex flex-1 flex-col text-[12px]">
       <div className="flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none">
         <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
-          {meta.item.name}
+          {_meta.item.name}
         </div>
         <div
           className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
           onClick={() => {
-            const item = meta.item as IItem;
+            const item = _meta.item as IItem;
 
             const comp_id = item.component?.id;
 

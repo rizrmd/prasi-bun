@@ -25,6 +25,7 @@ export const mainPerItemVisit = (
         e.currentTarget.blur();
       }
     };
+
     parts.props.onBlur = (e) => {
       p.page.prevent_rebuild = false;
       p.render();
@@ -79,7 +80,16 @@ export const mainPerItemVisit = (
   );
   parts.props.onPointerOver = (e) => {
     e.stopPropagation();
-    active.hover.id = meta.item.id;
+
+    if (active.comp_id) {
+      if (meta.parent?.comp_id === active.comp_id && meta.item.originalId) {
+        active.hover.id = meta.item.originalId;
+      } else {
+        active.hover.id = meta.item.id;
+      }
+    } else {
+      active.hover.id = meta.item.id;
+    }
     active.hover.renderMain();
     active.hover.renderTree();
   };
@@ -122,8 +132,15 @@ export const mainPerItemVisit = (
           }
         } else if (meta.parent?.comp_id === active.comp_id) {
           active.item_id = meta.item.originalId || meta.item.id;
-        } else {
-          active.comp_id = "";
+        } else if (m) {
+          if (m.mitem) {
+            active.comp_id = "";
+          } else if (m.parent?.comp_id && m.parent?.instance_id) {
+            const pmeta = p.page.meta[m.parent.instance_id];
+            if (pmeta.item.originalId) {
+              active.item_id = pmeta.item.originalId;
+            }
+          }
         }
       } else {
         if (m) {
@@ -141,7 +158,7 @@ const getOuterMeta = (p: { meta: Record<string, IMeta> }, meta: IMeta) => {
 
   if (cur.jsx_prop) return meta;
 
-  while (cur?.parent?.instance_id) {
+  while (cur?.parent?.instance_id && p.meta[cur?.parent?.instance_id]) {
     cur = p.meta[cur?.parent?.instance_id];
   }
 

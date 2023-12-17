@@ -44,9 +44,9 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
   }
   if (item.id) {
     if (p.set_meta !== false) {
-      p.meta[item.id] = meta;
+      p.meta[meta.item.id] = meta;
     }
-  }
+  } 
 
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
@@ -54,7 +54,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
         item: v,
         is_root: false,
         parent: {
-          item,
+          item: meta.item,
           instance_id: arg.parent?.instance_id,
           comp: arg.parent?.comp,
         },
