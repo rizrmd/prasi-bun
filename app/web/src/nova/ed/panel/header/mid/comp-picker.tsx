@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { useGlobal } from "web-utils";
-import { MContent } from "../../../../../utils/types/general";
+import { IContent, MContent } from "../../../../../utils/types/general";
 import { IItem, MItem } from "../../../../../utils/types/item";
 import { MRoot } from "../../../../../utils/types/root";
 import { ISection, MSection } from "../../../../../utils/types/section";
@@ -25,7 +25,7 @@ export const EdCompPicker = () => {
 
           if (!comp_ref) {
             alert("Cannot load component!");
-            return; 
+            return;
           }
 
           const comp = comp_ref.doc
@@ -39,32 +39,35 @@ export const EdCompPicker = () => {
           }
 
           let active_meta = getMetaById(p, active.item_id);
-          // const root = getMRoot(p);
-          // if (!active_meta) {
-          //   alert("Please select an item/section to add component!");
-          // } else {
-          //   let item = active_meta.item;
-          //   if (item.type === "item" && item.component?.id) {
-          //     active_meta = getMetaById(p, active_meta.parent_item.id);
+          if (!active_meta) {
+            alert("Please select an item/section to add component!");
+          } else {
+            let item = active_meta.item as IContent;
+            if (
+              item.type === "item" &&
+              item.component?.id &&
+              active_meta.parent?.id
+            ) {
+              active_meta = getMetaById(p, active_meta.parent.id);
 
-          //     if (active_meta) {
-          //       item = active_meta.item;
-          //     } else {
-          //       alert("Failed to add component!");
-          //       return;
-          //     }
-          //   }
+              if (active_meta) {
+                item = active_meta.item;
+              } else {
+                alert("Failed to add component!");
+                return;
+              }
+            }
 
-          //   const mitem = active_meta.mitem;
+            const mitem = active_meta.mitem;
 
-          //   if (item && mitem) {
-          //     if (item.type !== "text") {
-          //       addComponent(mitem as MItem, comp);
-          //     }
-          //   } else {
-          //     alert("Failed to add component!");
-          //   }
-          // }
+            if (item && mitem) {
+              if (item.type !== "text") {
+                addComponent(mitem as MItem, comp);
+              }
+            } else {
+              alert("Failed to add component!");
+            }
+          }
         };
         p.render();
       }}
