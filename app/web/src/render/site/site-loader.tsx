@@ -1,4 +1,4 @@
-import { w } from "../../utils/script/init-api";
+import { w } from "../../utils/types/general";
 import { Loader } from "../live/logic/global";
 
 const base = `/_web/${(window as any).id_site}`;

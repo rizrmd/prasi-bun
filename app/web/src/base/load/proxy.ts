@@ -47,11 +47,16 @@ export const fetchViaProxy = async (
   const cur = new URL(location.href);
   const base = new URL(url);
   if (cur.host === base.host) {
-    const res = await fetch(base.pathname, {
-      method: "POST",
-      body,
-      headers,
-    });
+    const res = await fetch(
+      base.pathname,
+      data
+        ? {
+            method: "POST",
+            body,
+            headers,
+          }
+        : undefined
+    );
     const raw = await res.text();
     try {
       return JSON.parse(raw);
@@ -59,17 +64,15 @@ export const fetchViaProxy = async (
       return raw;
     }
   } else {
-    console.log(url);
-    return null;
-    // const res = await fetch(`/_proxy`, {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     url,
-    //     body,
-    //     headers,
-    //   }),
-    //   headers: { "content-type": "application/json" },
-    // });
-    // return res.json();
+    const res = await fetch(`/_proxy`, {
+      method: "POST",
+      body: JSON.stringify({
+        url,
+        body,
+        headers,
+      }),
+      headers: { "content-type": "application/json" },
+    });
+    return res.json();
   }
 };

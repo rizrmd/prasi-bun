@@ -1,4 +1,4 @@
-import { w } from "../../utils/script/init-api";
+import { w } from "../../utils/types/general";
 import { Loader } from "../live/logic/global";
 
 const cache = {
@@ -55,7 +55,7 @@ export const mobileLoader: Loader = {
 };
 
 const load = async (url: string) => {
-  const res = await fetch(`${w.mobilepath}${url}`);
+  const res = await fetch(`${(w as any).mobilepath}${url}`);
   try {
     const text = await res.text();
     const json = JSON.parse(text);

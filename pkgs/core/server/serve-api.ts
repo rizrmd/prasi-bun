@@ -1,7 +1,6 @@
 import { createRouter } from "radix3";
 import { g } from "utils/global";
 import { createResponse } from "./api/api-ctx";
-import { prepareApiRoutes } from "./api/api-scan";
 
 export const serveAPI = {
   init: async () => {

@@ -1,6 +1,7 @@
 import { IContent } from "../../../../utils/types/general";
 import { VG } from "../../../vi/render/global";
 import { IMeta, PG, active } from "../../logic/ed-global";
+import { treeRebuild } from "../../logic/tree/build";
 
 type MPIVParam = Parameters<Exclude<VG["visit"], undefined>>;
 export const mainPerItemVisit = (
@@ -58,6 +59,12 @@ export const mainPerItemVisit = (
   };
   parts.props.onPointerDown = (e) => {
     e.stopPropagation();
+
+    if (active.comp_id && !p.comp.list[active.comp_id]) {
+      active.comp_id = "";
+      treeRebuild(p);
+      return;
+    }
 
     const item = getOuterItem(
       {

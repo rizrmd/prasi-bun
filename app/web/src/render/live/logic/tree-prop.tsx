@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { createAPI, createDB } from "../../../utils/script/init-api";
+import { apiProxy } from "../../../base/load/api/api-proxy";
+import { dbProxy } from "../../../base/load/db/db-proxy";
 import { FNCompDef } from "../../../utils/types/meta-fn";
 import { LItem } from "../elements/l-item";
 import { PG } from "./global";
@@ -19,8 +20,8 @@ export const treePropEval = (
 
   if (meta.item.type === "item" && meta.item.component) {
     if (p.site.api_url) {
-      if (!p.script.db) p.script.db = createDB(p.site.api_url);
-      if (!p.script.api) p.script.api = createAPI(p.site.api_url);
+      if (!p.script.db) p.script.db = dbProxy(p.site.api_url);
+      if (!p.script.api) p.script.api = apiProxy(p.site.api_url);
     }
 
     const props = meta.item.component.props;

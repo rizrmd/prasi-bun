@@ -1,7 +1,7 @@
 import { createRouter } from "radix3";
 import { validate } from "uuid";
-import { type apiClient } from "web-utils";
-import { createAPI, createDB, initApi } from "../../../utils/script/init-api";
+import { apiProxy } from "../../../base/load/api/api-proxy";
+import { dbProxy } from "../../../base/load/db/db-proxy";
 import importModule from "../../editor/tools/dynamic-import";
 import { LSite, PG } from "./global";
 import { validateLayout } from "./layout";
@@ -17,7 +17,6 @@ export const w = window as unknown as {
   isDesktop: boolean;
   exports: any;
   params: any;
-  apiClient: typeof apiClient;
   apiurl: string;
   preload: (path: string) => void;
   mobile?: ReturnType<typeof registerMobile>;
@@ -94,7 +93,7 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
 
       await validateLayout(p);
 
-      p.site.api_url = await initApi(site.config, "prod");
+      p.site.api_url = site.config.api_url || "";
 
       w.apiurl = p.site.api_url;
 
@@ -104,8 +103,8 @@ export const initLive = async (p: PG, domain_or_siteid: string) => {
       const exec = (fn: string, scopes: any) => {
         if (p) {
           if (p.site.api_url) {
-            scopes["api"] = createAPI(p.site.api_url);
-            scopes["db"] = createDB(p.site.api_url);
+            scopes["api"] = apiProxy(p.site.api_url);
+            scopes["db"] = dbProxy(p.site.api_url);
           }
           if (!w.params) {
             w.params = {};

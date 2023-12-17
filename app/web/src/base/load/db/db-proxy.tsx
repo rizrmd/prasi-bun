@@ -1,8 +1,7 @@
-import { waitUntil } from "web-utils";
-import { createFrameCors } from "./client-frame";
 import hash_sum from "hash-sum";
+import { fetchViaProxy } from "../proxy";
 
-export const dbClient = (name: string, dburl?: string) => {
+export const dbProxy = (dburl: string) => {
   return new Proxy(
     {},
     {
@@ -10,7 +9,6 @@ export const dbClient = (name: string, dburl?: string) => {
         if (table === "_tables") {
           return () => {
             return fetchSendDb(
-              name,
               {
                 name,
                 action: "definition",
@@ -24,7 +22,6 @@ export const dbClient = (name: string, dburl?: string) => {
         if (table === "_definition") {
           return (table: string) => {
             return fetchSendDb(
-              name,
               {
                 name,
                 action: "definition",
@@ -38,7 +35,6 @@ export const dbClient = (name: string, dburl?: string) => {
         if (table.startsWith("$")) {
           return (...params: any[]) => {
             return fetchSendDb(
-              name,
               {
                 name,
                 action: "query",
@@ -60,7 +56,6 @@ export const dbClient = (name: string, dburl?: string) => {
                   action = "query";
                 }
                 return fetchSendDb(
-                  name,
                   {
                     name,
                     action,
@@ -83,37 +78,13 @@ const cachedQueryResult: Record<
   { timestamp: number; result: any; promise: Promise<any> }
 > = {};
 
-export const fetchSendDb = async (
-  name: string,
-  params: any,
-  dburl?: string
-) => {
-  const w = typeof window === "object" ? window : (globalThis as any);
-  let url = `/_dbs/${name}`;
-  let frm: Awaited<ReturnType<typeof createFrameCors>>;
-
+export const fetchSendDb = async (params: any, dburl: string) => {
+  const base = new URL(dburl);
+  base.pathname = `/_dbs/`;
   if (params.table) {
-    url += `/${params.table}`;
+    base.pathname += `/${params.table}`;
   }
-
-  const _base = dburl || w.serverurl;
-
-  if (!w.frmapi) {
-    w.frmapi = {};
-  }
-
-  if (!w.frmapi[_base]) {
-    w.frmapi[_base] = await createFrameCors(_base);
-  }
-
-  frm = w.frmapi[_base];
-
-  if (!frm) {
-    await waitUntil(() => {
-      frm = w.frmapi[_base];
-      return frm;
-    });
-  }
+  const url = base.toString();
 
   const hsum = hash_sum(params);
   const cached = cachedQueryResult[hsum];
@@ -121,7 +92,9 @@ export const fetchSendDb = async (
   if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
     cachedQueryResult[hsum] = {
       timestamp: Date.now(),
-      promise: frm.send(url, params, w.apiHeaders),
+      promise: fetchViaProxy(url, params, {
+        "content-type": "application/json",
+      }),
       result: null,
     };
 

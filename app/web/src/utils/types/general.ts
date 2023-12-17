@@ -12,12 +12,12 @@ export type PageProps = {
 
 export type PrasiAPI = {
   apiEntry: any;
-  prismaTypes: {
+  prismaTypes?: {
     "prisma.d.ts": string;
     "runtime/library.d.ts": string;
     "runtime/index.d.ts": string;
   };
-  apiTypes: string;
+  apiTypes?: string;
 };
 
 export const w = window as unknown as {
@@ -32,6 +32,7 @@ export const w = window as unknown as {
   editorGlbDefault: string;
   ts: number;
   serverurl: string;
+  apiurl: string;
   api: any;
   db: any;
   offline: boolean;
