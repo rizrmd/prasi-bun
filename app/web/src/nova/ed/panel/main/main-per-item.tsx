@@ -25,7 +25,7 @@ export const mainPerItemVisit = (
   meta: MPIVParam[0],
   parts: MPIVParam[1]
 ) => {
-  if ((meta.item as IContent).type === "text" && !meta.item.adv?.jsBuilt) {
+  if ((meta.item as IContent).type === "text" && !meta.item.adv?.js) {
     parts.props.spellCheck = false;
     parts.props.contentEditable = true;
     if (meta.parent?.comp_id) {

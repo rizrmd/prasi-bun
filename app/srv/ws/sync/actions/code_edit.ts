@@ -38,7 +38,11 @@ export const code_edit: SAction["code"]["edit"] = async function (
       const mitem = findId(root, item_id);
 
       if (mitem) {
-        const adv = mitem.get("adv");
+        let adv = mitem.get("adv");
+        if (!adv) {
+          mitem.set("adv", new Y.Map() as any);
+          adv = mitem.get("adv");
+        }
 
         if (adv) {
           const res = await transform(`render(${src})`, {
@@ -48,10 +52,13 @@ export const code_edit: SAction["code"]["edit"] = async function (
             minify: true,
             sourcemap: "inline",
           });
+
           doc?.transact(() => {
-            adv.set(mode, src);
-            if (mode === "js") {
-              adv.set("jsBuilt", res.code);
+            if (adv) {
+              adv.set(mode, src);
+              if (mode === "js") {
+                adv.set("jsBuilt", res.code);
+              }
             }
           });
         }

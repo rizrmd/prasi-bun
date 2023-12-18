@@ -25,7 +25,6 @@ export const EdPopScript = () => {
 
               if (script.type === "item") {
                 delete p.script.init_local_effect[active.item_id];
-                treeRebuild(p, { note: "script-close" });
               }
 
               p.render();

@@ -229,8 +229,10 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
           meta,
           on: {
             visit(meta) {
-              if (typeof meta.item.adv?.js === "string") {
-                meta.scope.def = parseJs(meta);
+              if (!meta.parent?.comp_id) {
+                if (typeof meta.item.adv?.js === "string") {
+                  meta.scope.def = parseJs(meta);
+                }
               }
             },
           },
@@ -242,7 +244,23 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
 
   const comps: EPage["comps"] = {};
   for (const [id, snap] of Object.entries(msnap)) {
-    comps[id] = { id, snapshot: await gzipAsync(snap.bin) };
+    const meta = {};
+    genMeta(
+      {
+        comps: {},
+        meta,
+        on: {
+          visit(meta) {
+            if (typeof meta.item.adv?.js === "string") {
+              meta.scope.def = parseJs(meta);
+            }
+          },
+        },
+      },
+      { item: mcomps[id].comp }
+    );
+
+    comps[id] = { id, meta, snapshot: await gzipAsync(snap.bin) };
   }
 
   return { meta: simplifyMeta(meta), comps, entry };

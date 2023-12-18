@@ -56,6 +56,7 @@ const EmptyPage = {
 
 const EmptyComp = {
   id: "",
+  meta: {} as Record<string, ISimpleMeta>,
   snapshot: null as null | Uint8Array,
 };
 

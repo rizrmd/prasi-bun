@@ -1,8 +1,9 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { updatePropScope } from "./eval-prop";
 
 export const createViLocal = (
+  metas: Record<string, IMeta>,
   meta: IMeta,
   scope: any,
   init_local_effect: any
@@ -32,10 +33,24 @@ export const createViLocal = (
     }
 
     useEffect(() => {
-      let should_run = !init_local_effect[meta.item.id];
+      let id = meta.item.id;
+      if (meta.parent?.instance_id) {
+        const parent_meta = metas[meta.parent?.instance_id];
+        if (parent_meta && parent_meta.instances) {
+          for (const [k, v] of Object.entries(
+            parent_meta.instances[meta.parent.instance_id]
+          )) {
+            if (v === meta.item.id) {
+              id = k;
+              break;
+            }
+          }
+        }
+      }
+      let should_run = !init_local_effect[id];
       if (should_run) {
         if (typeof init_local_effect === "object") {
-          init_local_effect[meta.item.id] = true;
+          init_local_effect[id] = true;
         }
         const fn = async () => {
           if (arg.effect) {
