@@ -46,14 +46,15 @@ export const EdCompPicker = () => {
             if (
               item.type === "item" &&
               item.component?.id &&
-              active_meta.parent?.id
+              active_meta.parent?.id &&
+              item.component?.id !== active.comp_id
             ) {
               active_meta = getMetaById(p, active_meta.parent.id);
 
               if (active_meta) {
                 item = active_meta.item;
               } else {
-                alert("Failed to add component!");
+                alert("Warning: Please edit component first before adding. ");
                 return;
               }
             }

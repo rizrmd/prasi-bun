@@ -28,6 +28,11 @@ export const mainPerItemVisit = (
   if ((meta.item as IContent).type === "text" && !meta.item.adv?.jsBuilt) {
     parts.props.spellCheck = false;
     parts.props.contentEditable = true;
+    if (meta.parent?.comp_id) {
+      if (meta.parent.comp_id !== active.comp_id) {
+        parts.props.contentEditable = false;
+      }
+    }
 
     parts.props.onBlur = (e) => {
       text_edit.prevent_select_all = false;
@@ -104,6 +109,8 @@ export const mainPerItemVisit = (
     is_active && "el-active",
     is_active &&
       css`
+        outline: none;
+
         &::after {
           content: " ";
           pointer-events: none;
