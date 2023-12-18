@@ -153,7 +153,6 @@ export const EDGlobal = {
     entry: [] as string[],
     tree: [] as NodeModel<IMeta>[],
     render: () => {},
-    prevent_rebuild: false,
   },
   comp: {
     doc: null as null | DComp,

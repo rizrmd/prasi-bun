@@ -1,13 +1,23 @@
 import { IContent } from "../../../../utils/types/general";
+import {
+  getSelectionOffset,
+  setSelectionOffset,
+} from "../../../../utils/ui/selection";
 import { VG } from "../../../vi/render/global";
 import { activateMeta } from "../../logic/active/activate-meta";
 import { isMetaActive } from "../../logic/active/is-meta.active";
 import { PG, active } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
+import { edActionDelete } from "../tree/node/item/action/del";
 
 type MPIVParam = Parameters<Exclude<VG["visit"], undefined>>;
 
-const text_edit = { timeout: null as any };
+const text_edit = {
+  timeout: null as any,
+  caret: null as any,
+  prevent_select_all: false,
+  id: null as any,
+};
 
 export const mainPerItemVisit = (
   p: PG,
@@ -17,28 +27,48 @@ export const mainPerItemVisit = (
   if ((meta.item as IContent).type === "text" && !meta.item.adv?.jsBuilt) {
     parts.props.spellCheck = false;
     parts.props.contentEditable = true;
+
+    parts.props.onBlur = (e) => {
+      text_edit.prevent_select_all = false;
+      const sel = window.getSelection();
+      if (sel) sel.removeAllRanges();
+    };
+
+    parts.props.autoFocus = false;
     parts.props.onFocus = (e) => {
-      p.page.prevent_rebuild = true;
-      p.render();
-      const is_active = ![meta.item.originalId, meta.item.id].includes(
-        active.item_id
-      );
-      if (is_active) {
-        e.currentTarget.blur();
+      (e.currentTarget as any).watch_for_del = true;
+    };
+
+    parts.props.ref = (el) => {
+      if (el && text_edit.caret && text_edit.id === meta.item.id) {
+        setCaret(el, text_edit.caret);
+        text_edit.caret = null;
       }
     };
 
-    parts.props.onBlur = (e) => {
-      p.page.prevent_rebuild = false;
-      p.render();
+    parts.props.onKeyDown = (e) => {
+      if ((e.currentTarget as any).watch_for_del) {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          e.currentTarget.blur();
+          edActionDelete(p, meta.item);
+          p.render();
+        } else {
+          (e.currentTarget as any).watch_for_del = false;
+        }
+      }
     };
 
     parts.props.onInput = (e) => {
       e.stopPropagation();
       e.preventDefault();
       const val = e.currentTarget.innerHTML;
+      const el = e.currentTarget;
+
       clearTimeout(text_edit.timeout);
       text_edit.timeout = setTimeout(() => {
+        text_edit.caret = getCaret(el);
+        text_edit.id = meta.item.id;
+
         if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
           const comp = p.comp.list[active.comp_id];
           const m = comp.meta[meta.item.originalId || meta.item.id];
@@ -114,6 +144,10 @@ export const mainPerItemVisit = (
   parts.props.onPointerDown = (e) => {
     e.stopPropagation();
 
+    if ((meta.item as IContent).type === "text") {
+      text_edit.prevent_select_all = true;
+    }
+
     if (active.comp_id && !p.comp.list[active.comp_id]) {
       active.comp_id = "";
       treeRebuild(p);
@@ -125,3 +159,11 @@ export const mainPerItemVisit = (
     p.render();
   };
 };
+
+function getCaret(el: any) {
+  return getSelectionOffset(el);
+}
+
+function setCaret(el: any, offset: any) {
+  setSelectionOffset(el, offset[0], offset[1]);
+}

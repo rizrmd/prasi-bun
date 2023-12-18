@@ -1,6 +1,6 @@
 import { IContent } from "../../../../../../../utils/types/general";
+import { getMetaById } from "../../../../../logic/active/get-meta";
 import { PG } from "../../../../../logic/ed-global";
-import { getMetaById } from "../../../../../logic/tree/build";
 
 export const edActionHide = (
   p: PG,

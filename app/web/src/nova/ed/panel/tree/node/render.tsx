@@ -105,7 +105,9 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
               return;
             }
             const el_active = document.querySelector(".el-active") as any;
-            if (el_active) el_active.focus();
+            if (el_active) {
+              setEndOfContenteditable(el_active);
+            }
           }, 100);
         }
       }}
@@ -142,3 +144,15 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     </div>
   );
 };
+
+function setEndOfContenteditable(div: any) {
+  let range: any, sel: any;
+  if (document.createRange) {
+    //Firefox, Chrome, Opera, Safari, IE 9+
+    range = document.createRange();
+    range.selectNodeContents(div);
+    sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
