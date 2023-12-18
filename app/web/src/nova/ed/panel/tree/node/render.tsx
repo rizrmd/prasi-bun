@@ -9,6 +9,7 @@ import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 import { IContent } from "../../../../../utils/types/general";
+import { getCompMeta } from "../../../logic/comp/comp-meta";
 
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -52,6 +53,16 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     }
   }
 
+  let is_hover = false;
+  if (active.hover.id === item.id) {
+    is_hover = true;
+  }
+
+  let is_active = false;
+  if (active.item_id === item.id) {
+    is_active = true;
+  }
+
   return (
     <div
       ref={(el) => {
@@ -71,10 +82,8 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
             }
           }
         `,
-        active.item_id === item.id
-          ? ["bg-blue-100"]
-          : [isComponent && `bg-purple-50`],
-        active.hover.id === item.id && "bg-blue-50"
+        is_active ? ["bg-blue-100"] : [isComponent && `bg-purple-50`],
+        is_hover && "bg-blue-50"
       )}
       onKeyDown={treeItemKeyMap(p, prm, item)}
       onContextMenu={(event) => {

@@ -1,6 +1,7 @@
 import { IContent } from "../../../../utils/types/general";
 import { VG } from "../../../vi/render/global";
-import { IMeta, PG, active } from "../../logic/ed-global";
+import { getCompMeta } from "../../logic/comp/comp-meta";
+import { PG, active } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
 
 type MPIVParam = Parameters<Exclude<VG["visit"], undefined>>;
@@ -58,7 +59,27 @@ export const mainPerItemVisit = (
 
   let is_active: boolean = active.item_id === meta.item.id;
   if (active.comp_id) {
-    is_active = active.item_id === meta.item.originalId;
+    if (meta.parent?.comp_id === active.comp_id) {
+      const active_meta = getCompMeta(p, active.item_id, "is_active");
+      if (active_meta) {
+        if (active_meta.item.originalId === meta.item.originalId) {
+          is_active = true;
+        } else if (active_meta.item.id === meta.item.originalId) {
+          is_active = true;
+        }
+      }
+    } else {
+      is_active = active.item_id === meta.item.originalId;
+    }
+  }
+
+  let is_component = false;
+  if (
+    !is_active &&
+    active.comp_id &&
+    meta.item.component?.id === active.comp_id
+  ) {
+    is_component = true;
   }
 
   parts.props.className = cx(
@@ -76,20 +97,24 @@ export const mainPerItemVisit = (
           right: 0;
           border: 2px solid #1c88f3;
         }
+      `,
+    is_component &&
+      css`
+        &::after {
+          content: " ";
+          pointer-events: none;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          border: 2px solid #641cf3;
+        }
       `
   );
   parts.props.onPointerOver = (e) => {
     e.stopPropagation();
-
-    if (active.comp_id) {
-      if (meta.parent?.comp_id === active.comp_id && meta.item.originalId) {
-        active.hover.id = meta.item.originalId;
-      } else {
-        active.hover.id = meta.item.id;
-      }
-    } else {
-      active.hover.id = meta.item.id;
-    }
+    active.hover.id = meta.item.id;
     active.hover.renderMain();
     active.hover.renderTree();
   };
@@ -108,88 +133,123 @@ export const mainPerItemVisit = (
       return;
     }
 
-    const m = getOuterMeta(
-      {
-        meta: active.comp_id ? p.comp.list[active.comp_id].meta : p.page.meta,
-      },
-      meta
-    );
-    let found = false;
-    if (m) {
-      if (m.item.component?.id && active.comp_id !== m.item.component.id) {
-        if (active.item_id === m.item.id) {
-          active.comp_id = m.item.component.id;
-          found = true;
-        } else {
-        }
-      } else {
-        if (active.comp_id && m && m.parent?.instance_id) {
-          const meta = p.page.meta[m.parent.instance_id];
-          const comp_id = meta.item.component?.id;
-          if (meta.item.originalId && comp_id) {
-            if (active.item_id === meta.item.originalId) {
-              if (comp_id) {
-                active.instance.item_id = meta.item.originalId;
-                active.instance.comp_id = active.comp_id;
-
-                active.comp_id = comp_id || "";
-                const root = p.comp.list[comp_id].tree.find(
-                  (e) => e.parent === "root"
-                );
-                if (root && typeof root.id === "string") {
-                  active.item_id = root.id || "";
+    if (meta.parent?.comp_id) {
+      if (active.comp_id) {
+        if (active.comp_id === meta.parent?.comp_id) {
+          if (meta.item.originalId) {
+            if (
+              meta.item.component?.id &&
+              meta.parent.comp_id === active.comp_id
+            ) {
+              const cmeta = p.comp.list[active.comp_id].meta;
+              for (const val of Object.values(cmeta)) {
+                if (
+                  val.item.originalId &&
+                  val.item.originalId === meta.item.originalId
+                ) {
+                  if (active.item_id !== val.item.id) {
+                    active.item_id = val.item.id;
+                  } else {
+                    active.instance.comp_id = active.comp_id;
+                    active.instance.item_id = active.item_id;
+                    active.comp_id = meta.item.component.id;
+                    active.item_id = val.item.originalId;
+                  }
                 }
+              }
+            } else if (meta.item.originalId !== active.item_id) {
+              active.item_id = meta.item.originalId;
+            }
+          }
+        } else {
+          if (
+            meta.item.component?.id === active.comp_id &&
+            meta.item.originalId
+          ) {
+            active.item_id = meta.item.originalId;
+          } else if (meta.parent.instance_id) {
+            const pmeta = p.page.meta[meta.parent.instance_id];
 
-                p.render();
+            if (pmeta.parent?.comp_id === active.comp_id) {
+              const cmeta = p.comp.list[active.comp_id].meta;
+
+              for (const val of Object.values(cmeta)) {
+                if (
+                  val.item.originalId &&
+                  val.item.originalId === pmeta.item.originalId
+                ) {
+                  if (active.item_id !== val.item.id) {
+                    active.item_id = val.item.id;
+                  } else if (pmeta.item.component) {
+                    active.instance.comp_id = active.comp_id;
+                    active.instance.item_id = active.item_id;
+                    active.comp_id = pmeta.item.component?.id;
+                    active.item_id = val.item.originalId;
+                  }
+                }
               }
             } else {
+              active.comp_id = meta.parent.comp_id;
+              active.item_id = meta.parent.id;
+            }
+          }
+        }
+      } else {
+        if (meta.parent.instance_id) {
+          let parent = meta.parent;
+
+          if (
+            parent.comp_id &&
+            parent.instance_id &&
+            p.page.meta[parent.instance_id] &&
+            !p.page.meta[parent.instance_id].mitem
+          ) {
+            while (parent.comp_id && parent.instance_id) {
+              const par = p.page.meta[parent.instance_id];
+              if (par) {
+                if (par.mitem) {
+                  if (active.item_id !== par.item.id) {
+                    active.item_id = par.item.id;
+                  } else {
+                    active.instance.comp_id = active.comp_id;
+                    active.instance.item_id = active.item_id;
+                    active.comp_id = parent.comp_id;
+                    const root_id = p.comp.list[parent.comp_id]?.tree.find(
+                      (e) => e.parent === "root"
+                    )?.id as string;
+                    if (root_id) {
+                      active.item_id = root_id;
+                    }
+                  }
+                  break;
+                }
+                parent = par.parent as any;
+              } else break;
+            }
+          } else {
+            if (active.item_id !== meta.parent.instance_id) {
+              active.item_id = meta.parent.instance_id;
+            } else if (parent.comp_id && meta.item.originalId) {
+              active.instance.comp_id = active.comp_id;
+              active.instance.item_id = active.item_id;
+              active.comp_id = parent.comp_id;
               active.item_id = meta.item.originalId;
-              found = true;
             }
           }
         }
       }
-    }
-
-    if (!found) {
+    } else {
       if (active.comp_id) {
-        if (meta.item.component?.id === active.comp_id) {
-          active.item_id = meta.item.id;
-        } else if (m && m.parent?.comp_id === active.comp_id) {
-          if (m.item.originalId) {
-            active.item_id = m.item.originalId;
-          }
-        } else if (meta.parent?.comp_id === active.comp_id) {
-          active.item_id = meta.item.originalId || meta.item.id;
-        } else if (m) {
-          if (m.mitem) {
-            active.comp_id = "";
-          } else if (m.parent?.comp_id && m.parent?.instance_id) {
-            const pmeta = p.page.meta[m.parent.instance_id];
-            if (pmeta.item.originalId) {
-              active.item_id = pmeta.item.originalId;
-            }
-          }
+        if (!meta.parent?.comp_id) {
+          active.comp_id = "";
+        } else if (meta.item.originalId) {
+          active.item_id = meta.item.originalId;
         }
       } else {
-        if (m) {
-          active.item_id = m.item.id;
-        }
+        active.item_id = meta.item.id;
       }
     }
     active.hover.id = "";
     p.render();
   };
-};
-
-const getOuterMeta = (p: { meta: Record<string, IMeta> }, meta: IMeta) => {
-  let cur: undefined | IMeta = meta;
-
-  if (cur.jsx_prop) return meta;
-
-  while (cur?.parent?.instance_id && p.meta[cur?.parent?.instance_id]) {
-    cur = p.meta[cur?.parent?.instance_id];
-  }
-
-  if (cur) return cur;
 };

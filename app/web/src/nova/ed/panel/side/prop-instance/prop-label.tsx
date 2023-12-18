@@ -3,7 +3,7 @@ import { Tooltip } from "../../../../../utils/ui/tooltip";
 
 export const EdPropLabel: FC<{ name: string }> = ({ name }) => {
   const label = (
-    <div className="px-1">
+    <div className="px-1 flex items-center">
       <div className=" w-[70px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center">
         {name}
       </div>
