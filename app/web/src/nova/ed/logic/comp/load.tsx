@@ -42,6 +42,9 @@ export const loadCompSnapshot = async (
   comp_id: string,
   snapshot: Uint8Array
 ) => {
+  if (p.comp.list[comp_id] && p.comp.list[comp_id].doc) {
+    return;
+  }
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
   const mitem = doc.getMap("map").get("root");
@@ -85,7 +88,11 @@ export const loadCompSnapshot = async (
                 comp_id,
                 Buffer.from(compress(diff_local))
               );
-              const updated = await updateComponentMeta(p, doc, comp_id);
+              const updated = await updateComponentMeta(
+                p,
+                p.comp.list[comp_id].doc,
+                comp_id
+              );
               if (updated) {
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;

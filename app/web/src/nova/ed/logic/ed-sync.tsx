@@ -184,6 +184,7 @@ export const edInitSync = (p: PG) => {
                   p.comp.list[data.id].meta = updated.meta;
                   p.comp.list[data.id].tree = updated.tree;
                 }
+
                 await treeRebuild(p, { note: "sv_remote" });
               }
               p.render();

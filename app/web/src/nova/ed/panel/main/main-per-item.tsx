@@ -41,13 +41,11 @@ export const mainPerItemVisit = (
     };
 
     parts.props.ref = (el) => {
-      if (
-        el &&
-        text_edit.caret &&
-        (text_edit.id === meta.item.id || text_edit.id === meta.item.originalId)
-      ) {
-        setCaret(el, text_edit.caret);
-        text_edit.caret = null;
+      if (el && text_edit.caret) {
+        if (text_edit.id === meta.item.id) {
+          setCaret(el, text_edit.caret);
+          text_edit.caret = null;
+        }
       }
     };
 
@@ -71,8 +69,8 @@ export const mainPerItemVisit = (
 
       clearTimeout(text_edit.timeout);
       text_edit.timeout = setTimeout(() => {
+        text_edit.id = meta.item.id;
         text_edit.caret = getCaret(el);
-        text_edit.id = meta.item.originalId || meta.item.id;
 
         if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
           const comp = p.comp.list[active.comp_id];
