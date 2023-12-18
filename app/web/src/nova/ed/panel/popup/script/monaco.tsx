@@ -7,10 +7,10 @@ import { useGlobal, useLocal } from "web-utils";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
+import { getActiveMeta } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
-import { getMetaById } from "../../../logic/tree/build";
-import { declareScope } from "./scope";
 import { edMonacoDefaultVal } from "./default-val";
+import { declareScope } from "./scope";
 
 const scriptEdit = {
   timeout: null as any,
@@ -189,7 +189,7 @@ export const EdScriptMonaco: FC<{}> = () => {
         local.render();
         clearTimeout(scriptEdit.timeout);
         scriptEdit.timeout = setTimeout(() => {
-          const meta = getMetaById(p, active.item_id);
+          const meta = getActiveMeta(p);
           const type = p.ui.popup.script.mode;
           if (meta && meta.mitem) {
             let arg = {} as any;

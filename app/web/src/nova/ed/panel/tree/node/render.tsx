@@ -1,15 +1,14 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
 import { useGlobal, useLocal } from "web-utils";
+import { IContent } from "../../../../../utils/types/general";
 import { Loading } from "../../../../../utils/ui/loading";
+import { getMetaById } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
-import { getMetaById } from "../../../logic/tree/build";
 import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
-import { IContent } from "../../../../../utils/types/general";
-import { getCompMeta } from "../../../logic/comp/comp-meta";
 
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");

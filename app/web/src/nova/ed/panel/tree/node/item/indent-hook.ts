@@ -1,8 +1,8 @@
 import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
-import { IMeta, PG, active } from "../../../../logic/ed-global";
-import { getMetaById } from "../../../../logic/tree/build";
 import { IContent } from "../../../../../../utils/types/general";
+import { getMetaById } from "../../../../logic/active/get-meta";
+import { IMeta, PG, active } from "../../../../logic/ed-global";
 
 export const expandTreeHook = (
   p: PG,

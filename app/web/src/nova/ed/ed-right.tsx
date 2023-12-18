@@ -1,12 +1,12 @@
 import { useGlobal } from "web-utils";
+import { getActiveMeta } from "./logic/active/get-meta";
 import { EDGlobal, active } from "./logic/ed-global";
-import { getMetaById } from "./logic/tree/build";
 import { EdSidePropInstance } from "./panel/side/prop-instance";
 import { EdSideStyle } from "./panel/side/side-style";
 
 export const EdRight = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const meta = getMetaById(p, active.item_id);
+  const meta = getActiveMeta(p);
 
   const isComponent =
     meta?.item.type === "item" &&

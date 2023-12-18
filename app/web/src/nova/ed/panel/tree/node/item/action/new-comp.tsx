@@ -1,6 +1,7 @@
 import { IItem } from "../../../../../../../utils/types/item";
+import { getMetaById } from "../../../../../logic/active/get-meta";
 import { PG, active } from "../../../../../logic/ed-global";
-import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
+import { treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionNewComp = (
   p: PG,

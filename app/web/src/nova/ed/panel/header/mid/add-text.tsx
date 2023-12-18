@@ -1,13 +1,13 @@
-import { useGlobal, waitUntil } from "web-utils";
-import { TopBtn } from "../top-btn";
-import { EDGlobal, active } from "../../../logic/ed-global";
-import { getMetaById } from "../../../logic/tree/build";
 import { createId } from "@paralleldrive/cuid2";
-import { IText } from "../../../../../utils/types/text";
+import { useGlobal, waitUntil } from "web-utils";
 import { IContent, MContent } from "../../../../../utils/types/general";
-import { fillID } from "../../../logic/tree/fill-id";
-import { prepSection } from "./prep-section";
 import { IItem } from "../../../../../utils/types/item";
+import { IText } from "../../../../../utils/types/text";
+import { getActiveMeta, getMetaById } from "../../../logic/active/get-meta";
+import { EDGlobal, active } from "../../../logic/ed-global";
+import { fillID } from "../../../logic/tree/fill-id";
+import { TopBtn } from "../top-btn";
+import { prepSection } from "./prep-section";
 
 export const EdAddText = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -16,12 +16,14 @@ export const EdAddText = () => {
     <TopBtn
       style="slim"
       onClick={async () => {
-        let meta = getMetaById(p, active.item_id);
+        let meta = getActiveMeta(p);
 
         if (!meta) {
           prepSection(p);
-          await waitUntil(() => getMetaById(p, active.item_id));
-          meta = getMetaById(p, active.item_id);
+          await waitUntil(() => {
+            meta = getActiveMeta(p);
+            return !!meta;
+          });
         }
         if (!meta) return null;
 

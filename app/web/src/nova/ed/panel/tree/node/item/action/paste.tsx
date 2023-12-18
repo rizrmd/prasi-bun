@@ -2,8 +2,9 @@ import { syncronize } from "y-pojo";
 import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 import { IContent } from "../../../../../../../utils/types/general";
 import { MItem } from "../../../../../../../utils/types/item";
+import { getMetaById } from "../../../../../logic/active/get-meta";
 import { PG, active } from "../../../../../logic/ed-global";
-import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
+import { treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionPaste = async (p: PG, item: IContent) => {
   const mitem = getMetaById(p, item.id)?.mitem;
