@@ -34,29 +34,28 @@ export const mainPerItemVisit = (
       if (sel) sel.removeAllRanges();
     };
 
-    parts.props.autoFocus = false;
-    parts.props.onFocus = (e) => {
-      (e.currentTarget as any).watch_for_del = true;
-    };
-
     parts.props.ref = (el) => {
-      if (el && text_edit.caret && text_edit.id === meta.item.id) {
+      if (
+        el &&
+        text_edit.caret &&
+        (text_edit.id === meta.item.id || text_edit.id === meta.item.originalId)
+      ) {
         setCaret(el, text_edit.caret);
         text_edit.caret = null;
       }
     };
 
-    parts.props.onKeyDown = (e) => {
-      if ((e.currentTarget as any).watch_for_del) {
-        if (e.key === "Backspace" || e.key === "Delete") {
-          e.currentTarget.blur();
-          edActionDelete(p, meta.item);
-          p.render();
-        } else {
-          (e.currentTarget as any).watch_for_del = false;
-        }
-      }
-    };
+    // parts.props.onKeyDown = (e) => {
+    //   if ((e.currentTarget as any).watch_for_del) {
+    //     if (e.key === "Backspace" || e.key === "Delete") {
+    //       e.currentTarget.blur();
+    //       edActionDelete(p, meta.item);
+    //       p.render();
+    //     } else {
+    //       (e.currentTarget as any).watch_for_del = false;
+    //     }
+    //   }
+    // };
 
     parts.props.onInput = (e) => {
       e.stopPropagation();
@@ -67,7 +66,7 @@ export const mainPerItemVisit = (
       clearTimeout(text_edit.timeout);
       text_edit.timeout = setTimeout(() => {
         text_edit.caret = getCaret(el);
-        text_edit.id = meta.item.id;
+        text_edit.id = meta.item.originalId || meta.item.id;
 
         if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
           const comp = p.comp.list[active.comp_id];
