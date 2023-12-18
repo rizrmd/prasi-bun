@@ -17,3 +17,18 @@ export const edActionDelete = async (p: PG, item: IContent) => {
     }
   }
 };
+
+export const edActionDeleteById = async (p: PG, id: string) => {
+  const meta = getMetaById(p, id);
+  if (meta) {
+    const mitem = meta.mitem;
+    if (mitem) {
+      mitem.parent.forEach((e, k) => {
+        if (e == mitem) {
+          mitem.parent.delete(k);
+        }
+      });
+      await treeRebuild(p);
+    }
+  }
+};

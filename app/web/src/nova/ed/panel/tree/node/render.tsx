@@ -9,6 +9,7 @@ import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
+import { text_edit } from "../../main/main-per-item";
 
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -95,6 +96,9 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         p.render();
       }}
       onClick={() => {
+        if ((item as IContent).type === "text") {
+          text_edit.del_key_id = item.id;
+        }
         active.item_id = item.id;
         p.ui.tree.search = "";
         p.render();
