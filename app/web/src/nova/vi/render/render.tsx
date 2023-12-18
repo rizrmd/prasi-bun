@@ -10,7 +10,6 @@ export const ViRender: FC<{
   meta: IMeta;
   children?: ReactNode;
 }> = ({ meta, children }) => {
-  const vi = useGlobal(ViGlobal, "VI");
   if (!meta) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
@@ -27,7 +26,7 @@ export const ViChild: FC<{
   const vi = useGlobal(ViGlobal, "VI");
   const parts = viParts(meta);
   if (vi.visit) vi.visit(meta, parts);
-  
+
   let renderChild = undefined;
 
   if (parts.shouldRenderChild) {

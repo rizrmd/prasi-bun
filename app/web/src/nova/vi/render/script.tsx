@@ -18,12 +18,11 @@ export const ViScript: FC<{ meta: IMeta; children: ReactNode }> = ({
   const scope_meta = getScopeMeta({ meta: vi.meta }, meta);
   const scope = getScopeValue(scope_meta);
 
-
   if (meta.item.component?.id) {
     viEvalProps(vi, meta, scope);
   }
 
-  if (meta.item.adv?.jsBuilt) {
+  if (meta.item.adv?.js) {
     viEvalScript(vi, meta, scope);
 
     if (meta.script) return meta.script.result;
