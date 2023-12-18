@@ -54,7 +54,7 @@ export const EdTreeCtxMenu = ({
   const type = item?.type;
   const comp = (item as IItem).component as FNComponent | undefined;
   const isComponent = comp?.id;
-  const isActiveComponent = active.comp_id === item?.id;
+  const isActiveComponent = active.comp_id === comp?.id;
 
   if (!item) {
     return (
@@ -101,11 +101,13 @@ export const EdTreeCtxMenu = ({
         // hotKey={<HotKey shortcut={"X"} />}
         onClick={() => edActionCut(p, item)}
       />
-      <MenuItem
-        label="Delete"
-        hotKey="⌫"
-        onClick={() => edActionDelete(p, item)}
-      />
+      {!isActiveComponent && (
+        <MenuItem
+          label="Delete"
+          hotKey="⌫"
+          onClick={() => edActionDelete(p, item)}
+        />
+      )}
       <MenuItem label="Clone" onClick={() => edActionClone(p, item)} />
       <MenuItem label="Copy" onClick={() => edActionCopy(p, item)} />
       {local.allowCopy &&

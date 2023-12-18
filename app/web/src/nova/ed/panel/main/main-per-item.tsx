@@ -8,15 +8,16 @@ import { activateMeta } from "../../logic/active/activate-meta";
 import { isMetaActive } from "../../logic/active/is-meta.active";
 import { PG, active } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
-import { edActionDelete } from "../tree/node/item/action/del";
+import { edActionDeleteById } from "../tree/node/item/action/del";
 
 type MPIVParam = Parameters<Exclude<VG["visit"], undefined>>;
 
-const text_edit = {
+export const text_edit = {
   timeout: null as any,
   caret: null as any,
   prevent_select_all: false,
   id: null as any,
+  del_key_id: false as false | string,
 };
 
 export const mainPerItemVisit = (
@@ -45,17 +46,17 @@ export const mainPerItemVisit = (
       }
     };
 
-    // parts.props.onKeyDown = (e) => {
-    //   if ((e.currentTarget as any).watch_for_del) {
-    //     if (e.key === "Backspace" || e.key === "Delete") {
-    //       e.currentTarget.blur();
-    //       edActionDelete(p, meta.item);
-    //       p.render();
-    //     } else {
-    //       (e.currentTarget as any).watch_for_del = false;
-    //     }
-    //   }
-    // };
+    parts.props.onKeyDown = (e) => {
+      if (typeof text_edit.del_key_id === "string") {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          e.currentTarget.blur();
+          edActionDeleteById(p, text_edit.del_key_id);
+          p.render();
+        } else {
+          text_edit.del_key_id = false;
+        }
+      }
+    };
 
     parts.props.onInput = (e) => {
       e.stopPropagation();

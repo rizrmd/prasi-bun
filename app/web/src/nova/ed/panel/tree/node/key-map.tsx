@@ -157,6 +157,14 @@ export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
       let last = "";
       let found = null as HTMLInputElement | null;
 
+      if (
+        item.type === "item" &&
+        item.component?.id === active.comp_id &&
+        active.comp_id
+      ) {
+        return;
+      }
+
       const meta = getMetaById(p, item.id);
       const pmeta = active.comp_id
         ? p.comp.list[active.comp_id].meta
