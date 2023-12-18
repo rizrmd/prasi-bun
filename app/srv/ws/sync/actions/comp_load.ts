@@ -1,7 +1,10 @@
 import { EComp } from "../../../../web/src/nova/ed/logic/ed-global";
+import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
+import { IItem } from "../../../../web/src/utils/types/item";
 import { DComp } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { loadComponent, userSyncComponent } from "../editor/load-component";
+import { parseJs } from "../editor/parser/parse-js";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { gzipAsync } from "../entity/zlib";
@@ -32,8 +35,30 @@ export const comp_load: SAction["comp"]["load"] = async function (
 
     const snap = snapshot.get("comp", id);
     if (snap) {
+      const meta = {};
+      const item = docs.comp[id].doc
+        .getMap("map")
+        .get("root")
+        ?.toJSON() as IItem;
+
+      genMeta(
+        {
+          comps: {},
+          meta,
+          on: {
+            visit(meta) {
+              if (typeof meta.item.adv?.js === "string") {
+                meta.scope.def = parseJs(meta);
+              }
+            },
+          },
+        },
+        { item }
+      );
+
       result[id] = {
         id,
+        meta,
         snapshot: await gzipAsync(snap.bin),
       };
     }

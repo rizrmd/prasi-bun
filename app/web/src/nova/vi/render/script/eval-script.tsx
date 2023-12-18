@@ -34,7 +34,7 @@ export const viEvalScript = (
   if (!meta.script) {
     meta.script = {
       result: null,
-      Local: createViLocal(meta, scope, vi.script?.init_local_effect),
+      Local: createViLocal(vi.meta, meta, scope, vi.script?.init_local_effect),
       PassProp: createViPassProp(vi, meta, scope),
     };
   }
