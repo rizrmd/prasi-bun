@@ -1,6 +1,7 @@
 import { IContent } from "../../../../../../../utils/types/general";
+import { getMetaById } from "../../../../../logic/active/get-meta";
 import { PG } from "../../../../../logic/ed-global";
-import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
+import { treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionDelete = async (p: PG, item: IContent) => {
   const meta = getMetaById(p, item.id);

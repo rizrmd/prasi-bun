@@ -4,8 +4,6 @@ import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
-  if (p.page.prevent_rebuild) return;
-
   const is_layout =
     p.site.layout &&
     p.site.layout.id === p.page.cur.id &&
@@ -101,4 +99,3 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     }
   }
 };
-
