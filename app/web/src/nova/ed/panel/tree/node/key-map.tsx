@@ -3,7 +3,7 @@ import { KeyboardEvent } from "react";
 import { IContent } from "../../../../../utils/types/general";
 import { PG, active } from "../../../logic/ed-global";
 import { edActionDelete } from "./item/action/del";
-import { getMetaById } from "../../../logic/tree/build";
+import { getMetaById } from "../../../logic/active/get-meta";
 
 export const treeItemKeyMap = (p: PG, prm: RenderParams, item: IContent) => {
   return (e: KeyboardEvent) => {

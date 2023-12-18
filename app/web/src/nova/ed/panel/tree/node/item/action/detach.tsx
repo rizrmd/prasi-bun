@@ -1,8 +1,9 @@
 import { syncronize } from "y-pojo";
-import { IItem } from "../../../../../../../utils/types/item";
-import { PG } from "../../../../../logic/ed-global";
-import { getMetaById, treeRebuild } from "../../../../../logic/tree/build";
 import { fillID } from "../../../../../../../render/editor/tools/fill-id";
+import { IItem } from "../../../../../../../utils/types/item";
+import { getMetaById } from "../../../../../logic/active/get-meta";
+import { PG } from "../../../../../logic/ed-global";
+import { treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionDetach = (p: PG, item: IItem) => {
   const mitem = getMetaById(p, item.id)?.mitem;

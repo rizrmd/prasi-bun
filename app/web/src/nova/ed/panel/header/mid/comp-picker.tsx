@@ -4,11 +4,11 @@ import { IContent, MContent } from "../../../../../utils/types/general";
 import { IItem, MItem } from "../../../../../utils/types/item";
 import { MRoot } from "../../../../../utils/types/root";
 import { ISection, MSection } from "../../../../../utils/types/section";
+import { getActiveMeta, getMetaById } from "../../../logic/active/get-meta";
+import { loadComponent } from "../../../logic/comp/load";
 import { EDGlobal, active } from "../../../logic/ed-global";
-import { getMetaById } from "../../../logic/tree/build";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
-import { loadComponent } from "../../../logic/comp/load";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -38,7 +38,7 @@ export const EdCompPicker = () => {
             return;
           }
 
-          let active_meta = getMetaById(p, active.item_id);
+          let active_meta = getActiveMeta(p);
           if (!active_meta) {
             alert("Please select an item/section to add component!");
           } else {
