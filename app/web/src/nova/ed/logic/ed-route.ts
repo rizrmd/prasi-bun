@@ -3,7 +3,7 @@ import { PG } from "./ed-global";
 import { loadSite } from "./ed-site";
 import { treeRebuild } from "./tree/build";
 import { loadCompSnapshot } from "./comp/load";
-
+import { produce } from "immer";
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
     if (!p.site.domain && !p.site.name) {
@@ -50,7 +50,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   if (remotePage.comps) {
     for (const [id_comp, c] of Object.entries(remotePage.comps)) {
       if (c && c.snapshot) {
-        await loadCompSnapshot(p, id_comp, c.snapshot);
+        await loadCompSnapshot(p, id_comp, c.snapshot, c.meta);
       }
     }
   }

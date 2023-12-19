@@ -7,7 +7,7 @@ import { createViPassProp } from "../render/script/passprop";
 
 export type GenMetaP = {
   meta: Record<string, IMeta>;
-  comps: Record<string, { comp: IItem }>;
+  comps: Record<string, { comp: IItem; smeta: Record<string, ISimpleMeta> }>;
   on?: {
     visit_component?: (id: string) => void;
     visit?: (meta: IMeta) => void;

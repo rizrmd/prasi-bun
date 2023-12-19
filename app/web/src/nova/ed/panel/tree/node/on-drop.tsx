@@ -31,6 +31,10 @@ export const nodeOnDrop: (
       let from = fromMeta.mitem;
 
       if (to) {
+        if (to.get("component")?.get("id")) {
+          return null;
+        }
+
         to.doc?.transact(() => {
           if (to && from && typeof relativeIndex === "number") {
             const toChilds = to.get("childs");
@@ -91,34 +95,12 @@ export const canDrop = (p: PG, arg: DropOptions<IMeta>) => {
         return false;
       } else if (from === "item") {
         if (to === "section" || to === "item") {
-          if (
-            dropTarget.data.item.type === "item" &&
-            dropTarget.data.item.component?.id
-          ) {
-            if (p.comp) {
-              if (active.comp_id === dropTarget.data.item.component?.id) {
-                return true;
-              }
-            }
-            return false;
-          }
           return true;
         } else {
           return false;
         }
       } else if (from === "text") {
-        if (to === "item") {
-          if (
-            dropTarget.data.item.type === "item" &&
-            dropTarget.data.item.component?.id
-          ) {
-            if (p.comp) {
-              if (active.comp_id === dropTarget.data.item.component.id) {
-                return true;
-              }
-            }
-            return false;
-          }
+        if (to === "item" || to === "section") {
           return true;
         }
       }

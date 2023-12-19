@@ -16,9 +16,11 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       if (icomp) {
         p.comp.loaded[k] = {
           comp: icomp,
+          smeta: v.comp.meta,
         };
       }
     }
+    if (v.comp.meta) p.comp.loaded[k].smeta = v.comp.meta;
   }
 
   const mroot = p.page.doc?.getMap("map").get("root");

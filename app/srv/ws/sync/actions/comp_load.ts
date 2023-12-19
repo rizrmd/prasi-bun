@@ -1,7 +1,6 @@
 import { EComp } from "../../../../web/src/nova/ed/logic/ed-global";
 import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
 import { IItem } from "../../../../web/src/utils/types/item";
-import { DComp } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { loadComponent, userSyncComponent } from "../editor/load-component";
 import { parseJs } from "../editor/parser/parse-js";
