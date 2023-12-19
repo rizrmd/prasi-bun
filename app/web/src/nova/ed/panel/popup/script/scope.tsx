@@ -51,8 +51,10 @@ export const declareScope = async (
           },
           source: `\
 export const {};
+const _local = ${def.local.value};
+
 declare global {
-  const ${def.local.name} = ${def.local.value};
+  const ${def.local.name}: typeof _local & { render: () =>void };
 }`,
         });
       } else if (def.passprop) {

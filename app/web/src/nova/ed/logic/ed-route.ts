@@ -1,9 +1,9 @@
 import { compress, decompress } from "wasm-gzip";
+import { loadCompSnapshot } from "./comp/load";
 import { PG } from "./ed-global";
 import { loadSite } from "./ed-site";
 import { treeRebuild } from "./tree/build";
-import { loadCompSnapshot } from "./comp/load";
-import { produce } from "immer";
+
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
     if (!p.site.domain && !p.site.name) {

@@ -3,12 +3,11 @@ import {
   EComp,
   EPage,
   ESite,
-  IScopeComp,
   PropFieldKind,
 } from "../../../web/src/nova/ed/logic/ed-global";
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
-import { parseJs } from "./editor/parser/parse-js";
+import { ParsedScope, parseJs } from "./editor/parser/parse-js";
 
 /* 
    WARNING:
@@ -113,7 +112,7 @@ export const SyncActions = {
             prop_kind: PropFieldKind;
             value: Uint8Array;
           }
-    ) => ({}) as boolean,
+    ) => ({}) as boolean | ParsedScope,
     parse: async (code: string | Record<string, string>) =>
       ({}) as Record<string, ReturnType<typeof parseJs>>,
   },

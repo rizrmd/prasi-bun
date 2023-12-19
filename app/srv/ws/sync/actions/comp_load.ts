@@ -47,7 +47,7 @@ export const comp_load: SAction["comp"]["load"] = async function (
           on: {
             visit(meta) {
               if (typeof meta.item.adv?.js === "string") {
-                meta.scope.def = parseJs(meta);
+                meta.scope.def = parseJs(meta.item.adv?.js);
               }
             },
           },
