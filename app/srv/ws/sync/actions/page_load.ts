@@ -2,7 +2,7 @@ import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
 import { initLoadComp } from "../../../../web/src/nova/vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
 import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
-import { GenMetaP } from "../../../../web/src/nova/vi/utils/types";
+import { GenMetaP, IMeta } from "../../../../web/src/nova/vi/utils/types";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
@@ -213,7 +213,23 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
 
             if (docs.comp[id]) {
               const mitem = docs.comp[id].doc.getMap("map").get("root");
-              mcomps[id] = { comp: mitem?.toJSON() as IItem };
+              const comp = mitem?.toJSON() as IItem;
+              const smeta: Record<string, IMeta> = {};
+              genMeta(
+                {
+                  comps: {},
+                  meta: smeta,
+                  on: {
+                    visit(meta) {
+                      if (typeof meta.item.adv?.js === "string") {
+                        meta.scope.def = parseJs(meta);
+                      }
+                    },
+                  },
+                },
+                { item: comp, ignore_first_component: true }
+              );
+              mcomps[id] = { comp, smeta: simplifyMeta(smeta) };
             }
           }
         }
@@ -244,22 +260,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
 
   const comps: EPage["comps"] = {};
   for (const [id, snap] of Object.entries(msnap)) {
-    const meta = {};
-    genMeta(
-      {
-        comps: {},
-        meta,
-        on: {
-          visit(meta) {
-            if (typeof meta.item.adv?.js === "string") {
-              meta.scope.def = parseJs(meta);
-            }
-          },
-        },
-      },
-      { item: mcomps[id].comp }
-    );
-
+    const meta = mcomps[id].smeta;
     comps[id] = { id, meta, snapshot: await gzipAsync(snap.bin) };
   }
 

@@ -1,4 +1,5 @@
-import { GenMetaArg, GenMetaP, IMeta } from "../utils/types";
+import { deepClone } from "web-utils";
+import { GenMetaArg, GenMetaP, IMeta, ISimpleMeta } from "../utils/types";
 import { instantiate, walkChild } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
@@ -17,31 +18,24 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
     }
 
     if (pcomp) {
-      let smeta_instances: IMeta["instances"] = undefined;
-      if (p.smeta && p.smeta[item.id]) {
-        const smeta = p.smeta[item.id];
-        if (smeta && smeta.comp) {
-          smeta_instances = smeta.comp.instances;
-        }
-      }
-
       let instance = {};
       let instances: IMeta["instances"] = undefined;
 
-      if (!smeta_instances) {
-        const parent_instance = getParentInstance(p, arg, item.id);
-        instance = parent_instance || {};
-        instances = !parent_instance ? { [item.id]: instance } : undefined;
-      } else {
-        instance = smeta_instances[item.id];
-        instances = smeta_instances;
-      }
+      const parent_instance = getParentInstance(p, arg, item.id);
+      instance = parent_instance || {};
+      instances = !parent_instance ? { [item.id]: instance } : undefined;
 
       instantiate({
         item,
         comp: pcomp.comp,
         ids: instance,
       });
+
+      let smeta = p.comps[item.component.id].smeta;
+      if (smeta) {
+        smeta = applySMeta(smeta, instance);
+      }
+
       const meta: IMeta = {
         item: simplifyItemChild(item),
         parent: {
@@ -53,8 +47,10 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         scope: {},
       };
 
-      if (p.smeta?.[item.id]) {
-        meta.scope.def = p.smeta[item.id].scope;
+      if (!meta.parent?.comp_id) {
+        if (p.smeta?.[item.id]) {
+          meta.scope.def = p.smeta[item.id].scope;
+        }
       }
 
       if (item.id) {
@@ -75,20 +71,23 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           ) {
             walkChild(prop.content, instance);
 
-            genMeta(p, {
-              item: prop.content,
-              is_root: false,
-              jsx_prop: {
-                is_root: true,
-                comp_id,
-                name,
-              },
-              parent: {
-                item: meta.item,
-                instance_id: item.id,
-                comp: pcomp.comp,
-              },
-            });
+            genMeta(
+              { ...p, smeta },
+              {
+                item: prop.content,
+                is_root: false,
+                jsx_prop: {
+                  is_root: true,
+                  comp_id,
+                  name,
+                },
+                parent: {
+                  item: meta.item,
+                  instance_id: item.id,
+                  comp: pcomp.comp,
+                },
+              }
+            );
           }
         },
       });
@@ -108,15 +107,18 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       for (const child of Object.values(item.childs)) {
         if (child.name.startsWith("jsx:")) continue;
 
-        genMeta(p, {
-          item: child,
-          is_root: false,
-          parent: {
-            item,
-            instance_id: item.id,
-            comp: pcomp.comp,
-          },
-        });
+        genMeta(
+          { ...p, smeta },
+          {
+            item: child,
+            is_root: false,
+            parent: {
+              item,
+              instance_id: item.id,
+              comp: pcomp.comp,
+            },
+          }
+        );
       }
     }
   }
@@ -133,4 +135,26 @@ const getParentInstance = (p: GenMetaP, arg: GenMetaArg, id: string) => {
       return parent_instance.instances[id];
     }
   }
+};
+
+const applySMeta = (
+  smeta: Record<string, ISimpleMeta>,
+  ids: Record<string, string>
+) => {
+  const nmeta: typeof smeta = {};
+
+  for (const [k, v] of Object.entries(smeta)) {
+    const id = ids[k];
+    if (id) {
+      nmeta[id] = deepClone(v);
+      nmeta[id].id = id;
+      const parent = nmeta[id].parent;
+      if (parent) {
+        if (parent.instance_id) parent.instance_id = ids[parent.instance_id];
+        if (parent.id) parent.id = ids[id];
+      }
+    }
+  }
+
+  return nmeta;
 };

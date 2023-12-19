@@ -46,7 +46,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     if (p.set_meta !== false) {
       p.meta[meta.item.id] = meta;
     }
-  } 
+  }
 
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
