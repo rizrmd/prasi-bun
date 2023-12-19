@@ -1,9 +1,9 @@
 import recast from "recast";
 import babel from "recast/parsers/babel-ts";
-import { IMeta } from "../../../../../web/src/nova/ed/logic/ed-global";
 
-export const parseJs = (meta: IMeta) => {
-  const code = meta.item.adv?.js;
+export type ParsedScope = Exclude<ReturnType<typeof parseJs>, undefined>;
+
+export const parseJs = (code?: string) => {
   if (!code) return undefined;
   const local = { name: "", value: "", index: 0 };
   const passprop: Record<string, { value: string; index: number }> = {};

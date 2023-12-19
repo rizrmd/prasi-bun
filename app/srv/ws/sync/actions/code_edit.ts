@@ -1,3 +1,5 @@
+import { transform } from "esbuild";
+import { g } from "utils/global";
 import { Doc } from "yjs";
 import { MContent } from "../../../../web/src/utils/types/general";
 import { MItem } from "../../../../web/src/utils/types/item";
@@ -6,7 +8,7 @@ import { SAction } from "../actions";
 import { docs } from "../entity/docs";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
-import { transform } from "esbuild";
+import { parseJs } from "../editor/parser/parse-js";
 const decoder = new TextDecoder();
 
 export const code_edit: SAction["code"]["edit"] = async function (
@@ -16,7 +18,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
   const src = decoder.decode(await gunzipAsync(arg.value));
 
   if (arg.type === "adv") {
-    const { item_id, mode, comp_id, page_id, value } = arg;
+    const { item_id, mode, comp_id, page_id } = arg;
 
     let root = undefined as undefined | MRoot | MItem;
     let doc = undefined as undefined | Doc;
@@ -45,22 +47,30 @@ export const code_edit: SAction["code"]["edit"] = async function (
         }
 
         if (adv) {
-          const res = await transform(`render(${src})`, {
-            jsx: "transform",
-            format: "cjs",
-            loader: "tsx",
-            minify: true,
-            sourcemap: "inline",
-          });
+          try {
+            const res = await transform(`render(${src})`, {
+              jsx: "transform",
+              format: "cjs",
+              loader: "tsx",
+              minify: true,
+              sourcemap: "inline",
+            });
 
-          doc?.transact(() => {
-            if (adv) {
-              adv.set(mode, src);
-              if (mode === "js") {
-                adv.set("jsBuilt", res.code);
+            doc?.transact(() => {
+              if (adv) {
+                adv.set(mode, src);
+                if (mode === "js") {
+                  adv.set("jsBuilt", res.code);
+                }
               }
-            }
-          });
+            });
+          } catch (e) {
+            g.log.error(e);
+          }
+
+          if (mode === "js") {
+            return parseJs(adv.get("js")) || false;
+          }
         }
       }
     }
@@ -75,28 +85,32 @@ export const code_edit: SAction["code"]["edit"] = async function (
           const mprops = root.get("component")?.get("props");
           const mprop = mprops?.get(prop_name);
           if (mprop) {
-            const res = await transform(`return ${src}`, {
-              jsx: "transform",
-              format: "cjs",
-              loader: "tsx",
-            });
-            doc?.transact(() => {
-              if (prop_kind === "value") {
-                mprop.set("value", src);
-                mprop.set("valueBuilt", res.code.substring(6));
-              } else if (prop_kind === "gen") {
-                mprop.set("gen", src);
-                mprop.set("genBuilt", res.code.substring(6));
-              } else if (prop_kind === "visible") {
-                mprop.set("visible", src);
-              } else if (prop_kind === "option") {
-                const meta = mprop.get("meta");
-                if (meta) {
-                  meta.set("options", src);
-                  meta.set("optionsBuilt", res.code.substring(6));
+            try {
+              const res = await transform(`return ${src}`, {
+                jsx: "transform",
+                format: "cjs",
+                loader: "tsx",
+              });
+              doc?.transact(() => {
+                if (prop_kind === "value") {
+                  mprop.set("value", src);
+                  mprop.set("valueBuilt", res.code.substring(6));
+                } else if (prop_kind === "gen") {
+                  mprop.set("gen", src);
+                  mprop.set("genBuilt", res.code.substring(6));
+                } else if (prop_kind === "visible") {
+                  mprop.set("visible", src);
+                } else if (prop_kind === "option") {
+                  const meta = mprop.get("meta");
+                  if (meta) {
+                    meta.set("options", src);
+                    meta.set("optionsBuilt", res.code.substring(6));
+                  }
                 }
-              }
-            });
+              });
+            } catch (e) {
+              g.log.error(e);
+            }
           }
         }
       }

@@ -11,6 +11,8 @@ import { getActiveMeta } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
 import { declareScope } from "./scope";
+import { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
+import { ISimpleMeta } from "../../../../vi/utils/types";
 
 const scriptEdit = {
   timeout: null as any,
@@ -188,7 +190,7 @@ export const EdScriptMonaco: FC<{}> = () => {
         local.value = val || "";
         local.render();
         clearTimeout(scriptEdit.timeout);
-        scriptEdit.timeout = setTimeout(() => {
+        scriptEdit.timeout = setTimeout(async () => {
           const meta = getActiveMeta(p);
           const type = p.ui.popup.script.mode;
           if (meta && meta.mitem) {
@@ -199,6 +201,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               arg.page_id = p.page.cur.id;
             }
 
+            let scope: boolean | ParsedScope = false;
             if (p.ui.popup.script.type === "prop-master") {
               p.sync.code.edit({
                 type: "prop",
@@ -208,13 +211,20 @@ export const EdScriptMonaco: FC<{}> = () => {
                 ...arg,
               });
             } else {
-              p.sync.code.edit({
+              scope = await p.sync.code.edit({
                 type: "adv",
                 mode: type,
                 item_id: active.item_id,
                 value: compress(encode.encode(val || "")),
                 ...arg,
               });
+            }
+
+            if (typeof scope === "object") {
+              if (active.comp_id) {
+              } else {
+                p.page.smeta[active.item_id].scope = scope;
+              }
             }
           }
         }, 1000);

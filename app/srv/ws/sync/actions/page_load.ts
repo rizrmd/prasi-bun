@@ -222,7 +222,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
                   on: {
                     visit(meta) {
                       if (typeof meta.item.adv?.js === "string") {
-                        meta.scope.def = parseJs(meta);
+                        meta.scope.def = parseJs(meta.item.adv?.js);
                       }
                     },
                   },
@@ -247,7 +247,7 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
             visit(meta) {
               if (!meta.parent?.comp_id) {
                 if (typeof meta.item.adv?.js === "string") {
-                  meta.scope.def = parseJs(meta);
+                  meta.scope.def = parseJs(meta.item.adv?.js);
                 }
               }
             },
