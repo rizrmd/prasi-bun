@@ -5,8 +5,11 @@ export type ParsedScope = Exclude<ReturnType<typeof parseJs>, undefined>;
 
 export const parseJs = (code?: string) => {
   if (!code) return undefined;
-  const local = { name: "", value: "", index: 0 };
-  const passprop: Record<string, { value: string; index: number }> = {};
+  const local = { name: "", value: "", start: 0, end: 0 };
+  const passprop: Record<
+    string,
+    { value: string; start: number; end: number }
+  > = {};
   const result = {} as {
     local?: typeof local | undefined;
     passprop?: typeof passprop | undefined;
@@ -48,18 +51,16 @@ export const parseJs = (code?: string) => {
                     attr.value.expression.properties.length - 1
                   ].loc?.end as any;
 
-                  if (
-                    typeof start === "number" &&
-                    typeof end === "number" &&
-                    typeof loc.start.index === "number"
-                  ) {
+                  if (typeof start === "number" && typeof end === "number") {
                     local.value = code.substring(start, end);
-                    local.index = loc.start.index;
+                    local.start = start;
+                    local.end = end;
                   }
 
                   if (typeof start === "object" && typeof end === "object") {
                     local.value = `{${code.substring(start.index, end.index)}}`;
-                    local.index = loc.start.index;
+                    local.start = loc.start.index;
+                    local.end = loc.end.index;
                   }
                 }
               }
@@ -72,7 +73,8 @@ export const parseJs = (code?: string) => {
               ) {
                 passprop[attr.name.name] = {
                   value: "0",
-                  index: 0,
+                  start: 0,
+                  end: 0,
                 };
                 // if (attr.value) {
                 //   if (

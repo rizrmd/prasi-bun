@@ -2,6 +2,7 @@ import type { Editor as MonacoEditor } from "@monaco-editor/react";
 import type Prettier from "prettier/standalone";
 import type estree from "prettier/plugins/estree";
 import type ts from "prettier/plugins/typescript";
+import { PG } from "../../nova/ed/logic/ed-global";
 export type FBuild = (
   entryFileName: string,
   src: string,
@@ -15,6 +16,7 @@ export const initJS = async () => {
 };
 
 export const jscript = {
+  reload: (p: PG) => {},
   editor: null as typeof MonacoEditor | null,
   build: null as null | FBuild,
   pending: null as null | Promise<void>,

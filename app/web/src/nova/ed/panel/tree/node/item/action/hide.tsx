@@ -11,7 +11,7 @@ export const edActionHide = (
   if (mitem) {
     const hidden = mitem.get("hidden");
     if (mode === "toggle") {
-      if (!hidden) mitem.set("hidden", "all");
+      if (!hidden) mitem.set("hidden", "only-editor");
       else mitem.delete("hidden");
     } else {
       if (!hidden) mitem.set("hidden", "all");
