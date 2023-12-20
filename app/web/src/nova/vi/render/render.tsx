@@ -12,6 +12,8 @@ export const ViRender: FC<{
 }> = ({ meta, children }) => {
   if (!meta) return null;
 
+  if (meta.item.hidden) return null;
+
   if (meta.item.adv?.js || meta.item.component?.id) {
     return <ViScript meta={meta}>{children}</ViScript>;
   }

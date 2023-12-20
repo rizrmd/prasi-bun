@@ -5,7 +5,6 @@ import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { propPopover } from "../../side/prop-master/prop-form";
 import { EdScriptWorkbench } from "./workbench";
-import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdPopScript = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

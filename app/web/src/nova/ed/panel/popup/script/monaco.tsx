@@ -4,15 +4,14 @@ import trim from "lodash.trim";
 import { FC, useEffect } from "react";
 import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
+import { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
 import { getActiveMeta } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
-import { declareScope } from "./scope";
-import { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
-import { ISimpleMeta } from "../../../../vi/utils/types";
+import { declareScope } from "./scope/scope";
 
 const scriptEdit = {
   timeout: null as any,
