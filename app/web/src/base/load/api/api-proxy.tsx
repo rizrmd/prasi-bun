@@ -15,7 +15,7 @@ export const apiProxy = (api_url: string) => {
   const base_url = `${base.protocol}//${base.host}`;
   if (!w.prasiApi[base_url]) {
     if (!apiProxyPending[base_url]) {
-      apiProxyPending[base_url] = loadApiProxyDef(base_url, false);
+      throw new Error(`API Definition not found: ${base_url}`);
     }
   }
 

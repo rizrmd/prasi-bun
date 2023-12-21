@@ -1,3 +1,4 @@
+import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
 import importModule from "../../../render/editor/tools/dynamic-import";
 import { viScriptArg } from "../render/script/arg";
 
@@ -38,7 +39,7 @@ export const viLoadLegacy = async (vi: {
     let api_url = vi.site.api_url;
     if (!api_url) api_url = ((site.config as any) || {}).api_url || "";
 
-    // await initApi(site.config);
+    await loadApiProxyDef(api_url, true);
 
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);

@@ -31,12 +31,13 @@ export const edInitSync = (p: PG) => {
       p.ui.popup.code.init = false;
       p.sync.site.load(params.site_id).then(async (site) => {
         if (site) {
-          await loadSite(p, site);
+          await loadSite(p, site, "from-sync");
           p.render();
         } else {
           alert("Site not found. redirecting...");
           location.href = `/ed/`;
         }
+        return;
       });
       return false;
     }

@@ -11,22 +11,31 @@ export const serveAPI = {
   },
   serve: async (url: URL, req: Request) => {
     let found = g.router.lookup(url.pathname);
+    let found_not_match = false;
     if (!found?.url) {
-      if (!url.pathname.endsWith("/")) {
-        found = g.router.lookup(url.pathname + "/");
+      let pathname = url.pathname;
+      if (!pathname.endsWith("/")) {
+        pathname = pathname + "/";
+        found = g.router.lookup(pathname);
+        found_not_match = true;
+      }
+      if (!pathname.endsWith("_")) {
+        found = g.router.lookup(pathname + "_");
+        found_not_match = true;
       }
 
       if (!found?.url) {
         found = null;
       }
     }
-
     if (found) {
       const params = { ...found.params };
 
-      let args = found.args.map((e) => {
-        return params[e];
-      });
+      let args = found_not_match
+        ? []
+        : found.args.map((e) => {
+            return params[e];
+          });
 
       if (req.method !== "GET") {
         if (

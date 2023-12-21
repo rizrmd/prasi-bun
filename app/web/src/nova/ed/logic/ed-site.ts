@@ -2,10 +2,12 @@ import { viLoadLegacy } from "../../vi/load/load-legacy";
 import { ESite, PG } from "./ed-global";
 import { reloadPage } from "./ed-route";
 
-export const loadSite = async (p: PG, site: ESite) => {
+export const loadSite = async (p: PG, site: ESite, note: string) => {
+  console.log("note", note);
   const old_layout_id = p.site.layout.id;
   const layout_changed = p.site.layout.id !== site.layout.id;
   p.site = site;
+
   if (layout_changed) {
     const old_layout = p.page.list[old_layout_id];
 

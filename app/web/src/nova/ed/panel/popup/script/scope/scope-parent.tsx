@@ -26,36 +26,12 @@ export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
         m.scope.def.props = meta.scope?.def?.props;
       }
     }
+    
     const def = m.scope.def;
     if (def) {
       if (def.local) {
-        addScope(p, "local", {
-          monaco,
-          loc: {
-            item_id: m.item.id,
-            comp_id: m.parent?.comp_id,
-            type: "item",
-          },
-          source: `\
-type _local = ${def.local.value};
-export const ${def.local.name}: _local & { render: () =>void };
-`,
-        });
       } else if (def.passprop) {
-        Object.entries(def.passprop).map(([e, v]) => {
-          if (e !== "idx" && e !== "key") {
-            addScope(p, "passprop", {
-              monaco,
-              loc: {
-                item_id: m.item.id,
-                comp_id: m.parent?.comp_id,
-                type: "item",
-              },
-              source: `\
-export const ${e} = ${v.value};`,
-            });
-          }
-        });
+      } else if (def.props) {
       }
     }
   }
