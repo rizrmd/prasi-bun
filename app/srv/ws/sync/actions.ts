@@ -106,10 +106,18 @@ export const SyncActions = {
             value: Uint8Array;
           }
         | {
-            type: "prop";
+            type: "prop-master";
             comp_id: string;
             prop_name: string;
             prop_kind: PropFieldKind;
+            value: Uint8Array;
+          }
+        | {
+            type: "prop-instance";
+            item_id: string;
+            page_id?: string;
+            comp_id?: string;
+            prop_name: string;
             value: Uint8Array;
           }
     ) => ({}) as boolean | ParsedScope,

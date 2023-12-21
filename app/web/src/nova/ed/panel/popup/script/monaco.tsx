@@ -209,6 +209,15 @@ export const EdScriptMonaco: FC<{}> = () => {
                 value: compress(encode.encode(val || "")),
                 ...arg,
               });
+            } else if (p.ui.popup.script.type === "prop-instance") {
+              scope = await p.sync.code.edit({
+                type: "adv",
+                mode: type,
+                prop_name: p.ui.popup.script.prop_name,
+                item_id: active.item_id,
+                value: compress(encode.encode(val || "")),
+                ...arg,
+              });
             } else {
               scope = await p.sync.code.edit({
                 type: "adv",
