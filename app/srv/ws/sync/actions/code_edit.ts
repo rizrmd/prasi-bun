@@ -17,8 +17,8 @@ export const code_edit: SAction["code"]["edit"] = async function (
 ) {
   const src = decoder.decode(await gunzipAsync(arg.value));
 
-  if (arg.type === "adv") {
-    const { item_id, mode, comp_id, page_id } = arg;
+  if (arg.type === "adv" || arg.type === "prop-instance") {
+    const { item_id, comp_id, page_id } = arg;
 
     let root = undefined as undefined | MRoot | MItem;
     let doc = undefined as undefined | Doc;
@@ -38,43 +38,64 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
     if (root) {
       const mitem = findId(root, item_id);
-
       if (mitem) {
-        let adv = mitem.get("adv");
-        if (!adv) {
-          mitem.set("adv", new Y.Map() as any);
-          adv = mitem.get("adv");
-        }
-
-        if (adv) {
-          try {
-            const res = await transform(`render(${src})`, {
-              jsx: "transform",
-              format: "cjs",
-              loader: "tsx",
-              minify: true,
-              sourcemap: "inline",
-            });
-
-            doc?.transact(() => {
-              if (adv) {
-                adv.set(mode, src);
-                if (mode === "js") {
-                  adv.set("jsBuilt", res.code);
-                }
-              }
-            });
-          } catch (e) {
-            g.log.error(e);
+        if (arg.type === "adv") {
+          const mode = arg.mode;
+          let adv = mitem.get("adv");
+          if (!adv) {
+            mitem.set("adv", new Y.Map() as any);
+            adv = mitem.get("adv");
           }
 
-          if (mode === "js") {
-            return parseJs(adv.get("js")) || false;
+          if (adv) {
+            try {
+              const res = await transform(`render(${src})`, {
+                jsx: "transform",
+                format: "cjs",
+                loader: "tsx",
+                minify: true,
+                sourcemap: "inline",
+              });
+
+              doc?.transact(() => {
+                if (adv) {
+                  adv.set(mode, src);
+                  if (mode === "js") {
+                    adv.set("jsBuilt", res.code);
+                  }
+                }
+              });
+            } catch (e) {
+              g.log.error(e);
+            }
+
+            if (mode === "js") {
+              return parseJs(adv.get("js")) || false;
+            }
+          }
+        } else {
+          const mprop = mitem
+            .get("component")
+            ?.get("props")
+            ?.get(arg.prop_name);
+          if (mprop) {
+            try {
+              const res = await transform(`return ${src}`, {
+                jsx: "transform",
+                format: "cjs",
+                loader: "tsx",
+              });
+
+              doc?.transact(() => {
+                mprop.set("value", src);
+                mprop.set("valueBuilt", res.code.substring(6));
+              });
+            } catch (e) {}
           }
         }
       }
     }
-  } else {
+  } else if (arg.type === "prop-master") {
     const { comp_id, prop_kind, prop_name } = arg;
     if (comp_id) {
       const ref = docs.comp[comp_id];
