@@ -15,7 +15,7 @@ export const edRoute = async (p: PG) => {
         return;
       }
 
-      await loadSite(p, site);
+      await loadSite(p, site, "from-route");
     }
 
     if (

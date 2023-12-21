@@ -75,7 +75,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
       }
     }
   } else {
-    const { comp_id, prop_kind, prop_name, value } = arg;
+    const { comp_id, prop_kind, prop_name } = arg;
     if (comp_id) {
       const ref = docs.comp[comp_id];
       if (ref) {

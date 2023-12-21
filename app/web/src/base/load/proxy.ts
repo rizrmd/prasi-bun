@@ -66,11 +66,13 @@ export const fetchViaProxy = async (
   } else {
     const res = await fetch(`/_proxy`, {
       method: "POST",
-      body: JSON.stringify({
-        url,
-        body,
-        headers,
-      }),
+      body: JSON.stringify([
+        {
+          url,
+          body,
+          headers,
+        },
+      ]),
       headers: { "content-type": "application/json" },
     });
     return res.json();

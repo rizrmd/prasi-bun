@@ -21,7 +21,11 @@ export const EmptySite = {
   config: { api_url: "" },
   js: "",
   js_compiled: "",
-  layout: { id: "", meta: {} as Record<string, IMeta>, entry: [] as string[] },
+  layout: {
+    id: "--",
+    meta: {} as Record<string, IMeta>,
+    entry: [] as string[],
+  },
 };
 
 export type ESite = typeof EmptySite;

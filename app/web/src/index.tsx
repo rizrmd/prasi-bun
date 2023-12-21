@@ -1,6 +1,7 @@
 import { Root as ReactRoot, createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { apiProxy } from "./base/load/api/api-proxy";
+import { loadApiProxyDef } from "./base/load/api/api-proxy-def";
 import { dbProxy } from "./base/load/db/db-proxy";
 import { Root } from "./base/root";
 import "./index.css";
@@ -18,6 +19,8 @@ const start = async () => {
   const cur = new URL(location.href);
   const base_url = `${cur.protocol}//${cur.host}`;
   w.db = dbProxy(base_url);
+
+  await loadApiProxyDef(base_url, false);
   w.api = apiProxy(base_url);
 
   w.serverurl = base;
