@@ -36,7 +36,7 @@ export const EdTreeSearch = () => {
     >
       <div className="flex items-stretch h-[24px] ">
         <input
-          name="search"
+          name="search-tree"
           ref={(ref) => {
             local.sref = ref;
           }}
@@ -117,7 +117,7 @@ export const doTreeSearch = (p: PG) => {
   let i = 0;
 
   let ptree = p.page.tree;
-  if (active.comp_id && p.comp.list[active.comp_id].tree) {
+  if (active.comp_id && p.comp.list[active.comp_id]?.tree) {
     ptree = p.comp.list[active.comp_id].tree;
   }
 

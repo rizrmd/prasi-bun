@@ -6,16 +6,16 @@
     "@hyrious/esbuild-plugin-style": "^0.3.5",
     "@node-rs/argon2": "^1.5.2",
     "@paralleldrive/cuid2": "^2.2.2",
-    "@types/mime-types": "^2.1.2",
+    "@types/mime-types": "^2.1.4",
     "recast": "^0.23.4",
-    "esbuild": "^0.19.4",
-    "lmdb": "^2.8.5",
+    "esbuild": "^0.19.10",
+    "lmdb": "^2.9.2",
     "mime-types": "^2.1.35",
-    "msgpackr": "^1.9.9",
+    "msgpackr": "^1.10.0",
     "radix3": "^1.1.0",
     "uuid": "^9.0.1",
     "y-pojo": "^0.0.8",
-    "yjs": "^13.6.8",
+    "yjs": "^13.6.10",
     "yjs-types": "^0.0.1"
   }
 }

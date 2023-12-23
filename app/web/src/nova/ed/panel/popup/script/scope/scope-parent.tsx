@@ -1,5 +1,5 @@
 import { IMeta, PG, active } from "../../../../logic/ed-global";
-import { addScope } from "./add-scope";
+import { extractExportImport } from "./extract-exim";
 import { Monaco } from "./type";
 
 export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
@@ -18,7 +18,12 @@ export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
+  let i = 0;
+  let next_parent = parents[i + 1];
+  const imports = {} as Record<string, any>;
   for (const m of parents) {
+    next_parent = parents[i + 1];
+
     if (active.comp_id && m.parent?.id === "root" && active.instance) {
       const meta = p.page.meta[active.instance.item_id];
       if (meta) {
@@ -26,13 +31,15 @@ export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
         m.scope.def.props = meta.scope?.def?.props;
       }
     }
-    
+
     const def = m.scope.def;
     if (def) {
-      if (def.local) {
-      } else if (def.passprop) {
-      } else if (def.props) {
+      if (!imports[m.item.id]) imports[m.item.id] = [];
+      const res = extractExportImport(p, m, imports[m.item.id]);
+      if (next_parent) {
+        imports[next_parent.item.id] = res.imports;
       }
     }
+    i++;
   }
 };

@@ -20,8 +20,12 @@ const start = async () => {
   const base_url = `${cur.protocol}//${cur.host}`;
   w.db = dbProxy(base_url);
 
-  await loadApiProxyDef(base_url, false);
-  w.api = apiProxy(base_url);
+  try {
+    await loadApiProxyDef(base_url, false);
+    w.api = apiProxy(base_url);
+  } catch (e) {
+    console.warn("Failed to load API:", base_url);
+  }
 
   w.serverurl = base;
 

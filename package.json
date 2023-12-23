@@ -27,6 +27,7 @@
   "dependencies": {
     "brotli-wasm": "^2.0.1",
     "fdir": "^6.1.0",
+    "react-select": "^5.8.0",
     "typescript": "^5.2.2"
   }
 }

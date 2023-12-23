@@ -47,8 +47,8 @@ export const syncHandler: WebSocketHandler<WSData> = {
         const msg = packr.unpack(Buffer.from(raw));
         if (msg.type === SyncType.UserID) {
           const { user_id, page_id, site_id } = msg;
-
           conn.user_id = user_id;
+
           conn.user = await db.user.findFirst({ where: { id: user_id } });
           let conf = await user.conf.getOrCreate(user_id);
           if (site_id) {
@@ -57,7 +57,6 @@ export const syncHandler: WebSocketHandler<WSData> = {
           } else if (!conf.site_id) {
             await loadDefaultSite(user_id);
           }
-
           conn.conf = new Proxy(conf, {
             get(_, p) {
               const conf = user.conf.get(user_id);
@@ -85,7 +84,6 @@ export const syncHandler: WebSocketHandler<WSData> = {
             }
             if (baseAction) {
               const action = baseAction.bind(conn);
-
               sendWS(ws, {
                 type: SyncType.ActionResult,
                 argid: msg.argid,
