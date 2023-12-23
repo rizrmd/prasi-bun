@@ -21,7 +21,7 @@ export const produceCSS = (
 ): string => {
   try {
     return cx([
-      `s-${item.id}`,
+      item.id ? `s-${item.id}` : "",
       css`
         display: flex;
         position: relative;

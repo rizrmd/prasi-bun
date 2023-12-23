@@ -24,7 +24,6 @@ export const ViScript: FC<{ meta: IMeta; children: ReactNode }> = ({
 
   if (meta.item.adv?.js) {
     viEvalScript(vi, meta, scope);
-
     if (meta.script) return meta.script.result;
   }
   return <ViChild meta={meta}>{children}</ViChild>;

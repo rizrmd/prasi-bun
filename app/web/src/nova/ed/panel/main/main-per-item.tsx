@@ -1,3 +1,4 @@
+import { produceCSS } from "../../../../utils/css/gen";
 import { IContent } from "../../../../utils/types/general";
 import {
   getSelectionOffset,
@@ -25,22 +26,34 @@ export const mainPerItemVisit = (
   meta: MPIVParam[0],
   parts: MPIVParam[1]
 ) => {
-  if ((meta.item as IContent).type === "text" && !meta.item.adv?.js) {
-    parts.props.spellCheck = false;
-    parts.props.contentEditable = true;
+  if ((meta.item as IContent).type === "text") {
+    const prop = meta.item.adv?.js ? parts.text_props : parts.props;
+
+    if (!meta.item.adv?.js) {
+      prop.dangerouslySetInnerHTML = { __html: meta.item.html || "" };
+      delete parts.props.children;
+    } else {
+      prop.dangerouslySetInnerHTML = { __html: meta.item.html || "" };
+      delete prop.children;
+    }
+
+    prop.spellCheck = false;
+    prop.contentEditable = true;
+
+    prop.suppressContentEditableWarning = true;
     if (meta.parent?.comp_id) {
       if (meta.parent.comp_id !== active.comp_id) {
-        parts.props.contentEditable = false;
+        prop.contentEditable = false;
       }
     }
 
-    parts.props.onBlur = (e) => {
+    prop.onBlur = (e) => {
       text_edit.prevent_select_all = false;
       const sel = window.getSelection();
       if (sel) sel.removeAllRanges();
     };
 
-    parts.props.ref = (el) => {
+    prop.ref = (el) => {
       if (el && text_edit.caret) {
         if (text_edit.id === meta.item.id) {
           setCaret(el, text_edit.caret);
@@ -49,7 +62,7 @@ export const mainPerItemVisit = (
       }
     };
 
-    parts.props.onKeyDown = (e) => {
+    prop.onKeyDown = (e) => {
       if (typeof text_edit.del_key_id === "string") {
         if (e.key === "Backspace" || e.key === "Delete") {
           e.currentTarget.blur();
@@ -61,7 +74,7 @@ export const mainPerItemVisit = (
       }
     };
 
-    parts.props.onInput = (e) => {
+    prop.onInput = (e) => {
       e.stopPropagation();
       e.preventDefault();
       const val = e.currentTarget.innerHTML;
@@ -147,7 +160,6 @@ export const mainPerItemVisit = (
     active.hover.renderTree();
   };
   parts.props.onPointerDown = (e) => {
-    console.log(p);
     e.stopPropagation();
 
     if ((meta.item as IContent).type === "text") {

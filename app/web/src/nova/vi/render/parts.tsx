@@ -1,7 +1,10 @@
+import { FC, ReactNode, Suspense } from "react";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { IMeta } from "../../ed/logic/ed-global";
+import { ErrorBox } from "../utils/error-box";
 import { VG } from "./global";
+import { ViRender } from "./render";
 
 export type ViParts = {
   mode: "mobile" | "desktop";
@@ -9,34 +12,55 @@ export type ViParts = {
   active?: boolean;
 };
 
-export const viParts = (meta: IMeta, arg?: ViParts) => {
-  const item = meta.item;
-  const content = meta.item as unknown as IContent;
+type PROPS = React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>;
 
-  const props: React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLDivElement>,
-    HTMLDivElement
-  > = {
+export const viParts = (
+  vi: {
+    meta: Record<string, IMeta>;
+  },
+  meta: IMeta
+) => {
+  const item = meta.item;
+
+  const props: PROPS = {
     className: produceCSS(item, {
-      mode: arg?.mode || "desktop",
-      hover: arg?.hover,
-      active: arg?.active,
+      mode: "desktop",
     }),
   };
 
-  let shouldRenderChild = true;
-  if (content.type === "text" && !item.adv?.js) {
-    props.dangerouslySetInnerHTML = { __html: item.html || "" };
-    shouldRenderChild = false;
-  }
+  let text_props: PROPS = {};
 
-  if (content.adv?.html && !content.adv?.js) {
-    props.dangerouslySetInnerHTML = { __html: content.adv.html };
-    shouldRenderChild = false;
+  const childs = meta.item.childs;
+  let children = undefined;
+  if ((meta.item as IContent).type === "text") {
+    children = <HTMLChild props={text_props} />;
+  } else {
+    children =
+      Array.isArray(childs) &&
+      childs?.map((item) => {
+        if (!item) return null;
+        const { id } = item;
+
+        return (
+          <ErrorBox key={id} meta={meta}>
+            <Suspense>
+              <ViRender meta={vi.meta[id]} />
+            </Suspense>
+          </ErrorBox>
+        );
+      });
   }
+  props.children = children;
 
   return {
-    shouldRenderChild,
     props,
+    text_props,
   };
+};
+
+const HTMLChild: FC<{ props: PROPS }> = ({ props }) => {
+  return <span {...props} />;
 };

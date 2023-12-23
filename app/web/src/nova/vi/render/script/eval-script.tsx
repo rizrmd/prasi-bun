@@ -8,6 +8,7 @@ import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
+import { IContent } from "../../../../utils/types/general";
 
 export const viEvalScript = (
   vi: {
@@ -18,18 +19,8 @@ export const viEvalScript = (
   meta: IMeta,
   scope: any
 ) => {
-  const childs = meta.item.childs;
-  const parts = viParts(meta);
+  const parts = viParts(vi, meta);
   if (vi.visit) vi.visit(meta, parts);
-
-  let children = undefined;
-  if (parts.shouldRenderChild) {
-    children =
-      Array.isArray(childs) &&
-      childs.map(({ id }) => {
-        return <ViRender key={id} meta={vi.meta[id]} />;
-      });
-  }
 
   if (!meta.script) {
     meta.script = {
@@ -43,7 +34,7 @@ export const viEvalScript = (
   const exports = (window as any).exports;
   const arg = {
     useEffect,
-    children,
+    children: parts.props.children,
     props: parts.props,
     Local: script.Local,
     PassProp: script?.PassProp,
