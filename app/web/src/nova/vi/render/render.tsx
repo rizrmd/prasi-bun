@@ -5,6 +5,7 @@ import { ErrorBox } from "../utils/error-box";
 import { ViGlobal } from "./global";
 import { viParts } from "./parts";
 import { ViScript } from "./script";
+import { IContent } from "../../../utils/types/general";
 
 export const ViRender: FC<{
   meta: IMeta;
@@ -26,27 +27,8 @@ export const ViChild: FC<{
   children?: ReactNode;
 }> = ({ meta, children }) => {
   const vi = useGlobal(ViGlobal, "VI");
-  const parts = viParts(meta);
+  const parts = viParts(vi, meta);
   if (vi.visit) vi.visit(meta, parts);
 
-  let renderChild = undefined;
-
-  if (parts.shouldRenderChild) {
-    renderChild = children
-      ? children
-      : meta.item.childs?.map((item) => {
-          if (!item) return null;
-          const { id } = item;
-
-          return (
-            <ErrorBox key={id} meta={meta}>
-              <Suspense>
-                <ViRender meta={vi.meta[id]} />
-              </Suspense>
-            </ErrorBox>
-          );
-        });
-  }
-
-  return <div {...parts.props} children={renderChild} />;
+  return <div {...parts.props} />;
 };
