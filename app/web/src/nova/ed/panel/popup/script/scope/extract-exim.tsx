@@ -1,23 +1,27 @@
 import { IMeta, PG } from "../../../../logic/ed-global";
 
 export const extractExportImport = (p: PG, m: IMeta, imports: string[]) => {
-  let _export = {};
-
+  const new_imports = [...imports];
   const def = m.scope.def;
   if (def) {
+    let res: null | ReturnType<typeof extractLocal> = null;
     if (def.local) {
-      const local = extractLocal(p, m, def, imports);
-      if (local) {
-        for (const [k, v] of Object.entries(local)) {
-          v.names.forEach((n) =>
-            imports.push(`import { ${n} } from "./${k}";`)
-          );
-        }
+      res = extractLocal(p, m, def, imports);
+    } else if (def.passprop) {
+      res = extractPassProp(p, m, def, imports);
+    } else if (def.props) {
+      res = extractProps(p, m, def, imports);
+    }
+    if (res) {
+      for (const [k, v] of Object.entries(res)) {
+        v.names.forEach((n) =>
+          new_imports.push(`import { ${n} } from "./${k}";`)
+        );
       }
     }
   }
 
-  return _export;
+  return { imports: new_imports };
 };
 
 const extractLocal = (
@@ -107,7 +111,7 @@ const extractProps = (
         exports.push(`export const ${e} = ${v.value};`);
       }
     }
-    
+
     result.src = `\
 ${imports.join("\n")}
 ${exports.join("\n")}

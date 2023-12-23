@@ -147,6 +147,7 @@ export const mainPerItemVisit = (
     active.hover.renderTree();
   };
   parts.props.onPointerDown = (e) => {
+    console.log(p);
     e.stopPropagation();
 
     if ((meta.item as IContent).type === "text") {

@@ -2,7 +2,12 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": ["WebWorker", "DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "WebWorker",
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "allowJs": false,
     "skipLibCheck": false,
     "esModuleInterop": false,
@@ -16,7 +21,12 @@
     // "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "dbgen": ["../../node_modules/.prisma/client/index.d.ts"],
-    }
+      "dbgen": [
+        "../../node_modules/.prisma/client/index.d.ts"
+      ],
+    },
+    "types": [
+      "bun-types" // add Bun global
+    ],
   }
 }

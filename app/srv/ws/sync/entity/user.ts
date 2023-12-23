@@ -37,10 +37,12 @@ export const user = {
     },
     async getOrCreate(user_id: string) {
       let res = this.db.get(user_id);
+
       if (!res) {
         await this.db.put(user_id, structuredClone(defaultConf));
         res = this.db.get(user_id);
       }
+
       return res as UserConf;
     },
     get(user_id: string) {

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:a5f64103e7ba098d@web.andromedia.co.id:5446/prasi?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model billing_account {
