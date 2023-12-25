@@ -26,7 +26,6 @@ export const edActionDetach = (p: PG, item: IItem) => {
               const nmap = new Y.Map();
               syncronize(nmap, comp);
               mitem.parent.insert(k, [nmap]);
-              console.log(nmap.toJSON());
             }
           });
         });
