@@ -10,15 +10,17 @@ export const scopeMapExportImport = (p: PG, meta: IMeta, parents: IMeta[]) => {
   for (const m of parents) {
     next_parent = parents[i + 1];
 
-    // if (active.comp_id && m.parent?.id === "root" && active.instance) {
-    //   const meta = p.page.meta[active.instance.item_id];
-    //   if (meta) {
-    //     if (!m.scope.def) m.scope.def = {};
-    //     m.scope.def.props = { ...m.scope.def.props, ...meta.scope?.def?.props };
-    //   }
-    // }
+    let def = m.scope.def;
 
-    const def = m.scope.def;
+    if (active.comp_id && m.parent?.id === "root" && active.instance) {
+      const meta = p.page.meta[active.instance.item_id];
+      if (meta) {
+        if (!m.scope.def) m.scope.def = {};
+        def = m.scope.def;
+        def.props = { ...m.scope.def.props, ...meta.scope?.def?.props };
+      }
+    }
+
     if (def) {
       const ex = extractExportImport(p, m, imports);
       if (next_parent) {
