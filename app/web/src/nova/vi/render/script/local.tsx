@@ -1,11 +1,12 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { updatePropScope } from "./eval-prop";
+import { modifyChild } from "./passprop";
 
 export const createViLocal = (
   metas: Record<string, IMeta>,
   meta: IMeta,
-  scope: any,
+  passprop: any,
   init_local_effect: any
 ) => {
   return <T extends Record<string, any>>(arg: {
@@ -20,7 +21,7 @@ export const createViLocal = (
     const local = ref.current;
     local.render = meta.render;
 
-    updatePropScope(meta, scope);
+    updatePropScope(meta, passprop);
 
     if (arg.hook) {
       arg.hook(local);
@@ -58,6 +59,6 @@ export const createViLocal = (
       return () => {};
     }, []);
 
-    return children;
+    return modifyChild(children, { ...passprop, [arg.name]: local });
   };
 };

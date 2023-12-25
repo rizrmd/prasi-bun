@@ -6,16 +6,17 @@ export const scopeMapExportImport = (p: PG, meta: IMeta, parents: IMeta[]) => {
   let next_parent = parents[i + 1];
   const imports = {} as Record<string, string>;
   const exports = {} as Record<string, Record<string, string>>;
+
   for (const m of parents) {
     next_parent = parents[i + 1];
 
-    if (active.comp_id && m.parent?.id === "root" && active.instance) {
-      const meta = p.page.meta[active.instance.item_id];
-      if (meta) {
-        if (!m.scope.def) m.scope.def = {};
-        m.scope.def.props = meta.scope?.def?.props;
-      }
-    }
+    // if (active.comp_id && m.parent?.id === "root" && active.instance) {
+    //   const meta = p.page.meta[active.instance.item_id];
+    //   if (meta) {
+    //     if (!m.scope.def) m.scope.def = {};
+    //     m.scope.def.props = { ...m.scope.def.props, ...meta.scope?.def?.props };
+    //   }
+    // }
 
     const def = m.scope.def;
     if (def) {

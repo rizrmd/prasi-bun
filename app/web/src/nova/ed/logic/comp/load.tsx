@@ -153,6 +153,7 @@ export const updateComponentMeta = async (
     {
       comps: p.comp.loaded,
       meta,
+      smeta,
       on: {
         visit(m) {
           pushTreeNode(p, m, meta, tree);

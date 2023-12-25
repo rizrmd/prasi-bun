@@ -5,14 +5,14 @@ import { VG } from "../global";
 export const createViPassProp = (
   vi: { meta: VG["meta"] },
   meta: IMeta,
-  scope: any
+  passprop?: any
 ) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
-    return modifyChild(arg);
+    return modifyChild(arg, passprop);
   };
 };
 
-export const modifyChild = (arg: any) => {
+export const modifyChild = (arg: any, passprop?: any) => {
   for (const [k, v] of Object.entries(arg)) {
     if (k === "key" || k === "idx" || k === "continue") continue;
   }
@@ -20,19 +20,22 @@ export const modifyChild = (arg: any) => {
   const childs = [];
   if (Array.isArray(arg.children)) {
     for (const child of arg.children) {
-      childs.push(modify(child, arg));
+      childs.push(modify(child, arg, passprop));
     }
   } else {
-    childs.push(modify(arg.children, arg));
+    childs.push(modify(arg.children, arg, passprop));
   }
   return childs;
 };
 
-const modify = (el: ReactNode, arg: any) => {
+const modify = (el: ReactNode, arg: any, passprop?: any) => {
   if (isValidElement(el)) {
-    const passprop = { ...arg };
-    delete passprop.children;
-    return { ...el, props: { ...el.props, passprop } };
+    const passarg = { ...arg };
+    delete passarg.children;
+    return {
+      ...el,
+      props: { ...el.props, passprop: { ...passprop, ...passarg } },
+    };
   }
   return el;
 };
