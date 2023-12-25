@@ -57,9 +57,7 @@ export const updatePropScope = (meta: IMeta, scope: any) => {
   if (meta.scope.def?.props) {
     for (const [name, prop] of Object.entries(meta.scope.def.props)) {
       if (prop.fn) {
-        const all_scope = {
-          ...scope,
-        };
+        const all_scope = scope;
         const fn = new Function(
           ...Object.keys(all_scope),
           `// [${meta.item.name}] ${name}: ${meta.item.id} 
