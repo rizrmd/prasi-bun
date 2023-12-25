@@ -1,6 +1,7 @@
 import { IItem } from "../../../../../../../utils/types/item";
 import { getMetaById } from "../../../../../logic/active/get-meta";
-import { PG, active } from "../../../../../logic/ed-global";
+import { loadCompSnapshot } from "../../../../../logic/comp/load";
+import { EComp, PG, active } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
 
 export const edActionNewComp = (
@@ -16,21 +17,27 @@ export const edActionNewComp = (
         const item = mitem.toJSON() as IItem;
         let item_id = active.item_id;
         p.ui.tree.item_loading.push(item_id);
-        await treeRebuild(p);
+        let newcomp: void | EComp = undefined;
         if (active.comp_id) {
-          await p.sync.comp.new({
+          newcomp = await p.sync.comp.new({
             group_id,
             item,
             comp_id: active.comp_id,
             item_id: active.item_id,
           });
         } else {
-          await p.sync.comp.new({
+          newcomp = await p.sync.comp.new({
             group_id,
             item,
             page_id: p.page.cur.id,
             item_id: active.item_id,
           });
+        }
+
+        console.log(newcomp);
+        if (newcomp && newcomp.snapshot) {
+          await loadCompSnapshot(p, newcomp.id, newcomp.snapshot, newcomp.meta);
+          await treeRebuild(p);
         }
 
         p.ui.tree.item_loading = p.ui.tree.item_loading.filter(

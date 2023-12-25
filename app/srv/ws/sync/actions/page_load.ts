@@ -45,11 +45,14 @@ export const page_load: SAction["page"]["load"] = async function (
       snapshot.set("page", id, "bin", bin);
 
       const sv_local = await gzipAsync(update);
+
       user.active.findAll({ page_id: id }).map((e) => {
         if (origin !== um) {
           if (e.client_id === origin) return;
         }
+
         const ws = conns.get(e.client_id)?.ws;
+
         if (ws)
           sendWS(ws, {
             type: SyncType.Event,

@@ -8,6 +8,7 @@ import {
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
 import { ParsedScope, parseJs } from "./editor/parser/parse-js";
+import { ISimpleMeta } from "../../../web/src/nova/vi/utils/types";
 
 /* 
    WARNING:
@@ -40,7 +41,7 @@ export const SyncActions = {
       comp_id?: string;
       item_id: string;
       item: IItem;
-    }) => {},
+    }) => ({}) as EComp | void,
     list: async () =>
       ({}) as Record<string, Exclude<component, "content_tree">>,
     group: async (id_site: string) =>

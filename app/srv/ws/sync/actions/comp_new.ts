@@ -1,11 +1,16 @@
 import { TypedArray } from "yjs-types";
-import { MItem } from "../../../../web/src/utils/types/item";
+import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
+import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
+import { IMeta } from "../../../../web/src/nova/vi/utils/types";
+import { IItem, MItem } from "../../../../web/src/utils/types/item";
 import {
   FMComponent,
   FNComponent,
 } from "../../../../web/src/utils/types/meta-fn";
 import { MText } from "../../../../web/src/utils/types/text";
 import { SAction } from "../actions";
+import { loadComponent } from "../editor/load-component";
+import { parseJs } from "../editor/parser/parse-js";
 import { docs } from "../entity/docs";
 import { SyncConnection } from "../type";
 
@@ -61,7 +66,7 @@ export const comp_new: SAction["comp"]["new"] = async function (
           walk(e);
         });
       }
-    }, "server: comp_new");
+    });
   } else if (comp_id) {
     const doc = docs.comp[comp_id].doc;
     doc.transact(() => {
@@ -71,7 +76,37 @@ export const comp_new: SAction["comp"]["new"] = async function (
           walk(e);
         });
       }
-    }, "server: comp_new");
+    });
+  }
+
+  if (comp) {
+    const load = await loadComponent(comp.id, this);
+
+    if (load) {
+      const mitem = docs.comp[comp.id].doc.getMap("map").get("root");
+      const citem = mitem?.toJSON() as IItem;
+      const smeta: Record<string, IMeta> = {};
+      genMeta(
+        {
+          comps: {},
+          meta: smeta,
+          on: {
+            visit(meta) {
+              if (typeof meta.item.adv?.js === "string") {
+                meta.scope.def = parseJs(meta.item.adv?.js);
+              }
+            },
+          },
+        },
+        { item: citem, ignore_first_component: true }
+      );
+
+      return {
+        id: comp.id,
+        meta: simplifyMeta(smeta),
+        snapshot: load.snapshot,
+      };
+    }
   }
 };
 
