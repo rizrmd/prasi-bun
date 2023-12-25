@@ -105,12 +105,14 @@ const extractLocal = (
 ${commentize("loc", loc)}
 ${genImports(imports)}
 
-const _local = ${def.local.value} 
+const _local = ${commentize("value", null, def.local.value)};
 export const ${def.local.name}: typeof _local & { render: ()=>void } = _local;
 declare global {
-  const /*NAME:${def.local.name} :NAME*/${
+  const ${commentize(
+    "name",
+    { old: def.local.name },
     def.local.name
-  }/** NAME-END **/: typeof _local & { render: ()=>void };
+  )}: typeof _local & { render: ()=>void };
 }
 `,
       },
@@ -130,7 +132,7 @@ const extractPassProp = (
       comp_id: m.parent?.comp_id,
       type: "passprop",
     };
-    let filename = `ts:scope~${JSON.stringify(loc)}.d.ts`;
+    let filename = `ts:scope~${hash_sum(loc)}.d.ts`;
 
     const result = {
       filename,
@@ -138,24 +140,25 @@ const extractPassProp = (
       src: "",
     };
 
-    const exports: string[] = [];
-    for (const [e, v] of Object.entries(def.passprop)) {
-      if (e !== "idx" && e !== "key") {
-        result.names.push(e);
-        exports.push(
-          `const ${commentize("name", null, e)} = ${commentize(
-            "value",
-            null,
-            e
-          )}`
-        );
+    const exports_global: string[] = [];
+    const exports_const: string[] = [];
+    for (const [name, v] of Object.entries(def.passprop)) {
+      if (name !== "idx" && name !== "key") {
+        result.names.push(name);
+        let val = `typeof ${v.value}`;
+        if (val.includes(" as ")) {
+          val = val.split(" as ").pop() || "any";
+        }
+        exports_global.push(`const ${name}: ${val};`);
+        exports_const.push(`export const ${name} = null as unknown as ${val}`);
       }
     }
     result.src = `\
 ${commentize("loc", loc)}
 ${genImports(imports)}
+${exports_const.join("\n")}
 declare global {
-  ${exports.join("\n")}
+  ${exports_global.join("\n")}
 }
 `;
 
@@ -175,7 +178,7 @@ const extractProps = (
       comp_id: m.parent?.comp_id,
       type: "prop-instance",
     };
-    let filename = `ts:scope~${JSON.stringify(loc)}.d.ts`;
+    let filename = `ts:scope~${hash_sum(loc)}.d.ts`;
 
     const result = {
       filename,
@@ -183,44 +186,20 @@ const extractProps = (
       src: "",
     };
 
-    const exports: string[] = [];
-    for (const [e, v] of Object.entries(def.props)) {
-      if (e !== "idx" && e !== "key") {
-        result.names.push(e);
-        exports.push(
-          `const ${commentize("name", null, e)} = ${commentize(
-            "value",
-            null,
-            e
-          )}`
-        );
-      }
-    }
-
-    result.src = `\
-${commentize("loc", loc)}
-${genImports(imports)}
-declare global {
-  ${exports.join("\n")}
-}
-`;
-
     return { [filename]: result };
   }
 };
 
 const commentize = (name: string, arg: any, children?: string) => {
   let opening = arg
-    ? `/*[${name}] ${JSON.stringify(arg)
+    ? `/*▸${name}${JSON.stringify(arg)
         .replace(/\//gi, "")
         .replace(/(\r\n|\n|\r)/gm, "")}`
-    : `/*[${name}]`;
+    : `/*▸${name}`;
 
   if (!children) {
-    return `${opening} [/${name}]*/`;
+    return `${opening}${name}◂*/`;
   }
-  return `
-${opening} */
-${children}
-/*[/${name}] */`;
+  return `\
+${opening}*/${children}/*${name}◂*/`;
 };

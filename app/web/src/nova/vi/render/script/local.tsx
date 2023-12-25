@@ -20,12 +20,6 @@ export const createViLocal = (
     const local = ref.current;
     local.render = meta.render;
 
-    if (!meta.scope.val) {
-      meta.scope.val = {};
-    }
-    const val = meta.scope.val;
-    val[arg.name] = local;
-
     updatePropScope(meta, scope);
 
     if (arg.hook) {

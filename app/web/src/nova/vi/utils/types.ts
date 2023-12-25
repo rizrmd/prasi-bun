@@ -65,7 +65,6 @@ export type IMeta = {
     PassProp: ReturnType<typeof createViPassProp>;
   };
   scope: {
-    val?: any;
     def?: ReturnType<typeof parseJs>;
   };
   render?: () => void;

@@ -227,6 +227,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 ...arg,
               });
             }
+            console.log(scope);
 
             if (typeof scope === "object") {
               if (active.comp_id) {

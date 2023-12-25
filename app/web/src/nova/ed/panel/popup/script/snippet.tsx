@@ -6,15 +6,16 @@ import { EDGlobal } from "../../../logic/ed-global";
 export const EdScriptSnippet: FC<{}> = ({}) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
+  const btn_style = css`
+    width: auto !important;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 12px;
+  `;
   return (
     <div className="flex items-center space-x-1 pl-2 border-l">
       <Button
-        className={cx(css`
-          width: auto !important;
-          padding-left: 5px;
-          padding-right: 5px;
-          font-size: 12px;
-        `)}
+        className={cx(btn_style)}
         onClick={() => {
           p.script.do_edit(
             `\
@@ -41,12 +42,7 @@ effect={async (local) => {
         &lt;Local/&gt;
       </Button>{" "}
       <Button
-        className={cx(css`
-          width: auto !important;
-          padding-left: 5px;
-          padding-right: 5px;
-          font-size: 12px;
-        `)}
+        className={cx(btn_style)}
         onClick={() => {
           p.script.do_edit(
             `\
@@ -59,6 +55,25 @@ effect={async (local) => {
         }}
       >
         &lt;PassProp/&gt;
+      </Button>
+      <Button
+        className={cx(btn_style)}
+        onClick={() => {
+          p.script.do_edit(
+            `\
+<div {...props}>
+{(local.list || []).map((item, idx) => (
+<PassProp item={item} key={idx}>
+{children}
+</PassProp>
+))}
+</div>   
+`,
+            true
+          );
+        }}
+      >
+        &lt;Map /&gt;
       </Button>
     </div>
   );

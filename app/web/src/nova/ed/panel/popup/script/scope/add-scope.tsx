@@ -21,7 +21,6 @@ export const addScope = (
     );
     model.onDidChangeContent((e) => {
       const text = model.getValue();
-      console.log(filename, text);
       // const models = monaco.editor.getModels().filter((e) => {
       //   return e.uri.toString().startsWith("ts:scope~");
       // });

@@ -1,33 +1,46 @@
-import { FC, ReactNode, Suspense } from "react";
+import { FC, ReactNode } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ErrorBox } from "../utils/error-box";
 import { ViGlobal } from "./global";
 import { viParts } from "./parts";
 import { ViScript } from "./script";
-import { IContent } from "../../../utils/types/general";
 
 export const ViRender: FC<{
   meta: IMeta;
   children?: ReactNode;
-}> = ({ meta, children }) => {
+  passprop?: any;
+}> = ({ meta, children, passprop }) => {
   if (!meta) return null;
 
   if (meta.item.hidden) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-    return <ViScript meta={meta}>{children}</ViScript>;
+    return (
+      <ErrorBox meta={meta}>
+        <ViScript meta={meta} passprop={passprop}>
+          {children}
+        </ViScript>
+      </ErrorBox>
+    );
   }
 
-  return <ViChild meta={meta}>{children}</ViChild>;
+  return (
+    <ErrorBox meta={meta}>
+      <ViChild meta={meta} passprop={passprop}>
+        {children}
+      </ViChild>
+    </ErrorBox>
+  );
 };
 
 export const ViChild: FC<{
   meta: IMeta;
   children?: ReactNode;
-}> = ({ meta, children }) => {
+  passprop?: any;
+}> = ({ meta, children, passprop }) => {
   const vi = useGlobal(ViGlobal, "VI");
-  const parts = viParts(vi, meta);
+  const parts = viParts(vi, meta, passprop);
   if (vi.visit) vi.visit(meta, parts);
 
   return <div {...parts.props} />;
