@@ -42,15 +42,3 @@ export const getScopeMeta = (
 
   return scope_meta;
 };
-
-export const getScopeValue = (scope_meta: ReturnType<typeof getScopeMeta>) => {
-  const scope: any = {};
-
-  for (const [varname, s] of Object.entries(scope_meta)) {
-    if (s.meta.scope.val) {
-      scope[varname] = s.meta.scope.val[varname];
-    }
-  }
-
-  return scope;
-};

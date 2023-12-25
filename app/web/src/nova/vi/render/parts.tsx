@@ -1,9 +1,7 @@
-import { FC, ReactNode, Suspense } from "react";
+import { FC } from "react";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { IMeta } from "../../ed/logic/ed-global";
-import { ErrorBox } from "../utils/error-box";
-import { VG } from "./global";
 import { ViRender } from "./render";
 
 export type ViParts = {
@@ -21,7 +19,8 @@ export const viParts = (
   vi: {
     meta: Record<string, IMeta>;
   },
-  meta: IMeta
+  meta: IMeta,
+  passprop?: any
 ) => {
   const item = meta.item;
 
@@ -44,13 +43,7 @@ export const viParts = (
         if (!item) return null;
         const { id } = item;
 
-        return (
-          <ErrorBox key={id} meta={meta}>
-            <Suspense>
-              <ViRender meta={vi.meta[id]} />
-            </Suspense>
-          </ErrorBox>
-        );
+        return <ViRender key={id} meta={vi.meta[id]} passprop={passprop} />;
       });
   }
   props.children = children;

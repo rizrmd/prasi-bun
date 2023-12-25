@@ -3,12 +3,10 @@ import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
 import { VG } from "../global";
 import { viParts } from "../parts";
-import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import { IContent } from "../../../../utils/types/general";
 
 export const viEvalScript = (
   vi: {
@@ -17,16 +15,22 @@ export const viEvalScript = (
     script?: { init_local_effect: any };
   },
   meta: IMeta,
-  scope: any
+  passprop: any
 ) => {
-  const parts = viParts(vi, meta);
+  const parts = viParts(vi, meta, passprop);
+
   if (vi.visit) vi.visit(meta, parts);
 
   if (!meta.script) {
     meta.script = {
       result: null,
-      Local: createViLocal(vi.meta, meta, scope, vi.script?.init_local_effect),
-      PassProp: createViPassProp(vi, meta, scope),
+      Local: createViLocal(
+        vi.meta,
+        meta,
+        passprop,
+        vi.script?.init_local_effect
+      ),
+      PassProp: createViPassProp(vi, meta, passprop),
     };
   }
   const script = meta.script;
@@ -45,7 +49,7 @@ export const viEvalScript = (
     },
     ...viScriptArg(),
     ...exports,
-    ...scope,
+    ...passprop,
   };
 
   const fn = new Function(
@@ -56,5 +60,5 @@ ${meta.item.adv?.jsBuilt || ""}
   );
   fn(...Object.values(arg));
 
-  updatePropScope(meta, scope);
+  updatePropScope(meta, passprop);
 };
