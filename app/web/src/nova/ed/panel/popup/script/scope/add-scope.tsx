@@ -14,7 +14,6 @@ export const addScope = (
   if (model) {
     model.setValue(source);
   } else {
-    console.log(filename, source);
     const model = monaco.editor.createModel(
       source,
       "typescript",
@@ -22,8 +21,6 @@ export const addScope = (
     );
     model.onDidChangeContent((e) => {
       const text = model.getValue();
-      console.log(filename, text);
-
       // const models = monaco.editor.getModels().filter((e) => {
       //   return e.uri.toString().startsWith("ts:scope~");
       // });

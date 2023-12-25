@@ -74,7 +74,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     }
 
     page.on_update = async (bin: Uint8Array, origin: any) => {
-      if (origin === "sv_remote" || origin === "local") return;
+      if (origin === "local") return;
 
       const res = await p.sync.yjs.sv_local(
         "page",
@@ -88,6 +88,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
           decompress(res.sv)
         );
         Y.applyUpdate(doc as any, decompress(res.diff), "local");
+
         await treeRebuild(p, { note: note + " page-on-update" });
 
         await p.sync.yjs.diff_local(
