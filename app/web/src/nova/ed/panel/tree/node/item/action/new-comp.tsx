@@ -34,7 +34,6 @@ export const edActionNewComp = (
           });
         }
 
-        console.log(newcomp);
         if (newcomp && newcomp.snapshot) {
           await loadCompSnapshot(p, newcomp.id, newcomp.snapshot, newcomp.meta);
           await treeRebuild(p);
