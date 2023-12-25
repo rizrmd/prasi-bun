@@ -76,24 +76,26 @@ export const parseJs = (code?: string) => {
                   start: 0,
                   end: 0,
                 };
-                // if (attr.value) {
-                //   if (
-                //     attr.value.type === "JSXExpressionContainer" &&
-                //     attr.value.expression.loc
-                //   ) {
-                //     const loc = attr.value.expression.loc as any;
-                //     passprop[attr.name.name] = {
-                //       value: code.substring(loc.start.index, loc.end.index),
-                //       index: loc.start.index,
-                //     };
-                //   } else if (attr.value.loc) {
-                //     const loc = attr.value.loc as any;
-                //     passprop[attr.name.name] = {
-                //       value: code.substring(loc.start.index, loc.end.index),
-                //       index: loc.start.index,
-                //     };
-                //   }
-                // }
+                if (attr.value) {
+                  if (
+                    attr.value.type === "JSXExpressionContainer" &&
+                    attr.value.expression.loc
+                  ) {
+                    const loc = attr.value.expression.loc as any;
+                    passprop[attr.name.name] = {
+                      value: code.substring(loc.start.index, loc.end.index),
+                      start: loc.start.index,
+                      end: loc.end.index,
+                    };
+                  } else if (attr.value.loc) {
+                    const loc = attr.value.loc as any;
+                    passprop[attr.name.name] = {
+                      value: code.substring(loc.start.index, loc.end.index),
+                      start: loc.start.index,
+                      end: loc.end.index,
+                    };
+                  }
+                }
               }
             }
           }

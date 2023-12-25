@@ -1,8 +1,7 @@
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { extractExportImport } from "./extract-exim";
-import { Monaco } from "./type";
 
-export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
+export const defineScopeParent = (p: PG, meta: IMeta) => {
   const metas = active.comp_id
     ? p.comp.list[active.comp_id]?.meta
     : p.page.meta;
@@ -20,7 +19,8 @@ export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
 
   let i = 0;
   let next_parent = parents[i + 1];
-  const imports = {} as Record<string, any>;
+  const imports = {} as Record<string, string>;
+  const exports = {} as Record<string, Record<string, string>>;
   for (const m of parents) {
     next_parent = parents[i + 1];
 
@@ -34,12 +34,21 @@ export const defineScopeParent = (p: PG, meta: IMeta, monaco: Monaco) => {
 
     const def = m.scope.def;
     if (def) {
-      if (!imports[m.item.id]) imports[m.item.id] = [];
-      const res = extractExportImport(p, m, imports[m.item.id]);
+      const ex = extractExportImport(p, m, imports);
       if (next_parent) {
-        imports[next_parent.item.id] = res.imports;
+        for (const e of Object.values(ex)) {
+          for (const [filename, v] of Object.entries(e)) {
+            if (!exports[m.item.id]) exports[m.item.id] = {};
+            exports[m.item.id][filename] = v.src;
+            for (const n of v.names) {
+              imports[n] = filename;
+            }
+          }
+        }
       }
     }
     i++;
   }
+
+  return { imports, exports };
 };

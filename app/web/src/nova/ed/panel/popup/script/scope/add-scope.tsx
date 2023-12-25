@@ -3,16 +3,10 @@ import { CodeLoc, Monaco } from "./type";
 
 export const addScope = (
   p: PG,
-  type: "local" | "props" | "passprop",
-  arg: {
-    monaco: Monaco;
-    loc: CodeLoc;
-    source: string;
-  }
+  monaco: Monaco,
+  filename: string,
+  source: string
 ) => {
-  const { monaco, source } = arg;
-
-  const filename = `ts:scope~${JSON.stringify(arg.loc)}.d.ts`;
   const model = monaco.editor.getModels().find((e) => {
     return e.uri.toString() === filename;
   });
@@ -20,6 +14,7 @@ export const addScope = (
   if (model) {
     model.setValue(source);
   } else {
+    console.log(filename, source);
     const model = monaco.editor.createModel(
       source,
       "typescript",
@@ -27,6 +22,14 @@ export const addScope = (
     );
     model.onDidChangeContent((e) => {
       const text = model.getValue();
+      console.log(filename, text);
+
+      // const models = monaco.editor.getModels().filter((e) => {
+      //   return e.uri.toString().startsWith("ts:scope~");
+      // });
+      // models.forEach((model) => {
+      //   console.log(model?.getValue());
+      // });
       // modifyJS(p, type, arg.loc, text);
     });
   }

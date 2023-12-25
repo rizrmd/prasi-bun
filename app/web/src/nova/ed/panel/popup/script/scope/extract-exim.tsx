@@ -1,50 +1,118 @@
 import { IMeta, PG } from "../../../../logic/ed-global";
+import hash_sum from "hash-sum";
 
-export const extractExportImport = (p: PG, m: IMeta, imports: string[]) => {
-  const new_imports = [...imports];
+export const extractExportImport = (
+  p: PG,
+  m: IMeta,
+  imports: Record<string, string>
+) => {
   const def = m.scope.def;
+  let result: {
+    local?: ReturnType<typeof extractLocal>;
+    passprop?: ReturnType<typeof extractPassProp>;
+    props?: ReturnType<typeof extractProps>;
+    content?: ReturnType<typeof extractContent>;
+  } = {};
+
   if (def) {
-    let res: null | ReturnType<typeof extractLocal> = null;
     if (def.local) {
-      res = extractLocal(p, m, def, imports);
-    } else if (def.passprop) {
-      res = extractPassProp(p, m, def, imports);
-    } else if (def.props) {
-      res = extractProps(p, m, def, imports);
+      result.local = extractLocal(p, m, def, imports);
     }
-    if (res) {
-      for (const [k, v] of Object.entries(res)) {
-        v.names.forEach((n) =>
-          new_imports.push(`import { ${n} } from "./${k}";`)
-        );
-      }
+    if (def.passprop) {
+      result.passprop = extractPassProp(p, m, def, imports);
+    }
+    if (def.props) {
+      result.props = extractProps(p, m, def, imports);
     }
   }
+  result.content = extractContent(p, m, result, "js");
 
-  return { imports: new_imports };
+  return result;
+};
+
+export const genImports = (imports: Record<string, string>) => {
+  return Object.entries(imports)
+    .map(([k, v]) => {
+      return `import { ${k} } from "${v}";`;
+    })
+    .join("\n");
+};
+
+const extractContent = (
+  p: PG,
+  m: IMeta,
+  res: {
+    local?: ReturnType<typeof extractLocal>;
+    passprop?: ReturnType<typeof extractPassProp>;
+    props?: ReturnType<typeof extractProps>;
+  },
+  mode: "js"
+) => {
+  if (mode === "js") {
+    const local = res.local?.[Object.keys(res.local)[0]];
+    const passprop = Object.entries(res.passprop || {});
+    const props = Object.entries(res.props || {});
+    let loc = {
+      item_id: m.item.id,
+      comp_id: m.parent?.comp_id,
+      type: "content",
+    };
+    const src = `
+${commentize("loc", loc)}
+${local ? `import { ${local.names.join(",")} } from "${local.filename}";` : ``}
+${
+  passprop.length > 0
+    ? passprop.map(([k, v]) => {
+        return `import { ${v.names.join(",")} } from "${v.filename}";`;
+      })
+    : ``
+}
+${
+  props.length > 0
+    ? props.map(([k, v]) => {
+        return `import { ${v.names.join(",")} } from "${v.filename}";`;
+      })
+    : ``
+}
+
+export const _content = (
+${commentize("value", null, m.item.adv?.js)}
+)`;
+
+    let filename = `ts:scope~content~${hash_sum(loc)}.tsx`;
+    return { [filename]: { names: [], filename, src } };
+  }
 };
 
 const extractLocal = (
   p: PG,
   m: IMeta,
   def: IMeta["scope"]["def"],
-  imports: string[]
+  imports: Record<string, string>
 ) => {
   if (def?.local) {
     let loc = {
       item_id: m.item.id,
       comp_id: m.parent?.comp_id,
-      type: "item",
+      type: "local",
     };
-    let filename = `ts:scope~${JSON.stringify(loc)}.d.ts`;
+    let filename = `ts:scope~${hash_sum(loc)}.d.ts`;
     return {
       [filename]: {
         names: [def.local.name],
+        filename,
         src: `\
-${imports.join("\n")}
-type _local = ${def.local.value};
-export const ${def.local.name}: _local & { render: () =>void };
-    `,
+${commentize("loc", loc)}
+${genImports(imports)}
+
+const _local = ${def.local.value} 
+export const ${def.local.name}: typeof _local & { render: ()=>void } = _local;
+declare global {
+  const /*NAME:${def.local.name} :NAME*/${
+    def.local.name
+  }/** NAME-END **/: typeof _local & { render: ()=>void };
+}
+`,
       },
     };
   }
@@ -54,17 +122,18 @@ const extractPassProp = (
   p: PG,
   m: IMeta,
   def: IMeta["scope"]["def"],
-  imports: string[]
+  imports: Record<string, string>
 ) => {
   if (def?.passprop) {
     let loc = {
       item_id: m.item.id,
       comp_id: m.parent?.comp_id,
-      type: "item",
+      type: "passprop",
     };
     let filename = `ts:scope~${JSON.stringify(loc)}.d.ts`;
 
     const result = {
+      filename,
       names: [] as string[],
       src: "",
     };
@@ -73,12 +142,21 @@ const extractPassProp = (
     for (const [e, v] of Object.entries(def.passprop)) {
       if (e !== "idx" && e !== "key") {
         result.names.push(e);
-        exports.push(`export const ${e} = ${v.value};`);
+        exports.push(
+          `const ${commentize("name", null, e)} = ${commentize(
+            "value",
+            null,
+            e
+          )}`
+        );
       }
     }
     result.src = `\
-${imports.join("\n")}
-${exports.join("\n")}
+${commentize("loc", loc)}
+${genImports(imports)}
+declare global {
+  ${exports.join("\n")}
+}
 `;
 
     return { [filename]: result };
@@ -89,34 +167,60 @@ const extractProps = (
   p: PG,
   m: IMeta,
   def: IMeta["scope"]["def"],
-  imports: string[]
+  imports: Record<string, string>
 ) => {
-  if (def?.passprop) {
+  if (def?.props) {
     let loc = {
       item_id: m.item.id,
       comp_id: m.parent?.comp_id,
-      type: "item",
+      type: "prop-instance",
     };
     let filename = `ts:scope~${JSON.stringify(loc)}.d.ts`;
 
     const result = {
+      filename,
       names: [] as string[],
       src: "",
     };
 
     const exports: string[] = [];
-    for (const [e, v] of Object.entries(def.passprop)) {
+    for (const [e, v] of Object.entries(def.props)) {
       if (e !== "idx" && e !== "key") {
         result.names.push(e);
-        exports.push(`export const ${e} = ${v.value};`);
+        exports.push(
+          `const ${commentize("name", null, e)} = ${commentize(
+            "value",
+            null,
+            e
+          )}`
+        );
       }
     }
 
     result.src = `\
-${imports.join("\n")}
-${exports.join("\n")}
+${commentize("loc", loc)}
+${genImports(imports)}
+declare global {
+  ${exports.join("\n")}
+}
 `;
 
     return { [filename]: result };
   }
+};
+
+const commentize = (name: string, arg: any, children?: string) => {
+  let opening = arg
+    ? `/*[${name}] ${JSON.stringify(arg)
+        .replace(/\//gi, "")
+        .replace(/(\r\n|\n|\r)/gm, "")}`
+    : `/*[${name}]`;
+
+  if (!children) {
+    return `${opening} [/${name}]*/`;
+  }
+  return `
+${opening} */
+${children}
+/*[/${name}] */`;
 };
