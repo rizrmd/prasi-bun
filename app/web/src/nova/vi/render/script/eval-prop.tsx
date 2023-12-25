@@ -5,8 +5,7 @@ import { viScriptArg } from "./arg";
 export const viEvalProps = (
   vi: { meta: VG["meta"] },
   meta: IMeta,
-  scope: any,
-  passprop?: any
+  passprop: any
 ) => {
   if (meta.item.component?.id) {
     if (!meta.scope.def) {
@@ -16,9 +15,8 @@ export const viEvalProps = (
     const exports = (window as any).exports;
     const arg = {
       ...exports,
-      ...scope,
       ...viScriptArg(),
-      ...(passprop || {}),
+      ...passprop,
     };
 
     meta.scope.def.props = {};
@@ -43,8 +41,11 @@ export const viEvalProps = (
             };
           }
 
-          scope[name] = val;
           arg[name] = val;
+
+          if (passprop) {
+            passprop[name] = val;
+          }
         } catch (e) {
           fails.add(name);
         }

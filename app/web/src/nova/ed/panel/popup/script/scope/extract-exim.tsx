@@ -145,12 +145,8 @@ const extractPassProp = (
     for (const [name, v] of Object.entries(def.passprop)) {
       if (name !== "idx" && name !== "key") {
         result.names.push(name);
-        let val = `typeof ${v.value}`;
-        if (val.includes(" as ")) {
-          val = val.split(" as ").pop() || "any";
-        }
-        exports_global.push(`const ${name}: ${val};`);
-        exports_const.push(`export const ${name} = null as unknown as ${val}`);
+        exports_global.push(`const ${name} = ${v.value};`);
+        exports_const.push(`export const ${name} = ${v.value}`);
       }
     }
     result.src = `\
@@ -185,6 +181,24 @@ const extractProps = (
       names: [] as string[],
       src: "",
     };
+
+    const exports_global: string[] = [];
+    const exports_const: string[] = [];
+    for (const [name, v] of Object.entries(def.props)) {
+      if (name !== "idx" && name !== "key") {
+        result.names.push(name);
+        exports_global.push(`const ${name} = ${v.value};`);
+        exports_const.push(`export const ${name} = ${v.value}`);
+      }
+    }
+    result.src = `\
+${commentize("loc", loc)}
+${genImports(imports)}
+${exports_const.join("\n")}
+declare global {
+  ${exports_global.join("\n")}
+}
+`;
 
     return { [filename]: result };
   }

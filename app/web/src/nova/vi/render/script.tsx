@@ -15,17 +15,19 @@ export const ViScript: FC<{
   const local = useLocal({});
   meta.render = local.render;
 
+  let _pass = passprop;
   if (meta.item.component?.id) {
-    viEvalProps(vi, meta, passprop);
+    if (!_pass) _pass = {};
+    viEvalProps(vi, meta, _pass);
   }
 
   if (meta.item.adv?.js) {
-    viEvalScript(vi, meta, passprop);
+    viEvalScript(vi, meta, _pass);
     if (meta.script) return meta.script.result;
   }
 
   return (
-    <ViChild meta={meta} passprop={passprop}>
+    <ViChild meta={meta} passprop={_pass}>
       {children}
     </ViChild>
   );
