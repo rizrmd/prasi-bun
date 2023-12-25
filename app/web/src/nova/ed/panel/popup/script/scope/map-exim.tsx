@@ -1,22 +1,7 @@
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { extractExportImport } from "./extract-exim";
 
-export const defineScopeParent = (p: PG, meta: IMeta) => {
-  const metas = active.comp_id
-    ? p.comp.list[active.comp_id]?.meta
-    : p.page.meta;
-
-  const parents: IMeta[] = [];
-  let cur = meta;
-  if (cur && cur.parent) {
-    while (cur && cur.parent && cur.parent.id) {
-      if (cur.mitem) {
-        parents.unshift(cur);
-      }
-      cur = metas[cur.parent.id];
-    }
-  }
-
+export const scopeMapExportImport = (p: PG, meta: IMeta, parents: IMeta[]) => {
   let i = 0;
   let next_parent = parents[i + 1];
   const imports = {} as Record<string, string>;
