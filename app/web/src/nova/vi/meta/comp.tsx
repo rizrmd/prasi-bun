@@ -22,6 +22,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       let instances: IMeta["instances"] = undefined;
 
       const parent_instance = getParentInstance(p, arg, item.id);
+
       instance = parent_instance || {};
       instances = !parent_instance ? { [item.id]: instance } : undefined;
 
@@ -68,30 +69,29 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         pcomp,
         each(name, prop) {
           const comp_id = item.component?.id;
-          if (
-            prop.meta?.type === "content-element" &&
-            prop.content &&
-            comp_id
-          ) {
-            walkChild(prop.content, instance);
 
-            genMeta(
-              { ...p, smeta },
-              {
-                item: prop.content,
-                is_root: false,
-                jsx_prop: {
-                  is_root: true,
-                  comp_id,
-                  name,
-                },
-                parent: {
-                  item: meta.item,
-                  instance_id: item.id,
-                  comp: pcomp.comp,
-                },
-              }
-            );
+          if (prop.meta?.type === "content-element" && comp_id) {
+            if (prop.content) {
+              walkChild(prop.content, instance);
+
+              genMeta(
+                { ...p, smeta },
+                {
+                  item: prop.content,
+                  is_root: false,
+                  jsx_prop: {
+                    is_root: true,
+                    comp_id,
+                    name,
+                  },
+                  parent: {
+                    item: meta.item,
+                    instance_id: item.id,
+                    comp: pcomp.comp,
+                  },
+                }
+              );
+            }
           }
         },
       });

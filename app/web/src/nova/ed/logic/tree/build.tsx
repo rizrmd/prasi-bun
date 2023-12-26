@@ -1,4 +1,5 @@
 import { IItem, MItem } from "../../../../utils/types/item";
+import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { pushTreeNode } from "./build/push-tree";
@@ -51,13 +52,39 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                     }
                   } else {
                     const parent = meta[m.parent.id];
-
                     if (parent.mitem) {
                       parent.mitem.get("childs")?.forEach((child) => {
                         if (child.get("id") === m.item.id) {
                           m.mitem = child;
+
+                          if (m.item.component?.props) {
+                            for (const [prop_name, v] of Object.entries(
+                              m.item.component.props
+                            )) {
+                              const mprop = m.mitem
+                                ?.get("component")
+                                ?.get("props")
+                                ?.get(prop_name);
+                              if (v.content && mprop) {
+                                const pmeta = meta[v.content.id];
+                                if (pmeta) {
+                                  pmeta.mitem = mprop.get("content");
+                                }
+                              }
+                            }
+                          }
                         }
                       });
+                    }
+                  }
+                }
+
+                if (m.jsx_prop && m.parent?.instance_id) {
+                  const parent = meta[m.parent?.instance_id];
+                  if (parent) {
+                    const prop = parent.item.component?.props[m.jsx_prop.name];
+                    if (prop) {
+                      prop.content = m.item;
                     }
                   }
                 }
@@ -67,6 +94,14 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         },
         { item }
       );
+
+      if (transact.list.length > 0) {
+        p.page.doc?.transact(() => {
+          for (const fn of transact.list) {
+            fn();
+          }
+        });
+      }
     }
   }
 
@@ -100,4 +135,35 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       }
     }
   }
+};
+
+const transact = {
+  list: [] as (() => void)[],
+  propContentFromItem: (
+    meta: IMeta,
+    mitem: MItem,
+    name: string,
+    prop: FNCompDef
+  ) => {
+    transact.list.push(() => {
+      const mprops = mitem?.get("component")?.get("props");
+
+      if (mprops) {
+        const map = new Y.Map();
+        syncronize(map, prop);
+        mprops.set(name, map as any);
+        console.log(mprops.get(name));
+        const mcontent = mprops.get(name)?.get("content");
+        console.log(mcontent);
+      }
+    });
+  },
+  jsxContentFromItem(meta: IMeta, content: IItem, mprop: FMCompDef) {
+    transact.list.push(() => {
+      const map = new Y.Map();
+      syncronize(map, content);
+      mprop.set("content", map as any);
+      meta.mitem = mprop.get("content");
+    });
+  },
 };

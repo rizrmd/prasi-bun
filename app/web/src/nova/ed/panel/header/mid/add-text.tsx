@@ -43,6 +43,7 @@ export const EdAddText = () => {
         let mitem = meta.mitem as MContent;
         if (mitem) {
           const item = meta.item as IContent;
+
           if (
             item.type === "text" ||
             (item.type === "item" && item.component?.id)
@@ -99,6 +100,7 @@ export const EdAddText = () => {
               }
 
               active.item_id = map.get("id") || "";
+
               p.render();
               focus();
             }

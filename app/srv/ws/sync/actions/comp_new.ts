@@ -13,6 +13,7 @@ import { loadComponent } from "../editor/load-component";
 import { parseJs } from "../editor/parser/parse-js";
 import { docs } from "../entity/docs";
 import { SyncConnection } from "../type";
+import { createId } from "@paralleldrive/cuid2";
 
 export const comp_new: SAction["comp"]["new"] = async function (
   this: SyncConnection,
@@ -33,6 +34,8 @@ export const comp_new: SAction["comp"]["new"] = async function (
           props: {},
         } as FNComponent
       );
+      mitem.set("id", createId());
+      mitem.set("originalId", item_id);
       mitem.set("component", map);
       mitem.set("childs", new Y.Array());
     }

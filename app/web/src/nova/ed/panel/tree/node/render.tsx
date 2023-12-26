@@ -40,7 +40,10 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
           const props = meta.scope.def?.props;
           if (props) {
             const prop = props[prop_name];
-            if (prop && prop.visible === true) {
+            if (
+              prop &&
+              (prop.visible === true || !prop.hasOwnProperty("visible"))
+            ) {
               hide = false;
             }
           }

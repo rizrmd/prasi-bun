@@ -50,12 +50,12 @@ export const EdPropPopoverForm: FC<{
               )}
               onClick={() => {
                 if (e.type === "content-element") {
-                  mmeta.doc?.transact(() => {
+                  mprop.doc?.transact(() => {
                     mmeta.set("type", e.type as any);
                     if (!mprop.get("content")) {
                       const json = {
                         id: createId(),
-                        name: `jsx-content`,
+                        name: name,
                         type: "item",
                         dim: { w: "full", h: "full" },
                         childs: [],

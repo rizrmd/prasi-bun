@@ -1,3 +1,4 @@
+import { deepClone } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FNCompDef } from "../../../../utils/types/meta-fn";
 
@@ -7,12 +8,13 @@ export const walkProp = (arg: {
   each: (name: string, prop: FNCompDef) => void;
 }) => {
   for (const [k, v] of Object.entries(arg.pcomp.comp.component?.props || {})) {
+    let prop = deepClone(v);
     const props = arg.item.component?.props;
-    let prop = props?.[k];
-    if (props) {
-      if (!props[k]) {
-        props[k] = v;
-        prop = v;
+    if (props && props[k]) {
+      prop.value = props[k].value;
+      prop.valueBuilt = props[k].valueBuilt;
+      if (props[k].content) {
+        prop.content = props[k].content;
       }
     }
 

@@ -38,13 +38,24 @@ export const pushTreeNode = (
         text: meta.item.name,
         data: meta,
       });
-    } else if (meta.jsx_prop) {
-      tree.push({
-        id: meta.item.id,
-        parent: meta.parent?.instance_id || "root",
-        text: meta.item.name,
-        data: meta,
-      });
+    } else {
+      if (meta.jsx_prop) {
+        tree.push({
+          id: meta.item.id,
+          parent: meta.parent?.instance_id || "root",
+          text: meta.item.name,
+          data: meta,
+        });
+      } else {
+        if (meta.parent.id !== meta.parent.instance_id) {
+          tree.push({
+            id: meta.item.id,
+            parent: meta.parent?.id || "root",
+            text: meta.item.name,
+            data: meta,
+          });
+        }
+      }
     }
   }
 };
