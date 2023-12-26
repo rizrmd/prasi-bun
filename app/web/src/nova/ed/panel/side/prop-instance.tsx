@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, MouseEvent } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
@@ -8,12 +8,13 @@ import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
+import { createEditScript } from "./prop-instance/edit-script";
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     rightClickEvent: null as any,
-    reset: { mprop: null as any, name: "" },
+    pick: { mprop: null as any, name: "" },
     showJSX: false,
   });
 
@@ -125,12 +126,20 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               <MenuItem
                 label="Reset"
                 onClick={() => {
-                  if (local.reset.name) {
-                    reset(p, comp_id, local.reset.mprop, local.reset.name);
+                  if (local.pick.name) {
+                    reset(p, comp_id, local.pick.mprop, local.pick.name);
                   }
                 }}
               />
-              <MenuItem label={"Edit Code"} onClick={() => {}} />
+              <MenuItem
+                label={"Edit Code"}
+                onClick={createEditScript(
+                  p,
+                  "value",
+                  local.pick.mprop,
+                  local.pick.name
+                )}
+              />
             </Menu>
           )}
           {filtered.length === 0 && (
@@ -143,35 +152,52 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             let hasCode = false;
 
             const value = mprop.get("value") || "";
-            if (!!value && ![`"`, "'", "`"].includes(value[0])) {
+            if (
+              !!value &&
+              (![`"`, "'", "`"].includes(value[0]) ||
+                ![`"`, "'", "`"].includes(value[value.length - 1]))
+            ) {
               hasCode = true;
             }
             if (value.length > 100) {
               hasCode = true;
             }
+            const labelClick = (e: MouseEvent<HTMLDivElement>) => {
+              e.preventDefault();
+              local.pick = { mprop, name };
+              local.rightClickEvent = e;
+              local.render();
+            };
 
             return (
               <div
                 key={name}
-                className="border-b text-[13px] relative"
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  local.reset = { mprop, name };
-                  local.rightClickEvent = e;
-                  local.render();
-                }}
+                className="border-b text-[13px] relative hover:bg-orange-100 cursor-default"
+                onContextMenu={labelClick}
               >
                 {hasCode ? (
                   <>
-                    <EdPropInstanceCode mprop={mprop} name={name} />
+                    <EdPropInstanceCode
+                      mprop={mprop}
+                      name={name}
+                      labelClick={labelClick}
+                    />
                   </>
                 ) : (
                   <>
                     {type === "text" && (
-                      <EdPropInstanceText mprop={mprop} name={name} />
+                      <EdPropInstanceText
+                        mprop={mprop}
+                        name={name}
+                        labelClick={labelClick}
+                      />
                     )}
                     {type === "option" && (
-                      <EdPropInstanceOptions mprop={mprop} name={name} />
+                      <EdPropInstanceOptions
+                        mprop={mprop}
+                        name={name}
+                        labelClick={labelClick}
+                      />
                     )}
                     {type === "content-element" && (
                       <div className="min-h-[28px] px-1 flex items-center">

@@ -7,6 +7,7 @@ import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
+import hash_sum from "hash-sum";
 
 export const viEvalScript = (
   vi: {
@@ -21,8 +22,11 @@ export const viEvalScript = (
 
   if (vi.visit) vi.visit(meta, parts);
 
-  if (!meta.script) {
-    meta.script = {
+  const mhash = hash_sum(passprop);
+
+  if (!meta.script) meta.script = {};
+  if (!meta.script[mhash]) {
+    meta.script[mhash] = {
       result: null,
       Local: createViLocal(
         vi.meta,
@@ -33,7 +37,7 @@ export const viEvalScript = (
       PassProp: createViPassProp(vi, meta, passprop),
     };
   }
-  const script = meta.script;
+  const script = meta.script[mhash];
 
   const exports = (window as any).exports;
   const arg = {
@@ -61,4 +65,5 @@ ${meta.item.adv?.jsBuilt || ""}
   fn(...Object.values(arg));
 
   updatePropScope(meta, passprop);
+  return mhash;
 };

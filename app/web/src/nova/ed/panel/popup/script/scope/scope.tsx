@@ -65,14 +65,6 @@ const map_childs = (
   for (const m of childs) {
     const meta = metas[m.id];
     if (meta) {
-      if (
-        meta.item.type === "item" &&
-        meta.item.component?.id &&
-        meta.item.component?.id !== active.comp_id
-      ) {
-        continue;
-      }
-
       let cur: null | IMeta[] = null;
       for (const path of paths) {
         if (path[path.length - 1] === parent) {
@@ -88,8 +80,16 @@ const map_childs = (
       }
 
       if (cur) {
-        if (Array.isArray(meta.item.childs)) {
-          map_childs(metas, meta.item.childs, paths, cur, meta);
+        if (
+          meta.item.type === "item" &&
+          meta.item.component?.id &&
+          meta.item.component?.id !== active.comp_id
+        ) {
+          continue;
+        } else {
+          if (Array.isArray(meta.item.childs)) {
+            map_childs(metas, meta.item.childs, paths, cur, meta);
+          }
         }
       }
     }

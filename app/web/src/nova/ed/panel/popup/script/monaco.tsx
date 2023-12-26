@@ -211,7 +211,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               });
             } else if (p.ui.popup.script.type === "prop-instance") {
               scope = await p.sync.code.edit({
-                type: "adv",
+                type: "prop-instance",
                 mode: type,
                 prop_name: p.ui.popup.script.prop_name,
                 item_id: active.item_id,

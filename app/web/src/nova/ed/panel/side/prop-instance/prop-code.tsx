@@ -7,11 +7,12 @@ import { EDGlobal, active } from "../../../logic/ed-global";
 export const EdPropInstanceCode: FC<{
   name: string;
   mprop: FMCompDef;
-}> = ({ name, mprop }) => {
+  labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+}> = ({ name, labelClick }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   return (
     <div className="flex items-center min-h-[28px]">
-      <EdPropLabel name={name} />
+      <EdPropLabel name={name} labelClick={labelClick} />
       <div className="flex-1 flex justify-end pr-1">
         <div
           className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px] select-none"

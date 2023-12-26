@@ -12,7 +12,8 @@ import { EdPropLabel } from "./prop-label";
 export const EdPropInstanceText: FC<{
   name: string;
   mprop: FMCompDef;
-}> = ({ name, mprop }) => {
+  labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+}> = ({ name, mprop, labelClick }) => {
   const val = mprop.get("value");
 
   const local = useLocal({
@@ -28,7 +29,7 @@ export const EdPropInstanceText: FC<{
 
   return (
     <div className="flex items-center min-h-[28px]">
-      <EdPropLabel name={name} />
+      <EdPropLabel name={name} labelClick={labelClick} />
       <AutoHeightTextarea
         className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}

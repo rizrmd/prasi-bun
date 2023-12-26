@@ -38,6 +38,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
     if (root) {
       const mitem = findId(root, item_id);
+
       if (mitem) {
         if (arg.type === "adv") {
           const mode = arg.mode;
@@ -78,6 +79,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
             .get("component")
             ?.get("props")
             ?.get(arg.prop_name);
+
           if (mprop) {
             try {
               const res = await transform(`return ${src}`, {
@@ -137,7 +139,6 @@ export const code_edit: SAction["code"]["edit"] = async function (
       }
     }
   }
-
   return false;
 };
 
