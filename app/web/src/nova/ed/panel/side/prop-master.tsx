@@ -139,7 +139,18 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
                 const indexes: (number | undefined)[] = [];
                 mprops.forEach((e) => indexes.push(e.get("idx")));
                 let idx: any = (indexes.sort().pop() || 0) + 1;
-                const name = `prop_${indexes.length === 0 ? 1 : idx + 1}`;
+                if (indexes.length === 0) {
+                  idx = 1;
+                } else {
+                  idx = parseInt(idx) + 1;
+                }
+
+                let name = `prop_${idx}`;
+                while (mprops.get(name)) {
+                  idx = parseInt(idx) + 1;
+                  name = `prop_${idx}`;
+                }
+
                 const map = new Y.Map() as FMCompDef;
                 syncronize(map, {
                   idx: idx,
