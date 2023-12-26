@@ -13,10 +13,13 @@ export const initLoadComp = async (
     {
       ...p,
       on: {
-        visit_component: (id) => {
-          if (!p.comps[id]) {
-            if (!_loaded || (_loaded && !_loaded.has(id))) {
-              comp_ids.add(id);
+        visit_component: ({ component }) => {
+          if (component) {
+            const { id } = component;
+            if (!p.comps[id]) {
+              if (!_loaded || (_loaded && !_loaded.has(id))) {
+                comp_ids.add(id);
+              }
             }
           }
         },

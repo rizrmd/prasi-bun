@@ -2,6 +2,7 @@ import { IItem, MItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
+import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
@@ -45,49 +46,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (!is_layout) {
                 pushTreeNode(p, m, meta, p.page.tree);
 
-                if (m.parent) {
-                  if (m.parent.id === "root") {
-                    if (m.item.id === item.id) {
-                      m.mitem = mitem;
-                    }
-                  } else {
-                    const parent = meta[m.parent.id];
-                    if (parent.mitem) {
-                      parent.mitem.get("childs")?.forEach((child) => {
-                        if (child.get("id") === m.item.id) {
-                          m.mitem = child;
-
-                          if (m.item.component?.props) {
-                            for (const [prop_name, v] of Object.entries(
-                              m.item.component.props
-                            )) {
-                              const mprop = m.mitem
-                                ?.get("component")
-                                ?.get("props")
-                                ?.get(prop_name);
-                              if (v.content && mprop) {
-                                const pmeta = meta[v.content.id];
-                                if (pmeta) {
-                                  pmeta.mitem = mprop.get("content");
-                                }
-                              }
-                            }
-                          }
-                        }
-                      });
-                    }
-                  }
-                }
-
-                if (m.jsx_prop && m.parent?.instance_id) {
-                  const parent = meta[m.parent?.instance_id];
-                  if (parent) {
-                    const prop = parent.item.component?.props[m.jsx_prop.name];
-                    if (prop) {
-                      prop.content = m.item;
-                    }
-                  }
-                }
+                assignMitem({ m, item, mitem, meta });
               }
             },
           },

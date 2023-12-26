@@ -1,7 +1,5 @@
 import { TypedMap } from "yjs-types";
 import { IItem, MItem } from "./item";
-import * as Y from "yjs";
-import { YText } from "yjs/dist/src/internals";
 export type FNLayout = {
   dir: "row" | "col" | "row-reverse" | "col-reverse";
   align: FNAlign;
@@ -25,6 +23,7 @@ export type FNComponent = {
   loaded?: boolean;
   props: Record<string, FNCompDef>;
   ref_ids?: Record<string, string>;
+  instances?: Record<string, Record<string, string>>;
 };
 
 export type FNCompDef = {

@@ -1,6 +1,6 @@
 import { deepClone } from "web-utils";
 import { GenMetaArg, GenMetaP, IMeta, ISimpleMeta } from "../utils/types";
-import { instantiate, walkChild } from "./comp/instantiate";
+import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";
 import { simplifyItemChild } from "./simplify";
@@ -10,7 +10,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let pcomp = p.comps[item.component.id];
     if (p.on?.visit_component) {
-      p.on.visit_component(item.component.id);
+      p.on.visit_component(item);
     }
 
     if (!pcomp) {
@@ -21,10 +21,15 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       let instance = {};
       let instances: IMeta["instances"] = undefined;
 
-      const parent_instance = getParentInstance(p, arg, item.id);
-
-      instance = parent_instance || {};
-      instances = !parent_instance ? { [item.id]: instance } : undefined;
+      if (item.component.instances) {
+        instances = item.component.instances;
+        instance = instances[item.id] || {};
+        instances[item.id] = instance;
+      } else {
+        const parent_instance = getParentInstance(p, arg, item.id);
+        instance = parent_instance || {};
+        instances = !parent_instance ? { [item.id]: instance } : undefined;
+      }
 
       instantiate({
         item,
@@ -72,8 +77,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
 
           if (prop.meta?.type === "content-element" && comp_id) {
             if (prop.content) {
-              walkChild(prop.content, instance);
-
               genMeta(
                 { ...p, smeta },
                 {

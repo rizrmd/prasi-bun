@@ -22,7 +22,7 @@ export const instantiate = (arg: {
       if (item.component.props[k]) {
         newitem.component.props[k] = item.component.props[k];
       }
-
+      
       const content = newitem.component.props[k].content;
       if (content) {
         walkChild(content, ids);
@@ -37,7 +37,6 @@ export const instantiate = (arg: {
   for (const [k, v] of Object.entries(newitem)) {
     (item as any)[k] = v;
   }
-
 };
 
 export const walkChild = (

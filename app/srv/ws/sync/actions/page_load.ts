@@ -1,4 +1,5 @@
 import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
+import { assignMitem } from "../../../../web/src/nova/ed/logic/tree/assign-mitem";
 import { initLoadComp } from "../../../../web/src/nova/vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
 import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
@@ -239,6 +240,10 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
       );
     }
 
+    const transact = {
+      instances_check: {} as Record<string, true | IMeta>,
+    };
+
     for (const mitem of childs) {
       const item = mitem.toJSON() as IItem;
       entry.push(item.id);
@@ -247,10 +252,21 @@ const scanMeta = async (doc: DPage, sync: SyncConnection) => {
           comps: mcomps,
           meta,
           on: {
-            visit(meta) {
-              if (!meta.parent?.comp_id) {
-                if (typeof meta.item.adv?.js === "string") {
-                  meta.scope.def = parseJs(meta.item.adv?.js);
+            visit_component(item) {
+              if (!item.component?.instances) {
+                transact.instances_check[item.id] = true;
+              }
+            },
+            visit(m) {
+              if (!m.parent?.comp_id) {
+                if (typeof m.item.adv?.js === "string") {
+                  m.scope.def = parseJs(m.item.adv?.js);
+                }
+              }
+
+              if (m.item.component?.id) {
+                if (transact.instances_check[m.item.id]) {
+                  transact.instances_check[m.item.id] = m;
                 }
               }
             },
