@@ -31,6 +31,10 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         ids: instance,
       });
 
+      if (item.component) {
+        item.component.loaded = true;
+      }
+
       let smeta = p.comps[item.component.id].smeta;
       if (smeta) {
         smeta = applySMeta(smeta, instance);

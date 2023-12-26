@@ -46,9 +46,7 @@ effect={async (local) => {
         onClick={() => {
           p.script.do_edit(
             `\
-<PassProp idx={0}>
-{children}
-</PassProp>
+<PassProp idx={0} children={children} />
     `,
             false
           );
@@ -63,9 +61,9 @@ effect={async (local) => {
             `\
 <div {...props}>
 {(local.list || []).map((item, idx) => (
-<PassProp item={item} key={idx}>
-{children}
-</PassProp>
+<Fragment key={idx}>
+  <PassProp item={item} children={children} />
+</Fragment>
 ))}
 </div>   
 `,

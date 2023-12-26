@@ -68,6 +68,9 @@ const CompTitleInstance = () => {
     const props = item.component.props;
     return (
       <div className="flex text-xs p-2 space-x-1 items-center">
+        <div className="bg-blue-700 text-white text-[11px] px-1 mr-1">
+          INSTANCE
+        </div>
         <div>{item.name}</div>
         <ArrowRight />
         <div>{p.ui.popup.script.prop_name}</div>
@@ -91,6 +94,9 @@ const CompTitleMaster = () => {
     const props = item.component.props;
     return (
       <div className="flex text-xs p-2 space-x-1 items-center">
+        <div className="bg-purple-700 text-white text-[11px] px-1 mr-1">
+          MASTER
+        </div>
         <div>{item.name}</div>
         <ArrowRight />
         <div>{p.ui.popup.script.prop_name}</div>

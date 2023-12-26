@@ -34,9 +34,11 @@ export const viParts = (
 
   const childs = meta.item.childs;
   let children = undefined;
+
   if ((meta.item as IContent).type === "text") {
     children = <HTMLChild props={text_props} />;
   } else {
+
     children =
       Array.isArray(childs) &&
       childs?.map((item) => {

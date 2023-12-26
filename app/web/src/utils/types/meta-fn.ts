@@ -22,7 +22,7 @@ export type FMAdv = TypedMap<FNAdv>;
 export type FNComponent = {
   id: string;
   name?: string;
-  updated_at?: number;
+  loaded?: boolean;
   props: Record<string, FNCompDef>;
   ref_ids?: Record<string, string>;
 };

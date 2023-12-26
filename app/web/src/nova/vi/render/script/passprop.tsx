@@ -32,6 +32,7 @@ const modify = (el: ReactNode, arg: any, passprop?: any) => {
   if (isValidElement(el)) {
     const passarg = { ...arg };
     delete passarg.children;
+
     return {
       ...el,
       props: { ...el.props, passprop: { ...passprop, ...passarg } },

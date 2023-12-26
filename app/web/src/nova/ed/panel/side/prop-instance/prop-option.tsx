@@ -10,7 +10,8 @@ import { EdPropLabel } from "./prop-label";
 export const EdPropInstanceOptions: FC<{
   name: string;
   mprop: FMCompDef;
-}> = ({ name, mprop }) => {
+  labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+}> = ({ name, mprop, labelClick }) => {
   const prop = mprop.toJSON() as FNCompDef;
   const local = useLocal({
     codeEditing: false,
@@ -85,7 +86,7 @@ else metaOptions = resOpt;
   if (!mode) mode = "button";
   return (
     <div className="flex items-stretch min-h-[28px]">
-      <EdPropLabel name={name} />
+      <EdPropLabel name={name} labelClick={labelClick} />
       <div className="flex flex-1 justify-end">
         {mode === "dropdown" && (
           <>
