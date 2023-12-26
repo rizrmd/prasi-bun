@@ -19,7 +19,7 @@
     "@qiwi/deep-proxy": "^2.0.3",
     "algoliasearch": "^4.22.0",
     "date-fns": "^2.30.0",
-    "fast-safe-stringify": "^2.1.1",
+    "safe-flat": "^2.1.0",
     "dbgen": "workspace:*",
     "downshift": "^8.2.3",
     "esbuild-wasm": "^0.19.10",

@@ -9,7 +9,7 @@ export type GenMetaP = {
   meta: Record<string, IMeta>;
   comps: Record<string, { comp: IItem; smeta: Record<string, ISimpleMeta> }>;
   on?: {
-    visit_component?: (id: string) => void;
+    visit_component?: (item: IItem) => void;
     visit?: (meta: IMeta) => void;
     item_exists?: (arg: { old: IMeta; new: IMeta }) => void;
     item_new?: (arg: { new: IMeta }) => void;

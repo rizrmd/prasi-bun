@@ -8,6 +8,7 @@ import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
 import hash_sum from "hash-sum";
+import { flatten } from "safe-flat";
 
 export const viEvalScript = (
   vi: {
@@ -22,7 +23,7 @@ export const viEvalScript = (
 
   if (vi.visit) vi.visit(meta, parts);
 
-  const mhash = hash_sum(passprop);
+  const mhash = hash_sum(flatten(passprop));
 
   if (!meta.script) meta.script = {};
   if (!meta.script[mhash]) {
