@@ -8,8 +8,8 @@ export const viEvalProps = (
   passprop: any
 ) => {
   if (meta.item.component?.id) {
-    if (!meta.scope.def) {
-      meta.scope.def = {};
+    if (!meta.item.script) {
+      meta.item.script = {};
     }
 
     const exports = (window as any).exports;
@@ -19,7 +19,7 @@ export const viEvalProps = (
       ...passprop,
     };
 
-    meta.scope.def.props = {};
+    meta.item.script.props = {};
     let fails = new Set<string>();
     if (!!meta.item.component.props) {
       for (const [name, prop] of Object.entries(meta.item.component.props)) {
@@ -31,13 +31,13 @@ export const viEvalProps = (
     `
           );
 
-          meta.scope.def.props[name] = { value: prop.valueBuilt };
+          meta.item.script.props[name] = { value: prop.valueBuilt };
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
-            meta.scope.def.props[name].fn = val;
+            meta.item.script.props[name].fn = val;
             val = (...args: any[]) => {
-              return meta.scope.def?.props?.[name].fn(...args);
+              return meta.item.script?.props?.[name].fn(...args);
             };
           }
 
@@ -55,8 +55,8 @@ export const viEvalProps = (
 };
 
 export const updatePropScope = (meta: IMeta, scope: any) => {
-  if (meta.scope.def?.props) {
-    for (const [name, prop] of Object.entries(meta.scope.def.props)) {
+  if (meta.item.script?.props) {
+    for (const [name, prop] of Object.entries(meta.item.script.props)) {
       if (prop.fn) {
         const all_scope = scope;
         const fn = new Function(

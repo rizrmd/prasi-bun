@@ -17,13 +17,20 @@ export const modifyChild = (arg: any, passprop?: any) => {
     if (k === "key" || k === "idx" || k === "continue") continue;
   }
 
+  let prop: any = {};
+  if (Array.isArray(arg)) {
+    prop.children = arg;
+  } else {
+    prop = arg;
+  }
+
   const childs = [];
-  if (Array.isArray(arg.children)) {
-    for (const child of arg.children) {
-      childs.push(modify(child, arg, passprop));
+  if (Array.isArray(prop.children)) {
+    for (const child of prop.children) {
+      childs.push(modify(child, prop, passprop));
     }
   } else {
-    childs.push(modify(arg.children, arg, passprop));
+    childs.push(modify(prop.children, prop, passprop));
   }
   return childs;
 };
