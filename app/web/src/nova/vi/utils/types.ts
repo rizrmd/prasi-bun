@@ -57,13 +57,11 @@ export type IMeta = {
     comp_id: string;
     is_root: boolean;
   };
-  script?: Record<
-    string,
-    {
-      result: ReactNode;
-      Local: ReturnType<typeof createViLocal>;
-      PassProp: ReturnType<typeof createViPassProp>;
-    }
-  >;
+  script?: {
+    passprop?: any;
+    result: ReactNode;
+    Local: ReturnType<typeof createViLocal>;
+    PassProp: ReturnType<typeof createViPassProp>;
+  };
   render?: () => void;
 };

@@ -25,20 +25,18 @@ export const viEvalScript = (
 
   const mhash = hash_sum(flatten(passprop));
 
-  if (!meta.script) meta.script = {};
-  if (!meta.script[mhash]) {
-    meta.script[mhash] = {
+  if (!meta.script) {
+    meta.script = {
+      passprop,
       result: null,
-      Local: createViLocal(
-        vi.meta,
-        meta,
-        passprop,
-        vi.script?.init_local_effect
-      ),
-      PassProp: createViPassProp(vi, meta, passprop),
+      Local: createViLocal(vi.meta, meta, vi.script?.init_local_effect),
+      PassProp: createViPassProp(vi, meta),
     };
+  } else {
+    meta.script.passprop = passprop;
   }
-  const script = meta.script[mhash];
+
+  const script = meta.script;
 
   const exports = (window as any).exports;
   const arg = {

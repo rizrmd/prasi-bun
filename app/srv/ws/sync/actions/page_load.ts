@@ -78,6 +78,8 @@ export const page_load: SAction["page"]["load"] = async function (
       const doc = new Y.Doc();
       let root = doc.getMap("map");
       const proot = await prepContentTree(page.id, page.content_tree, this);
+      await db.page.update({ where: { id }, data: { content_tree: proot } });
+
       syncronize(root, { id, root: proot });
 
       const um = await createUndoManager(root);

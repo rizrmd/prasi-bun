@@ -1,14 +1,22 @@
 import { IMeta, PG, active } from "../ed-global";
 
 export const activateMeta = (p: PG, meta: IMeta) => {
-  if (meta.parent?.comp_id) {
+  let parent_comp_id = meta.parent?.comp_id;
+  if (
+    active.comp_id &&
+    meta.item.component?.id === active.comp_id &&
+    meta.item.originalId
+  ) {
+    parent_comp_id = active.comp_id;
+    active.item_id = meta.item.originalId;
+    return;
+  }
+
+  if (meta.parent && parent_comp_id) {
     if (active.comp_id) {
-      if (active.comp_id === meta.parent?.comp_id) {
+      if (active.comp_id === parent_comp_id) {
         if (meta.item.originalId) {
-          if (
-            meta.item.component?.id &&
-            meta.parent.comp_id === active.comp_id
-          ) {
+          if (meta.item.component?.id && parent_comp_id === active.comp_id) {
             const cmeta = p.comp.list[active.comp_id].meta;
             for (const val of Object.values(cmeta)) {
               if (
@@ -57,7 +65,7 @@ export const activateMeta = (p: PG, meta: IMeta) => {
               }
             }
           } else {
-            active.comp_id = meta.parent.comp_id;
+            active.comp_id = parent_comp_id;
             active.item_id = meta.parent.id;
           }
         }
@@ -108,7 +116,7 @@ export const activateMeta = (p: PG, meta: IMeta) => {
     }
   } else {
     if (active.comp_id) {
-      if (!meta.parent?.comp_id) {
+      if (!parent_comp_id) {
         active.comp_id = "";
       } else if (meta.item.originalId) {
         active.item_id = meta.item.originalId;

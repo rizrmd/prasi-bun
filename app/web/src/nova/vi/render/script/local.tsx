@@ -6,7 +6,6 @@ import { modifyChild } from "./passprop";
 export const createViLocal = (
   metas: Record<string, IMeta>,
   meta: IMeta,
-  passprop: any,
   init_local_effect: any
 ) => {
   return <T extends Record<string, any>>(arg: {
@@ -21,7 +20,7 @@ export const createViLocal = (
     const local = ref.current;
     local.render = meta.render;
 
-    updatePropScope(meta, passprop);
+    updatePropScope(meta, meta.script?.passprop);
 
     if (arg.hook) {
       arg.hook(local);
@@ -59,6 +58,9 @@ export const createViLocal = (
       return () => {};
     }, []);
 
-    return modifyChild(children, { ...passprop, [arg.name]: local });
+    return modifyChild(children, {
+      ...meta.script?.passprop,
+      [arg.name]: local,
+    });
   };
 };

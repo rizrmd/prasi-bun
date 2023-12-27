@@ -22,8 +22,8 @@ export const ViScript: FC<{
   }
 
   if (meta.item.adv?.js) {
-    const mhash = viEvalScript(vi, meta, _pass);
-    if (meta.script && meta.script[mhash]) return meta.script[mhash].result;
+    viEvalScript(vi, meta, _pass);
+    if (meta.script) return meta.script.result;
   }
 
   return (
