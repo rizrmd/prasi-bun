@@ -2,13 +2,9 @@ import { ReactNode, isValidElement } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 
-export const createViPassProp = (
-  vi: { meta: VG["meta"] },
-  meta: IMeta,
-  passprop?: any
-) => {
+export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
-    return modifyChild(arg, passprop);
+    return modifyChild(arg, meta.script?.passprop);
   };
 };
 
