@@ -47,7 +47,6 @@ export const declareScope = async (
       for (const [filename, src] of Object.entries(v)) {
         if (!added.has(filename)) {
           added.add(filename);
-
           addScope(p, monaco, filename, src);
         }
       }

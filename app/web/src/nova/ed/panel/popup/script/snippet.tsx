@@ -46,7 +46,7 @@ effect={async (local) => {
         onClick={() => {
           p.script.do_edit(
             `\
-<PassProp idx={0} children={children} />
+<PassProp key={0} children={children} />
     `,
             false
           );

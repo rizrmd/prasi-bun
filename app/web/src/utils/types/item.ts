@@ -10,7 +10,6 @@ export type IItem = {
   linktag?: FNLinkTag;
   mobile?: IItem;
   adv?: FNAdv;
-  script?: ReturnType<typeof parseJs>;
   type: "item";
   component?: FNComponent;
   childs: (IItem | IText)[];
