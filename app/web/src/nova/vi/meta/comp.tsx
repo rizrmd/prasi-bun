@@ -25,7 +25,13 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       }
 
       if (instances) {
-        const instance = instances[item.id];
+        let instance = instances[item.id];
+
+        if (!instances[item.id]) {
+          instances[item.id] = {};
+          instance = instances[item.id];
+        }
+
         instantiate({
           item,
           comp: item_comp,

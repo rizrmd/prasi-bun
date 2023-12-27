@@ -22,7 +22,7 @@ export const instantiate = (arg: {
       if (item.component.props[k]) {
         newitem.component.props[k] = item.component.props[k];
       }
-      
+
       const content = newitem.component.props[k].content;
       if (content) {
         walkChild(content, ids);
@@ -39,10 +39,7 @@ export const instantiate = (arg: {
   }
 };
 
-export const walkChild = (
-  item: IItem,
-  ids: Exclude<FNComponent["ref_ids"], undefined>
-) => {
+export const walkChild = (item: IItem, ids: Record<string, string>) => {
   if (!item.originalId) {
     item.originalId = item.id;
   }
