@@ -58,7 +58,6 @@ const EmptyPage = {
 
 const EmptyComp = {
   id: "",
-  meta: {} as Record<string, ISimpleMeta>,
   snapshot: null as null | Uint8Array,
 };
 
@@ -152,7 +151,6 @@ export const EDGlobal = {
     >,
     building: false,
     meta: {} as Record<string, IMeta>,
-    smeta: {} as Record<string, ISimpleMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<IMeta>[],
     render: () => {},

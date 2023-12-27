@@ -2,13 +2,11 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { compress, decompress } from "wasm-gzip";
 import { IItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
+import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG } from "../ed-global";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
-import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
-import { ISimpleMeta } from "../../../vi/utils/types";
-import { simplifyMeta } from "../../../vi/meta/simplify";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -30,7 +28,7 @@ export const loadComponent = async (p: PG, id_comp: string, sync?: boolean) => {
 
       for (const [id_comp, comp] of result) {
         if (comp && comp.snapshot) {
-          await loadCompSnapshot(p, id_comp, comp.snapshot, comp.meta);
+          await loadCompSnapshot(p, id_comp, comp.snapshot);
         }
       }
       loadcomp.pending.clear();
@@ -42,8 +40,7 @@ export const loadComponent = async (p: PG, id_comp: string, sync?: boolean) => {
 export const loadCompSnapshot = async (
   p: PG,
   comp_id: string,
-  snapshot: Uint8Array,
-  smeta: Record<string, ISimpleMeta>
+  snapshot: Uint8Array
 ) => {
   if (p.comp.list[comp_id] && p.comp.list[comp_id].doc) {
     return;
@@ -56,16 +53,15 @@ export const loadCompSnapshot = async (
       doc.off("update", p.comp.list[comp_id].on_update);
     }
 
-    const updated = await updateComponentMeta(p, doc, comp_id, smeta);
+    const updated = await updateComponentMeta(p, doc, comp_id);
     if (updated) {
       const { meta, tree } = updated;
       if (p.comp.list[comp_id]) {
-        p.comp.list[comp_id].comp.meta = smeta;
         p.comp.list[comp_id].meta = meta;
         p.comp.list[comp_id].tree = tree;
       } else {
         p.comp.list[comp_id] = {
-          comp: { id: comp_id, snapshot, meta: smeta },
+          comp: { id: comp_id, snapshot },
           doc,
           meta,
           tree,
@@ -95,8 +91,7 @@ export const loadCompSnapshot = async (
               const updated = await updateComponentMeta(
                 p,
                 p.comp.list[comp_id].doc,
-                comp_id,
-                smeta
+                comp_id
               );
               if (updated) {
                 p.comp.list[comp_id].meta = updated.meta;
@@ -117,8 +112,7 @@ export const loadCompSnapshot = async (
 export const updateComponentMeta = async (
   p: PG,
   doc: DComp,
-  comp_id: string,
-  smeta: Record<string, ISimpleMeta>
+  comp_id: string
 ) => {
   const mitem = doc.getMap("map").get("root");
   if (!mitem) return;
@@ -127,13 +121,13 @@ export const updateComponentMeta = async (
   const tree: NodeModel<IMeta>[] = [];
   const item = mitem.toJSON() as IItem;
 
-  p.comp.loaded[comp_id] = { comp: item, smeta };
+  p.comp.loaded[comp_id] = item;
   await initLoadComp(
     {
       comps: p.comp.loaded,
       meta,
       set_meta: false,
-      smeta,
+      mode: "comp",
     },
     item,
     async (comp_ids: string[]) => {
@@ -143,7 +137,7 @@ export const updateComponentMeta = async (
 
       for (const [id_comp, comp] of result) {
         if (comp && comp.snapshot) {
-          await loadCompSnapshot(p, id_comp, comp.snapshot, comp.meta);
+          await loadCompSnapshot(p, id_comp, comp.snapshot);
         }
       }
     }
@@ -153,7 +147,7 @@ export const updateComponentMeta = async (
     {
       comps: p.comp.loaded,
       meta,
-      smeta,
+      mode: "comp",
       on: {
         visit(m) {
           pushTreeNode(p, m, meta, tree);
@@ -189,7 +183,7 @@ export const updateComponentMeta = async (
     { item, ignore_first_component: true }
   );
 
-  p.comp.loaded[comp_id] = { comp: item, smeta: simplifyMeta(meta) };
+  p.comp.loaded[comp_id] = item;
 
   return { meta, tree };
 };

@@ -16,13 +16,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       const mcomp = v.doc.getMap("map").get("root");
       const icomp = mcomp?.toJSON() as IItem | undefined;
       if (icomp) {
-        p.comp.loaded[k] = {
-          comp: icomp,
-          smeta: v.comp.meta,
-        };
+        p.comp.loaded[k] = icomp;
       }
     }
-    if (v.comp.meta) p.comp.loaded[k].smeta = v.comp.meta;
   }
 
   const mroot = p.page.doc?.getMap("map").get("root");
@@ -40,7 +36,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           note: "tree-rebuild",
           comps: p.comp.loaded,
           meta,
-          smeta: p.page.smeta,
+          mode: "page",
           on: {
             async visit(m) {
               if (!is_layout) {

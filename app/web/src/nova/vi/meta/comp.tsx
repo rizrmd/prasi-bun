@@ -1,5 +1,4 @@
-import { deepClone } from "web-utils";
-import { GenMetaArg, GenMetaP, IMeta, ISimpleMeta } from "../utils/types";
+import { GenMetaArg, GenMetaP, IMeta } from "../utils/types";
 import { instantiate } from "./comp/instantiate";
 import { walkProp } from "./comp/walk-prop";
 import { genMeta } from "./meta";

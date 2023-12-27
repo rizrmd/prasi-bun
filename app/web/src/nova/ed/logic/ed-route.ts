@@ -50,13 +50,10 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   if (remotePage.comps) {
     for (const [id_comp, c] of Object.entries(remotePage.comps)) {
       if (c && c.snapshot) {
-        await loadCompSnapshot(p, id_comp, c.snapshot, c.meta);
+        await loadCompSnapshot(p, id_comp, c.snapshot);
       }
     }
   }
-
-  p.page.entry = remotePage.entry;
-  p.page.smeta = remotePage.meta;
 
   p.page.cur = remotePage;
   if (remotePage.snapshot) {
@@ -107,6 +104,12 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     if (p.page.doc) {
       page.page = p.page.cur;
       page.doc = p.page.doc;
+
+      p.page.entry = p.page.doc
+        .getMap("map")
+        .get("root")
+        ?.get("childs")
+        ?.map((e) => e.get("id")) as string[];
     }
 
     if (p.page.doc) {

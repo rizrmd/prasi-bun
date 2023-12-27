@@ -39,7 +39,6 @@ export const simplifyMeta = (allmeta: Record<string, IMeta>) => {
               instances: meta.instances,
             }
           : undefined,
-      scope: meta.scope.def,
     };
   }
 

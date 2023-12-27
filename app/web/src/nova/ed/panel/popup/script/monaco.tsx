@@ -229,12 +229,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             }
 
             if (typeof scope === "object") {
-              if (active.comp_id) {
-              } else {
-                p.page.smeta[active.item_id].scope = scope;
-                if (!meta.scope) meta.scope = {};
-                meta.scope.def = scope;
-              }
+              meta.item.script = scope;
             }
           }
         }, 1000);

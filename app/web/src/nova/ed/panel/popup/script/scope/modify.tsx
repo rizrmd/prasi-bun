@@ -1,10 +1,6 @@
 import { Doc } from "yjs";
 import { ISimpleMeta } from "../../../../../vi/utils/types";
-import {
-  IMeta,
-  PG,
-  active
-} from "../../../../logic/ed-global";
+import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { CodeLoc } from "./type";
 
 const modif = {
@@ -50,11 +46,11 @@ const modifyJS = (
           const { meta, src, loc } = item;
           if (loc.type === "item") {
             const js = meta.item.adv?.js;
-            if (js) {
+            const script = meta.item.script;
+            if (js && script) {
               const text = extractText(type, src);
-              const def = meta.scope?.def?.[type];
-              const smeta = getSMetaByLoc(p, loc);
 
+              const def = script[type];
               if (text) {
                 if (
                   type === "local" &&
@@ -62,12 +58,8 @@ const modifyJS = (
                   typeof def.start === "number" &&
                   typeof def.end === "number"
                 ) {
-                  const final = replaceRange(js, def.start, def.end, text);
+                  // const final = replaceRange(js, def.start, def.end, text);
                   def.end = def.start + text.length;
-
-                  if (smeta && smeta.scope?.local) {
-                    smeta.scope.local.end = def.end;
-                  }
                 }
               }
             }
@@ -77,22 +69,6 @@ const modifyJS = (
     });
     modif.pending.length = 0;
   }, 500);
-};
-
-const getSMetaByLoc = (p: PG, loc: CodeLoc) => {
-  let meta = undefined as ISimpleMeta | undefined;
-  if (!active.comp_id) {
-    meta = p.page.smeta[loc.item_id];
-  } else {
-    const comp = p.comp.list[active.comp_id].comp.meta;
-    if (comp[loc.item_id]) {
-      meta = comp[loc.item_id];
-    }
-  }
-
-  if (loc.type === "item" && meta) {
-    return meta;
-  }
 };
 
 const getMetaByLoc = (p: PG, loc: CodeLoc) => {
