@@ -47,7 +47,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           instance_id: arg.parent?.instance_id,
         },
       };
-      meta.item.childs = [];
 
       if (item.id) {
         if (p.set_meta !== false) {
@@ -102,6 +101,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
               item,
               instance_id: item.id,
               root_instances: instances,
+              comp: item_comp,
             },
           }
         );

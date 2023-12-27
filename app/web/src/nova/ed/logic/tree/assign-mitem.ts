@@ -1,13 +1,15 @@
 import { IItem, MItem } from "../../../../utils/types/item";
-import { IMeta } from "../ed-global";
+import { IMeta, PG } from "../ed-global";
 
 export const assignMitem = (arg: {
+  p: PG;
   m: IMeta;
   item: IItem;
   mitem: MItem;
   meta: Record<string, IMeta>;
 }) => {
-  const { m, item, mitem, meta } = arg;
+  const { p, m, item, mitem, meta } = arg;
+
   if (m.parent) {
     if (m.parent.id === "root") {
       if (m.item.id === item.id) {
@@ -48,6 +50,23 @@ export const assignMitem = (arg: {
       const prop = parent.item.component?.props[m.jsx_prop.name];
       if (prop) {
         prop.content = m.item;
+      }
+    }
+  }
+
+  if (m.parent?.instance_id && m.parent?.instance_id === m.parent?.id) {
+    const parent = meta[m.parent?.instance_id];
+    if (parent.item.component?.id) {
+      const lcomp = p.comp.list[parent.item.component.id];
+      if (lcomp) {
+        const mcomp = lcomp.doc.getMap("map").get("root");
+        if (mcomp) {
+          mcomp.get("childs")?.forEach((e) => {
+            if (e.get("id") === m.item.originalId) {
+              m.mitem = e;
+            }
+          });
+        }
       }
     }
   }
