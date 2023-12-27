@@ -30,16 +30,16 @@ export const prepContentTree = async (
       comps,
       meta,
       on: {
-        visit_component(item) {
-          if (item.component) {
-            if (!item.component.instances) {
-              item.component.instances = {};
-            }
-          }
-        },
-        visit(meta) {
+        visit(meta, item) {
           if (meta.item.adv?.js) {
             meta.item.script = parseJs(meta.item.adv.js);
+          }
+
+          if (item.component?.id) {
+            if (!item.component?.instances) {
+              item.component.instances = {};
+              meta.item.childs = [];
+            }
           }
         },
       },
@@ -48,7 +48,7 @@ export const prepContentTree = async (
     { item: root as unknown as IItem }
   );
 
-  return ctree;
+  return root;
 };
 
 const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {

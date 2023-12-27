@@ -1,7 +1,7 @@
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { genMeta } from "../../../vi/meta/meta";
-import { IMeta, PG, active } from "../ed-global";
+import { IMeta, PG } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
 
@@ -40,7 +40,9 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           on: {
             async visit(m) {
               if (!is_layout) {
-                pushTreeNode(p, m, meta, p.page.tree);
+                if (m.parent?.instance_id !== m.parent?.id) {
+                  pushTreeNode(p, m, meta, p.page.tree);
+                }
 
                 assignMitem({ m, item, mitem, meta });
               }

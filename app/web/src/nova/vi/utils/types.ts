@@ -10,7 +10,7 @@ export type GenMetaP = {
   comps: Record<string, IItem>;
   on?: {
     visit_component?: (item: IItem) => void;
-    visit?: (meta: IMeta) => void;
+    visit?: (meta: IMeta, item: IItem) => void;
   };
   set_meta?: boolean;
   note?: string;
