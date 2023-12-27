@@ -5,8 +5,10 @@ import * as Y from "yjs";
 export type IRoot = {
   id: "root";
   type: "root";
-  id_page: string;
+  id_page?: string;
   childs: ISection[];
+  component_ids?: string[];
+  entry_ids?: string[];
 };
 export type MRoot = TypedMap<{
   id: "root";

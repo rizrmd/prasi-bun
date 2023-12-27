@@ -8,42 +8,30 @@ import { simplifyItemChild } from "./simplify";
 export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
   const { item } = arg;
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
-    let pcomp = p.comps[item.component.id];
+    let item_comp = p.comps[item.component.id];
     if (p.on?.visit_component) {
       p.on.visit_component(item);
     }
 
-    if (!pcomp) {
+    if (!item_comp) {
       return;
     }
 
-    if (pcomp) {
-      let instance = {};
-      let instances: IMeta["instances"] = undefined;
-
-      if (item.component.instances) {
+    if (item_comp) {
+      let instances: undefined | typeof item.component.instances = undefined;
+      if (p.mode === "page") {
         instances = item.component.instances;
-        instance = instances[item.id] || {};
-        instances[item.id] = instance;
       } else {
-        const parent_instance = getParentInstance(p, arg, item.id);
-        instance = parent_instance || {};
-        instances = !parent_instance ? { [item.id]: instance } : undefined;
+        instances = arg.parent?.root_instances;
       }
 
-      instantiate({
-        item,
-        comp: pcomp.comp,
-        ids: instance,
-      });
-
-      if (item.component) {
-        item.component.loaded = true;
-      }
-
-      let smeta = p.comps[item.component.id].smeta;
-      if (smeta) {
-        smeta = applySMeta(smeta, instance);
+      if (instances) {
+        const instance = instances[item.id];
+        instantiate({
+          item,
+          comp: item_comp,
+          ids: instance,
+        });
       }
 
       const meta: IMeta = {
@@ -53,15 +41,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           comp_id: arg.parent?.comp?.component?.id,
           instance_id: arg.parent?.instance_id,
         },
-        instances,
-        scope: {},
       };
-
-      if (!meta.parent?.comp_id) {
-        if (p.smeta?.[item.id]) {
-          meta.scope.def = p.smeta[item.id].scope;
-        }
-      }
 
       if (item.id) {
         if (p.set_meta !== false) {
@@ -71,14 +51,14 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
 
       walkProp({
         item,
-        pcomp,
+        item_comp: item_comp,
         each(name, prop) {
           const comp_id = item.component?.id;
 
           if (prop.meta?.type === "content-element" && comp_id) {
             if (prop.content) {
               genMeta(
-                { ...p, smeta },
+                { ...p },
                 {
                   item: prop.content,
                   is_root: false,
@@ -90,7 +70,8 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
                   parent: {
                     item: meta.item,
                     instance_id: item.id,
-                    comp: pcomp.comp,
+                    comp: item_comp,
+                    root_instances: instances,
                   },
                 }
               );
@@ -98,14 +79,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           }
         },
       });
-
-      if (p.on) {
-        if (p.on.item_exists && p.meta[item.id]) {
-          p.on.item_exists({ old: p.meta[item.id], new: meta });
-        } else if (p.on.item_new && !p.meta[item.id]) {
-          p.on.item_new({ new: meta });
-        }
-      }
 
       if (p.on?.visit) {
         p.on.visit(meta);
@@ -115,53 +88,18 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         if (child.name.startsWith("jsx:")) continue;
 
         genMeta(
-          { ...p, smeta },
+          { ...p, mode: "comp" },
           {
             item: child,
             is_root: false,
             parent: {
               item,
               instance_id: item.id,
-              comp: pcomp.comp,
+              root_instances: instances,
             },
           }
         );
       }
     }
   }
-};
-
-const getParentInstance = (p: GenMetaP, arg: GenMetaArg, id: string) => {
-  if (arg.parent?.instance_id && p.meta[arg.parent?.instance_id]) {
-    const parent_instance = p.meta[arg.parent?.instance_id];
-    if (parent_instance.instances) {
-      if (!parent_instance.instances[id]) {
-        parent_instance.instances[id] = {};
-      }
-
-      return parent_instance.instances[id];
-    }
-  }
-};
-
-const applySMeta = (
-  smeta: Record<string, ISimpleMeta>,
-  ids: Record<string, string>
-) => {
-  const nmeta: typeof smeta = {};
-
-  for (const [k, v] of Object.entries(smeta)) {
-    const id = ids[k];
-    if (id) {
-      nmeta[id] = deepClone(v);
-      nmeta[id].id = id;
-      const parent = nmeta[id].parent;
-      if (parent) {
-        if (parent.instance_id) parent.instance_id = ids[parent.instance_id];
-        if (parent.id) parent.id = ids[id];
-      }
-    }
-  }
-
-  return nmeta;
 };

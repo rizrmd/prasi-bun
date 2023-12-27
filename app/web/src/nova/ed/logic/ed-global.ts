@@ -53,8 +53,6 @@ const EmptyPage = {
   name: "",
   url: "",
   snapshot: null as null | Uint8Array,
-  entry: [] as string[],
-  meta: {} as Record<string, ISimpleMeta>,
   comps: {} as Record<string, EComp>,
 };
 

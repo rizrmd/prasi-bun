@@ -1,5 +1,4 @@
 import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
-import { assignMitem } from "../../../../web/src/nova/ed/logic/tree/assign-mitem";
 import { initLoadComp } from "../../../../web/src/nova/vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
 import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
@@ -9,6 +8,8 @@ import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { loadComponent, userSyncComponent } from "../editor/load-component";
 import { parseJs } from "../editor/parser/parse-js";
+import { prepareComponentForPage } from "../editor/prep-comp-page";
+import { prepContentTree } from "../editor/prep-page";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -85,7 +86,8 @@ export const page_load: SAction["page"]["load"] = async function (
 
       const doc = new Y.Doc();
       let root = doc.getMap("map");
-      syncronize(root, { id, root: page.content_tree });
+      const proot = await prepContentTree(page.id, page.content_tree, this);
+      syncronize(root, { id, root: proot });
 
       const um = await createUndoManager(root);
       docs.page[id] = {
@@ -116,14 +118,12 @@ export const page_load: SAction["page"]["load"] = async function (
         page_id: page.id,
       });
 
-      const meta = await scanMeta(docs.page[id].doc, this);
-
       return {
         id: id,
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        ...meta,
+        comps: await prepareComponentForPage(id),
       };
     }
   } else if (snap && !ydoc) {
@@ -151,14 +151,12 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const meta = await scanMeta(docs.page[id].doc, this);
-
     return {
       id: id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      ...meta,
+      comps: await prepareComponentForPage(id),
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -171,117 +169,116 @@ export const page_load: SAction["page"]["load"] = async function (
       page_id: snap.id,
     });
 
-    const meta = await scanMeta(ydoc.doc, this);
     return {
       id: snap.id,
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      ...meta,
+      comps: await prepareComponentForPage(id),
     };
   }
 };
 
-const scanMeta = async (doc: DPage, sync: SyncConnection) => {
-  const meta: GenMetaP["meta"] = {};
-  const mcomps: GenMetaP["comps"] = {};
-  const msnap: Record<string, CompSnapshot> = {};
+// const scanMeta = async (doc: DPage, sync: SyncConnection) => {
+//   const meta: GenMetaP["meta"] = {};
+//   const mcomps: GenMetaP["comps"] = {};
+//   const msnap: Record<string, CompSnapshot> = {};
 
-  const loading = {} as Record<string, Promise<void>>;
-  const mchilds = doc.getMap("map").get("root")?.get("childs");
-  const entry: string[] = [];
-  if (mchilds) {
-    const childs = mchilds.map((m) => m);
-    for (const mchild of childs) {
-      await initLoadComp(
-        { comps: mcomps, meta },
-        mchild.toJSON(),
-        async (comp_ids) => {
-          for (const id of comp_ids) {
-            if (!docs.comp[id]) {
-              if (typeof loading[id] === "undefined") {
-                loading[id] = new Promise<void>(async (resolve) => {
-                  await loadComponent(id, sync);
-                  resolve();
-                });
-              }
-              await loading[id];
-            } else {
-              userSyncComponent(sync, id);
-            }
+//   const loading = {} as Record<string, Promise<void>>;
+//   const mchilds = doc.getMap("map").get("root")?.get("childs");
+//   const entry: string[] = [];
+//   if (mchilds) {
+//     const childs = mchilds.map((m) => m);
+//     for (const mchild of childs) {
+//       await initLoadComp(
+//         { comps: mcomps, meta },
+//         mchild.toJSON(),
+//         async (comp_ids) => {
+//           for (const id of comp_ids) {
+//             if (!docs.comp[id]) {
+//               if (typeof loading[id] === "undefined") {
+//                 loading[id] = new Promise<void>(async (resolve) => {
+//                   await loadComponent(id, sync);
+//                   resolve();
+//                 });
+//               }
+//               await loading[id];
+//             } else {
+//               userSyncComponent(sync, id);
+//             }
 
-            const snap = snapshot.get("comp", id);
-            if (snap) {
-              msnap[id] = snap;
-            }
+//             const snap = snapshot.get("comp", id);
+//             if (snap) {
+//               msnap[id] = snap;
+//             }
 
-            if (docs.comp[id]) {
-              const mitem = docs.comp[id].doc.getMap("map").get("root");
-              const comp = mitem?.toJSON() as IItem;
-              const smeta: Record<string, IMeta> = {};
-              genMeta(
-                {
-                  comps: {},
-                  meta: smeta,
-                  on: {
-                    visit(meta) {
-                      if (typeof meta.item.adv?.js === "string") {
-                        meta.scope.def = parseJs(meta.item.adv?.js);
-                      }
-                    },
-                  },
-                },
-                { item: comp, ignore_first_component: true }
-              );
-              mcomps[id] = { comp, smeta: simplifyMeta(smeta) };
-            }
-          }
-        }
-      );
-    }
+//             if (docs.comp[id]) {
+//               const mitem = docs.comp[id].doc.getMap("map").get("root");
+//               const comp = mitem?.toJSON() as IItem;
+//               const smeta: Record<string, IMeta> = {};
+//               genMeta(
+//                 {
+//                   comps: {},
+//                   meta: smeta,
+//                   on: {
+//                     visit(meta) {
+//                       if (typeof meta.item.adv?.js === "string") {
+//                         meta.scope.def = parseJs(meta.item.adv?.js);
+//                       }
+//                     },
+//                   },
+//                 },
+//                 { item: comp, ignore_first_component: true }
+//               );
+//               mcomps[id] = { comp, smeta: simplifyMeta(smeta) };
+//             }
+//           }
+//         }
+//       );
+//     }
 
-    const transact = {
-      instances_check: {} as Record<string, true | IMeta>,
-    };
+//     const save = {
+//       instances_check: {} as Record<string, true | IMeta>,
+//     };
 
-    for (const mitem of childs) {
-      const item = mitem.toJSON() as IItem;
-      entry.push(item.id);
-      genMeta(
-        {
-          comps: mcomps,
-          meta,
-          on: {
-            visit_component(item) {
-              if (!item.component?.instances) {
-                transact.instances_check[item.id] = true;
-              }
-            },
-            visit(m) {
-              if (!m.parent?.comp_id) {
-                if (typeof m.item.adv?.js === "string") {
-                  m.scope.def = parseJs(m.item.adv?.js);
-                }
-              }
+//     for (const mitem of childs) {
+//       const item = mitem.toJSON() as IItem;
+//       entry.push(item.id);
+//       genMeta(
+//         {
+//           comps: mcomps,
+//           meta,
+//           on: {
+//             visit_component(item) {
+//               if (!item.component?.instances) {
+//                 save.instances_check[item.id] = true;
+//               }
+//             },
+//             visit(m) {
+//               if (!m.parent?.comp_id) {
+//                 if (typeof m.item.adv?.js === "string") {
+//                   m.scope.def = parseJs(m.item.adv?.js);
+//                 }
+//               }
 
-              if (m.item.component?.id) {
-                if (transact.instances_check[m.item.id]) {
-                  transact.instances_check[m.item.id] = m;
-                }
-              }
-            },
-          },
-        },
-        { item }
-      );
-    }
-  }
+//               if (m.item.component?.id) {
+//                 if (save.instances_check[m.item.id]) {
+//                   save.instances_check[m.item.id] = m;
+//                 }
+//               }
+//             },
+//           },
+//         },
+//         { item }
+//       );
+//     }
+//   }
 
-  const comps: EPage["comps"] = {};
-  for (const [id, snap] of Object.entries(msnap)) {
-    const meta = mcomps[id].smeta;
-    comps[id] = { id, meta, snapshot: await gzipAsync(snap.bin) };
-  }
+//   const comps: EPage["comps"] = {};
+//   for (const [id, snap] of Object.entries(msnap)) {
+//     const meta = mcomps[id].smeta;
+//     comps[id] = { id, meta, snapshot: await gzipAsync(snap.bin) };
+//   }
 
-  return { meta: simplifyMeta(meta), comps, entry };
-};
+//   return { meta: simplifyMeta(meta), comps, entry };
+// };

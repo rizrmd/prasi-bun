@@ -19,10 +19,7 @@ export type FNAdv = {
 export type FMAdv = TypedMap<FNAdv>;
 export type FNComponent = {
   id: string;
-  name?: string;
-  loaded?: boolean;
   props: Record<string, FNCompDef>;
-  ref_ids?: Record<string, string>;
   instances?: Record<string, Record<string, string>>;
 };
 
