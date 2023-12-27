@@ -55,14 +55,21 @@ export const mainPerItemVisit = (
 
     prop.ref = (el) => {
       if (el && text_edit.caret) {
-        if (text_edit.id === meta.item.id) {
-          setCaret(el, text_edit.caret);
-          text_edit.caret = null;
+        if (
+          text_edit.id === meta.item.id ||
+          text_edit.id === meta.item.originalId
+        ) {
+          if (document.activeElement !== el) {
+            setCaret(el, text_edit.caret);
+            text_edit.caret = null;
+          }
         }
       }
     };
 
     prop.onKeyDown = (e) => {
+      text_edit.caret = getCaret(e.currentTarget);
+
       if (typeof text_edit.del_key_id === "string") {
         if (e.key === "Backspace" || e.key === "Delete") {
           e.currentTarget.blur();
@@ -77,14 +84,14 @@ export const mainPerItemVisit = (
     prop.onInput = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      const val = e.currentTarget.innerHTML;
       const el = e.currentTarget;
+      const val = e.currentTarget.innerHTML;
 
       clearTimeout(text_edit.timeout);
-      text_edit.timeout = setTimeout(() => {
-        text_edit.id = meta.item.id;
-        text_edit.caret = getCaret(el);
+      text_edit.id = meta.item.originalId || meta.item.id;
 
+      text_edit.timeout = setTimeout(() => {
+        text_edit.caret = getCaret(el);
         if (active.comp_id && meta.parent?.comp_id === active.comp_id) {
           const comp = p.comp.list[active.comp_id];
           const m = comp.meta[meta.item.originalId || meta.item.id];

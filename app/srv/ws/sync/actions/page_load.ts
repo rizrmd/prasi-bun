@@ -123,7 +123,7 @@ export const page_load: SAction["page"]["load"] = async function (
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        comps: await prepareComponentForPage(id),
+        comps: await prepareComponentForPage(id, this),
       };
     }
   } else if (snap && !ydoc) {
@@ -156,7 +156,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps: await prepareComponentForPage(id),
+      comps: await prepareComponentForPage(id, this),
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -174,7 +174,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps: await prepareComponentForPage(id),
+      comps: await prepareComponentForPage(id, this),
     };
   }
 };

@@ -44,7 +44,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                   pushTreeNode(p, m, meta, p.page.tree);
                 }
 
-                assignMitem({ m, item, mitem, meta });
+                assignMitem({ p, m, item, mitem, meta });
               }
             },
           },
