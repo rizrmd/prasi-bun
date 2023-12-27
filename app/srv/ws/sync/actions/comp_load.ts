@@ -44,10 +44,11 @@ export const comp_load: SAction["comp"]["load"] = async function (
         {
           comps: {},
           meta,
+          mode: "comp",
           on: {
             visit(meta) {
               if (typeof meta.item.adv?.js === "string") {
-                meta.scope.def = parseJs(meta.item.adv?.js);
+                meta.item.script = parseJs(meta.item.adv?.js);
               }
             },
           },
@@ -57,7 +58,6 @@ export const comp_load: SAction["comp"]["load"] = async function (
 
       result[id] = {
         id,
-        meta,
         snapshot: await gzipAsync(snap.bin),
       };
     }

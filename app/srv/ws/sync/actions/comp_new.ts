@@ -88,15 +88,16 @@ export const comp_new: SAction["comp"]["new"] = async function (
     if (load) {
       const mitem = docs.comp[comp.id].doc.getMap("map").get("root");
       const citem = mitem?.toJSON() as IItem;
-      const smeta: Record<string, IMeta> = {};
+      const comp_meta: Record<string, IMeta> = {};
       genMeta(
         {
           comps: {},
-          meta: smeta,
+          meta: comp_meta,
+          mode: "comp",
           on: {
             visit(meta) {
               if (typeof meta.item.adv?.js === "string") {
-                meta.scope.def = parseJs(meta.item.adv?.js);
+                meta.item.script = parseJs(meta.item.adv?.js);
               }
             },
           },
@@ -106,7 +107,7 @@ export const comp_new: SAction["comp"]["new"] = async function (
 
       return {
         id: comp.id,
-        meta: simplifyMeta(smeta),
+        meta: simplifyMeta(comp_meta),
         snapshot: load.snapshot,
       };
     }
