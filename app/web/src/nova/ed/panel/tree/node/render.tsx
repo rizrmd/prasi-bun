@@ -33,11 +33,11 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     const comp = p.comp.loaded[node.data.jsx_prop.comp_id];
     if (comp) {
       const prop_name = node.data?.jsx_prop?.name;
-      const cprop = comp.comp.component?.props[prop_name];
+      const cprop = comp.component?.props[prop_name];
       if (cprop && node.data.parent?.instance_id) {
         const meta = getMetaById(p, node.data.parent.instance_id);
         if (meta && prop_name) {
-          const props = meta.scope.def?.props;
+          const props = meta.item.script?.props;
           if (props) {
             const prop = props[prop_name];
             if (

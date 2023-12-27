@@ -22,7 +22,7 @@ export const getScopeMeta = (
   }
 
   for (const m of scopes_meta) {
-    const def = m.scope.def;
+    const def = m.item.script;
     if (def) {
       if (def.passprop) {
         for (const p of Object.keys(def.passprop)) {

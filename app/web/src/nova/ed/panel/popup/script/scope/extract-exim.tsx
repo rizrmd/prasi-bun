@@ -6,7 +6,7 @@ export const extractExportImport = (
   m: IMeta,
   imports: Record<string, string>
 ) => {
-  const def = m.scope.def;
+  const def = m.item.script;
   let result: {
     local?: ReturnType<typeof extractLocal>;
     passprop?: ReturnType<typeof extractPassProp>;
@@ -87,7 +87,7 @@ ${commentize("value", null, m.item.adv?.js)}
 const extractLocal = (
   p: PG,
   m: IMeta,
-  def: IMeta["scope"]["def"],
+  def: IMeta["item"]["script"],
   imports: Record<string, string>
 ) => {
   if (def?.local) {
@@ -123,7 +123,7 @@ declare global {
 const extractPassProp = (
   p: PG,
   m: IMeta,
-  def: IMeta["scope"]["def"],
+  def: IMeta["item"]["script"],
   imports: Record<string, string>
 ) => {
   if (def?.passprop) {
@@ -165,7 +165,7 @@ declare global {
 const extractProps = (
   p: PG,
   m: IMeta,
-  def: IMeta["scope"]["def"],
+  def: IMeta["item"]["script"],
   imports: Record<string, string>
 ) => {
   if (def?.props) {

@@ -10,14 +10,14 @@ export const scopeMapExportImport = (p: PG, meta: IMeta, parents: IMeta[]) => {
   for (const m of parents) {
     next_parent = parents[i + 1];
 
-    let def = m.scope.def;
+    let def = m.item.script;
 
     if (active.comp_id && m.parent?.id === "root" && active.instance) {
       const meta = p.page.meta[active.instance.item_id];
       if (meta) {
-        if (!m.scope.def) m.scope.def = {};
-        def = m.scope.def;
-        def.props = { ...m.scope.def.props, ...meta.scope?.def?.props };
+        if (!m.item.script) m.item.script = {};
+        def = m.item.script;
+        def.props = { ...m.item.script.props, ...meta.item.script?.props };
       }
     }
 
