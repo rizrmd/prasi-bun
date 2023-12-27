@@ -31,8 +31,8 @@ export const prepContentTree = async (
       meta,
       on: {
         visit(meta, item) {
-          if (meta.item.adv?.js) {
-            meta.item.script = parseJs(meta.item.adv.js);
+          if (item.adv?.js) {
+            item.script = parseJs(item.adv.js);
           }
 
           if (item.component?.id) {

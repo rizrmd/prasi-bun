@@ -21,6 +21,8 @@ export const scopeMapExportImport = (p: PG, meta: IMeta, parents: IMeta[]) => {
       }
     }
 
+    console.log(def);
+
     if (def) {
       const ex = extractExportImport(p, m, imports);
       if (next_parent) {

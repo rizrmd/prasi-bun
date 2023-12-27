@@ -1,3 +1,4 @@
+import { parseJs } from "../../../../srv/ws/sync/editor/parser/parse-js";
 import {
   FMAdv,
   FMBackground,
@@ -32,6 +33,7 @@ export type BasicItem = {
   font?: FNFont;
   dim?: FNDimension;
   border?: FNBorder;
+  script?: ReturnType<typeof parseJs>;
 };
 
 export type MBasicItem = {
@@ -41,7 +43,7 @@ export type MBasicItem = {
   component?: FMComponent;
   dim?: FMDimension;
   layout?: FMLayout;
-  linktag?: FMLinkTag;
   adv?: FMAdv;
   border?: FMBorder;
+  script?: ReturnType<typeof parseJs>;
 };
