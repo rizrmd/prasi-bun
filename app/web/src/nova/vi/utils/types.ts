@@ -7,16 +7,14 @@ import { createViPassProp } from "../render/script/passprop";
 
 export type GenMetaP = {
   meta: Record<string, IMeta>;
-  comps: Record<string, { comp: IItem; smeta: Record<string, ISimpleMeta> }>;
+  comps: Record<string, IItem>;
   on?: {
     visit_component?: (item: IItem) => void;
     visit?: (meta: IMeta) => void;
-    item_exists?: (arg: { old: IMeta; new: IMeta }) => void;
-    item_new?: (arg: { new: IMeta }) => void;
   };
-  smeta?: Record<string, ISimpleMeta>;
   set_meta?: boolean;
   note?: string;
+  mode: "page" | "comp";
 };
 
 export type GenMetaArg = {
@@ -28,6 +26,7 @@ export type GenMetaArg = {
     item: IItem;
     instance_id?: string;
     comp?: IItem;
+    root_instances?: Record<string, Record<string, string>>;
   };
 };
 
@@ -42,7 +41,6 @@ export type ISimpleMeta = {
     instance_id?: string;
     comp_id?: string;
   };
-  scope: IMeta["scope"]["def"];
 };
 
 export type IMeta = {
@@ -67,8 +65,5 @@ export type IMeta = {
       PassProp: ReturnType<typeof createViPassProp>;
     }
   >;
-  scope: {
-    def?: ReturnType<typeof parseJs>;
-  };
   render?: () => void;
 };

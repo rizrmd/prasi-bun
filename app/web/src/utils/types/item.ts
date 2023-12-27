@@ -1,18 +1,16 @@
 import { TypedArray, TypedMap } from "yjs-types";
+import { parseJs } from "../../../../srv/ws/sync/editor/parser/parse-js";
 import { BasicItem, MBasicItem, MetaItem } from "./meta";
-import {
-  FNAdv,
-  FNComponent,
-  FNLayout,
-  FNLinkTag
-} from "./meta-fn";
+import { FNAdv, FNComponent, FNLayout, FNLinkTag } from "./meta-fn";
 import { MSection } from "./section";
 import { IText, MText } from "./text";
+
 export type IItem = {
   layout?: FNLayout;
   linktag?: FNLinkTag;
   mobile?: IItem;
   adv?: FNAdv;
+  script?: ReturnType<typeof parseJs>;
   type: "item";
   component?: FNComponent;
   childs: (IItem | IText)[];

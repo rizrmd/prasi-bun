@@ -13,13 +13,6 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     }
   }
 
-  let scope: IMeta["scope"] = {};
-  if (p.smeta) {
-    if (p.smeta[item.id] && p.smeta[item.id].scope) {
-      scope.def = p.smeta[item.id].scope;
-    }
-  }
-
   const meta: IMeta = {
     item: simplifyItemChild(item),
     jsx_prop: arg.jsx_prop,
@@ -28,20 +21,12 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       instance_id: arg.parent?.instance_id,
       comp_id: arg.parent?.comp?.component?.id,
     },
-    scope,
   };
 
   if (p.on?.visit) {
     p.on.visit(meta);
   }
 
-  if (p.on) {
-    if (p.on.item_exists && p.meta[item.id]) {
-      p.on.item_exists({ old: p.meta[item.id], new: meta });
-    } else if (p.on.item_new && !p.meta[item.id]) {
-      p.on.item_new({ new: meta });
-    }
-  }
   if (item.id) {
     if (p.set_meta !== false) {
       p.meta[meta.item.id] = meta;
@@ -57,6 +42,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
           item: meta.item,
           instance_id: arg.parent?.instance_id,
           comp: arg.parent?.comp,
+          root_instances: arg.parent?.root_instances,
         },
       });
     }

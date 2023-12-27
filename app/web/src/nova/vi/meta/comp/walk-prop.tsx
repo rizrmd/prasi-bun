@@ -4,10 +4,10 @@ import { FNCompDef } from "../../../../utils/types/meta-fn";
 
 export const walkProp = (arg: {
   item: IItem;
-  pcomp: { comp: IItem };
+  item_comp: IItem;
   each: (name: string, prop: FNCompDef) => void;
 }) => {
-  for (const [k, v] of Object.entries(arg.pcomp.comp.component?.props || {})) {
+  for (const [k, v] of Object.entries(arg.item_comp.component?.props || {})) {
     let prop = deepClone(v);
     const props = arg.item.component?.props;
     if (props && props[k]) {
