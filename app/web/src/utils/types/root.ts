@@ -8,12 +8,13 @@ export type IRoot = {
   id_page?: string;
   childs: ISection[];
   component_ids?: string[];
-  entry_ids?: string[];
 };
 export type MRoot = TypedMap<{
   id: "root";
+  id_page?: string;
   type: "root";
   childs: TypedArray<ISection>;
+  component_ids?: string[];
 }>;
 
 export type DPage = TypedDoc<{

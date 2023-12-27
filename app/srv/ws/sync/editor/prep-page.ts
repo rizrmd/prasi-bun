@@ -51,7 +51,7 @@ export const prepContentTree = async (
   return root;
 };
 
-const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
+export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
   const meta: GenMetaP["meta"] = {};
   const mcomps: GenMetaP["comps"] = {};
   const result = new Set<string>();
