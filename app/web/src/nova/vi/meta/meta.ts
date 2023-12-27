@@ -15,7 +15,6 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
 
   const meta: IMeta = {
     item: simplifyItemChild(item),
-    jsx_prop: arg.jsx_prop,
     parent: {
       id: arg.parent?.item.id || "root",
       instance_id: arg.parent?.instance_id,
@@ -23,8 +22,12 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
     },
   };
 
+  if (arg.jsx_prop) {
+    meta.jsx_prop = arg.jsx_prop;
+  }
+
   if (p.on?.visit) {
-    p.on.visit(meta);
+    p.on.visit(meta, item);
   }
 
   if (item.id) {

@@ -5,11 +5,11 @@ import { FNComponent } from "../../../../utils/types/meta-fn";
 
 export const instantiate = (arg: {
   item: IItem;
-  comp: IItem;
+  item_comp: IItem;
   ids: Record<string, string>;
 }) => {
-  const { item, comp, ids } = arg;
-  const newitem = deepClone(comp);
+  const { item, item_comp, ids } = arg;
+  const newitem = deepClone(item_comp);
 
   walkChild(newitem, ids);
 

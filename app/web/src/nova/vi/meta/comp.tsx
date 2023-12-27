@@ -34,7 +34,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
 
         instantiate({
           item,
-          comp: item_comp,
+          item_comp: item_comp,
           ids: instance,
         });
       }
@@ -47,6 +47,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           instance_id: arg.parent?.instance_id,
         },
       };
+      meta.item.childs = [];
 
       if (item.id) {
         if (p.set_meta !== false) {
@@ -86,7 +87,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       });
 
       if (p.on?.visit) {
-        p.on.visit(meta);
+        p.on.visit(meta, item);
       }
 
       for (const child of Object.values(item.childs)) {

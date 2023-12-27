@@ -34,7 +34,7 @@ export const declareScope = async (
     ? p.comp.list[active.comp_id]?.meta
     : p.page.meta;
   const entry = active.comp_id
-    ? [p.comp.loaded[active.comp_id].comp]
+    ? [p.comp.loaded[active.comp_id]]
     : p.page.entry.map((e) => p.page.meta[e].item);
 
   const paths: IMeta[][] = [];
