@@ -1,19 +1,10 @@
-import { EPage } from "../../../../web/src/nova/ed/logic/ed-global";
-import { initLoadComp } from "../../../../web/src/nova/vi/meta/comp/init-comp-load";
-import { genMeta } from "../../../../web/src/nova/vi/meta/meta";
-import { simplifyMeta } from "../../../../web/src/nova/vi/meta/simplify";
-import { GenMetaP, IMeta } from "../../../../web/src/nova/vi/utils/types";
-import { IItem } from "../../../../web/src/utils/types/item";
-import { DPage } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
-import { loadComponent, userSyncComponent } from "../editor/load-component";
-import { parseJs } from "../editor/parser/parse-js";
 import { prepareComponentForPage } from "../editor/prep-comp-page";
 import { prepContentTree } from "../editor/prep-page";
 import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
-import { CompSnapshot, snapshot } from "../entity/snapshot";
+import { snapshot } from "../entity/snapshot";
 import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
@@ -123,7 +114,7 @@ export const page_load: SAction["page"]["load"] = async function (
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        comps: await prepareComponentForPage(id, this),
+        comps: await prepareComponentForPage(id, this, false),
       };
     }
   } else if (snap && !ydoc) {
@@ -133,6 +124,8 @@ export const page_load: SAction["page"]["load"] = async function (
 
     Y.applyUpdate(doc, snap.bin);
     let root = doc.getMap("map");
+
+    const comps = await prepareComponentForPage(id, this, true, doc as any);
 
     const um = await createUndoManager(root);
     await attachOnUpdate(doc, um);
@@ -156,7 +149,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps: await prepareComponentForPage(id, this),
+      comps,
     };
   } else if (snap && ydoc) {
     await setActivityPage(snap.id_site, id);
@@ -174,7 +167,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps: await prepareComponentForPage(id, this),
+      comps: await prepareComponentForPage(id, this, true),
     };
   }
 };
