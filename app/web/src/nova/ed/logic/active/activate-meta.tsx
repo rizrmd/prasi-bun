@@ -2,6 +2,7 @@ import { IMeta, PG, active } from "../ed-global";
 
 export const activateMeta = (p: PG, meta: IMeta) => {
   let parent_comp_id = meta.parent?.comp_id;
+
   if (
     active.comp_id &&
     meta.item.component?.id === active.comp_id &&
@@ -103,13 +104,15 @@ export const activateMeta = (p: PG, meta: IMeta) => {
             } else break;
           }
         } else {
-          if (active.item_id !== meta.parent.instance_id) {
+          if (active.item_id !== meta.parent.instance_id && !meta.jsx_prop) {
             active.item_id = meta.parent.instance_id;
           } else if (parent.comp_id && meta.item.originalId) {
             active.instance.comp_id = active.comp_id;
             active.instance.item_id = active.item_id;
             active.comp_id = parent.comp_id;
             active.item_id = meta.item.originalId;
+          } else {
+            active.item_id = meta.item.id;
           }
         }
       }

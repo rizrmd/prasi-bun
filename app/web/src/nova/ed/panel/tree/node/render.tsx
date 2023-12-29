@@ -42,6 +42,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
 
         if (meta && prop_name) {
           const props = meta.item.script?.props;
+
           if (props) {
             const prop = props[prop_name];
             if (
@@ -49,9 +50,16 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
               (prop.visible === true || !prop.hasOwnProperty("visible"))
             ) {
               hide = false;
+            } else {
+              const prop = meta.item.component?.props[prop_name];
+
+              if (prop && (prop.visible || !prop.hasOwnProperty("visible"))) {
+                hide = false;
+              }
             }
           } else {
             const prop = meta.item.component?.props[prop_name];
+
             if (prop && (prop.visible || !prop.hasOwnProperty("visible"))) {
               hide = false;
             }
