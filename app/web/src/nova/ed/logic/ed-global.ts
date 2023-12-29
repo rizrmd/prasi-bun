@@ -214,6 +214,7 @@ export const EDGlobal = {
         type: "item" as "item" | "prop-master" | "prop-instance",
         prop_kind: "" as PropFieldKind,
         prop_name: "",
+        on_close: () => {},
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {
