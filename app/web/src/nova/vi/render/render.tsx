@@ -11,6 +11,7 @@ export const ViRender: FC<{
   children?: ReactNode;
   passprop?: any;
 }> = ({ meta, children, passprop }) => {
+
   if (!meta) return null;
 
   if (meta.item.hidden) return null;

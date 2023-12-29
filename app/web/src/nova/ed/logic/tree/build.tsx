@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { genMeta } from "../../../vi/meta/meta";
@@ -40,11 +41,28 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
           on: {
             async visit(m) {
               if (!is_layout) {
-                if (m.parent?.instance_id !== m.parent?.id) {
+                if (m.parent?.instance_id !== m.parent?.id || m.jsx_prop) {
                   pushTreeNode(p, m, meta, p.page.tree);
+                } else {
                 }
 
-                assignMitem({ p, m, item, mitem, meta });
+                assignMitem({
+                  p,
+                  m,
+                  root: item,
+                  mitem,
+                  meta,
+                  new_prop_jsx(meta, mprops, prop_name, prop_val) {
+                    transact.list.push(() => {
+                      const map = new Y.Map();
+
+                      if (prop_val.content) prop_val.content.id = createId();
+
+                      syncronize(map, prop_val);
+                      mprops.set(prop_name, map as any);
+                    });
+                  },
+                });
               }
             },
           },
@@ -96,31 +114,4 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
 
 const transact = {
   list: [] as (() => void)[],
-  propContentFromItem: (
-    meta: IMeta,
-    mitem: MItem,
-    name: string,
-    prop: FNCompDef
-  ) => {
-    transact.list.push(() => {
-      const mprops = mitem?.get("component")?.get("props");
-
-      if (mprops) {
-        const map = new Y.Map();
-        syncronize(map, prop);
-        mprops.set(name, map as any);
-        console.log(mprops.get(name));
-        const mcontent = mprops.get(name)?.get("content");
-        console.log(mcontent);
-      }
-    });
-  },
-  jsxContentFromItem(meta: IMeta, content: IItem, mprop: FMCompDef) {
-    transact.list.push(() => {
-      const map = new Y.Map();
-      syncronize(map, content);
-      mprop.set("content", map as any);
-      meta.mitem = mprop.get("content");
-    });
-  },
 };

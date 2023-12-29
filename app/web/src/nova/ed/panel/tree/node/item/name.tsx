@@ -22,7 +22,7 @@ export const EdTreeName = ({
   const item = node.data?.item;
 
   if (!item) return <></>;
-  const is_jsx_prop = !!node.data?.jsx_prop;
+  const is_jsx_prop = !!node.data?.jsx_prop?.is_root;
 
   const isRenaming = p.ui.tree.rename_id === item.id;
   return (
@@ -98,7 +98,9 @@ export const EdTreeName = ({
       ) : (
         <div className="flex flex-col">
           <Name name={node.text} is_jsx_prop={is_jsx_prop} />
-          {/* <div className={"text-[9px] text-gray-500 -mt-1"}>{node.id} - {item.originalId}</div> */}
+          <div className={"text-[9px] text-gray-500 -mt-1"}>
+            {node.id} - {item.originalId}
+          </div>
         </div>
       )}
     </div>

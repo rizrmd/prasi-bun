@@ -39,6 +39,7 @@ export const EdBase = () => {
     );
   }
 
+
   return (
     <div className="flex flex-col flex-1">
       <div className="flex justify-between"></div>

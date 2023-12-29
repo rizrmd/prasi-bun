@@ -16,7 +16,10 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const local = useLocal({
     rightClick: null as null | React.MouseEvent<HTMLDivElement, MouseEvent>,
   });
-  if (!node || !node.data) return <></>;
+  if (!node || !node.data) {
+    console.log("hello", node, prm);
+    return <></>;
+  }
   const item = node.data?.item;
   const isComponent = item.type === "item" && item.component?.id;
 
@@ -36,6 +39,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
       const cprop = comp.component?.props[prop_name];
       if (cprop && node.data.parent?.instance_id) {
         const meta = getMetaById(p, node.data.parent.instance_id);
+
         if (meta && prop_name) {
           const props = meta.item.script?.props;
           if (props) {
@@ -44,6 +48,11 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
               prop &&
               (prop.visible === true || !prop.hasOwnProperty("visible"))
             ) {
+              hide = false;
+            }
+          } else {
+            const prop = meta.item.component?.props[prop_name];
+            if (prop && (prop.visible || !prop.hasOwnProperty("visible"))) {
               hide = false;
             }
           }
@@ -118,10 +127,10 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
           }, 100);
         }
       }}
-      onMouseOver={() => {
+      onMouseEnter={() => {
         active.hover.id = item.id;
-        active.hover.renderTree();
         active.hover.renderMain();
+        active.hover.renderTree();
       }}
     >
       {active.hover.id === item.id && (

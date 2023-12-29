@@ -328,16 +328,16 @@ export const walk = async (
               let mp = mprops.get(name);
               if (mp) {
                 const mprop = mp?.toJSON() as FNCompDef;
-                const jsx_prop = iprops.get(name);
+                const jprop = iprops.get(name);
 
-                if (jsx_prop) {
+                if (jprop) {
                   if (mprop.meta?.type === "content-element") {
-                    let mcontent = jsx_prop.get("content");
+                    let mcontent = jprop.get("content");
 
                     let isNew = false;
                     if (!mcontent) {
                       isNew = true;
-                      jsx_prop.set(
+                      jprop.set(
                         "content",
                         newMap({
                           id: createId(),
@@ -350,7 +350,7 @@ export const walk = async (
                           },
                         }) as any
                       );
-                      mcontent = jsx_prop.get("content");
+                      mcontent = jprop.get("content");
                     }
 
                     if (!!mcontent) {
@@ -372,7 +372,7 @@ export const walk = async (
                         if (defaultJSX && mcontent) {
                           syncronize(mcontent as any, defaultJSX);
                         }
-                        mcontent = jsx_prop.get("content");
+                        mcontent = jprop.get("content");
                       }
                       if (mcontent) {
                         await walk(p, mode, {

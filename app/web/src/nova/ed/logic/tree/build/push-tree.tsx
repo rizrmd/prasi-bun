@@ -39,7 +39,7 @@ export const pushTreeNode = (
         data: meta,
       });
     } else {
-      if (meta.jsx_prop) {
+      if (meta.jsx_prop?.is_root) {
         tree.push({
           id: meta.item.id,
           parent: meta.parent?.instance_id || "root",

@@ -4,6 +4,7 @@ import { IContent, MContent } from "../../../../../utils/types/general";
 import { getMetaById } from "../../../logic/active/get-meta";
 import { IMeta, PG, active } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const nodeOnDrop: (
   p: PG,
@@ -51,6 +52,8 @@ export const nodeOnDrop: (
             });
           }
         });
+        treeRebuild(p);
+        p.render();
       }
     }
   }
