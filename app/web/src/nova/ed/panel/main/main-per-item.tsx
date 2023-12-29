@@ -154,7 +154,7 @@ export const mainPerItemVisit = (
         }
       `
   );
-  parts.props.onPointerOver = (e) => {
+  parts.props.onPointerEnter = (e) => {
     e.stopPropagation();
     active.hover.id = meta.item.id;
     active.hover.renderMain();

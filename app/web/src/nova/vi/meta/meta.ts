@@ -38,7 +38,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
 
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
-      genMeta(p, {
+      const carg: GenMetaArg = {
         item: v,
         is_root: false,
         parent: {
@@ -47,7 +47,14 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
           comp: arg.parent?.comp,
           root_instances: arg.parent?.root_instances,
         },
-      });
+      };
+      if (arg.jsx_prop) {
+        carg.jsx_prop = { 
+          ...arg.jsx_prop,
+          is_root: false,
+        };
+      }
+      genMeta(p, carg);
     }
   }
 };

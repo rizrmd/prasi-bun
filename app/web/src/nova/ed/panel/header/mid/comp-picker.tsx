@@ -87,6 +87,11 @@ const addComponent = (mitem: MItem | MSection, comp: IItem) => {
   const map = new Y.Map() as MContent;
   if (map) {
     comp.originalId = comp.id;
+
+    if (comp.component && !comp.component?.instances) {
+      comp.component.instances = {};
+    }
+
     syncronize(map as any, fillID(comp));
     const childs = mitem.get("childs");
     if (childs) {

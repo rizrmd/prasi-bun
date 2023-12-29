@@ -1,7 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { deepClone } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
-import { FNComponent } from "../../../../utils/types/meta-fn";
 
 export const instantiate = (arg: {
   item: IItem;
@@ -22,11 +21,6 @@ export const instantiate = (arg: {
       if (item.component.props[k]) {
         newitem.component.props[k] = item.component.props[k];
       }
-
-      const content = newitem.component.props[k].content;
-      if (content) {
-        walkChild(content, ids);
-      }
     }
   }
 
@@ -40,9 +34,7 @@ export const instantiate = (arg: {
 };
 
 export const walkChild = (item: IItem, ids: Record<string, string>) => {
-  if (!item.originalId) {
-    item.originalId = item.id;
-  }
+  item.originalId = item.id;
 
   if (!ids[item.id]) {
     ids[item.id] = createId();

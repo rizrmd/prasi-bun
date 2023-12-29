@@ -35,7 +35,7 @@ export const edActionNewComp = (
         }
 
         if (newcomp && newcomp.snapshot) {
-          await loadCompSnapshot(p, newcomp.id, newcomp.snapshot, newcomp.meta);
+          await loadCompSnapshot(p, newcomp.id, newcomp.snapshot);
           await treeRebuild(p);
         }
 

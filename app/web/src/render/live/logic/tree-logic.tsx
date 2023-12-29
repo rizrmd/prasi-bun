@@ -132,11 +132,11 @@ const walk = async (
 
         if (cprops && iprops) {
           for (const [name, mprop] of Object.entries(cprops)) {
-            const jsx_prop = iprops[name];
+            const jprop = iprops[name];
 
-            if (jsx_prop) {
+            if (jprop) {
               if (mprop.meta?.type === "content-element") {
-                let icontent = jsx_prop.content;
+                let icontent = jprop.content;
 
                 if (icontent)
                   await walk(p, {

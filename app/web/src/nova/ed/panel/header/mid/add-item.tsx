@@ -7,6 +7,7 @@ import { EDGlobal, active } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
 import { prepSection } from "./prep-section";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdAddItem = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -68,6 +69,8 @@ export const EdAddItem = () => {
 
               active.item_id = map.get("id") || "";
               p.render();
+
+              treeRebuild(p);
             }
           }
         }

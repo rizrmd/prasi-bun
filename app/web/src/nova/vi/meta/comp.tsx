@@ -54,9 +54,32 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         }
       }
 
+      if (p.on?.visit) {
+        p.on.visit(meta, item);
+      }
+
+      for (const child of Object.values(item.childs)) {
+        if (child.name.startsWith("jsx:")) continue;
+
+        genMeta(
+          { ...p, mode: "comp" },
+          {
+            item: child,
+            is_root: false,
+            parent: {
+              item,
+              instance_id: item.id,
+              root_instances: instances,
+              comp: item_comp,
+            },
+          }
+        );
+      } 
+
       walkProp({
         item,
         item_comp: item_comp,
+        instance: instances ? instances[item.id] : {},
         each(name, prop) {
           const comp_id = item.component?.id;
 
@@ -84,28 +107,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           }
         },
       });
-
-      if (p.on?.visit) {
-        p.on.visit(meta, item);
-      }
-
-      for (const child of Object.values(item.childs)) {
-        if (child.name.startsWith("jsx:")) continue;
-
-        genMeta(
-          { ...p, mode: "comp" },
-          {
-            item: child,
-            is_root: false,
-            parent: {
-              item,
-              instance_id: item.id,
-              root_instances: instances,
-              comp: item_comp,
-            },
-          }
-        );
-      }
     }
   }
 };
