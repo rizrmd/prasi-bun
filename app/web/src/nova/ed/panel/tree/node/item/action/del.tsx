@@ -34,9 +34,6 @@ export const edActionDeleteById = async (p: PG, id: string) => {
 
 const deleteByParent = (p: PG, mitem: MItem, index: number) => {
   const mchild = mitem.parent.get(index);
-  const child = mchild?.toJSON() as IItem;
-
-  console.log(child);
   mitem.parent.delete(index);
   treeRebuild(p);
 };
