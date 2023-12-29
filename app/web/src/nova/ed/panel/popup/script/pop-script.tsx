@@ -26,6 +26,8 @@ export const EdPopScript = () => {
                 delete p.script.init_local_effect[active.item_id];
               }
 
+              script.on_close();
+
               p.render();
             }
           }

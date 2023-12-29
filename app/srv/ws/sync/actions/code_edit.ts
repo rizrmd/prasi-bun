@@ -145,20 +145,39 @@ export const code_edit: SAction["code"]["edit"] = async function (
 };
 
 const findId = (mitem: MContent | MRoot, id: string) => {
-  if ((mitem as MItem).get("id") === id) {
-    return mitem as MItem;
+  let found: null | MItem = null;
+
+  const m = mitem as MItem;
+  if (m.get("id") === id) {
+    return m;
   }
 
-  const childs = (mitem as MItem).get("childs");
+  const childs = m.get("childs");
   if (childs) {
-    let found: null | MItem = null;
     childs.forEach((child) => {
       const f = findId(child, id);
       if (f) {
         found = f;
       }
     });
-
-    if (found) return found;
   }
+
+  if (!found) {
+    const mprops = m.get("component")?.get("props");
+    if (mprops) {
+      mprops.forEach((mprop) => {
+        if (mprop.get("meta")?.get("type") === "content-element") {
+          const mcontent = mprop.get("content");
+          if (mcontent) {
+            const f = findId(mcontent, id);
+            if (f) {
+              found = f;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  if (found) return found;
 };

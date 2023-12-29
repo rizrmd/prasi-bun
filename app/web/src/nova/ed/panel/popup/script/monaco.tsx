@@ -189,7 +189,8 @@ export const EdScriptMonaco: FC<{}> = () => {
         local.value = val || "";
         local.render();
         clearTimeout(scriptEdit.timeout);
-        scriptEdit.timeout = setTimeout(async () => {
+
+        const applyChanges = async () => {
           const meta = getActiveMeta(p);
           const type = p.ui.popup.script.mode;
           if (meta && meta.mitem) {
@@ -232,7 +233,14 @@ export const EdScriptMonaco: FC<{}> = () => {
               meta.item.script = scope;
             }
           }
-        }, 1000);
+        };
+
+        p.ui.popup.script.on_close = () => {
+          clearTimeout(scriptEdit.timeout);
+          applyChanges();
+          p.ui.popup.script.on_close = () => {};
+        };
+        scriptEdit.timeout = setTimeout(applyChanges, 1000);
       }}
       onMount={async (editor, monaco) => {
         local.monaco = monaco;
