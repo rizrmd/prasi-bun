@@ -1,5 +1,6 @@
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
+import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
 
 export const viEvalProps = (
@@ -24,6 +25,27 @@ export const viEvalProps = (
     if (!!meta.item.component.props) {
       for (const [name, prop] of Object.entries(meta.item.component.props)) {
         try {
+          if (prop.meta?.type === "content-element") {
+            let val = {
+              _jsx: true,
+              fn: (arg: { passprop: any; meta: any }) => {
+                const id = prop.content?.id;
+                if (id) {
+                  const meta = vi.meta[id];
+                  return <ViRender meta={meta} passprop={arg.passprop}  />;
+                }
+                return null;
+              },
+            };
+
+            arg[name] = val;
+
+            if (passprop) {
+              passprop[name] = val;
+            }
+            continue;
+          }
+
           const fn = new Function(
             ...Object.keys(arg),
             `// [${meta.item.name}] ${name}: ${meta.item.id} 

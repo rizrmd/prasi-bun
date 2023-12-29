@@ -41,7 +41,7 @@ export const mainPerItemVisit = (
     prop.contentEditable = true;
 
     prop.suppressContentEditableWarning = true;
-    if (meta.parent?.comp_id) {
+    if (meta.parent?.comp_id && !meta.jsx_prop) {
       if (meta.parent.comp_id !== active.comp_id) {
         prop.contentEditable = false;
       }

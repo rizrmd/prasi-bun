@@ -55,6 +55,18 @@ export const viEvalScript = (
     ...passprop,
   };
 
+  if (typeof passprop === "object") {
+    for (const [k, v] of Object.entries(passprop)) {
+      if (typeof v === "object" && (v as any)._jsx) {
+        const jprop = v as unknown as {
+          _jsx: true;
+          fn: (arg: { passprop: any }) => ReactNode;
+        };
+        arg[k] = jprop.fn({ passprop });
+      }
+    }
+  }
+
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
