@@ -3,6 +3,7 @@ import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
+import { treeRebuild } from "../../../../logic/tree/build";
 
 export const EdTreeName = ({
   node,
@@ -38,9 +39,17 @@ export const EdTreeName = ({
           spellCheck={false}
           defaultValue={local.rename}
           onFocus={(e) => {
-            e.currentTarget.select();
+            if (node.data?.jsx_prop?.is_root) {
+              p.ui.tree.rename_id = "";
+              p.render();
+            } else {
+              e.currentTarget.select();
+            }
           }}
           onBlur={() => {
+            if (node.data?.jsx_prop?.is_root) {
+              return;
+            }
             item.name = local.rename;
 
             let mitem = node.data?.mitem;
@@ -50,25 +59,22 @@ export const EdTreeName = ({
             }
 
             if (mitem) {
-              mitem.doc?.transact(() => {
-                if (mitem) {
-                  mitem.set("name", item.name);
+              mitem.set("name", item.name);
+            }
 
-                  if (active.comp_id === item.component?.id) {
-                    db.component.update({
-                      where: {
-                        id: active.comp_id,
-                      },
-                      data: {
-                        name: item.name,
-                      },
-                    });
-                  }
-                }
+            if (active.comp_id === item.component?.id) {
+              db.component.update({
+                where: {
+                  id: active.comp_id,
+                },
+                data: {
+                  name: item.name,
+                },
               });
             }
 
             p.ui.tree.rename_id = "";
+            treeRebuild(p);
             p.render();
           }}
           onKeyDown={(e) => {
@@ -98,9 +104,9 @@ export const EdTreeName = ({
       ) : (
         <div className="flex flex-col">
           <Name name={node.text} is_jsx_prop={is_jsx_prop} />
-          <div className={"text-[9px] text-gray-500 -mt-1"}>
+          {/* <div className={"text-[9px] text-gray-500 -mt-1"}>
             {node.id} - {item.originalId}
-          </div>
+          </div> */}
         </div>
       )}
     </div>

@@ -55,7 +55,7 @@ export const EdTreeCtxMenu = ({
   const comp = (item as IItem).component as FNComponent | undefined;
   const isComponent = comp?.id;
   const isActiveComponent = active.comp_id === comp?.id;
-
+  const isJSXProp = node.data?.jsx_prop?.is_root;
   if (!item) {
     return (
       <Menu mouseEvent={event} onClose={onClose}>
@@ -69,19 +69,22 @@ export const EdTreeCtxMenu = ({
 
   return (
     <Menu mouseEvent={event} onClose={onClose}>
-      {type === "item" && !isActiveComponent && !item.component?.id && (
-        <MenuItem
-          label="Attach Component"
-          onClick={() => edActionAttach(p, item)}
-        />
-      )}
+      {type === "item" &&
+        !isActiveComponent &&
+        !isJSXProp &&
+        !item.component?.id && (
+          <MenuItem
+            label="Attach Component"
+            onClick={() => edActionAttach(p, item)}
+          />
+        )}
       {type === "item" && comp?.id && !isActiveComponent && (
         <MenuItem
           label="Detach Component"
           onClick={() => edActionDetach(p, item)}
         />
       )}
-      {type === "item" && !comp?.id && (
+      {type === "item" && !comp?.id && !isJSXProp && (
         <MenuItem
           label="Create Component"
           onClick={(e) => edActionNewComp(p, item, e)}
@@ -91,35 +94,46 @@ export const EdTreeCtxMenu = ({
         label={item.hidden ? "Unhide" : "Hide"}
         onClick={() => edActionHide(p, item)}
       />
-      <MenuItem
-        label="Rename"
-        hotKey={"↵"}
-        onClick={() => edActionRename(p, item)}
-      />
-      <MenuItem
-        label="Cut"
-        // hotKey={<HotKey shortcut={"X"} />}
-        onClick={() => edActionCut(p, item)}
-      />
-      {!isActiveComponent && (
+      {!isJSXProp && (
+        <MenuItem
+          label="Rename"
+          hotKey={"↵"}
+          onClick={() => edActionRename(p, item)}
+        />
+      )}
+      {!isJSXProp && (
+        <MenuItem
+          label="Cut"
+          // hotKey={<HotKey shortcut={"X"} />}
+          onClick={() => edActionCut(p, item)}
+        />
+      )}
+
+      {!isActiveComponent && !isJSXProp && (
         <MenuItem
           label="Delete"
           hotKey="⌫"
           onClick={() => edActionDelete(p, item)}
         />
       )}
-      <MenuItem label="Clone" onClick={() => edActionClone(p, item)} />
-      <MenuItem label="Copy" onClick={() => edActionCopy(p, item)} />
+
+      {!isJSXProp && (
+        <MenuItem label="Clone" onClick={() => edActionClone(p, item)} />
+      )}
+
+      {!isJSXProp && (
+        <MenuItem label="Copy" onClick={() => edActionCopy(p, item)} />
+      )}
       {local.allowCopy &&
         local.allowPaste &&
         !isComponent &&
         item.type !== "text" && (
           <MenuItem label="Paste" onClick={() => edActionPaste(p, item)} />
         )}
-      {["text", "item"].includes(item.type) && (
+      {["text", "item"].includes(item.type) && !isJSXProp && (
         <MenuItem label="Wrap" onClick={() => edActionWrap(p, item as IItem)} />
       )}
-      {["item"].includes(item.type) && !isComponent && (
+      {["item"].includes(item.type) && !isJSXProp && !isComponent && (
         <MenuItem
           label="Unwrap"
           onClick={() => edActionUnwrap(p, item as IItem)}

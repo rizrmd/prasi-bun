@@ -7,6 +7,8 @@ import { EDGlobal, PG, active } from "../../../logic/ed-global";
 import { EdCompPreviewTree } from "./comp-preview-tree";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { loadComponent } from "../../../logic/comp/load";
+import { NodeModel } from "@minoru/react-dnd-treeview";
+import { CompItem } from "./comp-tree";
 
 export const EdCompPreview = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -22,6 +24,23 @@ export const EdCompPreview = () => {
       loadComponent(p, comp_id, false).then(() => {
         p.render();
       });
+    }
+
+    let found = compPicker.tree.find((e) => e.id === comp_id);
+    if (!found) {
+      found = compPicker.trash.find((e) => e.id === comp_id);
+    }
+    if (found) {
+      const root = ref.tree.find((e) => e.parent === "root");
+      if (root) {
+        if (root.text !== found.text) {
+          found.text = root.text;
+          db.component.update({
+            where: { id: comp_id },
+            data: { name: found.text },
+          });
+        }
+      }
     }
   }, [comp_id]);
 

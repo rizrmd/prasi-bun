@@ -1,5 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { PG } from "../../../logic/ed-global";
+import { IMeta, PG } from "../../../logic/ed-global";
 import { CompItem } from "./comp-tree";
 
 export const compPicker = {
@@ -56,6 +56,24 @@ export const reloadCompPicker = async (p: PG) => {
         comp.id_component_group !== trash_id
           ? compPicker.tree
           : compPicker.trash;
+
+      if (p.comp.list[comp.id]) {
+        const tree = p.comp.list[comp.id].tree;
+        if (tree) {
+          const root = tree.find(
+            (e) => e.parent === "root"
+          ) as NodeModel<IMeta>;
+          if (root) {
+            if (root.data?.item.name && comp.name !== root.data?.item.name) {
+              comp.name = root.data.item.name;
+              db.component.update({
+                where: { id: comp.id },
+                data: { name: comp.name },
+              });
+            }
+          }
+        }
+      }
 
       tree.push({
         id: comp.id,

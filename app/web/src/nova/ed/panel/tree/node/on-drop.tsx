@@ -45,11 +45,13 @@ export const nodeOnDrop: (
               toChilds.insert(relativeIndex, [map]);
             }
 
-            from.parent.forEach((e, idx) => {
-              if (from && e.get("id") === from.get("id")) {
-                from.parent.delete(idx);
-              }
-            });
+            if (!fromMeta?.jsx_prop?.is_root) {
+              from.parent.forEach((e, idx) => {
+                if (from && !!e && !!e.get && e.get("id") === from.get("id")) {
+                  from.parent.delete(idx);
+                }
+              });
+            }
           }
         });
         treeRebuild(p);
