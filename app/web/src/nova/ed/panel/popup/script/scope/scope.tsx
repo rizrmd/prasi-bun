@@ -41,8 +41,8 @@ export const declareScope = async (
   map_childs(metas, entry, paths);
   const added = new Set<string>();
   for (const path of paths) {
+    console.log(path.map((e) => e.item.name));
     const exim = scopeMapExportImport(p, meta, path);
-
     for (const [k, v] of Object.entries(exim.exports)) {
       for (const [filename, src] of Object.entries(v)) {
         if (!added.has(filename)) {
@@ -64,31 +64,34 @@ const map_childs = (
   for (const m of childs) {
     const meta = metas[m.id];
     if (meta) {
-      let cur: null | IMeta[] = null;
-      for (const path of paths) {
-        if (path[path.length - 1] === parent) {
-          cur = path;
-          cur.push(meta);
-          break;
-        }
-      }
-
-      if (!cur) {
-        paths.push([...(curpath || []), meta]);
-        cur = paths[paths.length - 1];
-      }
-
-      if (cur) {
-        if (
-          meta.item.type === "item" &&
-          meta.item.component?.id &&
-          meta.item.component?.id !== active.comp_id
-        ) {
-          continue;
-        } else {
-          if (Array.isArray(meta.item.childs)) {
-            map_childs(metas, meta.item.childs, paths, cur, meta);
+      paths.push([...(curpath || []), meta]);
+      if (
+        meta.item.type === "item" &&
+        meta.item.component?.id &&
+        meta.item.component?.id !== active.comp_id
+      ) {
+        if (meta.item.component?.props) {
+          for (const [_, p] of Object.entries(meta.item.component.props)) {
+            if (p.meta?.type === "content-element" && p.content) {
+              map_childs(
+                metas,
+                [p.content],
+                paths,
+                [...(curpath || []), meta],
+                meta
+              );
+            }
           }
+        }
+      } else {
+        if (Array.isArray(meta.item.childs)) {
+          map_childs(
+            metas,
+            meta.item.childs,
+            paths,
+            [...(curpath || []), meta],
+            meta
+          );
         }
       }
     }
