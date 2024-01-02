@@ -33,25 +33,33 @@ export const declareScope = (
     : p.page.entry.map((e) => p.page.meta[e].item);
 
   const paths: IMeta[][] = [];
+
   map_childs(metas, entry, paths);
+  const import_map = extract_import_map(paths, meta, p, monaco);
+  return import_map[active.item_id];
+};
+
+const extract_import_map = (
+  paths: IMeta[][],
+  meta: IMeta,
+  p: PG,
+  monaco: Monaco
+) => {
   const added = new Set<string>();
 
-  let result_imports = "";
+  let cur = "page";
+
+  const import_map = {} as Record<string, string>;
   for (const path of paths) {
     const imports = new Set<string>();
     if (path.map((e) => e.item.id).includes(meta.item.id)) {
       let i = 0;
-      let mode = "parent" as "parent" | "current" | "child";
 
       for (const meta of path) {
         if (!added.has(meta.item.id)) {
           added.add(meta.item.id);
 
           const ex = extractExport(p, meta);
-
-          if (meta.item.id === active.item_id) {
-            result_imports = [...imports].join("\n");
-          }
 
           for (const [k, v] of Object.entries(ex)) {
             let src = "";
@@ -67,7 +75,7 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
               addScope(
                 p,
                 monaco,
-                `file:///${v.id}_${v.type}_${k}.d.ts`,
+                `file:///${cur}_${v.id}_${v.type}_${k}.d.ts`,
                 `\
 ${[...imports].join("\n")}
 ${src}`
@@ -76,20 +84,18 @@ ${src}`
           }
 
           for (const [k, v] of Object.entries(ex)) {
-            imports.add(`import { ${k} } from './${v.id}_${v.type}_${k}';`);
+            imports.add(
+              `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`
+            );
           }
-        }
 
-        if (mode === "current") mode = "child";
-        if (meta.item.id === active.item_id) {
-          mode = "current";
+          import_map[meta.item.id] = [...imports].join("\n");
         }
         i++;
       }
     }
   }
-
-  return result_imports;
+  return import_map;
 };
 
 const map_childs = (
