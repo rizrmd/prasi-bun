@@ -19,6 +19,7 @@ export const addScope = (
       "typescript",
       monaco.Uri.parse(filename)
     );
+
     model.onDidChangeContent((e) => {
       const text = model.getValue();
       console.log(filename, text);

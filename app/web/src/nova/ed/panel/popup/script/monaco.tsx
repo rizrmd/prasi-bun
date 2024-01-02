@@ -64,27 +64,13 @@ export const EdScriptMonaco: FC<{}> = () => {
         if (!local.init) {
           if (p.ui.popup.script.mode === "js") {
             monaco.editor.getModels().forEach((model) => {
-              model.dispose();
-            });
-            monaco.editor.getModels().forEach((model) => {
-              if (model.uri.toString().startsWith("inmemory://model")) {
+              if (
+                model.uri.toString().startsWith("inmemory://model") ||
+                model.uri.toString().startsWith("file://")
+              ) {
                 model.dispose();
               }
             });
-
-            let model = monaco.editor.createModel(
-              val,
-              "typescript",
-              monaco.Uri.parse(
-                `ts:${
-                  active.comp_id
-                    ? `comp-${active.comp_id}`
-                    : `page-${p.page.cur.id}`
-                }-${active.item_id}.tsx`
-              )
-            );
-            editor.setModel(model);
-            await jsMount(editor, monaco, p);
             await monacoTypings(
               {
                 site_dts: p.site_dts,
@@ -97,9 +83,23 @@ export const EdScriptMonaco: FC<{}> = () => {
               { types: {}, values: {} }
             );
             if (meta) {
-              declareScope(p, meta, editor, monaco).then(() => {
-                local.render();
-              });
+              const imports = declareScope(p, meta, editor, monaco);
+
+              let model = monaco.editor.createModel(
+                `\
+// #region imports
+${imports}
+// #endregion
+
+${val}
+`,
+                "typescript",
+                monaco.Uri.parse(`file:///active.tsx`)
+              );
+              editor.setModel(model);
+              editor.trigger("fold", "editor.foldAllMarkerRegions", {});
+
+              await jsMount(editor, monaco, p);
             }
           }
 
@@ -184,8 +184,8 @@ export const EdScriptMonaco: FC<{}> = () => {
       language={
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
-      value={local.value}
       onChange={(val) => {
+        return;
         local.value = val || "";
         local.render();
         clearTimeout(scriptEdit.timeout);
