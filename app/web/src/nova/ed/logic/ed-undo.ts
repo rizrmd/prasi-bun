@@ -13,44 +13,55 @@ export const edUndoManager = async (p: PG) => {
         evt.stopPropagation();
       }
 
-      if (
-        (evt.key === "Y" || evt.key === "y") &&
-        (evt.ctrlKey || evt.metaKey) &&
-        !evt.shiftKey
-      ) {
-        if (active.comp_id) {
-          p.sync.yjs.um("comp", "redo", active.comp_id);
-        } else {
-          p.sync.yjs.um("page", "redo", p.page.cur.id);
-        }
-        return;
-      }
+      let preventUndo = false;
 
       if (
-        (evt.key === "Z" || evt.key === "z") &&
-        (evt.ctrlKey || evt.metaKey) &&
-        evt.shiftKey
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.tagName === "INPUT"
       ) {
-        if (active.comp_id) {
-          p.sync.yjs.um("comp", "redo", active.comp_id);
-        } else {
-          p.sync.yjs.um("page", "redo", p.page.cur.id);
-        }
-        return;
+        preventUndo = true;
       }
 
-      if (
-        (evt.key === "Z" || evt.key === "z") &&
-        (evt.ctrlKey || evt.metaKey) &&
-        !evt.shiftKey
-      ) {
-        if (active.comp_id) {
-          p.sync.yjs.um("comp", "undo", active.comp_id);
-        } else {
-          p.sync.yjs.um("page", "undo", p.page.cur.id);
+      if (!preventUndo) {
+        if (
+          (evt.key === "Y" || evt.key === "y") &&
+          (evt.ctrlKey || evt.metaKey) &&
+          !evt.shiftKey
+        ) {
+          if (active.comp_id) {
+            p.sync.yjs.um("comp", "redo", active.comp_id);
+          } else {
+            p.sync.yjs.um("page", "redo", p.page.cur.id);
+          }
+          return;
+        }
+
+        if (
+          (evt.key === "Z" || evt.key === "z") &&
+          (evt.ctrlKey || evt.metaKey) &&
+          evt.shiftKey
+        ) {
+          if (active.comp_id) {
+            p.sync.yjs.um("comp", "redo", active.comp_id);
+          } else {
+            p.sync.yjs.um("page", "redo", p.page.cur.id);
+          }
+          return;
+        }
+
+        if (
+          (evt.key === "Z" || evt.key === "z") &&
+          (evt.ctrlKey || evt.metaKey) &&
+          !evt.shiftKey
+        ) {
+          if (active.comp_id) {
+            p.sync.yjs.um("comp", "undo", active.comp_id);
+          } else {
+            p.sync.yjs.um("page", "undo", p.page.cur.id);
+          }
         }
       }
-
+      
       if (
         (evt.key === "r" || evt.key === "R" || evt.key === "®") &&
         evt.altKey
