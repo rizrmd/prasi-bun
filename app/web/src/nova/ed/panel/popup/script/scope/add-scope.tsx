@@ -1,6 +1,6 @@
 import { extractLoc } from "../../../../../../utils/script/mount";
-import { PG } from "../../../../logic/ed-global";
-import { CodeLoc, Monaco } from "./type";
+import { PG, active } from "../../../../logic/ed-global";
+import { Monaco } from "./type";
 
 export const addScope = (
   p: PG,
@@ -20,9 +20,11 @@ export const addScope = (
 
     const arg = extractLoc(uri.path.split("_"), p);
     model.onDidChangeContent((e) => {
-      const text = model.getValue();
-      console.log(arg);
-      console.warn(text);
+      if (arg.id !== active.item_id) {
+        const text = model.getValue();
+        console.log(arg);
+        console.warn(text);
+      }
     });
   }
 };
