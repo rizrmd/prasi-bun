@@ -97,7 +97,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             if (meta) {
               const imports = declareScope(p, meta, monaco);
 
-              let cur = "page";
+              let cur = active.comp_id ? active.comp_id : "page";
               monaco.editor.getModels().forEach((model) => {
                 if (
                   model.uri.path === `/${cur}_${active.item_id}_src_src.tsx`
@@ -106,15 +106,21 @@ export const EdScriptMonaco: FC<{}> = () => {
                 }
               });
 
+              const model = editor.getModel();
+              if (!model) {
+                const nmodel = monaco.editor.createModel(
+                  val,
+                  "typescript",
+                  monaco.Uri.parse("file:///active.tsx")
+                );
+
+                editor.setModel(nmodel);
+              }
+
               if (imports) {
                 local.imports = imports;
-
-                const range = new monaco.Range(
-                  1,
-                  0,
-                  imports.split("\n").length + 1,
-                  0
-                );
+                const end = imports.split("\n").length + 1;
+                const range = new monaco.Range(1, 0, end, 0);
                 (editor as any).setHiddenAreas([range]);
               }
 
@@ -156,8 +162,8 @@ export const EdScriptMonaco: FC<{}> = () => {
           ?.getValue()
           .replace(/\{\s*children\s*\}/gi, newval);
 
-        if (curval.includes("/** IMPORT BOUNDARY **/")) {
-          curval = curval.split("/** IMPORT BOUNDARY **/\n").pop() || "";
+        if (curval.includes("/** IMPORT MODULE **/")) {
+          curval = curval.split("/** IMPORT MODULE **/\n").pop() || "";
         }
 
         const text = trim(
@@ -170,7 +176,7 @@ export const EdScriptMonaco: FC<{}> = () => {
 
         let final_src = text;
         if (local.imports) {
-          final_src = `${local.imports}\n/** IMPORT BOUNDARY **/\n${text}`;
+          final_src = `${local.imports}\n/** IMPORT MODULE **/\n${text}`;
         }
         local.editor.executeEdits(null, [
           {
@@ -218,8 +224,8 @@ export const EdScriptMonaco: FC<{}> = () => {
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
       onChange={(value) => {
-        if ((value || "").includes("/** IMPORT BOUNDARY **/")) {
-          const valparts = (value || "").split("/** IMPORT BOUNDARY **/\n");
+        if ((value || "").includes("/** IMPORT MODULE **/")) {
+          const valparts = (value || "").split("/** IMPORT MODULE **/\n");
           if (valparts.length === 2) local.value = valparts[1];
         } else {
           local.value = value || "";

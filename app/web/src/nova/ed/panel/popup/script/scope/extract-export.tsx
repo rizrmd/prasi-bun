@@ -26,6 +26,7 @@ export const extractExport = (p: PG, m: IMeta) => {
 
   if (script?.passprop) {
     for (const [k, v] of Object.entries(script.passprop)) {
+      if (k === "key") continue;
       result[k] = {
         type: "passprop",
         id: m.item.id,
