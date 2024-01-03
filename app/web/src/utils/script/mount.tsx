@@ -61,6 +61,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
             const args = r.path.split("_");
             if (args.length === 4) {
               const { cur, id, meta } = extractLoc(args, p);
+              console.log(cur, id, meta.item.name);
             }
           }
         }
@@ -183,7 +184,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
 export const extractLoc = (args: string[], p: PG) => {
   const [_cur, id, type, _varname] = args;
   const cur = _cur.substring(1);
-  const varname = _varname.substring(0, _varname.length - ".d.ts".length);
+  const varname = _varname.substring(0, _varname.length - ".tsx".length);
 
   let meta = p.page.meta[id];
   if (cur !== "page") {

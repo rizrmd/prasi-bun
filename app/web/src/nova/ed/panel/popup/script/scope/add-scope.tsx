@@ -21,14 +21,8 @@ export const addScope = (
     const arg = extractLoc(uri.path.split("_"), p);
     model.onDidChangeContent((e) => {
       const text = model.getValue();
-      console.log(arg, text);
-      // const models = monaco.editor.getModels().filter((e) => {
-      //   return e.uri.toString().startsWith("ts:scope~");
-      // });
-      // models.forEach((model) => {
-      //   console.log(model?.getValue());
-      // });
-      // modifyJS(p, type, arg.loc, text);
+      console.log(arg);
+      console.warn(text);
     });
   }
 };
