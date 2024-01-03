@@ -85,19 +85,24 @@ export const EdScriptMonaco: FC<{}> = () => {
             if (meta) {
               const imports = declareScope(p, meta, editor, monaco);
 
-              let model = monaco.editor.createModel(
-                `\
-// #region imports
-${imports}
-// #endregion
+              let cur = "page";
+              monaco.editor.getModels().forEach((model) => {
+                if (
+                  model.uri.path === `/${cur}_${active.item_id}_src_src.tsx`
+                ) {
+                  editor.setModel(model);
+                }
+              });
 
-${val}
-`,
-                "typescript",
-                monaco.Uri.parse(`file:///active.tsx`)
-              );
-              editor.setModel(model);
-              editor.trigger("fold", "editor.foldAllMarkerRegions", {});
+              if (imports) {
+                const range = new monaco.Range(
+                  1,
+                  0,
+                  imports.split("\n").length + 1,
+                  0
+                );
+                (editor as any).setHiddenAreas([range]);
+              }
 
               await jsMount(editor, monaco, p);
             }
@@ -184,13 +189,20 @@ ${val}
       language={
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
-      onChange={(val) => {
+      onChange={(value) => {
         return;
-        local.value = val || "";
+        if ((value || "").includes("/** IMPORT BOUNDARY **/")) {
+          const valparts = (value || "").split("/** IMPORT BOUNDARY **/\n");
+          if (valparts.length === 2) local.value = valparts[1];
+        } else {
+          local.value = value || "";
+        }
+
         local.render();
         clearTimeout(scriptEdit.timeout);
 
         const applyChanges = async () => {
+          const value = local.value;
           const meta = getActiveMeta(p);
           const type = p.ui.popup.script.mode;
           if (meta && meta.mitem) {
@@ -207,7 +219,7 @@ ${val}
                 type: "prop",
                 prop_kind: p.ui.popup.script.prop_kind,
                 prop_name: p.ui.popup.script.prop_name,
-                value: compress(encode.encode(val || "")),
+                value: compress(encode.encode(value || "")),
                 ...arg,
               });
             } else if (p.ui.popup.script.type === "prop-instance") {
@@ -216,7 +228,7 @@ ${val}
                 mode: type,
                 prop_name: p.ui.popup.script.prop_name,
                 item_id: active.item_id,
-                value: compress(encode.encode(val || "")),
+                value: compress(encode.encode(value || "")),
                 ...arg,
               });
             } else {
@@ -224,7 +236,7 @@ ${val}
                 type: "adv",
                 mode: type,
                 item_id: active.item_id,
-                value: compress(encode.encode(val || "")),
+                value: compress(encode.encode(value || "")),
                 ...arg,
               });
             }

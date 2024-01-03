@@ -35,19 +35,61 @@ export const declareScope = (
   const paths: IMeta[][] = [];
 
   map_childs(metas, entry, paths);
-  const import_map = extract_import_map(paths, meta, p, monaco);
+
+  let cur = "page";
+  const import_map = extract_import_map(cur, paths, meta, p, monaco);
+  gen_content(cur, p, paths, import_map, monaco);
   return import_map[active.item_id];
 };
 
+const gen_content = (
+  cur: string,
+  p: PG,
+  paths: IMeta[][],
+  import_map: Record<string, string>,
+  monaco: Monaco
+) => {
+  const added = new Set<string>();
+  for (const path of paths) {
+    let idx = 0;
+    let last_import = "";
+    for (const m of path) {
+      if (!import_map[m.item.id]) {
+        if (idx === 0) {
+          break;
+        }
+      } else {
+        last_import = import_map[m.item.id];
+      }
+
+      if (!added.has(m.item.id) && m.item.adv?.js) {
+        added.add(m.item.id);
+        const content = `\
+${last_import}
+/** IMPORT BOUNDARY **/
+${m.item.adv.js}
+`;
+
+        addScope(
+          p,
+          monaco,
+          `file:///${cur}_${m.item.id}_src_src.tsx`,
+          content
+        );
+      }
+      idx++;
+    }
+  }
+};
+
 const extract_import_map = (
+  cur: string,
   paths: IMeta[][],
   meta: IMeta,
   p: PG,
   monaco: Monaco
 ) => {
   const added = new Set<string>();
-
-  let cur = "page";
 
   const import_map = {} as Record<string, string>;
   for (const path of paths) {
@@ -75,9 +117,10 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
               addScope(
                 p,
                 monaco,
-                `file:///${cur}_${v.id}_${v.type}_${k}.d.ts`,
+                `file:///${cur}_${v.id}_${v.type}_${k}.tsx`,
                 `\
 ${[...imports].join("\n")}
+/** IMPORT BOUNDARY **/
 ${src}`
               );
             }
