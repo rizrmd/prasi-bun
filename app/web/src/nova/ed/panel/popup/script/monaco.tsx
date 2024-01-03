@@ -29,6 +29,7 @@ export const EdScriptMonaco: FC<{}> = () => {
     value: "",
     historyOpen: false,
     mode: "",
+    imports: "",
     idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
   });
 
@@ -62,15 +63,26 @@ export const EdScriptMonaco: FC<{}> = () => {
         }
 
         if (!local.init) {
+          monaco.editor.getModels().forEach((model) => {
+            if (
+              model.uri.toString().startsWith("inmemory://model") ||
+              model.uri.toString().startsWith("file://")
+            ) {
+              model.dispose();
+            }
+          });
+
+          if (meta) {
+            if (!meta.item.adv) {
+              meta.item.adv = {};
+            }
+
+            if (!meta.item.adv[p.ui.popup.script.mode]) {
+              meta.item.adv[p.ui.popup.script.mode] = val;
+            }
+          }
+
           if (p.ui.popup.script.mode === "js") {
-            monaco.editor.getModels().forEach((model) => {
-              if (
-                model.uri.toString().startsWith("inmemory://model") ||
-                model.uri.toString().startsWith("file://")
-              ) {
-                model.dispose();
-              }
-            });
             await monacoTypings(
               {
                 site_dts: p.site_dts,
@@ -83,7 +95,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               { types: {}, values: {} }
             );
             if (meta) {
-              const imports = declareScope(p, meta, editor, monaco);
+              const imports = declareScope(p, meta, monaco);
 
               let cur = "page";
               monaco.editor.getModels().forEach((model) => {
@@ -95,6 +107,8 @@ export const EdScriptMonaco: FC<{}> = () => {
               });
 
               if (imports) {
+                local.imports = imports;
+
                 const range = new monaco.Range(
                   1,
                   0,
@@ -106,6 +120,15 @@ export const EdScriptMonaco: FC<{}> = () => {
 
               await jsMount(editor, monaco, p);
             }
+          } else {
+            const model = monaco.editor.createModel(
+              val,
+              { css: "scss", js: "typescript", html: "html" }[
+                p.ui.popup.script.mode
+              ],
+              monaco.Uri.parse(`inmemory://model/1`)
+            );
+            editor.setModel(model);
           }
 
           local.init = true;
@@ -129,21 +152,26 @@ export const EdScriptMonaco: FC<{}> = () => {
       const prettier_estree = jscript.prettier.estree;
 
       if (prettier && prettier_estree && prettier_ts) {
+        let curval = local.editor
+          ?.getValue()
+          .replace(/\{\s*children\s*\}/gi, newval);
+
+        if (curval.includes("/** IMPORT BOUNDARY **/")) {
+          curval = curval.split("/** IMPORT BOUNDARY **/\n").pop() || "";
+        }
+
         const text = trim(
-          await prettier.format(
-            all
-              ? newval
-              : local.editor
-                  ?.getValue()
-                  .replace(/\{\s*children\s*\}/gi, newval),
-            {
-              parser: "typescript",
-              plugins: [prettier_ts, prettier_estree],
-            }
-          ),
+          await prettier.format(all ? newval : curval, {
+            parser: "typescript",
+            plugins: [prettier_ts, prettier_estree],
+          }),
           "; \n"
         );
 
+        let final_src = text;
+        if (local.imports) {
+          final_src = `${local.imports}\n/** IMPORT BOUNDARY **/\n${text}`;
+        }
         local.editor.executeEdits(null, [
           {
             range: {
@@ -152,7 +180,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               endColumn: Number.MAX_SAFE_INTEGER,
               endLineNumber: Number.MAX_SAFE_INTEGER,
             },
-            text,
+            text: final_src,
           },
         ]);
       }
@@ -190,7 +218,6 @@ export const EdScriptMonaco: FC<{}> = () => {
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
       onChange={(value) => {
-        return;
         if ((value || "").includes("/** IMPORT BOUNDARY **/")) {
           const valparts = (value || "").split("/** IMPORT BOUNDARY **/\n");
           if (valparts.length === 2) local.value = valparts[1];

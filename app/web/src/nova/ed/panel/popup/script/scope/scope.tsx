@@ -8,23 +8,7 @@ import { addScope } from "./add-scope";
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
 
-export const declareScope = (
-  p: PG,
-  meta: IMeta,
-  editor: MonacoEditor,
-  monaco: Monaco
-) => {
-  const e = editor as any;
-  const sum_id = hash_sum({
-    page_id: p.page.cur.id,
-    comp_id: active.comp_id,
-  });
-  if (e.scope_id === sum_id) {
-    return;
-  } else {
-    e.scope_id = sum_id;
-  }
-
+export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   const metas = active.comp_id
     ? p.comp.list[active.comp_id]?.meta
     : p.page.meta;
@@ -70,12 +54,7 @@ ${last_import}
 ${m.item.adv.js}
 `;
 
-        addScope(
-          p,
-          monaco,
-          `file:///${cur}_${m.item.id}_src_src.tsx`,
-          content
-        );
+        addScope(p, monaco, `file:///${cur}_${m.item.id}_src_src.tsx`, content);
       }
       idx++;
     }
