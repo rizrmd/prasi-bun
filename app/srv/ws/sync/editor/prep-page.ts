@@ -30,16 +30,16 @@ export const prepContentTree = async (
       comps,
       meta,
       on: {
-        visit(meta, item) {
-          if (item.adv?.js) {
-            item.script = parseJs(item.adv.js);
-          }
-
+        visit_component(item) {
           if (item.component?.id) {
             if (!item.component?.instances) {
               item.component.instances = {};
-              meta.item.childs = [];
             }
+          }
+        },
+        visit(meta, item) {
+          if (item.adv?.js) {
+            item.script = parseJs(item.adv.js);
           }
         },
       },
@@ -56,10 +56,10 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
   const mcomps: GenMetaP["comps"] = {};
   const result = new Set<string>();
   const loading = {} as Record<string, Promise<void>>;
-  for (const mchild of ctree.childs) {
+  for (const child of ctree.childs) {
     await initLoadComp(
       { comps: mcomps, meta, mode: "page" },
-      mchild as unknown as IItem,
+      child as unknown as IItem,
       async (comp_ids) => {
         for (const id of comp_ids) {
           if (!docs.comp[id]) {

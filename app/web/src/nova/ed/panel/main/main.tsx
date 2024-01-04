@@ -2,6 +2,8 @@ import { useGlobal, useLocal } from "web-utils";
 import { Vi } from "../../../vi/vi";
 import { EDGlobal, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
+import { VG } from "../../../vi/render/global";
+import { IItem } from "../../../../utils/types/item";
 
 export const EdMain = () => {
   // return <div className="flex flex-1 flex-col relative"></div>;

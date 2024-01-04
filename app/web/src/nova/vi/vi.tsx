@@ -8,6 +8,7 @@ import { ErrorBox } from "./utils/error-box";
 
 export const Vi: FC<{
   meta: Record<string, IMeta>;
+  comp_load?: (comp_id: string) => Promise<void>;
   entry: string[];
   api_url: string;
   site_id: string;
@@ -18,6 +19,7 @@ export const Vi: FC<{
   visit?: VG["visit"];
 }> = ({ meta, entry, api_url, site_id, api, db, visit, script }) => {
   const vi = useGlobal(ViGlobal, "VI");
+
   if (vi.meta !== meta) {
     vi.meta = meta;
   }

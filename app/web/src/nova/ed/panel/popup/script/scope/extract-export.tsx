@@ -49,5 +49,18 @@ export const extractExport = (p: PG, m: IMeta) => {
     }
   }
 
+  const props = m.item.component?.props;
+  if (props) {
+    for (const [k, v] of Object.entries(props)) {
+      result[k] = {
+        type: "prop",
+        id: m.item.id,
+        start: 0,
+        end: 0,
+        val: v.value,
+      };
+    }
+  }
+
   return result;
 };
