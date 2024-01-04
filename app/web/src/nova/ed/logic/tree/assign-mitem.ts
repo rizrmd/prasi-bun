@@ -18,6 +18,7 @@ export const assignMitem = (arg: {
 }) => {
   const { p, m, root, mitem, meta } = arg;
 
+  console.log(m.item.name, m.item.id);
   if (m.jsx_prop && m.parent?.instance_id) {
     const instance_meta = meta[m.parent?.instance_id];
     if (instance_meta) {
@@ -59,32 +60,25 @@ export const assignMitem = (arg: {
         }
       }
 
-      //     if (m.item.component?.props) {
-      //       for (const [prop_name, v] of Object.entries(
-      //         m.item.component.props
-      //       )) {
-      //         const mprop = m.mitem
-      //           ?.get("component")
-      //           ?.get("props")
-      //           ?.get(prop_name);
+      if (m.item.component?.props) {
+        for (const [prop_name, v] of Object.entries(m.item.component.props)) {
+          const mprop = m.mitem?.get("component")?.get("props")?.get(prop_name);
 
-      //         if (v.content) {
-      //           if (mprop) {
-      //             const pmeta = meta[v.content.id];
-      //             if (pmeta) {
-      //               pmeta.mitem = mprop.get("content");
-      //             }
-      //           } else {
-      //             const mprops = m.mitem?.get("component")?.get("props");
-      //             if (mprops) {
-      //               arg.new_prop_jsx(m, mprops, prop_name, v);
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // });
+          if (v.content) {
+            if (mprop) {
+              const pmeta = meta[v.content.id];
+              if (pmeta) {
+                pmeta.mitem = mprop.get("content");
+              }
+            } else {
+              const mprops = m.mitem?.get("component")?.get("props");
+              if (mprops) {
+                arg.new_prop_jsx(m, mprops, prop_name, v);
+              }
+            }
+          }
+        }
+      }
     }
   }
 };

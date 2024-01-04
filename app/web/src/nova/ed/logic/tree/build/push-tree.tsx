@@ -1,5 +1,5 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { IMeta, PG, active } from "../../ed-global";
+import { IMeta, PG } from "../../ed-global";
 
 export const pushTreeNode = (
   p: PG,
@@ -43,7 +43,7 @@ export const pushTreeNode = (
         tree.push({
           id: meta.item.id,
           parent: meta.parent?.instance_id || "root",
-          text: meta.item.name,
+          text: meta.jsx_prop.name,
           data: meta,
         });
       } else {

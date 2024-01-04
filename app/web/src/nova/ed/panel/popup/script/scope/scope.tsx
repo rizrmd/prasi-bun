@@ -93,7 +93,6 @@ const extract_import_map = (
           added.add(m.item.id);
 
           const ex = extractExport(p, m);
-
           for (const [k, v] of Object.entries(ex)) {
             let src = "";
             if (v.type === "local") {
@@ -105,6 +104,7 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
               src = `export const ${k} = ${v.val}`;
             }
             if (src) {
+
               addScope(
                 p,
                 monaco,
@@ -180,7 +180,6 @@ const map_childs = (
             );
 
             jprop = comp_map[meta.item.component.id];
-            //todo: comp prop src: import from page scope
             for (const path of jprop.paths) {
               for (const m of path) {
                 if (!jprop.exports[m.item.id]) {

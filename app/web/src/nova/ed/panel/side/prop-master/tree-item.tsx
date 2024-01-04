@@ -23,6 +23,10 @@ export const EdPropCompTreeItem: FC<{
   if (node.id === "root") {
     return <></>;
   }
+
+  let type = "TXT";
+  if (node.data?.prop.meta?.type === "option") type = "OPT";
+  else if (node.data?.prop.meta?.type === "content-element") type = "JSX";
   return (
     <div className="flex items-stretch border-b text-[14px] min-h-[27px]">
       <div
@@ -74,7 +78,12 @@ export const EdPropCompTreeItem: FC<{
           }
           className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer items-center flex"
         >
-          {node.text}
+          <div className="flex items-center justify-between flex-1">
+            <div>{node.text}</div>
+            <div className="text-[9px] px-1 border border-slate-400 ml-1 text-slate-500">
+              {type}
+            </div>
+          </div>
         </Popover>
       )}
       <div
