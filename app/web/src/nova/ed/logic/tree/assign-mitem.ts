@@ -18,7 +18,6 @@ export const assignMitem = (arg: {
 }) => {
   const { p, m, root, mitem, meta } = arg;
 
-  console.log(m.item.name, m.item.id);
   if (m.jsx_prop && m.parent?.instance_id) {
     const instance_meta = meta[m.parent?.instance_id];
     if (instance_meta) {
