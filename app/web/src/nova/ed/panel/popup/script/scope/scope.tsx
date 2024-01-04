@@ -20,10 +20,16 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   map_childs(p, metas, entry, paths);
 
   let cur = active.comp_id ? active.comp_id : "page";
-  const import_map = extract_import_map(cur, paths, meta, p, monaco);
+  const { import_map, parent_id } = extract_import_map(
+    cur,
+    paths,
+    meta,
+    p,
+    monaco
+  );
 
   gen_content(cur, p, paths, import_map, monaco);
-  return import_map[active.item_id];
+  return import_map[parent_id];
 };
 
 const gen_content = (
@@ -38,22 +44,24 @@ const gen_content = (
     let idx = 0;
     let last_import = "";
     for (const m of path) {
+      if (!added.has(m.item.id) && m.item.adv?.js) {
+        added.add(m.item.id);
+        const content = last_import
+          ? `\
+${last_import}
+/** IMPORT MODULE **/
+${m.item.adv.js}`
+          : m.item.adv.js;
+
+        addScope(p, monaco, `file:///${cur}_${m.item.id}_src_src.tsx`, content);
+      }
+
       if (!import_map[m.item.id]) {
         if (idx === 0) {
           break;
         }
       } else {
         last_import = import_map[m.item.id];
-      }
-      if (!added.has(m.item.id) && m.item.adv?.js) {
-        added.add(m.item.id);
-        const content = `\
-${last_import}
-/** IMPORT MODULE **/
-${m.item.adv.js}
-`;
-
-        addScope(p, monaco, `file:///${cur}_${m.item.id}_src_src.tsx`, content);
       }
       idx++;
     }
@@ -68,18 +76,23 @@ const extract_import_map = (
   monaco: Monaco
 ) => {
   const added = new Set<string>();
-
+  let parent_id = "";
   const import_map = {} as Record<string, string>;
   for (const path of paths) {
     const imports = new Set<string>();
     if (path.map((e) => e.item.id).includes(meta.item.id)) {
       let i = 0;
 
-      for (const meta of path) {
-        if (!added.has(meta.item.id)) {
-          added.add(meta.item.id);
+      let prev_m = null as any;
+      for (const m of path) {
+        if (m.item.id === meta.item.id) {
+          if (prev_m) parent_id = prev_m.item.id;
+        }
+        prev_m = m;
+        if (!added.has(m.item.id)) {
+          added.add(m.item.id);
 
-          const ex = extractExport(p, meta);
+          const ex = extractExport(p, m);
 
           for (const [k, v] of Object.entries(ex)) {
             let src = "";
@@ -110,13 +123,13 @@ ${src}`
             );
           }
 
-          import_map[meta.item.id] = [...imports].join("\n");
+          import_map[m.item.id] = [...imports].join("\n");
         }
         i++;
       }
     }
   }
-  return import_map;
+  return { import_map, parent_id };
 };
 
 const comp_map = {} as Record<
@@ -167,6 +180,7 @@ const map_childs = (
             );
 
             jprop = comp_map[meta.item.component.id];
+            //todo: comp prop src: import from page scope
             for (const path of jprop.paths) {
               for (const m of path) {
                 if (!jprop.exports[m.item.id]) {

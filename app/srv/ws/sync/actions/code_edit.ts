@@ -72,6 +72,8 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 const res = parseJs(adv.get("js")) || false;
                 if (res) {
                   mitem.set("script", res);
+                } else {
+                  mitem.delete("script");
                 }
               }
             }

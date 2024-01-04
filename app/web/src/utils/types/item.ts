@@ -1,5 +1,4 @@
 import { TypedArray, TypedMap } from "yjs-types";
-import { parseJs } from "../../../../srv/ws/sync/editor/parser/parse-js";
 import { BasicItem, MBasicItem, MetaItem } from "./meta";
 import { FNAdv, FNComponent, FNLayout, FNLinkTag } from "./meta-fn";
 import { MSection } from "./section";

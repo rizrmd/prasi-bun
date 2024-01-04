@@ -32,7 +32,20 @@ export const viEvalProps = (
                 const id = prop.content?.id;
                 if (id) {
                   const meta = vi.meta[id];
-                  return <ViRender meta={meta} passprop={arg.passprop}  />;
+                  if (
+                    meta.mitem &&
+                    prop.jsxCalledBy !== (meta.item.originalId || meta.item.id)
+                  ) {
+                    meta.mitem
+                      .get("component")
+                      ?.get("props")
+                      ?.get(name)
+                      ?.set(
+                        "jsxCalledBy",
+                        meta.item.originalId || meta.item.id
+                      );
+                  }
+                  return <ViRender meta={meta} passprop={arg.passprop} />;
                 }
                 return null;
               },

@@ -30,6 +30,7 @@ export type FNCompDef = {
   valueBuilt: any;
   gen?: string;
   genBuilt?: string;
+  jsxCalledBy?: string;
   content?: IItem;
   visible?: string;
   meta?: FNCompMeta;
