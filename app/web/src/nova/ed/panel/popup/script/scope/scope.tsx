@@ -17,7 +17,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
   const paths: IMeta[][] = [];
 
-  map_childs(p, metas, entry, paths);
+  map_childs(p, metas, entry, paths, active.comp_id ? [active.comp_id] : []);
 
   let cur = active.comp_id ? active.comp_id : "page";
   const { import_map, parent_id } = extract_import_map(
@@ -104,7 +104,6 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
               src = `export const ${k} = ${v.val}`;
             }
             if (src) {
-
               addScope(
                 p,
                 monaco,
@@ -146,6 +145,7 @@ const map_childs = (
   metas: Record<string, IMeta>,
   childs: IContent[],
   paths: IMeta[][],
+  skip_comp_id: string[],
   curpath?: IMeta[]
 ) => {
   for (const m of childs) {
@@ -155,7 +155,7 @@ const map_childs = (
       if (
         meta.item.type === "item" &&
         meta.item.component?.id &&
-        meta.item.component?.id !== active.comp_id
+        !skip_comp_id.includes(meta.item.component?.id)
       ) {
         const comp_id = meta.item.component.id;
         let jprop = comp_map[comp_id];
@@ -176,7 +176,8 @@ const map_childs = (
               p,
               comp_metas,
               [comp_metas[id].item],
-              comp_map[meta.item.component.id].paths
+              comp_map[meta.item.component.id].paths,
+              [...skip_comp_id, comp_id]
             );
 
             jprop = comp_map[meta.item.component.id];
@@ -189,12 +190,34 @@ const map_childs = (
             }
           }
         }
+
+        if (jprop) {
+          for (const [name, prop] of Object.entries(
+            meta.item.component.props
+          )) {
+            if (
+              prop.meta?.type === "content-element" &&
+              prop.content &&
+              prop.jsxCalledBy
+            ) {
+              console.log(
+                name,
+                prop.jsxCalledBy,
+                jprop
+              );
+            }
+          }
+        }
       } else {
         if (Array.isArray(meta.item.childs)) {
-          map_childs(p, metas, meta.item.childs, paths, [
-            ...(curpath || []),
-            meta,
-          ]);
+          map_childs(
+            p,
+            metas,
+            meta.item.childs,
+            paths,
+            [...skip_comp_id],
+            [...(curpath || []), meta]
+          );
         }
       }
     }
