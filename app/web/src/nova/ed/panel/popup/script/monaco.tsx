@@ -109,7 +109,9 @@ export const EdScriptMonaco: FC<{}> = () => {
               const model = editor.getModel();
               if (!model) {
                 const nmodel = monaco.editor.createModel(
-                  val,
+                  imports && imports.length > 0
+                    ? `${imports}\n/** IMPORT MODULE **/\n${val}`
+                    : val,
                   "typescript",
                   monaco.Uri.parse("file:///active.tsx")
                 );

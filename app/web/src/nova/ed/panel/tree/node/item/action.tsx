@@ -127,7 +127,7 @@ export const EdTreeAction = ({
           )}
           {comp.id === active.comp_id && (
             <>
-              <Tooltip content="Edit Component">
+              <Tooltip content="Close Component">
                 <div
                   className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
                   onClick={(e) => {

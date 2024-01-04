@@ -86,6 +86,15 @@ export const EdTreeBody = () => {
           if (!args.dragSource?.data?.item) return false;
           return canDrop(p, args);
         }}
+        canDrag={(node) => {
+          if (node) {
+            if (node.data?.jsx_prop?.is_root) {
+              return false;
+            }
+          }
+
+          return true;
+        }}
         dragPreviewRender={DragPreview}
         placeholderRender={(node, params) => (
           <Placeholder node={node} params={params} />

@@ -23,8 +23,6 @@ export const viEvalScript = (
 
   if (vi.visit) vi.visit(meta, parts);
 
-  const mhash = hash_sum(flatten(passprop));
-
   if (!meta.script) {
     meta.script = {
       passprop,
@@ -76,5 +74,4 @@ ${meta.item.adv?.jsBuilt || ""}
   fn(...Object.values(arg));
 
   updatePropScope(meta, passprop);
-  return mhash;
 };

@@ -94,7 +94,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
           Buffer.from(compress(diff_local))
         );
         p.ui.syncing = false;
-        p.render();
+        // p.render();
       }
     };
 
