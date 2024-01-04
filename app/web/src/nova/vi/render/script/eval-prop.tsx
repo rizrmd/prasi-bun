@@ -28,24 +28,28 @@ export const viEvalProps = (
           if (prop.meta?.type === "content-element") {
             let val = {
               _jsx: true,
-              fn: (arg: { passprop: any; meta: any }) => {
+              fn: (arg: { passprop: any; meta: IMeta }) => {
                 const id = prop.content?.id;
                 if (id) {
-                  const meta = vi.meta[id];
+                  const m = vi.meta[id];
                   if (
-                    meta.mitem &&
-                    prop.jsxCalledBy !== (meta.item.originalId || meta.item.id)
+                    m.mitem &&
+                    prop.jsxCalledBy !==
+                      (arg.meta.item.originalId || arg.meta.item.id)
                   ) {
-                    meta.mitem
-                      .get("component")
+                    console.log("setmeta", arg.meta.item.name);
+                    const mprop = meta.mitem
+                      ?.get("component")
                       ?.get("props")
-                      ?.get(name)
-                      ?.set(
+                      ?.get(name);
+                    if (mprop) {
+                      mprop.set(
                         "jsxCalledBy",
-                        meta.item.originalId || meta.item.id
+                        arg.meta.item.originalId || arg.meta.item.id
                       );
+                    }
                   }
-                  return <ViRender meta={meta} passprop={arg.passprop} />;
+                  return <ViRender meta={m} passprop={arg.passprop} />;
                 }
                 return null;
               },

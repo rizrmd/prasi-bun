@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { FC, ReactNode, Suspense, lazy, useEffect } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
 import { VG } from "../global";
@@ -9,6 +9,7 @@ import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
 import hash_sum from "hash-sum";
 import { flatten } from "safe-flat";
+import { useLocal } from "web-utils";
 
 export const viEvalScript = (
   vi: {
@@ -46,7 +47,7 @@ export const viEvalScript = (
     ErrorBox: ErrorBox,
     newElement: () => {},
     render: (jsx: ReactNode) => {
-      script.result = jsx;
+      script.result = <Suspense>{jsx}</Suspense>;
     },
     ...viScriptArg(),
     ...exports,
@@ -58,9 +59,9 @@ export const viEvalScript = (
       if (typeof v === "object" && (v as any)._jsx) {
         const jprop = v as unknown as {
           _jsx: true;
-          fn: (arg: { passprop: any }) => ReactNode;
+          fn: (arg: { passprop: any; meta: IMeta }) => ReactNode;
         };
-        arg[k] = jprop.fn({ passprop });
+        arg[k] = <JsxProp fn={jprop.fn} passprop={passprop} meta={meta} />;
       }
     }
   }
@@ -74,4 +75,18 @@ ${meta.item.adv?.jsBuilt || ""}
   fn(...Object.values(arg));
 
   updatePropScope(meta, passprop);
+};
+
+const JsxProp: FC<{
+  fn: (arg: { passprop: any; meta: IMeta }) => ReactNode;
+  meta: IMeta;
+  passprop: any;
+}> = ({ fn, meta, passprop }) => {
+  const local = useLocal({ init: false, result: null as any });
+
+  if (!local.init) {
+    local.init = true;
+    local.result = fn({ passprop, meta });
+  }
+  return local.result;
 };
