@@ -59,10 +59,8 @@ export const mainPerItemVisit = (
           text_edit.id === meta.item.id ||
           text_edit.id === meta.item.originalId
         ) {
-          if (document.activeElement !== el) {
-            setCaret(el, text_edit.caret);
-            text_edit.caret = null;
-          }
+          setCaret(el, text_edit.caret);
+          text_edit.caret = null;
         }
       }
     };

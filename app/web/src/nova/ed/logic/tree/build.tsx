@@ -1,12 +1,18 @@
 import { createId } from "@paralleldrive/cuid2";
 import { IItem, MItem } from "../../../../utils/types/item";
-import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { genMeta } from "../../../vi/meta/meta";
-import { IMeta, PG } from "../ed-global";
+import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
+  if (document.activeElement) {
+    const a = document.activeElement;
+    if (a.tagName === "DIV" && a.getAttribute("contenteditable") === "true") {
+      return;
+    }
+  }
+
   const is_layout =
     p.site.layout &&
     p.site.layout.id === p.page.cur.id &&

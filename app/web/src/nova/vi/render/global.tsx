@@ -1,3 +1,4 @@
+import { IItem } from "../../../utils/types/item";
 import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
 
