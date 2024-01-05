@@ -1,11 +1,11 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
 import { FC } from "react";
+import { useLocal } from "web-utils";
+import { TypedMap } from "yjs-types";
 import { MItem } from "../../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { Popover } from "../../../../../utils/ui/popover";
 import { EdPropPopoverForm, propPopover } from "./prop-form";
-import { TypedMap } from "yjs-types";
-import { useLocal } from "web-utils";
 
 export type PropItem = {
   name: string;
@@ -20,6 +20,8 @@ export const EdPropCompTreeItem: FC<{
   render: () => void;
 }> = ({ node, params, render }) => {
   const local = useLocal({ closing: false });
+  propPopover.render[node.text] = local.render;
+
   if (node.id === "root") {
     return <></>;
   }
@@ -27,6 +29,15 @@ export const EdPropCompTreeItem: FC<{
   let type = "TXT";
   if (node.data?.prop.meta?.type === "option") type = "OPT";
   else if (node.data?.prop.meta?.type === "content-element") type = "JSX";
+
+  const label = (
+    <div className="flex items-center justify-between flex-1">
+      <div>{node.text}</div>
+      <div className="text-[9px] px-1 border border-slate-400 ml-1 text-slate-500">
+        {type}
+      </div>
+    </div>
+  );
   return (
     <div className="flex items-stretch border-b text-[14px] min-h-[27px]">
       <div
@@ -48,43 +59,37 @@ export const EdPropCompTreeItem: FC<{
           ></path>
         </svg>
       </div>
-      {node.data && (
+      {node.data && propPopover.name === node.text ? (
         <Popover
           placement="left-start"
-          autoFocus={false}
-          backdrop={false}
-          open={propPopover.name === node.text}
+          initialOpen
+          open
           popoverClassName="bg-white shadow-lg border border-slate-300"
           onOpenChange={(open) => {
-            if (!open) {
-              local.closing = true;
-              local.render();
-              setTimeout(() => {
-                propPopover.name = "";
-                render();
-              });
-            } else {
-              local.closing = false;
-              propPopover.name = node.text;
-              render();
-            }
+            propPopover.name = "";
+            render();
           }}
           content={
             <EdPropPopoverForm
               closing={local.closing}
-              mprop={node.data.mprop}
+              mprop={node.data?.mprop}
               name={node.text}
             />
           }
           className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer items-center flex"
         >
-          <div className="flex items-center justify-between flex-1">
-            <div>{node.text}</div>
-            <div className="text-[9px] px-1 border border-slate-400 ml-1 text-slate-500">
-              {type}
-            </div>
-          </div>
+          {label}
         </Popover>
+      ) : (
+        <div
+          className="flex-1 pl-1 hover:bg-blue-100 cursor-pointer items-center flex"
+          onClick={() => {
+            propPopover.name = node.text;
+            local.render();
+          }}
+        >
+          {label}
+        </div>
       )}
       <div
         className="flex p-1 hover:bg-red-500 hover:text-white items-center justify-center cursor-pointer"

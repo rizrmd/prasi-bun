@@ -20,6 +20,8 @@ export const EdPopScript = () => {
 
               if (script.prop_name && script.type === "prop-master") {
                 propPopover.name = script.prop_name;
+                const render = propPopover.render[propPopover.name];
+                if (render) render();
               }
 
               if (script.type === "item") {

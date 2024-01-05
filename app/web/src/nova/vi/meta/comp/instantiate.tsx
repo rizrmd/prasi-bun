@@ -13,13 +13,15 @@ export const instantiate = (arg: {
   walkChild(newitem, ids);
 
   if (item.id) {
-    newitem.id = item.id;
+    newitem.id = item.id; 
   }
 
   if (newitem.component && item.component && newitem.component.props) {
     for (const k of Object.keys(newitem.component.props)) {
       if (item.component.props[k]) {
-        newitem.component.props[k] = item.component.props[k];
+        newitem.component.props[k].value = item.component.props[k].value;
+        newitem.component.props[k].valueBuilt =
+          item.component.props[k].valueBuilt;
       }
     }
   }
