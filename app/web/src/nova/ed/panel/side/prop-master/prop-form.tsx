@@ -11,6 +11,7 @@ import { fillID } from "../../../logic/tree/fill-id";
 
 export const propPopover = {
   name: "",
+  render: {} as Record<string, () => void>,
 };
 
 export const EdPropPopoverForm: FC<{

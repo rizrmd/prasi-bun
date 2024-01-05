@@ -6,10 +6,7 @@ import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem } from "../../../utils/types/item";
 import { DComp, DPage } from "../../../utils/types/root";
-import {
-  GenMetaP,
-  IMeta as LogicMeta
-} from "../../vi/utils/types";
+import { GenMetaP, IMeta as LogicMeta } from "../../vi/utils/types";
 
 export type IMeta = LogicMeta;
 

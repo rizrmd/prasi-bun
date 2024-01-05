@@ -95,35 +95,45 @@ export const EdScriptMonaco: FC<{}> = () => {
               { types: {}, values: {} }
             );
             if (meta) {
-              const imports = declareScope(p, meta, monaco);
+              if (p.ui.popup.script.type !== "prop-master") {
+                const imports = declareScope(p, meta, monaco);
 
-              let cur = active.comp_id ? active.comp_id : "page";
-              monaco.editor.getModels().forEach((model) => {
-                if (
-                  model.uri.path === `/${cur}_${active.item_id}_src_src.tsx`
-                ) {
-                  editor.setModel(model);
+                let cur = active.comp_id ? active.comp_id : "page";
+                monaco.editor.getModels().forEach((model) => {
+                  if (
+                    model.uri.path === `/${cur}_${active.item_id}_src_src.tsx`
+                  ) {
+                    editor.setModel(model);
+                  }
+                });
+
+                const model = editor.getModel();
+                if (!model) {
+                  const nmodel = monaco.editor.createModel(
+                    imports && imports.length > 0
+                      ? `${imports}\n/** IMPORT MODULE **/\n${val}`
+                      : val,
+                    "typescript",
+                    monaco.Uri.parse("file:///active.tsx")
+                  );
+
+                  editor.setModel(nmodel);
                 }
-              });
 
-              const model = editor.getModel();
-              if (!model) {
+                if (imports) {
+                  local.imports = imports;
+                  const end = imports.split("\n").length + 1;
+                  const range = new monaco.Range(1, 0, end, 0);
+                  (editor as any).setHiddenAreas([range]);
+                }
+              } else {
                 const nmodel = monaco.editor.createModel(
-                  imports && imports.length > 0
-                    ? `${imports}\n/** IMPORT MODULE **/\n${val}`
-                    : val,
+                  val,
                   "typescript",
                   monaco.Uri.parse("file:///active.tsx")
                 );
 
                 editor.setModel(nmodel);
-              }
-
-              if (imports) {
-                local.imports = imports;
-                const end = imports.split("\n").length + 1;
-                const range = new monaco.Range(1, 0, end, 0);
-                (editor as any).setHiddenAreas([range]);
               }
 
               await jsMount(editor, monaco, p);
@@ -251,7 +261,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             let scope: boolean | ParsedScope = false;
             if (p.ui.popup.script.type === "prop-master") {
               p.sync.code.edit({
-                type: "prop",
+                type: "prop-master",
                 prop_kind: p.ui.popup.script.prop_kind,
                 prop_name: p.ui.popup.script.prop_name,
                 value: compress(encode.encode(value || "")),

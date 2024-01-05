@@ -23,6 +23,7 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const local = useLocal({});
   const item = meta?.item as IItem;
   if (!item) return null;
+
   const TypedTree = DNDTree<PropItem>;
 
   let filtered = [] as NodeModel<PropItem>[];

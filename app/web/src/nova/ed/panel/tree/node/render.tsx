@@ -10,6 +10,7 @@ import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
 import { text_edit } from "../../main/main-per-item";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -121,6 +122,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         }
         active.item_id = item.id;
         p.ui.tree.search = "";
+        treeRebuild(p);
         p.render();
         p.page.render();
         if ((item as IContent).type === "text") {

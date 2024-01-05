@@ -3,6 +3,7 @@ import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
 
 export const ViGlobal = {
+  ts: 0,
   status: "init" as "init" | "loading" | "ready",
   meta: {} as Record<string, IMeta>,
   tick: 0,

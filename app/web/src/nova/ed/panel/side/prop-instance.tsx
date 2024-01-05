@@ -1,14 +1,14 @@
 import { FC, MouseEvent } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
-import { FMCompDef } from "../../../../utils/types/meta-fn";
+import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, IMeta, active } from "../../logic/ed-global";
+import { createEditScript } from "./prop-instance/edit-script";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
-import { createEditScript } from "./prop-instance/edit-script";
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -35,7 +35,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const item = _meta?.item as IItem;
   if (!item) return <>Warning: Item not found</>;
 
-  let filtered = [] as { mprop: FMCompDef; name: string }[];
+  let filtered = [] as { mprop: FMCompDef; cprop: FNCompDef; name: string }[];
   const mprops = _meta.mitem?.get("component")?.get("props");
   const comp_id = _meta.mitem?.get("component")?.get("id") || "";
 
@@ -50,6 +50,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     mcprops.forEach((m, key) => {
       let mprop = mprops.get(key);
 
+      const cprop = m.toJSON() as any;
       const type = m.get("meta")?.get("type") || "text";
       const visible = mprop?.get("visible") || "";
       if (visible) {
@@ -65,9 +66,9 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
         const map = new Y.Map() as any;
         syncronize(map, json);
         mprops.set(key, map);
-        filtered.push({ mprop: map, name: key });
+        filtered.push({ mprop: map, cprop, name: key });
       } else {
-        filtered.push({ mprop, name: key });
+        filtered.push({ mprop, cprop, name: key });
       }
     });
 
@@ -147,7 +148,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               No Prop Available
             </div>
           )}
-          {filtered.map(({ name, mprop }) => {
+          {filtered.map(({ name, mprop, cprop }) => {
             const type = mprop.get("meta")?.get("type") || "text";
             let hasCode = false;
 
@@ -195,6 +196,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                     {type === "option" && (
                       <EdPropInstanceOptions
                         mprop={mprop}
+                        cprop={cprop}
                         name={name}
                         labelClick={labelClick}
                       />

@@ -10,8 +10,9 @@ import { EdPropLabel } from "./prop-label";
 export const EdPropInstanceOptions: FC<{
   name: string;
   mprop: FMCompDef;
+  cprop: FNCompDef;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ name, mprop, labelClick }) => {
+}> = ({ name, mprop, cprop, labelClick }) => {
   const prop = mprop.toJSON() as FNCompDef;
   const local = useLocal({
     codeEditing: false,
@@ -25,7 +26,7 @@ export const EdPropInstanceOptions: FC<{
 
   let metaOptions: { label: string; value: any }[] = [];
 
-  if (prop.meta?.options || prop.meta?.optionsBuilt) {
+  if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded) {
       try {
         if (p.site.config.api_url) {
@@ -42,7 +43,7 @@ export const EdPropInstanceOptions: FC<{
 ${Object.entries(args)
   .map((e) => `const ${e[0]} = args["${e[0]}"]`)
   .join(";\n")}
-const resOpt = ${prop.meta.optionsBuilt || prop.meta.options};
+const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 if (typeof resOpt === 'function')  local.metaFn = resOpt;
 else metaOptions = resOpt;
 `);
@@ -80,6 +81,8 @@ else metaOptions = resOpt;
       mprop.set("value", val);
       mprop.set("valueBuilt", val);
     });
+
+    p.render();
   };
 
   let mode = prop.meta?.option_mode;

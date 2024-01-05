@@ -37,7 +37,6 @@ export const viEvalProps = (
                     prop.jsxCalledBy !==
                       (arg.meta.item.originalId || arg.meta.item.id)
                   ) {
-                    console.log("setmeta", arg.meta.item.name);
                     const mprop = meta.mitem
                       ?.get("component")
                       ?.get("props")

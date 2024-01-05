@@ -110,7 +110,7 @@ export const mainPerItemVisit = (
   }
 
   let is_active = isMetaActive(p, meta);
-
+  
   let is_component = false;
   if (
     !is_active &&

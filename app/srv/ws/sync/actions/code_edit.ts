@@ -103,6 +103,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
     }
   } else if (arg.type === "prop-master") {
     const { comp_id, prop_kind, prop_name } = arg;
+
     if (comp_id) {
       const ref = docs.comp[comp_id];
       if (ref) {
