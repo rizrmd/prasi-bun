@@ -17,7 +17,16 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
   const paths: IMeta[][] = [];
 
-  map_childs(p, metas, entry, paths, active.comp_id ? [active.comp_id] : []);
+  const jsxprop_import_map: Record<string, string> = {};
+  map_childs(
+    monaco,
+    p,
+    metas,
+    entry,
+    paths,
+    active.comp_id ? [active.comp_id] : [],
+    jsxprop_import_map
+  );
 
   let cur = active.comp_id ? active.comp_id : "page";
   const { import_map, parent_id } = extract_import_map(
@@ -28,8 +37,13 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     monaco
   );
 
-  gen_content(cur, p, paths, import_map, monaco);
-  return import_map[parent_id];
+  const merged_import_map = {
+    ...import_map,
+    ...jsxprop_import_map,
+  };
+
+  gen_content(cur, p, paths, merged_import_map, monaco);
+  return merged_import_map[parent_id];
 };
 
 const gen_content = (
@@ -46,6 +60,7 @@ const gen_content = (
     for (const m of path) {
       if (!added.has(m.item.id) && m.item.adv?.js) {
         added.add(m.item.id);
+
         const content = last_import
           ? `\
 ${last_import}
@@ -73,7 +88,7 @@ const extract_import_map = (
   paths: IMeta[][],
   meta: IMeta,
   p: PG,
-  monaco: Monaco
+  monaco?: Monaco
 ) => {
   const added = new Set<string>();
   let parent_id = "";
@@ -103,7 +118,7 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
             } else {
               src = `export const ${k} = ${v.val}`;
             }
-            if (src) {
+            if (src && monaco) {
               addScope(
                 p,
                 monaco,
@@ -135,17 +150,18 @@ const comp_map = {} as Record<
   string,
   {
     paths: IMeta[][];
-    prop_imports: Record<string, string>;
     exports: Record<string, ReturnType<typeof extractExport>>;
   }
 >;
 
 const map_childs = (
+  monaco: Monaco,
   p: PG,
   metas: Record<string, IMeta>,
   childs: IContent[],
   paths: IMeta[][],
   skip_comp_id: string[],
+  jsxprop_import_map: Record<string, string> = {},
   curpath?: IMeta[]
 ) => {
   for (const m of childs) {
@@ -163,7 +179,6 @@ const map_childs = (
           const comp_metas = p.comp.list[comp_id].meta;
           comp_map[meta.item.component.id] = {
             paths: [],
-            prop_imports: {},
             exports: {},
           };
           const id = p.comp.list[comp_id].doc
@@ -173,6 +188,7 @@ const map_childs = (
 
           if (id) {
             map_childs(
+              monaco,
               p,
               comp_metas,
               [comp_metas[id].item],
@@ -200,10 +216,34 @@ const map_childs = (
               prop.content &&
               prop.jsxCalledBy
             ) {
-              console.log(
-                name,
-                prop.jsxCalledBy,
-                jprop
+              const mjsx = p.comp.list[comp_id].meta[prop.jsxCalledBy];
+              const { import_map, parent_id } = extract_import_map(
+                meta.item.component.id,
+                jprop.paths,
+                mjsx,
+                p,
+                monaco
+              );
+
+              gen_content(
+                meta.item.component.id,
+                p,
+                jprop.paths,
+                import_map,
+                monaco
+              );
+
+              jsxprop_import_map[prop.content.id] = import_map[parent_id];
+              const prop_meta = metas[prop.content.id];
+              map_childs(
+                monaco,
+                p,
+                metas,
+                prop.content.childs,
+                paths,
+                [...skip_comp_id, comp_id],
+                jsxprop_import_map,
+                [...(curpath || []), prop_meta]
               );
             }
           }
@@ -211,11 +251,13 @@ const map_childs = (
       } else {
         if (Array.isArray(meta.item.childs)) {
           map_childs(
+            monaco,
             p,
             metas,
             meta.item.childs,
             paths,
             [...skip_comp_id],
+            jsxprop_import_map,
             [...(curpath || []), meta]
           );
         }
