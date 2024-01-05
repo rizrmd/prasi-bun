@@ -82,7 +82,7 @@ else metaOptions = resOpt;
       mprop.set("valueBuilt", val);
     });
 
-    p.render();
+    setTimeout(p.render);
   };
 
   let mode = prop.meta?.option_mode;

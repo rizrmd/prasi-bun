@@ -149,7 +149,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             </div>
           )}
           {filtered.map(({ name, mprop, cprop }) => {
-            const type = mprop.get("meta")?.get("type") || "text";
+            const type = cprop.meta?.type || "text";
             let hasCode = false;
 
             const value = mprop.get("value") || "";
