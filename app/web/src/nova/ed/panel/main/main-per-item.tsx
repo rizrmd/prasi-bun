@@ -110,7 +110,7 @@ export const mainPerItemVisit = (
   }
 
   let is_active = isMetaActive(p, meta);
-  
+
   let is_component = false;
   if (
     !is_active &&
@@ -122,22 +122,6 @@ export const mainPerItemVisit = (
 
   parts.props.className = cx(
     parts.props.className,
-    is_active && "el-active",
-    is_active &&
-      css`
-        outline: none;
-
-        &::after {
-          content: " ";
-          pointer-events: none;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          border: 2px solid #1c88f3;
-        }
-      `,
     is_component &&
       css`
         &::after {
