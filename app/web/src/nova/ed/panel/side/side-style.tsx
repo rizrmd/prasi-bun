@@ -3,6 +3,7 @@ import { EDGlobal, IMeta, active } from "../../logic/ed-global";
 import { useGlobal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { EdSidePropComp } from "./prop-master";
+import { EdStyleAll } from "./style/side-all";
 
 export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -32,6 +33,7 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
           </div>
         )}
       </div>
+      <EdStyleAll />
     </div>
   );
 };
