@@ -1,9 +1,10 @@
 import { useGlobal, useLocal } from "web-utils";
 import { Vi } from "../../../vi/vi";
-import { EDGlobal, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
 import { VG } from "../../../vi/render/global";
 import { IItem } from "../../../../utils/types/item";
+import { isMetaActive } from "../../logic/active/is-meta.active";
 
 export const EdMain = () => {
   // return <div className="flex flex-1 flex-col relative"></div>;
@@ -11,6 +12,9 @@ export const EdMain = () => {
   const local = useLocal({});
   active.hover.renderMain = local.render;
 
+  const meta = active.comp_id
+    ? p.comp.list[active.comp_id].meta[active.item_id]
+    : p.page.meta[active.item_id];
   return (
     <div
       className={cx(
@@ -20,7 +24,7 @@ export const EdMain = () => {
         `
       )}
     >
-      <div className={mainStyle()}>
+      <div className={mainStyle(p, meta)}>
         <Vi
           meta={p.page.meta}
           api_url={p.site.config.api_url}
@@ -39,7 +43,9 @@ export const EdMain = () => {
   );
 };
 
-const mainStyle = () => {
+const mainStyle = (p: PG, meta: IMeta) => {
+  let is_active = isMetaActive(p, meta);
+
   return cx(
     "absolute inset-0 flex",
     active.hover.id &&
@@ -54,6 +60,23 @@ const mainStyle = () => {
             left: 0;
             right: 0;
             border: 2px solid #73b8ff;
+          }
+        }
+      `,
+    is_active &&
+      css`
+        .s-${active.item_id} {
+          outline: none;
+
+          &::after {
+            content: " ";
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border: 2px solid #1c88f3;
           }
         }
       `
