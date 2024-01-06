@@ -39,18 +39,17 @@ export const EdBase = () => {
     );
   }
 
-
   return (
     <div className="flex flex-col flex-1">
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
         <EdLeft />
-        <EdPane type="left" />
+        <EdPane type="left" min_size={200} />
         <div className="flex flex-1 flex-col items-stretch">
           <EdMid />
           <div className="flex flex-1 items-stretch">
             <EdMain />
-            <EdPane type="right" />
+            <EdPane type="right" min_size={206} />
             <EdRight />
           </div>
         </div>

@@ -1,12 +1,18 @@
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../logic/ed-global";
 
-export const EdPane = ({ type }: { type: "left" | "right" }) => {
+export const EdPane = ({
+  type,
+  min_size,
+}: {
+  type: "left" | "right";
+  min_size: number;
+}) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
   return (
     <EdPaneResize
-      minSize={200}
+      minSize={min_size}
       size={p.ui.layout[type]}
       onResize={(size) => {
         p.ui.layout[type] = size;
