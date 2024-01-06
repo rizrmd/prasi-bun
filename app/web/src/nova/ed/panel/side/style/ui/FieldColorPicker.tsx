@@ -83,7 +83,7 @@ export const FieldPickColor: FC<{
               tin.isValid() &&
                 css`
                   color: ${!tin.isLight() ? "#FFF" : "#000"};
-                  background-color: ${meta.inputValue};
+                  background-color: ${meta.inputValue || ""};
                 `
             )}
             onClick={() => {

@@ -1,7 +1,11 @@
 import { FC, useEffect } from "react";
 import { useLocal } from "web-utils";
 import { FieldColorPicker } from "./FieldColorPopover";
-import { w } from "../../../../../../utils/types/general";
+
+export const color = {
+  openedPopupID: {} as Record<string, boolean>,
+  lastColorPicked: "",
+};
 
 export const FieldColor: FC<{
   popupID: string;
@@ -9,15 +13,15 @@ export const FieldColor: FC<{
   update: (value: string) => void;
   showHistory?: boolean;
 }> = ({ value, update, showHistory = true, popupID }) => {
-  if (!w.openedPopupID) w.openedPopupID = {};
+  if (!color.openedPopupID) color.openedPopupID = {};
 
   const local = useLocal({
-    val: w.lastColorPicked || "",
+    val: color.lastColorPicked || "",
   });
 
   useEffect(() => {
     if (value) {
-      w.lastColorPicked = value;
+      color.lastColorPicked = value;
     }
     local.val = value || "";
 
@@ -25,13 +29,13 @@ export const FieldColor: FC<{
   }, [value]);
 
   const onOpen = () => {
-    w.openedPopupID[popupID] = true;
+    color.openedPopupID[popupID] = true;
     local.render();
   };
 
   const onClose = () => {
-    delete w.openedPopupID[popupID];
-    w.lastColorPicked = "";
+    delete color.openedPopupID[popupID];
+    color.lastColorPicked = "";
     local.render();
   };
 
@@ -46,7 +50,7 @@ export const FieldColor: FC<{
       update={(val) => update(val)}
       onOpen={onOpen}
       onClose={onClose}
-      open={w.openedPopupID[popupID]}
+      open={color.openedPopupID[popupID]}
       showHistory={showHistory}
     >
       <div
