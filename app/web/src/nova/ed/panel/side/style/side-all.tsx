@@ -1,7 +1,16 @@
 import { useCallback } from "react";
 import { useGlobal } from "web-utils";
 import { EDGlobal, active } from "../../../logic/ed-global";
+import { PanelAdv } from "./panel/advanced";
 import { PanelAutoLayout } from "./panel/auto-layout";
+import { PanelBackground } from "./panel/background";
+import { PanelBorder } from "./panel/border";
+import { PanelDimension } from "./panel/dimension";
+import { PanelFont } from "./panel/font";
+import { PanelLink } from "./panel/link";
+import { PanelPadding } from "./panel/padding";
+import { SideBox } from "./ui/SideBox";
+import { SideLabel } from "./ui/SideLabel";
 
 export const EdStyleAll = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -64,7 +73,38 @@ export const EdStyleAll = () => {
 
   return (
     <div className="flex flex-1 items-center flex-col p-[3px]">
-      <PanelAutoLayout mode={p.mode} value={item} update={update} />
+      <SideBox>
+        <PanelAutoLayout mode={p.mode} value={item} update={update} />
+        <PanelPadding
+          id={active.item_id}
+          value={item}
+          mode={p.mode}
+          update={update}
+        />
+        <PanelDimension
+          value={item}
+          mode={p.mode}
+          id={active.item_id}
+          update={update}
+        />
+      </SideBox>
+      <SideLabel>BACKGROUND</SideLabel>
+      <SideBox>
+        <PanelBackground value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>FONT</SideLabel>
+      <SideBox>
+        <PanelFont value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>BORDER</SideLabel>
+      <SideBox>
+        <PanelBorder value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>ADVANCED</SideLabel>
+      <SideBox>
+        <PanelLink value={item} mode={p.mode} update={update} />
+        <PanelAdv value={item} mode={p.mode} update={update} />
+      </SideBox>
     </div>
   );
 };
