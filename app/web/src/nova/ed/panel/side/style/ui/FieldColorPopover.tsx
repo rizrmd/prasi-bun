@@ -1,7 +1,7 @@
 import { FC, ReactElement, useEffect, useTransition } from "react";
 import { useLocal } from "web-utils";
 import { FieldPickColor } from "./FieldColorPicker";
-import { Popover } from "../../../../../utils/ui/popover";
+import { Popover } from "../../../../../../utils/ui/popover";
 
 export const FieldColorPicker: FC<{
   children: ReactElement;
