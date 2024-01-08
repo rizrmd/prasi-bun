@@ -60,7 +60,6 @@ export const EdStyleAll = () => {
               }
             }
           });
-          setTimeout(p.render);
         }
       }
     },
@@ -72,7 +71,7 @@ export const EdStyleAll = () => {
   }
 
   return (
-    <div className="flex flex-1 items-center flex-col p-[3px]">
+    <div className="flex flex-1 items-stretch flex-col pt-1">
       <SideBox>
         <PanelAutoLayout mode={p.mode} value={item} update={update} />
         <PanelPadding
