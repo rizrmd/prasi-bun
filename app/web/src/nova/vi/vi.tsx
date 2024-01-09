@@ -5,6 +5,7 @@ import { viLoad } from "./load/load";
 import { VG, ViGlobal } from "./render/global";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
+import { render_stat } from "./render/render";
 
 export const Vi: FC<{
   meta: Record<string, IMeta>;
@@ -17,8 +18,23 @@ export const Vi: FC<{
   db?: any;
   script?: { init_local_effect: Record<string, boolean> };
   visit?: VG["visit"];
-}> = ({ meta, entry, api_url, site_id, api, db, visit, script }) => {
+  render_stat?: "enabled" | "disabled";
+}> = ({
+  meta,
+  entry,
+  api_url,
+  site_id,
+  api,
+  db,
+  visit,
+  script,
+  render_stat: rs,
+}) => {
   const vi = useGlobal(ViGlobal, "VI");
+
+  if (rs === "disabled") {
+    render_stat.enabled = false;
+  }
 
   if (vi.meta !== meta) {
     vi.meta = meta;

@@ -180,12 +180,7 @@ export const edInitSync = (p: PG) => {
               if (data.type === "page") {
                 await treeRebuild(p, { note: "sv_remote" });
               } else {
-                const updated = await updateComponentMeta(
-                  p,
-                  doc,
-                  data.id,
-                  p.comp.list[data.id].comp.meta
-                );
+                const updated = await updateComponentMeta(p, doc, data.id);
                 if (updated) {
                   p.comp.list[data.id].meta = updated.meta;
                   p.comp.list[data.id].tree = updated.tree;

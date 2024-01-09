@@ -1,20 +1,20 @@
 import { FC } from "react";
 import { useLocal } from "web-utils";
-import { FieldColor } from "../ui/FieldColor";
-import fontlist from "./font.json";
-import { FieldNumUnit } from "../ui/FieldNumUnit";
-import { Button } from "../ui/Button";
-import { dropdownProp } from "../ui/style";
 import { w } from "../../../../../utils/types/general";
-import { BoxSep } from "../ui/BoxSep";
-import { FieldBtnRadio } from "../ui/FieldBtnRadio";
-import { FNFont } from "../../../../../utils/types/meta-fn";
-import { responsiveVal } from "../../../tools/responsive-val";
-import { Tooltip } from "../../../../../utils/ui/tooltip";
-import { Dropdown } from "../../../../../utils/ui/dropdown";
-import { ISection } from "../../../../../utils/types/section";
 import { IItem } from "../../../../../utils/types/item";
+import { FNFont } from "../../../../../utils/types/meta-fn";
+import { ISection } from "../../../../../utils/types/section";
 import { IText } from "../../../../../utils/types/text";
+import { Dropdown } from "../../../../../utils/ui/dropdown";
+import { Tooltip } from "../../../../../utils/ui/tooltip";
+import { responsiveVal } from "../../../tools/responsive-val";
+import { BoxSep } from "../ui/BoxSep";
+import { Button } from "../ui/Button";
+import { FieldBtnRadio } from "../ui/FieldBtnRadio";
+import { FieldColor } from "../ui/FieldColor";
+import { FieldNumUnit } from "../ui/FieldNumUnit";
+import { dropdownProp } from "../ui/style";
+import fontlist from "./font.json";
 
 type FontUpdate = {
   font: FNFont;

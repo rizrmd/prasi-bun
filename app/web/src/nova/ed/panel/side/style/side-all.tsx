@@ -71,39 +71,41 @@ export const EdStyleAll = () => {
   }
 
   return (
-    <div className="flex flex-1 items-stretch flex-col pt-1">
-      <SideBox>
-        <PanelAutoLayout mode={p.mode} value={item} update={update} />
-        <PanelPadding
-          id={active.item_id}
-          value={item}
-          mode={p.mode}
-          update={update}
-        />
-        <PanelDimension
-          value={item}
-          mode={p.mode}
-          id={active.item_id}
-          update={update}
-        />
-      </SideBox>
-      <SideLabel>BACKGROUND</SideLabel>
-      <SideBox>
-        <PanelBackground value={item} mode={p.mode} update={update} />
-      </SideBox>
-      <SideLabel>FONT</SideLabel>
-      <SideBox>
-        <PanelFont value={item} mode={p.mode} update={update} />
-      </SideBox>
-      <SideLabel>BORDER</SideLabel>
-      <SideBox>
-        <PanelBorder value={item} mode={p.mode} update={update} />
-      </SideBox>
-      <SideLabel>ADVANCED</SideLabel>
-      <SideBox>
-        <PanelLink value={item} mode={p.mode} update={update} />
-        <PanelAdv value={item} mode={p.mode} update={update} />
-      </SideBox>
+    <div className="flex h-full flex-1 relative overflow-auto">
+      <div className="absolute inset-0 flex items-stretch flex-col pt-1">
+        <SideBox>
+          <PanelAutoLayout mode={p.mode} value={item} update={update} />
+          <PanelPadding
+            id={active.item_id}
+            value={item}
+            mode={p.mode}
+            update={update}
+          />
+          <PanelDimension
+            value={item}
+            mode={p.mode}
+            id={active.item_id}
+            update={update}
+          />
+        </SideBox>
+        <SideLabel>BACKGROUND</SideLabel>
+        <SideBox>
+          <PanelBackground value={item} mode={p.mode} update={update} />
+        </SideBox>
+        <SideLabel>FONT</SideLabel>
+        <SideBox>
+          <PanelFont value={item} mode={p.mode} update={update} />
+        </SideBox>
+        <SideLabel>BORDER</SideLabel>
+        <SideBox>
+          <PanelBorder value={item} mode={p.mode} update={update} />
+        </SideBox>
+        <SideLabel>ADVANCED</SideLabel>
+        <SideBox>
+          <PanelLink value={item} mode={p.mode} update={update} />
+          <PanelAdv value={item} mode={p.mode} update={update} />
+        </SideBox>
+      </div>
     </div>
   );
 };
