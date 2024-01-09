@@ -26,3 +26,7 @@ export const live = {
   url:  "/live/:domain/**",
   page: () => import("./page/live"),
 };
+export const vi = {
+  url:  "/vi/:domain/**",
+  page: () => import("./page/vi"),
+};

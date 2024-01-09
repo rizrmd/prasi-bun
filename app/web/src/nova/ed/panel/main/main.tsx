@@ -1,13 +1,10 @@
 import { useGlobal, useLocal } from "web-utils";
 import { Vi } from "../../../vi/vi";
+import { isMetaActive } from "../../logic/active/is-meta.active";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
-import { VG } from "../../../vi/render/global";
-import { IItem } from "../../../../utils/types/item";
-import { isMetaActive } from "../../logic/active/is-meta.active";
 
 export const EdMain = () => {
-  // return <div className="flex flex-1 flex-col relative"></div>;
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({});
   active.hover.renderMain = local.render;
@@ -43,8 +40,8 @@ export const EdMain = () => {
   );
 };
 
-const mainStyle = (p: PG, meta: IMeta) => {
-  let is_active = isMetaActive(p, meta);
+const mainStyle = (p: PG, meta?: IMeta) => {
+  let is_active = meta ? isMetaActive(p, meta) : false;
 
   return cx(
     "absolute inset-0 flex",

@@ -39,13 +39,16 @@ export const viLoadLegacy = async (vi: {
     let api_url = vi.site.api_url;
     if (!api_url) api_url = ((site.config as any) || {}).api_url || "";
 
-    if (api_url) {
-      try {
-        await loadApiProxyDef(api_url, true);
-      } catch (e) {
-        console.warn("Failed to load API:", api_url);
+    try {
+      const apiURL = new URL(api_url);
+      if (api_url && apiURL.hostname) {
+        try {
+          await loadApiProxyDef(api_url, true);
+        } catch (e) {
+          console.warn("Failed to load API:", api_url);
+        }
       }
-    }
+    } catch (e) {}
 
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);

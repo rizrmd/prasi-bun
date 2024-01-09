@@ -1,9 +1,8 @@
 import init from "wasm-gzip";
-import { jscript } from "../../../utils/script/jscript";
+import { ApiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
+import { jscript } from "../../../utils/script/jscript";
 import { PG } from "./ed-global";
-import { fetchViaProxy } from "../../../base/load/proxy";
-import { ApiProxy, apiProxy } from "../../../base/load/api/api-proxy";
 
 let w = window as unknown as {
   db: ReturnType<typeof dbProxy>;

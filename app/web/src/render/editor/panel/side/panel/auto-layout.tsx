@@ -63,7 +63,7 @@ export const PanelAutoLayout: FC<{
             >
               <BoxSep
                 className={cx(
-                  "justify-between  my-0.5",
+                  "justify-between my-0.5 mx-[1px]",
                   css`
                     padding: 0px;
                     & > button {

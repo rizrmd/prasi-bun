@@ -34,7 +34,7 @@ const EdPaneResize = (arg: {
   position: "left" | "right";
 }) => {
   const local = useLocal({
-    default: arg.size,
+    default: arg.size > arg.minSize ? arg.size : arg.minSize,
     dragging: false,
     sx: 0,
     size: 0,

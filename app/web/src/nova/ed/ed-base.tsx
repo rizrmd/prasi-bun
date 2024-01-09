@@ -49,7 +49,7 @@ export const EdBase = () => {
           <EdMid />
           <div className="flex flex-1 items-stretch">
             <EdMain />
-            <EdPane type="right" min_size={206} />
+            <EdPane type="right" min_size={240} />
             <EdRight />
           </div>
         </div>

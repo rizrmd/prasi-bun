@@ -31,9 +31,11 @@ export const EdMid: FC<{}> = () => {
           </div>
         </div>
         <div className="flex items-center flex-1 justify-end">
-          <TopBtn style="slim" className="font-mono text-[9px]">
-            PREVIEW
-          </TopBtn>
+          <a href={`/vi/${params.site_id}/${params.page_id}`} target="_blank">
+            <TopBtn style="slim" className="font-mono text-[9px]">
+              PREVIEW
+            </TopBtn>
+          </a>
         </div>
       </div>
     </div>

@@ -36,9 +36,10 @@ export const viParts = (
   let children = undefined;
 
   if ((meta.item as IContent).type === "text") {
-    children = <HTMLChild props={text_props} />;
+    children = (
+      <HTMLChild props={{ ...{ children: meta.item.html }, ...text_props }} />
+    );
   } else {
-
     children =
       Array.isArray(childs) &&
       childs?.map((item) => {
@@ -48,6 +49,7 @@ export const viParts = (
         return <ViRender key={id} meta={vi.meta[id]} passprop={passprop} />;
       });
   }
+
   props.children = children;
 
   return {
