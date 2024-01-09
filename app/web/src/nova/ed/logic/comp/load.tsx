@@ -66,6 +66,14 @@ export const loadCompSnapshot = async (
           meta,
           tree,
           async on_update(bin, origin) {
+            if (
+              !document.activeElement?.attributes.getNamedItem(
+                "contenteditable"
+              )
+            ) {
+              return;
+            }
+
             if (origin === "sv_remote" || origin === "local") {
               return;
             }

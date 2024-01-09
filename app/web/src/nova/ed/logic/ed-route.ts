@@ -71,6 +71,10 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     }
 
     page.on_update = async (bin: Uint8Array, origin: any) => {
+      if (!document.activeElement?.attributes.getNamedItem("contenteditable")) {
+        return;
+      }
+
       if (origin === "local") return;
 
       const res = await p.sync.yjs.sv_local(
