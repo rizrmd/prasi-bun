@@ -43,6 +43,10 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   };
 
   gen_content(cur, p, paths, merged_import_map, monaco);
+
+  if (cur !== "page" && !parent_id) {
+    return merged_import_map[paths[0][0].item.id];
+  }
   return merged_import_map[parent_id];
 };
 
@@ -56,7 +60,8 @@ const gen_content = (
   const added = new Set<string>();
   for (const path of paths) {
     let idx = 0;
-    let last_import = "";
+    let last_import = cur !== "page" ? import_map[path[0].item.id] : "";
+
     for (const m of path) {
       if (!added.has(m.item.id) && m.item.adv?.js) {
         added.add(m.item.id);
