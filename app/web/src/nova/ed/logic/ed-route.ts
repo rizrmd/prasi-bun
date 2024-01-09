@@ -71,10 +71,6 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
     }
 
     page.on_update = async (bin: Uint8Array, origin: any) => {
-      if (!document.activeElement?.attributes.getNamedItem("contenteditable")) {
-        return;
-      }
-
       if (origin === "local") return;
 
       const res = await p.sync.yjs.sv_local(
@@ -90,7 +86,11 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
         );
         Y.applyUpdate(doc as any, decompress(res.diff), "local");
 
-        await treeRebuild(p, { note: note + " page-on-update" });
+        if (
+          !document.activeElement?.attributes.getNamedItem("contenteditable")
+        ) {
+          await treeRebuild(p, { note: note + " page-on-update" });
+        }
 
         await p.sync.yjs.diff_local(
           "page",
@@ -98,6 +98,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
           Buffer.from(compress(diff_local))
         );
         p.ui.syncing = false;
+
         if (p.ui.should_render) p.render();
       }
     };

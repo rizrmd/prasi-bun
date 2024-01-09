@@ -66,14 +66,6 @@ export const loadCompSnapshot = async (
           meta,
           tree,
           async on_update(bin, origin) {
-            if (
-              !document.activeElement?.attributes.getNamedItem(
-                "contenteditable"
-              )
-            ) {
-              return;
-            }
-
             if (origin === "sv_remote" || origin === "local") {
               return;
             }
@@ -104,6 +96,14 @@ export const loadCompSnapshot = async (
               if (updated) {
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;
+              }
+
+              if (
+                document.activeElement?.attributes.getNamedItem(
+                  "contenteditable"
+                )
+              ) {
+                return;
               }
               treeRebuild(p, { note: "load-comp" });
               p.render();

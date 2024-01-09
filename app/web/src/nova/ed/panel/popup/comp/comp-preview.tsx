@@ -30,7 +30,7 @@ export const EdCompPreview = () => {
     if (!found) {
       found = compPicker.trash.find((e) => e.id === comp_id);
     }
-    if (found) {
+    if (found && ref) {
       const root = ref.tree.find((e) => e.parent === "root");
       if (root) {
         if (root.text !== found.text) {
