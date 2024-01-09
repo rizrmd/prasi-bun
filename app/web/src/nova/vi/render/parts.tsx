@@ -36,14 +36,8 @@ export const viParts = (
   let children = undefined;
 
   if ((meta.item as IContent).type === "text") {
-    children = (
-      <HTMLChild
-        props={{
-          ...{ dangerouslySetInnerHTML: { __html: meta.item.html || "" } },
-          ...text_props,
-        }}
-      />
-    );
+    children = null;
+    props.dangerouslySetInnerHTML = { __html: meta.item.html || "" };
   } else {
     children =
       Array.isArray(childs) &&
@@ -61,8 +55,4 @@ export const viParts = (
     props,
     text_props,
   };
-};
-
-const HTMLChild: FC<{ props: PROPS }> = ({ props }) => {
-  return <span {...props} />;
 };
