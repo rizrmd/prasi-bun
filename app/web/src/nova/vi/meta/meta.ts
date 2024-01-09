@@ -27,7 +27,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
   }
 
   if (p.on?.visit) {
-    p.on.visit(meta, item);
+    p.on.visit(meta, item, arg.root || arg.item);
   }
 
   if (item.id) {
@@ -35,12 +35,13 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       p.meta[meta.item.id] = meta;
     }
   }
- 
+
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
       const carg: GenMetaArg = {
         item: v,
         is_root: false,
+        root: arg.root || arg.item,
         parent: {
           item: meta.item,
           instance_id: arg.parent?.instance_id,
@@ -49,7 +50,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
         },
       };
       if (arg.jsx_prop) {
-        carg.jsx_prop = { 
+        carg.jsx_prop = {
           ...arg.jsx_prop,
           is_root: false,
         };

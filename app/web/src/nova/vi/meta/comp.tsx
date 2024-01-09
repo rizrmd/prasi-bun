@@ -9,9 +9,9 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let item_comp = p.comps[item.component.id];
     if (p.on?.visit_component) {
-      p.on.visit_component(item);
+      p.on.visit_component(item, arg.root || arg.item);
     }
- 
+
     if (!item_comp) {
       return;
     }
@@ -19,6 +19,9 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
     if (item_comp) {
       let instances: undefined | typeof item.component.instances = undefined;
       if (p.mode === "page") {
+        if (!item.component.instances) {
+          item.component.instances = {};
+        }
         instances = item.component.instances;
       } else {
         instances = arg.parent?.root_instances;
@@ -49,7 +52,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       };
 
       if (p.on?.visit) {
-        p.on.visit(meta, item);
+        p.on.visit(meta, item, arg.root || arg.item);
       }
 
       if (item.id) {
@@ -68,11 +71,12 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           if (prop.meta?.type === "content-element" && comp_id) {
             if (prop.content) {
               prop.content.name = name;
- 
-              genMeta( 
+
+              genMeta(
                 { ...p },
                 {
                   item: prop.content,
+                  root: arg.root || prop.content,
                   is_root: false,
                   jsx_prop: {
                     is_root: true,
@@ -100,6 +104,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           {
             item: child,
             is_root: false,
+            root: arg.root || arg.item,
             parent: {
               item,
               instance_id: item.id,
@@ -109,7 +114,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           }
         );
       }
-
     }
   }
 };

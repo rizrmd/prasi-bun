@@ -66,10 +66,6 @@ export const page_load: SAction["page"]["load"] = async function (
       return data;
     });
   };
-  const page = await db.page.findFirst({ where: { id } });
-  if (page) {
-    await prepContentTree(page.id, page.content_tree, this);
-  }
 
   user.active.delAll({ client_id: this.client_id });
 
