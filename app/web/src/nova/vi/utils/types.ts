@@ -9,8 +9,8 @@ export type GenMetaP = {
   meta: Record<string, IMeta>;
   comps: Record<string, IItem>;
   on?: {
-    visit_component?: (item: IItem) => void;
-    visit?: (meta: IMeta, item: IItem) => void;
+    visit_component?: (item: IItem, root?: IContent) => void;
+    visit?: (meta: IMeta, item: IItem, root?: IContent) => void;
   };
   set_meta?: boolean;
   note?: string;
@@ -22,6 +22,7 @@ export type GenMetaArg = {
   is_root?: boolean;
   jsx_prop?: IMeta["jsx_prop"];
   ignore_first_component?: boolean;
+  root?: IContent;
   parent?: {
     item: IItem;
     instance_id?: string;

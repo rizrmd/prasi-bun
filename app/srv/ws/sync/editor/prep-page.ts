@@ -25,21 +25,23 @@ export const prepContentTree = async (
   }
 
   const meta = {};
+  let proot: any = root;
   genMeta(
     {
       comps,
       meta,
       on: {
-        visit_component(item) {
-          if (item.component?.id) {
-            if (!item.component?.instances) {
-              item.component.instances = {};
-            }
-          }
-        },
         visit(meta, item) {
           if (item.adv?.js) {
             item.script = parseJs(item.adv.js);
+          }
+          if (item.component?.id) {
+            try {
+              console.log(
+                "mokindo",
+                (proot.childs[0].childs[1].childs[0] as any).component.instances
+              );
+            } catch (e) {}
           }
         },
       },
@@ -47,6 +49,13 @@ export const prepContentTree = async (
     },
     { item: root as unknown as IItem }
   );
+
+  try {
+    console.log(
+      "moko",
+      (proot.childs[0].childs[1].childs[0] as any).component.instances
+    );
+  } catch (e) {}
 
   return root;
 };

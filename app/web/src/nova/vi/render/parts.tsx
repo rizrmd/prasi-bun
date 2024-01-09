@@ -37,7 +37,12 @@ export const viParts = (
 
   if ((meta.item as IContent).type === "text") {
     children = (
-      <HTMLChild props={{ ...{ children: meta.item.html }, ...text_props }} />
+      <HTMLChild
+        props={{
+          ...{ dangerouslySetInnerHTML: { __html: meta.item.html || "" } },
+          ...text_props,
+        }}
+      />
     );
   } else {
     children =
