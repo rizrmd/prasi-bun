@@ -3,13 +3,16 @@ import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { activity } from "../entity/activity";
 import { SyncConnection } from "../type";
+import { prepCode } from "../editor/code/prep-code";
+import { docs } from "../entity/docs";
+import { snapshot } from "../entity/snapshot";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
-  id: string
+  site_id: string
 ) {
-  if (validate(id)) {
-    const site = await db.site.findFirst({ where: { id } });
+  if (validate(site_id)) {
+    const site = await db.site.findFirst({ where: { id: site_id } });
     if (site) {
       if (this.conf) this.conf.site_id = site.id;
 
@@ -22,12 +25,14 @@ export const site_load: SAction["site"]["load"] = async function (
 
       const layout = await db.page.findFirst({
         where: {
-          id_site: id,
+          id_site: site_id,
           is_deleted: false,
           is_default_layout: true,
         },
         select: { id: true },
       });
+
+      await prepCode(site_id, "site");
 
       return {
         id: site.id,
@@ -37,6 +42,7 @@ export const site_load: SAction["site"]["load"] = async function (
         js: site.js || "",
         js_compiled: site.js_compiled || "",
         layout: { id: layout?.id || "", snapshot: null },
+        code: { snapshot: null },
       };
     }
   }

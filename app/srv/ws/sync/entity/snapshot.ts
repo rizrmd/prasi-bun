@@ -28,12 +28,27 @@ type PageSnapshot = {
   url: string;
   id_site: string;
 };
+
+type SiteSnapshot = {
+  type: "site";
+  id: string;
+  id_doc: number;
+  name: string;
+  src_bin: Uint8Array;
+  build_bin: Uint8Array;
+};
+
 type DocSnapshotMap = {
   page: PageSnapshot;
   comp: CompSnapshot;
+  site: SiteSnapshot;
   "": EmptySnapshot;
 };
-export type DocSnapshot = EmptySnapshot | CompSnapshot | PageSnapshot;
+export type DocSnapshot =
+  | EmptySnapshot
+  | CompSnapshot
+  | PageSnapshot
+  | SiteSnapshot;
 
 const emptySnapshot: DocSnapshot = {
   type: "",

@@ -1,7 +1,6 @@
 import { dir } from "dir";
-import { g } from "utils/global";
 import { dirAsync } from "fs-jetpack";
-import { docs } from "../../entity/docs";
+import { g } from "utils/global";
 export type DBCode = Exclude<Awaited<ReturnType<typeof getCode>>, null>;
 
 export const prepCode = async (site_id: string, name: string) => {
