@@ -20,6 +20,7 @@ export type MRoot = TypedMap<{
 export type DPage = TypedDoc<{
   map: TypedMap<{ id: string; root: MRoot; ts?: number }>;
 }>;
+
 export type DComp = TypedDoc<{
   map: TypedMap<{ id: string; root: MItem; ts?: number }>;
 }>;
@@ -28,6 +29,5 @@ export type DCode = TypedDoc<{
   map: TypedMap<{
     id: string;
     files: TypedMap<Record<string, Y.Text>>;
-    npm: TypedMap<Record<string, string>>;
   }>;
 }>;

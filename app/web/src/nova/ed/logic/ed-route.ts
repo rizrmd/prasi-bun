@@ -1,4 +1,5 @@
 import { compress, decompress } from "wasm-gzip";
+import { isTextEditing } from "./active/is-editing";
 import { loadCompSnapshot } from "./comp/load";
 import { PG } from "./ed-global";
 import { loadSite } from "./ed-site";
@@ -86,9 +87,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
         );
         Y.applyUpdate(doc as any, decompress(res.diff), "local");
 
-        if (
-          !document.activeElement?.attributes.getNamedItem("contenteditable")
-        ) {
+        if (!isTextEditing()) {
           await treeRebuild(p, { note: note + " page-on-update" });
         }
 

@@ -8,7 +8,6 @@ import {
 import { IItem } from "../../../web/src/utils/types/item";
 import { site_group } from "./actions/site_group";
 import { ParsedScope, parseJs } from "./editor/parser/parse-js";
-import { ISimpleMeta } from "../../../web/src/nova/vi/utils/types";
 
 /* 
    WARNING:
@@ -96,6 +95,11 @@ export const SyncActions = {
       ({}) as Record<string, { id: string; username: string }>,
   },
   code: {
+    load: async (id: string, type: "src" | "built") =>
+      ({}) as {
+        id: string;
+        snapshot: null | Uint8Array;
+      },
     edit: async (
       arg:
         | {
