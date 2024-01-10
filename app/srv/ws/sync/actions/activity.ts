@@ -3,6 +3,7 @@ import { prepCode } from "../editor/code/prep-code";
 import { startCodeWatcher, stopCodeWatcher } from "../editor/code/watcher";
 import { activity as a } from "../entity/activity";
 import { SyncConnection } from "../type";
+
 export const activity: SAction["activity"] = async function (
   this: SyncConnection,
   name,
