@@ -12,6 +12,7 @@ export const EdMain = () => {
   const meta = active.comp_id
     ? p.comp.list[active.comp_id].meta[active.item_id]
     : p.page.meta[active.item_id];
+
   return (
     <div
       className={cx(

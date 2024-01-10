@@ -111,7 +111,7 @@ export const _ = {
   },
 };
 
-function readDirectoryRecursively(
+export function readDirectoryRecursively(
   dirPath: string,
   baseDir?: string[]
 ): Record<string, string> {

@@ -1,6 +1,7 @@
 import { dir } from "dir";
 import { g } from "utils/global";
 import { dirAsync } from "fs-jetpack";
+import { docs } from "../../entity/docs";
 export type DBCode = Exclude<Awaited<ReturnType<typeof getCode>>, null>;
 
 export const prepCode = async (site_id: string, name: string) => {
@@ -61,10 +62,11 @@ export const hello_world = () => {
   });
 
   code = await getCode(site_id);
+
   return code as DBCode;
 };
 
-const getCode = async (site_id: string, name?: string) => {
+export const getCode = async (site_id: string, name?: string) => {
   return await db.code.findFirst({
     where: name
       ? { id_site: site_id, name }

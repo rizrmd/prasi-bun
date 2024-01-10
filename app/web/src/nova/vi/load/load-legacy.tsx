@@ -54,6 +54,7 @@ export const viLoadLegacy = async (vi: {
     await importModule(path);
     if (!vi.site.db.get()) {
     }
+
     if (!vi.site.api.get()) {
     }
 

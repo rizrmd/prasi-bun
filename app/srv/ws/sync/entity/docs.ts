@@ -27,5 +27,5 @@ export const docs = {
       um: Y.UndoManager;
     }
   >,
-  code: {} as Record<string, { id: string; src: DCode; built: DCode }>,
+  code: {} as Record<string, { id: string; src: DCode; build: DCode }>,
 };
