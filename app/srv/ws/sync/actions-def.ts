@@ -26,8 +26,9 @@ export const SyncActionDefinition = {
     "info": "15"
   },
   "code": {
-    "edit": "16",
-    "parse": "17"
+    "load": "16",
+    "edit": "17",
+    "parse": "18"
   }
 };
 export const SyncActionPaths = {
@@ -47,6 +48,7 @@ export const SyncActionPaths = {
   "13": "yjs.sv_remote",
   "14": "activity",
   "15": "client.info",
-  "16": "code.edit",
-  "17": "code.parse"
+  "16": "code.load",
+  "17": "code.edit",
+  "18": "code.parse"
 };

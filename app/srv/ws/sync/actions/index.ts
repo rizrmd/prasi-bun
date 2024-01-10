@@ -14,5 +14,6 @@ export * from "./yjs_diff_local";
 export * from "./yjs_sv_remote";
 export * from "./activity";
 export * from "./client_info";
+export * from "./code_load";
 export * from "./code_edit";
 export * from "./code_parse";

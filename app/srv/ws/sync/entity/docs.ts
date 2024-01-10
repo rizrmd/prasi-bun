@@ -1,6 +1,6 @@
 import { TypedDoc, TypedMap } from "yjs-types";
 import { MItem } from "../../../../web/src/utils/types/item";
-import { DComp, DPage } from "../../../../web/src/utils/types/root";
+import { DCode, DComp, DPage } from "../../../../web/src/utils/types/root";
 
 export const docs = {
   site: {} as Record<
@@ -27,4 +27,5 @@ export const docs = {
       um: Y.UndoManager;
     }
   >,
+  code: {} as Record<string, { id: string; src: DCode; built: DCode }>,
 };

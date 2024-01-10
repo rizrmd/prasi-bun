@@ -7,6 +7,7 @@ import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG } from "../ed-global";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
+import { isTextEditing } from "../active/is-editing";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -98,11 +99,7 @@ export const loadCompSnapshot = async (
                 p.comp.list[comp_id].tree = updated.tree;
               }
 
-              if (
-                document.activeElement?.attributes.getNamedItem(
-                  "contenteditable"
-                )
-              ) {
+              if (isTextEditing()) {
                 return;
               }
               treeRebuild(p, { note: "load-comp" });
