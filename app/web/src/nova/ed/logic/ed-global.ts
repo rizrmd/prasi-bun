@@ -19,8 +19,10 @@ export const EmptySite = {
   js_compiled: "",
   layout: {
     id: "--",
-    meta: {} as Record<string, IMeta>,
-    entry: [] as string[],
+    snapshot: null as null | Uint8Array,
+  },
+  code: {
+    snapshot: null as null | Uint8Array,
   },
 };
 
