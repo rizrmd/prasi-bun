@@ -1,3 +1,4 @@
+import { IRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { prepareComponentForPage } from "../editor/prep-comp-page";
 import { prepContentTree } from "../editor/prep-page";
@@ -71,7 +72,6 @@ export const page_load: SAction["page"]["load"] = async function (
 
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
-
     if (page) {
       await setActivityPage(page.id_site, page.id);
 

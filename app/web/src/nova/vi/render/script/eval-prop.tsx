@@ -30,6 +30,7 @@ export const viEvalProps = (
               _jsx: true,
               fn: (arg: { passprop: any; meta: IMeta }) => {
                 const id = prop.content?.id;
+                console.log(prop);
                 if (id) {
                   const m = vi.meta[id];
                   if (

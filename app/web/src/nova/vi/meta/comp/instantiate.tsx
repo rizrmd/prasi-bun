@@ -19,13 +19,13 @@ export const instantiate = (arg: {
   if (newitem.component) {
     if (newitem.component.props && item.component) {
       for (const k of Object.keys(newitem.component.props)) {
-        if (item.component.props[k]) {
-          newitem.component.props[k].value = item.component.props[k].value;
-          newitem.component.props[k].valueBuilt =
-            item.component.props[k].valueBuilt;
-
-          newitem.component.props[k].jsxCalledBy =
-            item.component.props[k].jsxCalledBy;
+        const cprop = item.component.props[k];
+        const nprop = newitem.component.props[k];
+        if (cprop) {
+          nprop.value = cprop.value;
+          nprop.valueBuilt = cprop.valueBuilt;
+          nprop.jsxCalledBy = cprop.jsxCalledBy;
+          nprop.content = cprop.content;
         }
       }
     }
