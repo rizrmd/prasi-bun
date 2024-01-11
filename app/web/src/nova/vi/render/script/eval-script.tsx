@@ -69,7 +69,7 @@ export const viEvalScript = (
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
-${meta.item.adv?.jsBuilt || ""}
+${replaceWithObject(meta.item.adv?.jsBuilt || "", replacement) || ""}
   `
   );
   fn(...Object.values(arg));
@@ -89,4 +89,14 @@ const JsxProp: FC<{
     local.result = fn({ passprop, meta });
   }
   return local.result;
+};
+
+const replacement = {
+  "stroke-width": "strokeWidth",
+};
+
+const replaceWithObject = (tpl: string, data: any) => {
+  return tpl.replace(/\$\(([^\)]+)?\)/g, function ($1, $2) {
+    return data[$2];
+  });
 };

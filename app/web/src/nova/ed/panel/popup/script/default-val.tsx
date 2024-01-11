@@ -32,6 +32,7 @@ export const edMonacoDefaultVal = (p: PG, adv: FNAdv, mitem: MItem) => {
       const mprop = mprops.get(p.ui.popup.script.prop_name);
       if (mprop) {
         const kind = p.ui.popup.script.prop_kind;
+
         if (kind === "value") {
           val = mprop.get("value");
         } else if (kind === "gen") {

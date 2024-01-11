@@ -51,6 +51,11 @@ export const viParts = (
 
   props.children = children;
 
+  if (meta.item.adv?.js && !meta.item.adv.js.includes("children")) {
+    delete props.children;
+    delete props.dangerouslySetInnerHTML;
+  }
+
   return {
     props,
     text_props,

@@ -23,7 +23,7 @@ export const instantiate = (arg: {
           newitem.component.props[k].value = item.component.props[k].value;
           newitem.component.props[k].valueBuilt =
             item.component.props[k].valueBuilt;
-            
+
           newitem.component.props[k].jsxCalledBy =
             item.component.props[k].jsxCalledBy;
         }
