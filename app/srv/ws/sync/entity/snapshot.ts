@@ -32,10 +32,9 @@ type PageSnapshot = {
 type SiteSnapshot = {
   type: "site";
   id: string;
-  id_doc: number;
   name: string;
-  src_bin: Uint8Array;
-  build_bin: Uint8Array;
+  src: { bin: Uint8Array; id_doc: number };
+  build: { bin: Uint8Array; id_doc: number };
 };
 
 type DocSnapshotMap = {
@@ -45,10 +44,10 @@ type DocSnapshotMap = {
   "": EmptySnapshot;
 };
 export type DocSnapshot =
-  | EmptySnapshot
-  | CompSnapshot
   | PageSnapshot
-  | SiteSnapshot;
+  | SiteSnapshot
+  | CompSnapshot
+  | EmptySnapshot;
 
 const emptySnapshot: DocSnapshot = {
   type: "",
@@ -69,12 +68,14 @@ export const snapshot = {
     });
     return this._db;
   },
+
   get db() {
     if (!this._db) {
       this._db = this.init();
     }
     return this._db;
   },
+
   async getOrCreate(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
     let res = this.db.get(id);
@@ -84,19 +85,22 @@ export const snapshot = {
     }
     return res as DocSnapshot;
   },
+
   get<K extends DocSnapshot["type"]>(type: K, id: string) {
     return this.db.get(`${type}-${id}`) as DocSnapshotMap[K] | null;
   },
+
   async update(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
     await this.db.put(id, data);
     return true;
   },
-  async set<T extends keyof DocSnapshot>(
-    type: keyof DocSnapshotMap,
+
+  async set<K extends keyof DocSnapshotMap, T extends keyof DocSnapshotMap[K]>(
+    type: K,
     id: string,
     key: T,
-    value: DocSnapshot[T]
+    value: DocSnapshotMap[K][T]
   ) {
     const item = this.get(type, id);
     if (item) {

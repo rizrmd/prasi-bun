@@ -95,7 +95,7 @@ export const SyncActions = {
       ({}) as Record<string, { id: string; username: string }>,
   },
   code: {
-    load: async (id: string, type: "src" | "built") =>
+    load: async (id: string, type: "src" | "build") =>
       ({}) as {
         id: string;
         snapshot: null | Uint8Array;
