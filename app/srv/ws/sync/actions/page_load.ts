@@ -69,7 +69,11 @@ export const page_load: SAction["page"]["load"] = async function (
   };
 
   user.active.delAll({ client_id: this.client_id });
-
+  const page = await db.page.findFirst({ where: { id } });
+  if (page) {
+    await prepContentTree(page.id, page.content_tree, this);
+  }
+  
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
     if (page) {

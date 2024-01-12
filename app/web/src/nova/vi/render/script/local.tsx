@@ -28,6 +28,7 @@ export const createViLocal = (
 
     useEffect(() => {
       let id = meta.item.id;
+
       if (meta.parent?.instance_id) {
         const parent_meta = metas[meta.parent?.instance_id];
         if (parent_meta && parent_meta.instances) {

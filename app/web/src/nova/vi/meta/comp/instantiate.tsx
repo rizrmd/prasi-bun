@@ -29,9 +29,7 @@ export const instantiate = (arg: {
         }
       }
     }
-    if (!newitem.component.instances) {
-      newitem.component.instances = {};
-    }
+    newitem.component.instances = item.component?.instances;
   }
 
   for (const key of Object.keys(item)) {
