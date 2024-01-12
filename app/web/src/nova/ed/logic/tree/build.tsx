@@ -13,6 +13,7 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     }
   }
 
+  active.should_render_main = true;
   const is_layout =
     p.site.layout &&
     p.site.layout.id === p.page.cur.id &&

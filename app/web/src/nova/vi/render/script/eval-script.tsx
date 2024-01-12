@@ -64,10 +64,13 @@ export const viEvalScript = (
     }
   }
 
+  const js = meta.item.adv?.jsBuilt || "";
+  const src = replaceWithObject(js, replacement) || "";
+
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
-${replaceWithObject(meta.item.adv?.jsBuilt || "", replacement) || ""}
+${src}
   `
   );
   fn(...Object.values(arg));
@@ -89,12 +92,16 @@ const JsxProp: FC<{
   return local.result;
 };
 
-const replacement = {
+export const replacement = {
   "stroke-width": "strokeWidth",
+  "fill-rule": "fillRule",
+  "clip-rule": "clipRule",
 };
 
-const replaceWithObject = (tpl: string, data: any) => {
-  return tpl.replace(/\$\(([^\)]+)?\)/g, function ($1, $2) {
-    return data[$2];
-  });
+export const replaceWithObject = (tpl: string, data: any) => {
+  let res = tpl;
+  for (const [k, v] of Object.entries(data)) {
+    res = res.replaceAll(k, v as string);
+  }
+  return res;
 };

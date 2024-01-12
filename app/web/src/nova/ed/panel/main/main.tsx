@@ -6,12 +6,45 @@ import { mainPerItemVisit } from "./main-per-item";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({});
-  active.hover.renderMain = local.render;
+  const local = useLocal({
+    cache: null as any,
+    first_load: false,
+  });
 
   const meta = active.comp_id
     ? p.comp.list[active.comp_id].meta[active.item_id]
     : p.page.meta[active.item_id];
+
+  if (active.should_render_main) {
+    local.cache = (
+      <Vi
+        meta={p.page.meta}
+        api_url={p.site.config.api_url}
+        site_id={p.site.id}
+        page_id={p.page.cur.id}
+        entry={p.page.entry}
+        api={p.script.api}
+        db={p.script.db}
+        script={{ init_local_effect: p.script.init_local_effect }}
+        visit={(meta, parts) => {
+          return mainPerItemVisit(p, meta, parts);
+        }}
+        onStatusChanged={(status) => {
+          if (status !== "ready") {
+            active.should_render_main = true;
+            local.render();
+          } else {
+            if (!local.first_load) {
+              local.first_load = true;
+              active.should_render_main = true;
+              local.render();
+            }
+          }
+        }}
+      />
+    );
+    active.should_render_main = false;
+  }
 
   return (
     <div
@@ -22,21 +55,7 @@ export const EdMain = () => {
         `
       )}
     >
-      <div className={mainStyle(p, meta)}>
-        <Vi
-          meta={p.page.meta}
-          api_url={p.site.config.api_url}
-          site_id={p.site.id}
-          page_id={p.page.cur.id}
-          entry={p.page.entry}
-          api={p.script.api}
-          db={p.script.db}
-          script={{ init_local_effect: p.script.init_local_effect }}
-          visit={(meta, parts) => {
-            return mainPerItemVisit(p, meta, parts);
-          }}
-        />
-      </div>
+      <div className={mainStyle(p, meta)}>{local.cache}</div>
     </div>
   );
 };

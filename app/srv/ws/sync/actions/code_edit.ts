@@ -45,8 +45,6 @@ export const code_edit: SAction["code"]["edit"] = async function (
             jsx: "transform",
             format: "cjs",
             loader: "tsx",
-            minify: true,
-            sourcemap: "inline",
           });
           doc?.transact(() => {
             const mode = arg.mode;

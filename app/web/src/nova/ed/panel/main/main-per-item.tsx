@@ -134,14 +134,12 @@ export const mainPerItemVisit = (
   parts.props.onPointerEnter = (e) => {
     e.stopPropagation();
     active.hover.id = meta.item.id;
-    active.hover.renderMain();
-    active.hover.renderTree();
+    p.render();
   };
   parts.props.onPointerLeave = (e) => {
     e.stopPropagation();
     active.hover.id = "";
-    active.hover.renderMain();
-    active.hover.renderTree();
+    p.render();
   };
   parts.props.onPointerDown = (e) => {
     e.stopPropagation();

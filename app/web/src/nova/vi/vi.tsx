@@ -19,6 +19,7 @@ export const Vi: FC<{
   script?: { init_local_effect: Record<string, boolean> };
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
+  onStatusChanged?: (status: VG["status"]) => void;
 }> = ({
   meta,
   entry,
@@ -29,8 +30,10 @@ export const Vi: FC<{
   visit,
   script,
   render_stat: rs,
+  onStatusChanged,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
+  vi.on_status_changes = onStatusChanged;
 
   if (rs === "disabled") {
     render_stat.enabled = false;

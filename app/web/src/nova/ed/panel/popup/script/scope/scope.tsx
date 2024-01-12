@@ -221,7 +221,7 @@ const map_childs = (
               prop.content &&
               prop.jsxCalledBy
             ) {
-              const mjsx = p.comp.list[comp_id].meta[prop.jsxCalledBy];
+              const mjsx = p.comp.list[comp_id].meta[prop.jsxCalledBy[0]];
               const { import_map, parent_id } = extract_import_map(
                 meta.item.component.id,
                 jprop.paths,

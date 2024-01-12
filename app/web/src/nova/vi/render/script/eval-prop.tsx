@@ -2,6 +2,7 @@ import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
+import { replaceWithObject, replacement } from "./eval-script";
 
 export const viEvalProps = (
   vi: { meta: VG["meta"] },
@@ -34,18 +35,32 @@ export const viEvalProps = (
                   const m = vi.meta[id];
                   if (
                     m.mitem &&
-                    prop.jsxCalledBy !==
-                      (arg.meta.item.originalId || arg.meta.item.id)
+                    prop.jsxCalledBy?.includes(
+                      arg.meta.item.originalId || arg.meta.item.id
+                    )
                   ) {
                     const mprop = meta.mitem
                       ?.get("component")
                       ?.get("props")
                       ?.get(name);
                     if (mprop) {
-                      mprop.set(
-                        "jsxCalledBy",
-                        arg.meta.item.originalId || arg.meta.item.id
-                      );
+                      let mjby = mprop.get("jsxCalledBy");
+                      if (!mjby || typeof mjby !== "object") {
+                        mprop.set("jsxCalledBy", [
+                          arg.meta.item.originalId || arg.meta.item.id,
+                        ]);
+                      } else {
+                        if (
+                          !mjby.includes(
+                            arg.meta.item.originalId || arg.meta.item.id
+                          )
+                        ) {
+                          mjby.push(
+                            arg.meta.item.originalId || arg.meta.item.id
+                          );
+                          mprop.set("jsxCalledBy", mjby);
+                        }
+                      }
                     }
                   }
                   return <ViRender meta={m} passprop={arg.passprop} />;
@@ -62,14 +77,16 @@ export const viEvalProps = (
             continue;
           }
 
+          const js = prop.valueBuilt || "";
+          const src = replaceWithObject(js, replacement) || "";
           const fn = new Function(
             ...Object.keys(arg),
             `// [${meta.item.name}] ${name}: ${meta.item.id} 
-  return ${prop.valueBuilt || ""}
+  return ${src}
     `
           );
 
-          meta.item.script.props[name] = { value: prop.valueBuilt };
+          meta.item.script.props[name] = { value: src };
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
@@ -96,14 +113,13 @@ export const updatePropScope = (meta: IMeta, scope: any) => {
   if (meta.item.script?.props) {
     for (const [name, prop] of Object.entries(meta.item.script.props)) {
       if (prop.fn) {
-        const all_scope = scope;
         const fn = new Function(
-          ...Object.keys(all_scope),
+          ...Object.keys(scope),
           `// [${meta.item.name}] ${name}: ${meta.item.id} 
   return ${prop.value || ""}
     `
         );
-        prop.fn = fn(...Object.values(all_scope));
+        prop.fn = fn(...Object.values(scope));
       }
     }
   }
