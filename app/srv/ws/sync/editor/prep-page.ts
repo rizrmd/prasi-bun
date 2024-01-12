@@ -25,7 +25,6 @@ export const prepContentTree = async (
   }
 
   const meta = {};
-  let proot: any = root;
   genMeta(
     {
       comps,
@@ -69,6 +68,10 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
           }
 
           result.add(id);
+          mcomps[id] = docs.comp[id].doc
+            .getMap("map")
+            .get("root")
+            ?.toJSON() as IItem;
         }
       }
     );

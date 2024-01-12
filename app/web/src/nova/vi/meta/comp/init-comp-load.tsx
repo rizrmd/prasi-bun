@@ -24,7 +24,7 @@ export const initLoadComp = async (
           }
         },
       },
-      set_meta: false,
+      set_meta: false,  
       note: "init-load-comp",
     },
     { item, ignore_first_component: true }
@@ -40,6 +40,11 @@ export const initLoadComp = async (
       if (loaded) loaded.add(id);
     });
 
-    await initLoadComp(p, item, load, loaded);
+    for (const id of [...loaded]) {
+      const comp = p.comps[id];
+      if (comp) {
+        await initLoadComp(p, comp, load, loaded);
+      }
+    }
   }
 };

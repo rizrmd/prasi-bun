@@ -18,6 +18,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
 
     if (item_comp) {
       let instances: undefined | typeof item.component.instances = undefined;
+
       if (p.mode === "page") {
         if (!item.component.instances) {
           item.component.instances = {};
@@ -33,7 +34,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         if (!instances[item.id]) {
           instances[item.id] = {};
           instance = instances[item.id];
-        }
+        } 
 
         instantiate({
           item,
@@ -41,7 +42,6 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           ids: instance,
         });
       }
-
       const meta: IMeta = {
         item: simplifyItemChild(item),
         parent: {
@@ -73,7 +73,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
               prop.content.name = name;
 
               genMeta(
-                { ...p },
+                { ...p, mode: "comp" },
                 {
                   item: prop.content,
                   root: arg.root || prop.content,

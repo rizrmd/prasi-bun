@@ -1,4 +1,5 @@
-import { FC, ReactNode, Suspense, lazy, useEffect } from "react";
+import { FC, ReactNode, Suspense, useEffect } from "react";
+import { useLocal } from "web-utils";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
 import { VG } from "../global";
@@ -7,9 +8,6 @@ import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import hash_sum from "hash-sum";
-import { flatten } from "safe-flat";
-import { useLocal } from "web-utils";
 
 export const viEvalScript = (
   vi: {
