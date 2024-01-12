@@ -139,8 +139,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
       }}
       onMouseEnter={() => {
         active.hover.id = item.id;
-        active.hover.renderMain();
-        active.hover.renderTree();
+        p.render();
       }}
     >
       {active.hover.id === item.id && (

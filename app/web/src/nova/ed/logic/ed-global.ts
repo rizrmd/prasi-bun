@@ -20,6 +20,7 @@ export const EmptySite = {
   layout: {
     id: "--",
     snapshot: null as null | Uint8Array,
+    meta: undefined as void | Record<string, IMeta>,
   },
   code: {
     snapshot: null as null | Uint8Array,
@@ -66,7 +67,8 @@ const target = {
   instance_item_id: false as any,
 };
 export const active = {
-  hover: { id: "", renderTree: () => {}, renderMain: () => {} },
+  should_render_main: true,
+  hover: { id: "" },
   text: { id: "", content: "", timeout: null as any, el: null as any },
   get item_id() {
     if (target.active_id === false) {
