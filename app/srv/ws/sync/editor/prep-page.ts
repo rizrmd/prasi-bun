@@ -53,26 +53,51 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
     await initLoadComp(
       { comps: mcomps, meta, mode: "page" },
       child as unknown as IItem,
-      async (comp_ids) => {
-        for (const id of comp_ids) {
-          if (!docs.comp[id]) {
-            if (typeof loading[id] === "undefined") {
-              loading[id] = new Promise<void>(async (resolve) => {
-                await loadComponent(id, sync);
-                resolve();
-              });
-            }
-            await loading[id];
-          } else {
-            userSyncComponent(sync, id);
-          }
+      {
+        visit(meta, item, shared) {
+          if (item.adv?.js) {
+            const script = parseJs(item.adv.js);
 
-          result.add(id);
-          mcomps[id] = docs.comp[id].doc
-            .getMap("map")
-            .get("root")
-            ?.toJSON() as IItem;
-        }
+            if (
+              !item.script ||
+              Object.keys(script || {}) !== Object.keys(item.script || {})
+            ) {
+              shared.should_save = true;
+              item.script = script;
+            }
+          }
+        },
+        async done(shared) {
+          if (shared.should_save) {
+            await db.component.update({
+              where: { id: shared.root.component.id },
+              data: {
+                content_tree: shared.root,
+              },
+            });
+          }
+        },
+        load: async (comp_ids) => {
+          for (const id of comp_ids) {
+            if (!docs.comp[id]) {
+              if (typeof loading[id] === "undefined") {
+                loading[id] = new Promise<void>(async (resolve) => {
+                  await loadComponent(id, sync);
+                  resolve();
+                });
+              }
+              await loading[id];
+            } else {
+              userSyncComponent(sync, id);
+            }
+
+            result.add(id);
+            mcomps[id] = docs.comp[id].doc
+              .getMap("map")
+              .get("root")
+              ?.toJSON() as IItem;
+          }
+        },
       }
     );
   }

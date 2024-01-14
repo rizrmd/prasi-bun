@@ -98,53 +98,57 @@ const extract_import_map = (
   const added = new Set<string>();
   let parent_id = "";
   const import_map = {} as Record<string, string>;
-  for (const path of paths) {
-    const imports = new Set<string>();
-    if (path.map((e) => e.item.id).includes(meta.item.id)) {
-      let i = 0;
+  const cur_id = meta.item.id;
+  if (cur_id) {
+    for (const path of paths) {
+      const imports = new Set<string>();
 
-      let prev_m = null as any;
-      for (const m of path) {
-        if (m.item.id === meta.item.id) {
-          if (prev_m) parent_id = prev_m.item.id;
-        }
-        prev_m = m;
-        if (!added.has(m.item.id)) {
-          added.add(m.item.id);
+      if (path.map((e) => e.item.id).includes(cur_id)) {
+        let i = 0;
 
-          const ex = extractExport(p, m);
-          for (const [k, v] of Object.entries(ex)) {
-            let src = "";
-            if (v.type === "local") {
-              src = `\
+        let prev_m = null as any;
+        for (const m of path) {
+          if (m.item.id === cur_id) {
+            if (prev_m) parent_id = prev_m.item.id;
+          }
+          prev_m = m;
+          if (!added.has(m.item.id)) {
+            added.add(m.item.id);
+
+            const ex = extractExport(p, m);
+            for (const [k, v] of Object.entries(ex)) {
+              let src = "";
+              if (v.type === "local") {
+                src = `\
 const _local = ${v.val};
 export const ${k}: typeof _local & { render: ()=>void } = _local;
 `;
-            } else {
-              src = `export const ${k} = ${v.val}`;
-            }
-            if (src && monaco) {
-              addScope(
-                p,
-                monaco,
-                `file:///${cur}_${v.id}_${v.type}_${k}.tsx`,
-                `\
+              } else {
+                src = `export const ${k} = ${v.val}`;
+              }
+              if (src && monaco) {
+                addScope(
+                  p,
+                  monaco,
+                  `file:///${cur}_${v.id}_${v.type}_${k}.tsx`,
+                  `\
 ${[...imports].join("\n")}
 /** IMPORT MODULE **/
 ${src}`
+                );
+              }
+            }
+
+            for (const [k, v] of Object.entries(ex)) {
+              imports.add(
+                `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`
               );
             }
-          }
 
-          for (const [k, v] of Object.entries(ex)) {
-            imports.add(
-              `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`
-            );
+            import_map[m.item.id] = [...imports].join("\n");
           }
-
-          import_map[m.item.id] = [...imports].join("\n");
+          i++;
         }
-        i++;
       }
     }
   }

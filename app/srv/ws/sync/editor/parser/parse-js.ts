@@ -42,7 +42,9 @@ export const parseJs = (code?: string) => {
                   attr.value &&
                   attr.value.type === "JSXExpressionContainer" &&
                   attr.value.expression.type === "ObjectExpression" &&
-                  attr.value.expression.loc
+                  attr.value.expression.loc &&
+                  Array.isArray(attr.value.expression.properties) &&
+                  attr.value.expression.properties.length > 0
                 ) {
                   const loc = attr.value.expression.loc as any;
                   const start = attr.value.expression.properties[0].loc
@@ -115,7 +117,7 @@ export const parseJs = (code?: string) => {
       return result;
     }
   } catch (e) {
-    // console.error(code, "\n", e);
+    console.error(code, "\n", e);
   }
   return result;
 };

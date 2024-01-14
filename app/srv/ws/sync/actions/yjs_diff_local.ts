@@ -23,19 +23,19 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
     const root = doc.getMap("map").get("root") as any;
     if (root) {
       if (mode === "page") {
-        // await db.page.update({
-        //   where: { id },
-        //   data: {
-        //     content_tree: root.toJSON(),
-        //   },
-        // });
+        await db.page.update({
+          where: { id },
+          data: {
+            content_tree: root.toJSON(),
+          },
+        });
       } else if (mode === "comp") {
-        // await db.component.update({
-        //   where: { id },
-        //   data: {
-        //     content_tree: root.toJSON(),
-        //   },
-        // });
+        await db.component.update({
+          where: { id },
+          data: {
+            content_tree: root.toJSON(),
+          },
+        });
       }
     }
   }
