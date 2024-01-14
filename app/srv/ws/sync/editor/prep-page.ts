@@ -68,13 +68,13 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
           }
         },
         async done(shared) {
-          if (shared.should_save) {
-            await db.component.update({
-              where: { id: shared.root.component.id },
-              data: {
-                content_tree: shared.root,
-              },
-            });
+          if (shared.should_save && shared.root.component?.id) {
+            // await db.component.update({
+            //   where: { id: shared.root.component.id },
+            //   data: {
+            //     content_tree: shared.root,
+            //   },
+            // });
           }
         },
         load: async (comp_ids) => {
