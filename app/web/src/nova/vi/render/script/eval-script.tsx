@@ -27,7 +27,7 @@ export const viEvalScript = (
     meta.script = {
       passprop,
       result: null,
-      Local: createViLocal(vi.meta, meta, vi.script?.init_local_effect),
+      Local: createViLocal(vi, meta),
       PassProp: createViPassProp(vi, meta),
     };
   } else {
@@ -35,7 +35,6 @@ export const viEvalScript = (
   }
 
   const script = meta.script;
-
   const exports = (window as any).exports;
   const arg = {
     useEffect,
@@ -57,7 +56,7 @@ export const viEvalScript = (
 
   if (typeof passprop === "object") {
     for (const [k, v] of Object.entries(passprop)) {
-      if (typeof v === "object" && (v as any)._jsx) {
+      if (typeof v === "object" && v && (v as any)._jsx) {
         const jprop = v as unknown as {
           _jsx: true;
           fn: (arg: { passprop: any; meta: IMeta }) => ReactNode;
@@ -69,7 +68,6 @@ export const viEvalScript = (
 
   const js = meta.item.adv?.jsBuilt || "";
   const src = replaceWithObject(js, replacement) || "";
-
   const fn = new Function(
     ...Object.keys(arg),
     `// ${meta.item.name}: ${meta.item.id} 
@@ -78,7 +76,7 @@ ${src}
   );
   fn(...Object.values(arg));
 
-  updatePropScope(meta, passprop);
+  updatePropScope(vi, meta, passprop);
 };
 
 const JsxProp: FC<{

@@ -4,9 +4,14 @@ import { updatePropScope } from "./eval-prop";
 import { modifyChild } from "./passprop";
 
 export const createViLocal = (
-  metas: Record<string, IMeta>,
-  meta: IMeta,
-  init_local_effect: any
+  vi: {
+    site: { db: any; api: any };
+    meta: Record<string, IMeta>;
+    script?: {
+      init_local_effect: any;
+    };
+  },
+  meta: IMeta
 ) => {
   return <T extends Record<string, any>>(arg: {
     children: ReactNode;
@@ -16,11 +21,13 @@ export const createViLocal = (
     effect?: (local: T) => void | Promise<void>;
   }) => {
     const { children } = arg;
+    const init_local_effect = vi.script?.init_local_effect;
+    const metas = vi.meta;
     const ref = useRef<any>(arg.value);
     const local = ref.current;
     local.render = meta.render;
 
-    updatePropScope(meta, meta.script?.passprop);
+    updatePropScope(vi, meta, meta.script?.passprop);
 
     if (arg.hook) {
       arg.hook(local);

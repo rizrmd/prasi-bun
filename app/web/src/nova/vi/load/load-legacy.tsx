@@ -1,4 +1,6 @@
+import { apiProxy } from "../../../base/load/api/api-proxy";
 import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
+import { dbProxy } from "../../../base/load/db/db-proxy";
 import importModule from "../../../render/editor/tools/dynamic-import";
 import { viScriptArg } from "../render/script/arg";
 
@@ -53,9 +55,11 @@ export const viLoadLegacy = async (vi: {
     const path = `/npm/site/${vi.site.id}/site.js`;
     await importModule(path);
     if (!vi.site.db.get()) {
+      vi.site.db.set(dbProxy(api_url));
     }
 
     if (!vi.site.api.get()) {
+      vi.site.api.set(apiProxy(api_url));
     }
 
     const w = window as any;
@@ -73,7 +77,7 @@ export const viLoadLegacy = async (vi: {
         return res;
       };
       const scope = {
-        ...viScriptArg(),
+        ...viScriptArg({ site: vi.site }),
         types: {},
         exports: w.exports,
         load: importModule,

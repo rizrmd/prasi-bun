@@ -111,17 +111,22 @@ export const viEvalProps = (
   }
 };
 
-export const updatePropScope = (meta: IMeta, scope: any) => {
+export const updatePropScope = (
+  vi: { site: { db: any; api: any } },
+  meta: IMeta,
+  scope: any
+) => {
   if (meta.item.script?.props) {
+    const scopes = { ...scope, api: vi.site.api, db: vi.site.db };
     for (const [name, prop] of Object.entries(meta.item.script.props)) {
       if (prop.fn) {
         const fn = new Function(
-          ...Object.keys(scope),
+          ...Object.keys(scopes),
           `// [${meta.item.name}] ${name}: ${meta.item.id} 
   return ${prop.value || ""}
     `
         );
-        prop.fn = fn(...Object.values(scope));
+        prop.fn = fn(...Object.values(scopes));
       }
     }
   }
