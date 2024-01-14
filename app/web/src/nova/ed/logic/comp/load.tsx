@@ -135,16 +135,18 @@ export const updateComponentMeta = async (
       mode: "comp",
     },
     item,
-    async (comp_ids: string[]) => {
-      const ids = comp_ids.filter((id) => !p.comp.loaded[id]);
-      const comps = await p.sync.comp.load(ids, true);
-      let result = Object.entries(comps);
+    {
+      load: async (comp_ids: string[]) => {
+        const ids = comp_ids.filter((id) => !p.comp.loaded[id]);
+        const comps = await p.sync.comp.load(ids, true);
+        let result = Object.entries(comps);
 
-      for (const [id_comp, comp] of result) {
-        if (comp && comp.snapshot) {
-          await loadCompSnapshot(p, id_comp, comp.snapshot);
+        for (const [id_comp, comp] of result) {
+          if (comp && comp.snapshot) {
+            await loadCompSnapshot(p, id_comp, comp.snapshot);
+          }
         }
-      }
+      },
     }
   );
 

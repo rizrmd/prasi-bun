@@ -1,14 +1,21 @@
+import { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
+import { IContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
-import { GenMetaP } from "../../utils/types";
+import { GenMetaP, IMeta } from "../../utils/types";
 import { genMeta } from "../meta";
 
 export const initLoadComp = async (
   p: GenMetaP,
   item: IItem,
-  load: (comp_ids: string[]) => Promise<void>,
+  opt: {
+    load: (comp_ids: string[]) => Promise<void>;
+    visit?: ((meta: IMeta, item: IItem, shared: any) => void) | undefined;
+    done?: (shared: any) => void;
+  },
   _loaded?: Set<string>
 ) => {
   const comp_ids = new Set<string>();
+  const shared = { root: item } as any;
   genMeta(
     {
       ...p,
@@ -23,14 +30,19 @@ export const initLoadComp = async (
             }
           }
         },
+        visit(meta, item) {
+          if (opt.visit) opt.visit(meta, item, shared);
+        },
       },
-      set_meta: false,  
+      set_meta: false,
       note: "init-load-comp",
     },
     { item, ignore_first_component: true }
   );
+
+  if (opt.done) opt.done(shared);
   if (comp_ids.size > 0) {
-    await load([...comp_ids]);
+    await opt.load([...comp_ids]);
 
     let loaded = _loaded;
     if (!loaded) {
@@ -43,7 +55,7 @@ export const initLoadComp = async (
     for (const id of [...loaded]) {
       const comp = p.comps[id];
       if (comp) {
-        await initLoadComp(p, comp, load, loaded);
+        await initLoadComp(p, comp, opt, loaded);
       }
     }
   }
