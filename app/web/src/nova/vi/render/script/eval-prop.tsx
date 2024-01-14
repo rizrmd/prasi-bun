@@ -5,7 +5,7 @@ import { viScriptArg } from "./arg";
 import { replaceWithObject, replacement } from "./eval-script";
 
 export const viEvalProps = (
-  vi: { meta: VG["meta"] },
+  vi: { meta: VG["meta"]; site: { db: any; api: any } },
   meta: IMeta,
   passprop: any
 ) => {
@@ -17,7 +17,9 @@ export const viEvalProps = (
     const exports = (window as any).exports;
     const arg = {
       ...exports,
-      ...viScriptArg(),
+      db: vi.site.db,
+      api: vi.site.api,
+      ...viScriptArg(vi),
       ...passprop,
     };
 

@@ -11,6 +11,7 @@ import { createViPassProp } from "./passprop";
 
 export const viEvalScript = (
   vi: {
+    site: { db: any; api: any };
     meta: VG["meta"];
     visit?: VG["visit"];
     script?: { init_local_effect: any };
@@ -41,13 +42,15 @@ export const viEvalScript = (
     children: parts.props.children,
     props: parts.props,
     Local: script.Local,
+    db: vi.site.db,
+    api: vi.site.api,
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
     render: (jsx: ReactNode) => {
       script.result = <Suspense>{jsx}</Suspense>;
     },
-    ...viScriptArg(),
+    ...viScriptArg(vi),
     ...exports,
     ...passprop,
   };
