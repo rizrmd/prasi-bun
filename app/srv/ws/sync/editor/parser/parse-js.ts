@@ -117,7 +117,7 @@ export const parseJs = (code?: string) => {
       return result;
     }
   } catch (e) {
-    console.error(code, "\n", e);
+    // console.error(code, "\n", e);
   }
   return result;
 };
