@@ -3,7 +3,7 @@ import babel from "recast/parsers/babel-ts";
 
 export type ParsedScope = Exclude<ReturnType<typeof parseJs>, undefined>;
 
-export const parseJs = (code?: string) => {
+export const parseJs = (code?: string, show_error?: boolean) => {
   if (!code) return undefined;
   const local = { name: "", value: "", start: 0, end: 0 };
   const passprop: Record<

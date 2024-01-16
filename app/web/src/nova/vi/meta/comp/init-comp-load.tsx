@@ -1,5 +1,3 @@
-import { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
-import { IContent } from "../../../../utils/types/general";
 import { IItem } from "../../../../utils/types/item";
 import { GenMetaP, IMeta } from "../../utils/types";
 import { genMeta } from "../meta";

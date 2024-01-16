@@ -4,6 +4,7 @@ import { GenMetaP } from "../../../../web/src/nova/vi/utils/types";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { IRoot } from "../../../../web/src/utils/types/root";
 import { docs } from "../entity/docs";
+import { snapshot } from "../entity/snapshot";
 import { SyncConnection } from "../type";
 import { loadComponent, userSyncComponent } from "./load-component";
 import { parseJs } from "./parser/parse-js";
@@ -49,6 +50,7 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
   const mcomps: GenMetaP["comps"] = {};
   const result = new Set<string>();
   const loading = {} as Record<string, Promise<void>>;
+  const should_save = {} as Record<string, IItem>;
   for (const child of ctree.childs) {
     await initLoadComp(
       { comps: mcomps, meta, mode: "page" },
@@ -56,11 +58,12 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
       {
         visit(meta, item, shared) {
           if (item.adv?.js) {
-            const script = parseJs(item.adv.js);
-
+            let script = undefined;
+            script = parseJs(item.adv.js);
             if (
               !item.script ||
-              Object.keys(script || {}) !== Object.keys(item.script || {})
+              Object.keys(script || {}).length !==
+                Object.keys(item.script || {}).length
             ) {
               shared.should_save = true;
               item.script = script;
@@ -69,12 +72,7 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
         },
         async done(shared) {
           if (shared.should_save && shared.root.component?.id) {
-            // await db.component.update({
-            //   where: { id: shared.root.component.id },
-            //   data: {
-            //     content_tree: shared.root,
-            //   },
-            // });
+            should_save[shared.root.component.id] = shared.root;
           }
         },
         load: async (comp_ids) => {
@@ -100,6 +98,21 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
         },
       }
     );
+  }
+
+  if (Object.keys(should_save).length > 0) {
+    for (const [comp_id, v] of Object.entries(should_save)) {
+      await db.component.update({
+        where: { id: comp_id },
+        data: {
+          content_tree: v,
+          name: v.name,
+        },
+      });
+      await snapshot.del("comp", comp_id);
+      delete docs.comp[comp_id];
+      await loadComponent(comp_id, sync);
+    }
   }
   return [...result];
 };
