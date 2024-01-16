@@ -47,7 +47,7 @@ if (!(await existsAsync(public_br))) {
           { quality: 11 }
         );
         if (br) {
-          console.log(`Compressing ${file}`);
+          console.log(`Compressing [public] ${file}`);
           await writeAsync(
             dir.path(`app/web/public-br/${file}`),
             Buffer.from(br)
@@ -74,7 +74,7 @@ if (files) {
             { quality: 11 }
           );
           if (br) {
-            console.log(`Compressing ${file}`);
+            console.log(`Compressing [static] ${file}`);
             await writeAsync(
               dir.path(`app/static-br/${file}`),
               Buffer.from(br)
@@ -87,13 +87,15 @@ if (files) {
   const pub = await listAsync(dir.path("app/web/public-br"));
   if (pub) {
     await Promise.all(
-      pub.map((file) =>
-        copyAsync(
+      pub.map(async (file) => {
+        if (await existsAsync(`app/static-br/${file}`)) {
+          await removeAsync(`app/static-br/${file}`);
+        }
+        await copyAsync(
           dir.path(`app/web/public-br/${file}`),
-          dir.path(`app/static-br/${file}`),
-          { overwrite: true }
-        )
-      )
+          dir.path(`app/static-br/${file}`)
+        );
+      })
     );
   }
 }
