@@ -58,6 +58,7 @@ const gen_content = (
   monaco: Monaco
 ) => {
   const added = new Set<string>();
+
   for (const path of paths) {
     let idx = 0;
     let last_import = cur !== "page" ? import_map[path[0].item.id] : "";
@@ -140,6 +141,13 @@ ${src}`
             }
 
             for (const [k, v] of Object.entries(ex)) {
+              if (
+                m.item.id === cur_id &&
+                ["local", "passprop"].includes(v.type)
+              ) {
+                continue;
+              }
+
               imports.add(
                 `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`
               );
