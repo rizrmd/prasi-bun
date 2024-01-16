@@ -13,18 +13,18 @@ export const addScope = (
   });
 
   if (model) {
-    model.setValue(source);
+    if (model.getValue() !== source) {
+      model.setValue(source);
+    }
   } else {
     const uri = monaco.Uri.parse(filename);
     const model = monaco.editor.createModel(source, "typescript", uri);
 
     const arg = extractLoc(uri.path.split("_"), p);
     model.onDidChangeContent((e) => {
-      if (arg.id !== active.item_id) {
-        const text = model.getValue();
-        console.log(arg);
-        console.warn(text);
-      }
+      // if (arg.id !== active.item_id && arg.type === "src") {
+      //   console.log("changed", arg.id, e.changes);
+      // }
     });
   }
 };

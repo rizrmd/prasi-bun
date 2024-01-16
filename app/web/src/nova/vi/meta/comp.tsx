@@ -34,7 +34,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
         if (!instances[item.id]) {
           instances[item.id] = {};
           instance = instances[item.id];
-        } 
+        }
 
         instantiate({
           item,
@@ -49,6 +49,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           comp_id: arg.parent?.comp?.component?.id,
           instance_id: arg.parent?.instance_id,
         },
+        instances,
       };
 
       if (p.on?.visit) {

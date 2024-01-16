@@ -34,6 +34,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     paths,
     meta,
     p,
+    false,
     monaco
   );
 
@@ -94,17 +95,28 @@ const extract_import_map = (
   paths: IMeta[][],
   meta: IMeta,
   p: PG,
+  include_cur?: boolean,
   monaco?: Monaco
 ) => {
   const added = new Set<string>();
   let parent_id = "";
   const import_map = {} as Record<string, string>;
-  const cur_id = meta.item.id;
+  let cur_id = meta.item.id;
+
   if (cur_id) {
     for (const path of paths) {
-      const imports = new Set<string>();
+      const import_exists = {} as Record<
+        string,
+        { type: "prop" | "local" | "passprop"; str: string }
+      >;
 
-      if (path.map((e) => e.item.id).includes(cur_id)) {
+      if (
+        path
+          .map((e) => {
+            return e.item.id;
+          })
+          .includes(cur_id)
+      ) {
         let i = 0;
 
         let prev_m = null as any;
@@ -113,7 +125,7 @@ const extract_import_map = (
             if (prev_m) parent_id = prev_m.item.id;
           }
           prev_m = m;
-          if (!added.has(m.item.id)) {
+          if (include_cur || (!include_cur && !added.has(m.item.id))) {
             added.add(m.item.id);
 
             const ex = extractExport(p, m);
@@ -127,13 +139,14 @@ export const ${k}: typeof _local & { render: ()=>void } = _local;
               } else {
                 src = `export const ${k} = ${v.val}`;
               }
+
               if (src && monaco) {
                 addScope(
                   p,
                   monaco,
                   `file:///${cur}_${v.id}_${v.type}_${k}.tsx`,
                   `\
-${[...imports].join("\n")}
+${[...Object.values(import_exists).map((e) => e.str)].join("\n")}
 /** IMPORT MODULE **/
 ${src}`
                 );
@@ -142,18 +155,22 @@ ${src}`
 
             for (const [k, v] of Object.entries(ex)) {
               if (
+                !include_cur &&
                 m.item.id === cur_id &&
                 ["local", "passprop"].includes(v.type)
               ) {
                 continue;
               }
 
-              imports.add(
-                `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`
-              );
+              import_exists[k] = {
+                type: v.type,
+                str: `import { ${k} } from './${cur}_${v.id}_${v.type}_${k}';`,
+              };
             }
 
-            import_map[m.item.id] = [...imports].join("\n");
+            import_map[m.item.id] = [
+              ...Object.values(import_exists).map((e) => e.str),
+            ].join("\n");
           }
           i++;
         }
@@ -185,100 +202,105 @@ const map_childs = (
     const meta = metas[m.id];
     if (meta) {
       paths.push([...(curpath || []), meta]);
-      if (
-        meta.item.type === "item" &&
-        meta.item.component?.id &&
-        !skip_comp_id.includes(meta.item.component?.id)
-      ) {
-        const comp_id = meta.item.component.id;
-        let jprop = comp_map[comp_id];
-        if (!jprop) {
-          const comp_metas = p.comp.list[comp_id].meta;
-          comp_map[meta.item.component.id] = {
-            paths: [],
-            exports: {},
-          };
-          const id = p.comp.list[comp_id].doc
-            .getMap("map")
-            .get("root")
-            ?.get("id");
+      // if (
+      //   meta.item.type === "item" &&
+      //   meta.item.component?.id &&
+      //   !skip_comp_id.includes(meta.item.component?.id)
+      // ) {
+      //   const comp_id = meta.item.component.id;
+      //   let jprop = comp_map[comp_id];
+      //   // if (!jprop) {
+      //   //   const comp_metas = p.comp.list[comp_id].meta;
+      //   //   comp_map[meta.item.component.id] = {
+      //   //     paths: [],
+      //   //     exports: {},
+      //   //   };
+      //   //   const id = p.comp.list[comp_id].doc
+      //   //     .getMap("map")
+      //   //     .get("root")
+      //   //     ?.get("id");
 
-          if (id) {
-            map_childs(
-              monaco,
-              p,
-              comp_metas,
-              [comp_metas[id].item],
-              comp_map[meta.item.component.id].paths,
-              [...skip_comp_id, comp_id]
-            );
+      //   //   if (id) {
+      //   //     map_childs(
+      //   //       monaco,
+      //   //       p,
+      //   //       comp_metas,
+      //   //       [comp_metas[id].item],
+      //   //       comp_map[meta.item.component.id].paths,
+      //   //       [...skip_comp_id, comp_id]
+      //   //     );
 
-            jprop = comp_map[meta.item.component.id];
-            for (const path of jprop.paths) {
-              for (const m of path) {
-                if (!jprop.exports[m.item.id]) {
-                  jprop.exports[m.item.id] = extractExport(p, m);
-                }
-              }
-            }
-          }
-        }
+      //   //     jprop = comp_map[meta.item.component.id];
+      //   //     for (const path of jprop.paths) {
+      //   //       for (const m of path) {
+      //   //         if (!jprop.exports[m.item.id]) {
+      //   //           jprop.exports[m.item.id] = extractExport(p, m);
+      //   //         }
+      //   //       }
+      //   //     }
+      //   //   }
+      //   // }
 
-        if (jprop) {
-          for (const [name, prop] of Object.entries(
-            meta.item.component.props
-          )) {
-            if (
-              prop.meta?.type === "content-element" &&
-              prop.content &&
-              prop.jsxCalledBy
-            ) {
-              const mjsx = p.comp.list[comp_id].meta[prop.jsxCalledBy[0]];
-              const { import_map, parent_id } = extract_import_map(
-                meta.item.component.id,
-                jprop.paths,
-                mjsx,
-                p,
-                monaco
-              );
+      //   if (jprop) {
+      //     for (const [name, prop] of Object.entries(
+      //       meta.item.component.props
+      //     )) {
+      //       if (
+      //         prop.meta?.type === "content-element" &&
+      //         prop.content &&
+      //         prop.jsxCalledBy
+      //       ) {
+      //         const m = metas[prop.jsxCalledBy[0]];
+      //         if (m && m.instances) {
+      //           const instances = m.instances[prop.jsxCalledBy[0]];
+      //           if (instances) {
+      //             const instance_id = instances[prop.jsxCalledBy[1]];
+      //             if (instance_id) {
+      //               const mjsx = metas[instance_id];
 
-              gen_content(
-                meta.item.component.id,
-                p,
-                jprop.paths,
-                import_map,
-                monaco
-              );
+      //               const { import_map, parent_id } = extract_import_map(
+      //                 "page",
+      //                 jprop.paths,
+      //                 mjsx,
+      //                 p,
+      //                 true,
+      //                 monaco
+      //               );
 
-              jsxprop_import_map[prop.content.id] = import_map[parent_id];
-              const prop_meta = metas[prop.content.id];
-              map_childs(
-                monaco,
-                p,
-                metas,
-                prop.content.childs,
-                paths,
-                [...skip_comp_id, comp_id],
-                jsxprop_import_map,
-                [...(curpath || []), prop_meta]
-              );
-            }
-          }
-        }
-      } else {
-        if (Array.isArray(meta.item.childs)) {
-          map_childs(
-            monaco,
-            p,
-            metas,
-            meta.item.childs,
-            paths,
-            [...skip_comp_id],
-            jsxprop_import_map,
-            [...(curpath || []), meta]
-          );
-        }
+      //               gen_content("page", p, jprop.paths, import_map, monaco);
+
+      //               jsxprop_import_map[prop.content.id] = import_map[parent_id];
+      //               const prop_meta = metas[prop.content.id];
+      //               map_childs(
+      //                 monaco,
+      //                 p,
+      //                 metas,
+      //                 prop.content.childs,
+      //                 paths,
+      //                 [...skip_comp_id, comp_id],
+      //                 jsxprop_import_map,
+      //                 [...(curpath || []), prop_meta]
+      //               );
+      //             }
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // } else {
+      if (Array.isArray(meta.item.childs)) {
+        map_childs(
+          monaco,
+          p,
+          metas,
+          meta.item.childs,
+          paths,
+          [...skip_comp_id],
+          jsxprop_import_map,
+          [...(curpath || []), meta]
+        );
       }
+      // }
     }
   }
 };
