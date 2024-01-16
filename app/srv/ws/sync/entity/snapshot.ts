@@ -86,6 +86,10 @@ export const snapshot = {
     return res as DocSnapshot;
   },
 
+  async del<K extends DocSnapshot["type"]>(type: K, id: string) {
+    await this.db.remove(`${type}-${id}`);
+  },
+
   get<K extends DocSnapshot["type"]>(type: K, id: string) {
     return this.db.get(`${type}-${id}`) as DocSnapshotMap[K] | null;
   },
