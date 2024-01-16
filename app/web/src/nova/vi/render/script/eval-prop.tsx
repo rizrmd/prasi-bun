@@ -35,11 +35,21 @@ export const viEvalProps = (
                 const id = prop.content?.id;
                 if (id) {
                   const m = vi.meta[id];
+
+                  const instances = meta.instances;
+                  if (!arg.meta.item.originalId || !instances) {
+                    return null;
+                  }
+
+                  const instance = instances[meta.item.id];
+                  if (!instance) return null;
+                  const original_id = arg.meta.item.originalId;
                   if (
                     m.mitem &&
-                    prop.jsxCalledBy?.includes(
-                      arg.meta.item.originalId || arg.meta.item.id
-                    )
+                    ((prop.jsxCalledBy &&
+                      (!prop.jsxCalledBy.includes(original_id) ||
+                        prop.jsxCalledBy.length !== 2)) ||
+                      !prop.jsxCalledBy)
                   ) {
                     const mprop = meta.mitem
                       ?.get("component")
@@ -48,19 +58,15 @@ export const viEvalProps = (
                     if (mprop) {
                       let mjby = mprop.get("jsxCalledBy");
                       if (!mjby || typeof mjby !== "object") {
-                        mprop.set("jsxCalledBy", [
-                          arg.meta.item.originalId || arg.meta.item.id,
-                        ]);
+                        mprop.set("jsxCalledBy", [meta.item.id, original_id]);
                       } else {
                         if (
-                          !mjby.includes(
-                            arg.meta.item.originalId || arg.meta.item.id
-                          )
+                          !mjby.includes(original_id) ||
+                          mjby.length !== 2 ||
+                          mjby[0] !== meta.item.id ||
+                          mjby[1] !== original_id
                         ) {
-                          mjby.push(
-                            arg.meta.item.originalId || arg.meta.item.id
-                          );
-                          mprop.set("jsxCalledBy", mjby);
+                          mprop.set("jsxCalledBy", [meta.item.id, original_id]);
                         }
                       }
                     }

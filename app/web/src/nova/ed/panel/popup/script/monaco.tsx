@@ -142,10 +142,11 @@ export const EdScriptMonaco: FC<{}> = () => {
                 if (imports) {
                   local.imports = imports;
                   end_hide = imports.split("\n").length + 1;
-                  const range = new monaco.Range(1, 0, end_hide, 0);
-                  (editor as any).setHiddenAreas([range]);
+                  // const range = new monaco.Range(1, 0, end_hide, 0);
+                  // (editor as any).setHiddenAreas([range]);
                 }
               }
+              editor.trigger("fold", "editor.foldAllMarkerRegions", {});
               await jsMount(editor, monaco, p);
 
               if (type === "prop-instance") {

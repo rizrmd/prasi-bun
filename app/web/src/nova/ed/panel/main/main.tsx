@@ -11,9 +11,17 @@ export const EdMain = () => {
     first_load: false,
   });
 
-  const meta = active.comp_id
-    ? p.comp.list[active.comp_id].meta[active.item_id]
-    : p.page.meta[active.item_id];
+  let meta: undefined | IMeta = undefined;
+
+  if (active.comp_id) {
+    if (p.comp.list[active.comp_id]) {
+      meta = p.comp.list[active.comp_id].meta[active.item_id];
+    } else {
+      active.comp_id = "";
+    }
+  } else {
+    meta = p.page.meta[active.item_id];
+  }
 
   if (active.should_render_main) {
     local.cache = (

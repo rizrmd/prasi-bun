@@ -7,14 +7,22 @@ import { watch } from "fs";
 import mime from "mime";
 import { g } from "utils/global";
 
-const webPath = "app/static";
+const web = {
+  get path() {
+    if (g.mode === "dev") return "static";
+    return "static-br";
+  },
+};
 const cache = {
-  static: {} as Record<string, { type: string; content: any }>,
+  static: {} as Record<
+    string,
+    { type: string; content: any; compression: "" | "br" }
+  >,
 };
 
 export const serveStatic = {
   init: async () => {
-    const list = await inspectTreeAsync(dir.path(`${webPath}`));
+    const list = await inspectTreeAsync(dir.path(`app/${web.path}`));
     const walk = async (
       list: InspectTreeResult,
       parent?: InspectTreeResult[]
@@ -27,12 +35,13 @@ export const serveStatic = {
         const path = join(...(parent || []).map((e) => e.name), list.name);
         const file = Bun.file(dir.path(`app/${path}`));
         if (await file.exists()) {
-          cache.static[path.substring("static".length)] = {
+          cache.static[path.substring(web.path.length)] = {
             type: mime.getType(path) || "application/octet-stream",
+            compression: g.mode === "prod" ? "br" : "",
             content: await file.arrayBuffer(),
           };
         }
-      } 
+      }
     };
     if (list) {
       await walk(list);
@@ -46,6 +55,7 @@ export const serveStatic = {
           if (await file.exists()) {
             cache.static[`/${filename}`] = {
               type: mime.getType(path) || "application/octet-stream",
+              compression: g.mode === "prod" ? "br" : "",
               content: await file.arrayBuffer(),
             };
           }
@@ -57,17 +67,23 @@ export const serveStatic = {
     return !!cache.static[url.pathname];
   },
   serve: (url: URL) => {
-    const file = cache.static[url.pathname];
+    let file = cache.static[url.pathname];
     if (file) {
       return new Response(file.content, {
-        headers: { "content-type": file.type },
+        headers: {
+          ...{ "content-type": file.type },
+          ...(file.compression ? { "content-encoding": file.compression } : {}),
+        },
       });
     }
 
-    const index = cache.static["/index.html"];
-    if (index) {
-      return new Response(index.content, {
-        headers: { "content-type": index.type },
+    file = cache.static["/index.html"];
+    if (file) {
+      return new Response(file.content, {
+        headers: {
+          ...{ "content-type": file.type },
+          ...(file.compression ? { "content-encoding": file.compression } : {}),
+        },
       });
     }
   },
