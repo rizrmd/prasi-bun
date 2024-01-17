@@ -21,6 +21,8 @@ const scriptEdit = {
   timeout: null as any,
 };
 
+const IMPORT_SEPARATOR = "//SCRIPT//";
+
 const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
 export const EdScriptMonaco: FC<{}> = () => {
@@ -34,11 +36,12 @@ export const EdScriptMonaco: FC<{}> = () => {
     historyOpen: false,
     mode: "",
     imports: "",
+    active_id: "",
     idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
   });
 
   const Editor = jscript.editor;
-  if (!Editor) return null;
+  if (!Editor) return <Loading backdrop={false} note="loading-monaco" />;
 
   let meta: IMeta | null = p.page.meta[active.item_id];
   if (active.comp_id) {
@@ -62,9 +65,13 @@ export const EdScriptMonaco: FC<{}> = () => {
 
       if (monaco && editor) {
         const type = p.ui.popup.script.type;
-        if (local.mode !== p.ui.popup.script.mode) {
+        if (
+          local.mode !== p.ui.popup.script.mode ||
+          local.active_id !== active.item_id
+        ) {
           local.init = false;
           local.mode = p.ui.popup.script.mode;
+          local.active_id = active.item_id;
         }
 
         if (!local.init) {
@@ -102,69 +109,86 @@ export const EdScriptMonaco: FC<{}> = () => {
               { types: {}, values: {} }
             );
             if (meta) {
-              let end_hide = 0;
-              if (type === "prop-master") {
-                const nmodel = monaco.editor.createModel(
-                  val,
-                  "typescript",
-                  monaco.Uri.parse("file:///active.tsx")
-                );
-                editor.setModel(nmodel);
-              } else {
-                const nmodel = monaco.editor.createModel(
-                  val,
-                  "typescript",
-                  monaco.Uri.parse("file:///active.tsx")
-                );
-                editor.setModel(nmodel);
-                const { exports, imports } = declareScope(p, meta, monaco);
-                console.log(
-                  Object.keys(imports).map((e) => [
-                    p.page.meta[e].item.name,
-                    exports[e],
-                  ])
-                );
-                // const added = new Set<string>();
-                // const im = imports[active.item_id];
-                // const im_flat = {} as Record<string, string[]>;
-                // for (const [var_name, item] of Object.entries(im)) {
-                //   const file_name = `${item.id}_${item.type}.tsx`;
-                //   if (!im_flat[file_name]) im_flat[file_name] = [];
-                //   im_flat[file_name].push(var_name);
-                // }
-                // console.log(im_flat, exports);
-                // if (active_src) {
-                // const end_hide =
-                //   active_src.split("//!!start")[0].split("\n").length + 1;
-                // const range = new monaco.Range(1, 0, end_hide, 0);
-                // (editor as any).setHiddenAreas([range]);
-                // }
-              }
-              editor.trigger("fold", "editor.foldAllMarkerRegions", {});
-              await jsMount(editor, monaco, p);
+              switch (type) {
+                case "prop-master":
+                  {
+                    const nmodel = monaco.editor.createModel(
+                      val,
+                      "typescript",
+                      monaco.Uri.parse("file:///active.tsx")
+                    );
+                    editor.setModel(nmodel);
+                  }
+                  break;
+                case "prop-instance":
+                  {
+                    const nmodel = monaco.editor.createModel(
+                      val,
+                      "typescript",
+                      monaco.Uri.parse("file:///active.tsx")
+                    );
+                    editor.setModel(nmodel);
+                    const constrainedInstance = constrainedEditor(monaco);
+                    constrainedInstance.initializeIn(editor);
+                    const model = editor.getModel();
+                    constrainedInstance.removeRestrictionsIn(model);
+                    const frange = model?.getFullModelRange();
+                    if (frange) {
+                      // const ranges = [
+                      //   {
+                      //     range: [
+                      //       end_hide + 1,
+                      //       `export const ${p.ui.popup.script.prop_name} = `
+                      //         .length,
+                      //       frange.getEndPosition().lineNumber,
+                      //       frange.getEndPosition().column,
+                      //     ],
+                      //     allowMultiline: true,
+                      //   },
+                      // ];
+                      // constrainedInstance.addRestrictionsTo(model, ranges);
+                    }
+                  }
+                  break;
+                case "item":
+                  {
+                    const { exports, imports } = declareScope(p, meta, monaco);
+                    const im = imports[active.item_id];
+                    const im_src = [];
 
-              if (type === "prop-instance") {
-                const constrainedInstance = constrainedEditor(monaco);
-                constrainedInstance.initializeIn(editor);
-                const model = editor.getModel();
-                constrainedInstance.removeRestrictionsIn(model);
-                const frange = model?.getFullModelRange();
-                if (frange) {
-                  const ranges = [
-                    {
-                      range: [
-                        end_hide + 1,
-                        `export const ${p.ui.popup.script.prop_name} = `.length,
-                        frange.getEndPosition().lineNumber,
-                        frange.getEndPosition().column,
-                      ],
-                      allowMultiline: true,
-                    },
-                  ];
-                  constrainedInstance.addRestrictionsTo(model, ranges);
-                }
+                    if (im) {
+                      for (const [var_name, item] of Object.entries(im)) {
+                        im_src.push(
+                          `import { ${var_name} } from "./${item.id}_${var_name}_${item.type}";`
+                        );
+                      }
+                    }
+                    for (const [k, v] of Object.entries(exports)) {
+                      addScope(p, monaco, `file:///${k}`, v);
+                    }
+                    let active_src =
+                      im_src.length > 0
+                        ? `${im_src.join("\n")}\n${IMPORT_SEPARATOR}\n${val}`
+                        : val;
+                    const model = monaco.editor.createModel(
+                      active_src,
+                      "typescript",
+                      monaco.Uri.parse("file:///active.tsx")
+                    );
+                    editor.setModel(model);
+                    editor.trigger("fold", "editor.foldAllMarkerRegions", {});
+                    if (active_src) {
+                      const end_hide = active_src
+                        .split(IMPORT_SEPARATOR)[0]
+                        .split("\n").length;
+                      const range = new monaco.Range(1, 1, end_hide, 1);
+                      (editor as any).setHiddenAreas([range]);
+                    }
+                  }
+                  break;
               }
             }
+            await jsMount(editor, monaco, p);
           } else {
             const model = monaco.editor.createModel(
               val,
@@ -184,7 +208,7 @@ export const EdScriptMonaco: FC<{}> = () => {
     })();
   }, [active.item_id, local.monaco, local.editor, p.ui.popup.script.mode]);
 
-  if (!meta) return null;
+  if (!meta) return <Loading backdrop={false} note="meta-not-found" />;
 
   const item = meta.item;
   const adv = meta.mitem?.get("adv")?.toJSON() || {};
@@ -201,8 +225,8 @@ export const EdScriptMonaco: FC<{}> = () => {
           ?.getValue()
           .replace(/\{\s*children\s*\}/gi, newval);
 
-        if (curval.includes("/** IMPORT MODULE **/")) {
-          curval = curval.split("/** IMPORT MODULE **/\n").pop() || "";
+        if (curval.includes(IMPORT_SEPARATOR)) {
+          curval = curval.split(IMPORT_SEPARATOR + "\n").pop() || "";
         }
 
         const text = trim(
@@ -215,7 +239,7 @@ export const EdScriptMonaco: FC<{}> = () => {
 
         let final_src = text;
         if (local.imports) {
-          final_src = `${local.imports}\n/** IMPORT MODULE **/\n${text}`;
+          final_src = `${local.imports}\n${IMPORT_SEPARATOR}\n${text}`;
         }
         local.editor.executeEdits(null, [
           {
@@ -263,6 +287,7 @@ export const EdScriptMonaco: FC<{}> = () => {
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
       onChange={(value) => {
+        return;
         const stype = p.ui.popup.script.type;
         if ((value || "").includes("/** SOURCE START **/")) {
           const valparts = (value || "").split("/** SOURCE START **/\n");

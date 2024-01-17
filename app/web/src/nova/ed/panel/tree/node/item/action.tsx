@@ -3,6 +3,7 @@ import { useGlobal } from "web-utils";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
 import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
 import { getMetaById } from "../../../../logic/active/get-meta";
+import { treeRebuild } from "../../../../logic/tree/build";
 
 export const EdTreeAction = ({
   node,
@@ -139,6 +140,7 @@ export const EdTreeAction = ({
                       active.item_id = active.instance.item_id || "";
                       active.instance.comp_id = "";
                       active.instance.item_id = "";
+                      treeRebuild(p);
                       p.render();
                     }
                   }}
