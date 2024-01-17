@@ -15,6 +15,7 @@ import { declareScope } from "./scope/scope";
 import { Loading } from "../../../../../utils/ui/loading";
 // @ts-ignore
 import { constrainedEditor } from "constrained-editor-plugin/dist/esm/constrainedEditor";
+import { addScope } from "./scope/add-scope";
 
 const scriptEdit = {
   timeout: null as any,
@@ -110,41 +111,34 @@ export const EdScriptMonaco: FC<{}> = () => {
                 );
                 editor.setModel(nmodel);
               } else {
-                const imports = declareScope(p, meta, monaco);
-                let cur = active.comp_id ? active.comp_id : "page";
-                monaco.editor.getModels().forEach((model) => {
-                  if (
-                    type === "item" &&
-                    model.uri.path === `/${cur}_${active.item_id}_src_src.tsx`
-                  ) {
-                    editor.setModel(model);
-                  }
-
-                  if (
-                    type === "prop-instance" &&
-                    model.uri.path ===
-                      `/${cur}_${active.item_id}_prop_${p.ui.popup.script.prop_name}.tsx`
-                  ) {
-                    editor.setModel(model);
-                  }
-                });
-                const model = editor.getModel();
-                if (!model) {
-                  const nmodel = monaco.editor.createModel(
-                    imports && imports.length > 0
-                      ? `${imports}\n/** IMPORT MODULE **/\n${val}`
-                      : val,
-                    "typescript",
-                    monaco.Uri.parse("file:///active.tsx")
-                  );
-                  editor.setModel(nmodel);
-                }
-                if (imports) {
-                  local.imports = imports;
-                  end_hide = imports.split("\n").length + 1;
-                  // const range = new monaco.Range(1, 0, end_hide, 0);
-                  // (editor as any).setHiddenAreas([range]);
-                }
+                const nmodel = monaco.editor.createModel(
+                  val,
+                  "typescript",
+                  monaco.Uri.parse("file:///active.tsx")
+                );
+                editor.setModel(nmodel);
+                const { exports, imports } = declareScope(p, meta, monaco);
+                console.log(
+                  Object.keys(imports).map((e) => [
+                    p.page.meta[e].item.name,
+                    exports[e],
+                  ])
+                );
+                // const added = new Set<string>();
+                // const im = imports[active.item_id];
+                // const im_flat = {} as Record<string, string[]>;
+                // for (const [var_name, item] of Object.entries(im)) {
+                //   const file_name = `${item.id}_${item.type}.tsx`;
+                //   if (!im_flat[file_name]) im_flat[file_name] = [];
+                //   im_flat[file_name].push(var_name);
+                // }
+                // console.log(im_flat, exports);
+                // if (active_src) {
+                // const end_hide =
+                //   active_src.split("//!!start")[0].split("\n").length + 1;
+                // const range = new monaco.Range(1, 0, end_hide, 0);
+                // (editor as any).setHiddenAreas([range]);
+                // }
               }
               editor.trigger("fold", "editor.foldAllMarkerRegions", {});
               await jsMount(editor, monaco, p);
@@ -270,8 +264,8 @@ export const EdScriptMonaco: FC<{}> = () => {
       }
       onChange={(value) => {
         const stype = p.ui.popup.script.type;
-        if ((value || "").includes("/** IMPORT MODULE **/")) {
-          const valparts = (value || "").split("/** IMPORT MODULE **/\n");
+        if ((value || "").includes("/** SOURCE START **/")) {
+          const valparts = (value || "").split("/** SOURCE START **/\n");
           if (valparts.length === 2) local.value = valparts[1];
           if (
             stype === "prop-instance" &&

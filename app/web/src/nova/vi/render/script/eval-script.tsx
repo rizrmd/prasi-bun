@@ -25,13 +25,13 @@ export const viEvalScript = (
 
   if (!meta.script) {
     meta.script = {
-      passprop,
+      scope: passprop,
       result: null,
       Local: createViLocal(vi, meta),
       PassProp: createViPassProp(vi, meta),
     };
   } else {
-    meta.script.passprop = passprop;
+    meta.script.scope = passprop;
   }
 
   const script = meta.script;

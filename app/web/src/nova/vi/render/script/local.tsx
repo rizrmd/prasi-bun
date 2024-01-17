@@ -27,7 +27,7 @@ export const createViLocal = (
     const local = ref.current;
     local.render = meta.render;
 
-    updatePropScope(vi, meta, meta.script?.passprop);
+    updatePropScope(vi, meta, meta.script?.scope);
 
     if (arg.hook) {
       arg.hook(local);
@@ -67,7 +67,7 @@ export const createViLocal = (
     }, []);
 
     return modifyChild(children, {
-      ...meta.script?.passprop,
+      ...meta.script?.scope,
       [arg.name]: local,
     });
   };
