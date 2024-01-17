@@ -4,7 +4,23 @@ import { VG } from "../global";
 
 export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
-    return modifyChild(arg, meta.script?.passprop);
+    if (!meta.item.script) {
+      meta.item.script = {};
+    }
+
+    if (!meta.item.script.passprop) {
+      meta.item.script.passprop = {};
+    }
+
+    if (meta.item.script.passprop) {
+      for (const [k, v] of Object.entries(arg)) {
+        if (!["children", "key"].includes(k)) {
+          meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
+        }
+      }
+    }
+
+    return modifyChild(arg, meta.script?.scope);
   };
 };
 

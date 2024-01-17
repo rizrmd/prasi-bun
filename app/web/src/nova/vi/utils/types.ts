@@ -59,7 +59,7 @@ export type IMeta = {
     is_root: boolean;
   };
   script?: {
-    passprop?: any;
+    scope?: any;
     result: ReactNode;
     Local: ReturnType<typeof createViLocal>;
     PassProp: ReturnType<typeof createViPassProp>;

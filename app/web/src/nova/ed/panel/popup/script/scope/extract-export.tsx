@@ -4,7 +4,7 @@ export const extractExport = (p: PG, m: IMeta) => {
   const result = {} as Record<
     string,
     {
-      type: "local" | "passprop" | "prop";
+      type: "local" | "passprop" | "prop" | "scope";
       id: string;
       start: number;
       end: number;
@@ -37,11 +37,11 @@ export const extractExport = (p: PG, m: IMeta) => {
     }
   }
 
-  if (m.script?.passprop) {
-    for (const [k, v] of Object.entries(m.script.passprop)) {
+  if (m.script?.scope) {
+    for (const [k, v] of Object.entries(m.script.scope)) {
       if (k === "key") continue;
       result[k] = {
-        type: "passprop",
+        type: "scope",
         id: m.item.id,
         start: 0,
         end: 0,
