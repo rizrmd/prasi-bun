@@ -53,15 +53,42 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
 
   if (p) {
     monaco.editor.registerEditorOpener({
-      openCodeEditor(source, r, selectionOrPosition) {
+      openCodeEditor(source, r, _sel) {
         if (p) {
-          p.ui.popup.script.mode === "js";
-
           if (r.scheme === "file" && r.path) {
             const args = r.path.split("_");
-            if (args.length === 4) {
-              const { cur, id, meta } = extractLoc(args, p);
-              console.log(cur, id, meta.item.name);
+            if (args.length === 3) {
+              const loc = extractLoc(args, p);
+              console.log(loc.meta);
+              if (loc.meta) {
+                if (loc.meta.item.component?.id && loc.meta.instances) {
+                  active.comp_id = loc.meta.item.component?.id;
+                  active.instance = {
+                    comp_id: loc.meta.item.component?.id,
+                    item_id: loc.meta.item.id,
+                  };
+                  const item_id = p.comp.list[active.comp_id].tree.find(
+                    (e) => e.parent === "root"
+                  )?.id;
+                  if (item_id) {
+                    active.item_id = item_id as string;
+                  }
+                } else if (
+                  loc.meta.parent?.instance_id &&
+                  loc.meta.parent.comp_id &&
+                  loc.meta.item.originalId
+                ) {
+                  active.comp_id = loc.meta.parent.comp_id;
+                  active.instance = {
+                    comp_id: active.comp_id,
+                    item_id: loc.meta.parent.instance_id,
+                  };
+                  active.item_id = loc.meta.item.originalId;
+                } else {
+                  active.item_id = loc.meta.item.id;
+                }
+                p.render();
+              }
             }
           }
         }
@@ -182,17 +209,19 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
 };
 
 export const extractLoc = (args: string[], p: PG) => {
-  const [_cur, id, type, _varname] = args;
-  const cur = _cur.substring(1);
-  const varname = _varname.substring(0, _varname.length - ".tsx".length);
-
+  const [_id, var_name, _type] = args;
+  const id = _id.substring(1);
+  const type = _type.replace(".tsx", "");
   let meta = p.page.meta[id];
-  if (cur !== "page") {
-    const comp = p.comp.list[cur];
-    if (comp) {
-      meta = comp.meta[id];
-    }
+
+  if (active.comp_id) {
+    meta = p.comp.list[active.comp_id].meta[id];
   }
 
-  return { cur, varname, type, id, meta };
+  return {
+    id,
+    var_name,
+    type,
+    meta,
+  };
 };

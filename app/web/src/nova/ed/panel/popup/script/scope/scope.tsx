@@ -46,29 +46,34 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   let prev_m = null as null | IMeta;
   for (const m of cur_path) {
     if (!exports[m.item.id]) {
-      const export_types = {
-        local: [] as string[],
-        prop: [] as string[],
-        passprop: [] as string[],
-        scope: [] as string[],
-      };
       extract_exports[m.item.id] = extractExport(p, m);
 
       for (const [k, v] of Object.entries(extract_exports[m.item.id])) {
+        let src = "";
         if (v.type !== "local") {
-          export_types[v.type].push(`export const ${k} = ${v.val};`);
+          src = `export const ${k} = ${v.val};`;
         } else {
-          export_types[v.type].push(`\
-    const ${k}__local = ${v.val};
-    export const ${k}: typeof ${k}__local & { render: ()=>void } = ${k}__local as any;`);
+          src = `\
+          const ${k}__local = ${v.val};
+          export const ${k}: typeof ${k}__local & { render: ()=>void } = ${k}__local as any;`;
         }
+        exports[`${m.item.id}_${k}_${v.type}.tsx`] = src;
       }
-      for (const [k, v] of Object.entries(export_types)) {
-        if (v.length > 0) {
-          exports[`${m.item.id}_${k}.tsx`] = v.join("\n");
+    }
+
+    if (
+      m.item.id === active.item_id &&
+      m.item.component?.id === active.comp_id &&
+      active.comp_id
+    ) {
+      for (const [k, v] of Object.entries(extract_exports[m.item.id])) {
+        if (!imports[m.item.id]) imports[m.item.id] = {};
+        if (v.type === "prop") {
+          imports[m.item.id][k] = v;
         }
       }
     }
+
     if (prev_m && extract_exports[prev_m.item.id]) {
       imports[m.item.id] = {};
       if (imports[prev_m.item.id]) {

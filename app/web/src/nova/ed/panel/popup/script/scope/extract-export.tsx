@@ -37,19 +37,6 @@ export const extractExport = (p: PG, m: IMeta) => {
     }
   }
 
-  if (m.script?.scope) {
-    for (const [k, v] of Object.entries(m.script.scope)) {
-      if (k === "key") continue;
-      result[k] = {
-        type: "scope",
-        id: m.item.id,
-        start: 0,
-        end: 0,
-        val: "null as any",
-      };
-    }
-  }
-
   if (script?.props) {
     for (const [k, v] of Object.entries(script.props)) {
       result[k] = {

@@ -1,11 +1,27 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../../utils/types/item";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { EdScriptMonaco } from "./monaco";
 import { EdScriptSnippet } from "./snippet";
+import { useEffect } from "react";
+import { Loading } from "../../../../../utils/ui/loading";
 
 export const EdScriptWorkbench = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({ active_id: "" });
+
+  useEffect(() => {
+    if (!local.active_id) {
+      local.active_id = active.item_id;
+      local.render();
+    } else {
+      setTimeout(() => {
+        local.active_id = active.item_id;
+        local.render();
+      }, 200);
+    }
+  }, [active.item_id]);
+
   return (
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
@@ -52,7 +68,11 @@ export const EdScriptWorkbench = () => {
           )}
         </div>
         <div className="relative flex flex-1">
-          <EdScriptMonaco />
+          {local.active_id === active.item_id ? (
+            <EdScriptMonaco />
+          ) : (
+            <Loading backdrop={false} note={"opening script"} />
+          )}
         </div>
       </div>
     </div>
