@@ -30,26 +30,31 @@ export const apiProxy = (api_url: string) => {
           ) {
             return new Promise<any>(async (resolve, reject) => {
               try {
-                let api_def = w.prasiApi[base_url];
+                let api_ref = w.prasiApi[base_url];
 
-                if (!api_def) {
+                if (
+                  !api_ref &&
+                  apiProxyLoaded &&
+                  typeof apiProxyLoaded[base_url] === "object"
+                ) {
                   await apiProxyLoaded[base_url];
+                  api_ref = w.prasiApi[base_url];
                 }
 
-                if (api_def) {
-                  if (!api_def.apiEntry) api_def.apiEntry = {};
-                  if (api_def.apiEntry && !api_def.apiEntry[actionName]) {
+                if (api_ref) {
+                  if (!api_ref.apiEntry) api_ref.apiEntry = {};
+                  if (api_ref.apiEntry && !api_ref.apiEntry[actionName]) {
                     reject(
                       `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
-                        api_def || {}
+                        api_ref || {}
                       ).join("\n   - ")}`
                     );
                     return;
                   }
                 }
 
-                let actionUrl = api_def.apiEntry[actionName].url;
-                const actionParams = api_def.apiEntry[actionName].args;
+                let actionUrl = api_ref.apiEntry[actionName].url;
+                const actionParams = api_ref.apiEntry[actionName].args;
                 if (actionUrl && actionParams) {
                   if (rest.length > 0 && actionParams.length > 0) {
                     for (const [idx, p] of Object.entries(rest)) {

@@ -1,6 +1,8 @@
-import { loadApiProxyDef } from "../../../../../base/load/api/api-proxy-def";
+import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { w } from "../../../../../utils/types/general";
 import { PG } from "../../../logic/ed-global";
+
+export const apiRef = {} as Record<string, any>;
 
 export const dev = JSON.parse(localStorage.getItem("prasi-dev") || "{}") as {
   enabled: boolean;
@@ -49,10 +51,9 @@ export const checkAPI = async (p: PG) => {
   if (!url) return "offline";
 
   try {
-    if (!w.prasiApi[url]) {
-      await loadApiProxyDef(url, true);
-    }
-    const capi = w.prasiApi[url] as any;
+    if (!apiRef[url]) apiRef[url] = apiProxy(url) as any;
+
+    const capi = apiRef[url];
     if (!capi) {
       console.error(`Cannot initialize API for ${url}.`, w.prasiApi[url]);
     } else {
