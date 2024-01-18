@@ -13,10 +13,15 @@ export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
     }
 
     if (meta.item.script.passprop) {
+      let is_changed = false;
       for (const [k, v] of Object.entries(arg)) {
         if (!["children", "key"].includes(k)) {
+          is_changed = true;
           meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
         }
+      }
+
+      if (is_changed) {
       }
     }
 
