@@ -75,6 +75,22 @@ export const fetchViaProxy = async (
       ]),
       headers: { "content-type": "application/json" },
     });
-    return res.json();
+
+    let text = "";
+    try {
+      text = await res.text();
+      return JSON.parse(text);
+    } catch (e) {
+      let formatted_body = null;
+      try {
+        formatted_body = JSON.stringify(JSON.parse(body), null, 2);
+      } catch (e) {}
+
+      throw new Error(
+        `\n\n⚡ Failed to JSON.parse fetch result of ${url}:\n\n${JSON.stringify(
+          text
+        )} \n\nwith params:\n${formatted_body}`
+      );
+    }
   }
 };

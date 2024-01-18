@@ -1,3 +1,5 @@
+import { loadApiProxyDef } from "../../../../../base/load/api/api-proxy-def";
+import { w } from "../../../../../utils/types/general";
 import { PG } from "../../../logic/ed-global";
 
 export const dev = JSON.parse(localStorage.getItem("prasi-dev") || "{}") as {
@@ -14,8 +16,6 @@ export const server = {
     | "pulling"
     | "restarting",
 };
-
-export const apiRef = {} as any;
 
 export const apiUrl = function (p: PG): string {
   if (dev.enabled) {
@@ -49,30 +49,33 @@ export const checkAPI = async (p: PG) => {
   if (!url) return "offline";
 
   try {
-    if (!apiRef[url]) {
-      // await initApi({ api_url: url }, "dev");
-      // apiRef[url] = createAPI(url);
+    if (!w.prasiApi[url]) {
+      await loadApiProxyDef(url, true);
     }
-    const capi = apiRef[url];
-    let res = await capi._deploy({
-      type: "check",
-      id_site: p.site.id,
-    });
-    if (!res) {
-      return { deployable: false, db: "", hasDB: false, domains: [] };
+    const capi = w.prasiApi[url] as any;
+    if (!capi) {
+      console.error(`Cannot initialize API for ${url}.`, w.prasiApi[url]);
     } else {
-      if (res.db && res.now) {
-        return {
-          deployable: true,
-          db: res.db,
-          hasDB: true,
-          domains: res.domains as string[],
-          deploy: {
-            now: res.now,
-            current: res.current,
-            deploys: res.deploys,
-          },
-        };
+      let res = await capi._deploy({
+        type: "check",
+        id_site: p.site.id,
+      });
+      if (!res) {
+        return { deployable: false, db: "", hasDB: false, domains: [] };
+      } else {
+        if (res.db && res.now) {
+          return {
+            deployable: true,
+            db: res.db,
+            hasDB: true,
+            domains: res.domains as string[],
+            deploy: {
+              now: res.now,
+              current: res.current,
+              deploys: res.deploys,
+            },
+          };
+        }
       }
     }
   } catch (e) {

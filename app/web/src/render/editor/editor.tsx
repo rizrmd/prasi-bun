@@ -1,13 +1,13 @@
 import { FC, useEffect } from "react";
-import { useGlobal, deepClone, waitUntil } from "web-utils";
+import { useGlobal, waitUntil } from "web-utils";
+import { w } from "../../utils/types/general";
 import { Loading } from "../../utils/ui/loading";
-import { EMainEditor } from "./panel/e-main-editor";
 import { EditorGlobal } from "./logic/global";
 import { execSiteJS, initEditor } from "./logic/init";
 import { routeEditor } from "./logic/route";
-import { undoManager } from "./logic/undo";
-import { w } from "../../utils/types/general";
 import { rebuildTree } from "./logic/tree-logic";
+import { undoManager } from "./logic/undo";
+import { EMainEditor } from "./panel/e-main-editor";
 
 export const Editor: FC<{ site_id: string; page_id: string; session: any }> = ({
   session,
