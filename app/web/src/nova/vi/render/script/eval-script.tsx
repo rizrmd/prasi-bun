@@ -97,6 +97,9 @@ export const replacement = {
   "stroke-width": "strokeWidth",
   "fill-rule": "fillRule",
   "clip-rule": "clipRule",
+  "stroke-linejoin": "strokeLinejoin",
+  "stroke-linecap": "strokeLinecap",
+  "clip-path": "clipPath",
 };
 
 export const replaceWithObject = (tpl: string, data: any) => {
