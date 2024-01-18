@@ -86,11 +86,12 @@ export const fetchViaProxy = async (
         formatted_body = JSON.stringify(JSON.parse(body), null, 2);
       } catch (e) {}
 
-      throw new Error(
+      console.warn(
         `\n\n⚡ Failed to JSON.parse fetch result of ${url}:\n\n${JSON.stringify(
           text
         )} \n\nwith params:\n${formatted_body}`
       );
+      return text;
     }
   }
 };
