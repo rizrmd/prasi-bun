@@ -28,7 +28,7 @@ export const EdBase = () => {
 
   edRoute(p);
 
-  if (p.status === "loading") {
+  if (p.status === "post-init") {
     return <Loading note={`page-${p.status}`} />;
   }
   if (p.status === "site-not-found" || p.status === "page-not-found") {

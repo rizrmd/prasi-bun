@@ -8,7 +8,7 @@ import { treeRebuild } from "./tree/build";
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
     if (!p.site.domain && !p.site.name) {
-      p.status = "loading";
+      p.status = "post-init";
       const site = await p.sync.site.load(p.site.id);
       if (!site) {
         p.status = "site-not-found";
@@ -39,7 +39,7 @@ export const edRoute = async (p: PG) => {
 };
 
 export const reloadPage = async (p: PG, page_id: string, note: string) => {
-  p.status = "loading";
+  p.status = "reload";
   const remotePage = await p.sync.page.load(page_id);
 
   if (!remotePage) {

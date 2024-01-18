@@ -123,7 +123,8 @@ export const EDGlobal = {
   clients: {} as Record<string, { id: string; username: string }>,
   status: "init" as
     | "init"
-    | "loading"
+    | "post-init"
+    | "reload"
     | "site-not-found"
     | "page-not-found"
     | "ready",
