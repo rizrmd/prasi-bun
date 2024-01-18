@@ -287,10 +287,9 @@ export const EdScriptMonaco: FC<{}> = () => {
         { css: "scss", js: "typescript", html: "html" }[p.ui.popup.script.mode]
       }
       onChange={(value) => {
-        return;
         const stype = p.ui.popup.script.type;
-        if ((value || "").includes("/** SOURCE START **/")) {
-          const valparts = (value || "").split("/** SOURCE START **/\n");
+        if ((value || "").includes(IMPORT_SEPARATOR)) {
+          const valparts = (value || "").split(IMPORT_SEPARATOR + "\n");
           if (valparts.length === 2) local.value = valparts[1];
           if (
             stype === "prop-instance" &&
@@ -302,7 +301,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               `export const ${p.ui.popup.script.prop_name} = `.length
             );
           }
-        } else {
+        } else { 
           local.value = value || "";
         }
         local.render();
