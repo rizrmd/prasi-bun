@@ -14,10 +14,9 @@ import { PanelFont } from "./panel/font";
 import { PanelLink } from "./panel/link";
 import { PanelPadding } from "./panel/padding";
 import { CPInstance } from "./props/CPInstance";
-import { CPMaster, PreviewItemProp } from "./props/CPMaster";
+import { CPMaster } from "./props/CPMaster";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
-import { treeRebuild } from "../../../../nova/ed/logic/tree/build";
 
 export const ESide = () => {
   const p = useGlobal(EditorGlobal, "EDITOR");
@@ -70,7 +69,6 @@ export const ESide = () => {
   );
   let meta = p.item.active ? p.treeMeta[p.item.active] : null;
 
-  console.log(meta);
   if (!meta)
     return (
       <div
