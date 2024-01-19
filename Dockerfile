@@ -12,8 +12,8 @@ RUN apt-get install -y curl unzip bash
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.18" 
 RUN ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 
-RUN curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o n &&
-  bash n $NODE_VERSION &&
+RUN curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o n
+RUN n $NODE_VERSION &&
   rm n &&
   npm install -g n
 RUN bun install -g pm2
