@@ -59,8 +59,15 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
             const args = r.path.split("_");
             if (args.length === 3) {
               const loc = extractLoc(args, p);
-              console.log(loc.meta);
               if (loc.meta) {
+                active.script_nav.list.length = active.script_nav.idx;
+                active.script_nav.list.push({
+                  item_id: active.item_id,
+                  comp_id: active.comp_id,
+                  instance: active.instance,
+                });
+                active.script_nav.idx = active.script_nav.idx + 1;
+
                 if (loc.meta.item.component?.id && loc.meta.instances) {
                   active.comp_id = loc.meta.item.component?.id;
                   active.instance = {
@@ -87,6 +94,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
                 } else {
                   active.item_id = loc.meta.item.id;
                 }
+
                 p.render();
               }
             }

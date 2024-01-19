@@ -70,6 +70,14 @@ const target = {
 export const active = {
   should_render_main: true,
   hover: { id: "" },
+  script_nav: {
+    list: [] as {
+      item_id: string;
+      comp_id?: string;
+      instance?: { item_id: string; comp_id?: string };
+    }[],
+    idx: -1,
+  },
   text: { id: "", content: "", timeout: null as any, el: null as any },
   get item_id() {
     if (target.active_id === false) {

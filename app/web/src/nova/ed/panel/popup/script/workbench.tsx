@@ -22,10 +22,61 @@ export const EdScriptWorkbench = () => {
     }
   }, [active.item_id]);
 
+  const scriptNav = {
+    canNext: active.script_nav.idx < active.script_nav.list.length - 1,
+    canBack: active.script_nav.list.length > 0,
+  };
+
   return (
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
-        <div className="flex border-b">
+        <div className="flex border-b items-stretch">
+          {active.script_nav.list.length > 0 && (
+            <div className="border-r px-2 flex items-center">
+              <div
+                className={cx(scriptNav.canBack ? "" : "text-slate-200")}
+                onClick={() => {
+                  if (scriptNav.canBack) {
+                    active.script_nav.idx = active.script_nav.idx - 1;
+                    const item = active.script_nav.list.pop();
+
+                    if (item) {
+                      active.item_id = item.item_id;
+                      active.comp_id = item.comp_id || "";
+                      active.instance = {
+                        item_id: item.instance?.item_id || "",
+                        comp_id: item.instance?.comp_id || "",
+                      };
+                      p.render();
+                    }
+                  }
+                }}
+              >
+                <ChevronLeft />
+              </div>
+              <div
+                className={cx(scriptNav.canNext ? "" : "text-slate-200")}
+                onClick={() => {
+                  if (scriptNav.canNext) {
+                    active.script_nav.idx = active.script_nav.idx + 1;
+                    const item = active.script_nav.list[active.script_nav.idx];
+
+                    if (item) {
+                      active.item_id = item.item_id;
+                      active.comp_id = item.comp_id || "";
+                      active.instance = {
+                        item_id: item.instance?.item_id || "",
+                        comp_id: item.instance?.comp_id || "",
+                      };
+                      p.render();
+                    }
+                  }
+                }}
+              >
+                <ChevronRight />
+              </div>
+            </div>
+          )}
           {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
           {p.ui.popup.script.type === "prop-instance" && <CompTitleInstance />}
           {p.ui.popup.script.type === "item" && (
@@ -150,6 +201,38 @@ const ArrowRight = () => (
       fill="currentColor"
       fillRule="evenodd"
       clipRule="evenodd"
+    ></path>
+  </svg>
+);
+
+export const ChevronRight = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={15}
+    height={15}
+    fill="none"
+    viewBox="0 0 15 15"
+  >
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M6.158 3.135a.5.5 0 01.707.023l3.75 4a.5.5 0 010 .684l-3.75 4a.5.5 0 11-.73-.684L9.566 7.5l-3.43-3.658a.5.5 0 01.023-.707z"
+      clipRule="evenodd"
+    ></path>
+  </svg>
+);
+
+export const ChevronLeft = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+  >
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M14 18l-6-6 6-6 1.4 1.4-4.6 4.6 4.6 4.6L14 18z"
     ></path>
   </svg>
 );
