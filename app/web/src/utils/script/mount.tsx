@@ -60,7 +60,8 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
             if (args.length === 3) {
               const loc = extractLoc(args, p);
               if (loc.meta) {
-                active.script_nav.list.length = active.script_nav.idx;
+                if (active.script_nav.idx >= 0)
+                  active.script_nav.list.length = active.script_nav.idx;
                 active.script_nav.list.push({
                   item_id: active.item_id,
                   comp_id: active.comp_id,

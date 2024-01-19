@@ -31,52 +31,58 @@ export const EdScriptWorkbench = () => {
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
         <div className="flex border-b items-stretch">
-          {active.script_nav.list.length > 0 && (
-            <div className="border-r px-2 flex items-center">
-              <div
-                className={cx(scriptNav.canBack ? "" : "text-slate-200")}
-                onClick={() => {
-                  if (scriptNav.canBack) {
-                    active.script_nav.idx = active.script_nav.idx - 1;
-                    const item = active.script_nav.list.pop();
+          <div className="border-r px-2 flex items-center">
+            <div
+              className={cx(
+                scriptNav.canBack
+                  ? "cursor-pointer hover:text-blue-400"
+                  : "text-slate-200"
+              )}
+              onClick={() => {
+                if (scriptNav.canBack) {
+                  active.script_nav.idx = active.script_nav.idx - 1;
+                  const item = active.script_nav.list.pop();
 
-                    if (item) {
-                      active.item_id = item.item_id;
-                      active.comp_id = item.comp_id || "";
-                      active.instance = {
-                        item_id: item.instance?.item_id || "",
-                        comp_id: item.instance?.comp_id || "",
-                      };
-                      p.render();
-                    }
+                  if (item) {
+                    active.item_id = item.item_id;
+                    active.comp_id = item.comp_id || "";
+                    active.instance = {
+                      item_id: item.instance?.item_id || "",
+                      comp_id: item.instance?.comp_id || "",
+                    };
+                    p.render();
                   }
-                }}
-              >
-                <ChevronLeft />
-              </div>
-              <div
-                className={cx(scriptNav.canNext ? "" : "text-slate-200")}
-                onClick={() => {
-                  if (scriptNav.canNext) {
-                    active.script_nav.idx = active.script_nav.idx + 1;
-                    const item = active.script_nav.list[active.script_nav.idx];
-
-                    if (item) {
-                      active.item_id = item.item_id;
-                      active.comp_id = item.comp_id || "";
-                      active.instance = {
-                        item_id: item.instance?.item_id || "",
-                        comp_id: item.instance?.comp_id || "",
-                      };
-                      p.render();
-                    }
-                  }
-                }}
-              >
-                <ChevronRight />
-              </div>
+                }
+              }}
+            >
+              <ChevronLeft />
             </div>
-          )}
+            <div
+              className={cx(
+                scriptNav.canNext
+                  ? "cursor-pointer hover:text-blue-400"
+                  : "text-slate-200"
+              )}
+              onClick={() => {
+                if (scriptNav.canNext) {
+                  active.script_nav.idx = active.script_nav.idx + 1;
+                  const item = active.script_nav.list[active.script_nav.idx];
+
+                  if (item) {
+                    active.item_id = item.item_id;
+                    active.comp_id = item.comp_id || "";
+                    active.instance = {
+                      item_id: item.instance?.item_id || "",
+                      comp_id: item.instance?.comp_id || "",
+                    };
+                    p.render();
+                  }
+                }
+              }}
+            >
+              <ChevronRight />
+            </div>
+          </div>
           {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
           {p.ui.popup.script.type === "prop-instance" && <CompTitleInstance />}
           {p.ui.popup.script.type === "item" && (
@@ -208,8 +214,8 @@ const ArrowRight = () => (
 export const ChevronRight = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={15}
-    height={15}
+    width={"22"}
+    height={"22"}
     fill="none"
     viewBox="0 0 15 15"
   >
@@ -225,8 +231,8 @@ export const ChevronRight = () => (
 export const ChevronLeft = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="15"
-    height="15"
+    width="22"
+    height="22"
     viewBox="0 0 24 24"
   >
     <path
