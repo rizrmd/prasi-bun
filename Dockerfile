@@ -13,6 +13,7 @@ RUN curl -sL https://deb.nodesource.com/setup_20.x  | bash -
 RUN apt-get -y install nodejs
 RUN npm install -g pm2
 RUN npm install -g node-gyp
+RUN npm install -g node-gyp-build-optional-packages
 
 
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.18"
