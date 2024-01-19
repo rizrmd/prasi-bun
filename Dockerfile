@@ -7,7 +7,7 @@ COPY . .
 ARG NODE_VERSION=18
 
 RUN apt-get update
-RUN apt-get install -y curl unzip
+RUN apt-get install -y curl unzip bash
 
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.18" 
 RUN ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
