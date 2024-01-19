@@ -8,7 +8,7 @@ export const createEditScript = (
   mprop: FMCompDef,
   name: string
 ) => {
-  return ((e) => {
+  return (e: any) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -21,5 +21,5 @@ export const createEditScript = (
       p.ui.popup.script.prop_name = name;
       p.render();
     }
-  }) as MouseEventHandler<HTMLButtonElement>;
+  };
 };
