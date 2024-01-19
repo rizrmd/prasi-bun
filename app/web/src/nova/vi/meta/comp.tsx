@@ -6,6 +6,7 @@ import { simplifyItemChild } from "./simplify";
 
 export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
   const { item } = arg;
+
   if (item.type === "item" && item.component?.id && arg.parent?.item.id) {
     let item_comp = p.comps[item.component.id];
     if (p.on?.visit_component) {
@@ -42,8 +43,10 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
           ids: instance,
         });
       }
+
       const meta: IMeta = {
         item: simplifyItemChild(item),
+        jsx_prop: arg.jsx_prop,
         parent: {
           id: arg.parent.item.id,
           comp_id: arg.parent?.comp?.component?.id,

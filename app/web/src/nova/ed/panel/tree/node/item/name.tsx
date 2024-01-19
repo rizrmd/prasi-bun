@@ -26,6 +26,10 @@ export const EdTreeName = ({
   const is_jsx_prop = !!node.data?.jsx_prop?.is_root;
 
   const isRenaming = p.ui.tree.rename_id === item.id;
+  let name = item.name;
+  if (item.component?.id && p.comp.loaded[item.component.id]) {
+    name = p.comp.loaded[item.component.id].name;
+  }
   return (
     <div className="text-[14px] relative flex flex-col justify-center cursor-pointer flex-1">
       {/* <div className="text-[10px]">{item.id}</div> */}
@@ -37,7 +41,7 @@ export const EdTreeName = ({
           )}
           autoFocus
           spellCheck={false}
-          defaultValue={local.rename}
+          value={local.rename}
           onFocus={(e) => {
             if (node.data?.jsx_prop?.is_root) {
               p.ui.tree.rename_id = "";
@@ -97,13 +101,13 @@ export const EdTreeName = ({
             }
           }}
           onChange={(e) => {
-            local.rename = e.target.value;
+            local.rename = e.target.value.replace(/[\W_]+/g, "_");
             p.render();
           }}
         />
       ) : (
         <div className="flex flex-col">
-          <Name name={node.text} is_jsx_prop={is_jsx_prop} />
+          <Name name={name} is_jsx_prop={is_jsx_prop} />
           {/* <div className={"text-[9px] text-gray-500 -mt-1"}>
             {node.id} - {item.originalId}
           </div> */}

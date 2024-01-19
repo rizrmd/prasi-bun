@@ -4,21 +4,20 @@ import { IContent } from "../../../../../utils/types/general";
 import { Loading } from "../../../../../utils/ui/loading";
 import { getMetaById } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
+import { text_edit } from "../../main/main-per-item";
 import { EdTreeAction } from "./item/action";
 import { EdTreeCtxMenu } from "./item/ctx-menu";
 import { EdTreeIndent } from "./item/indent";
 import { EdTreeName } from "./item/name";
 import { treeItemKeyMap } from "./key-map";
-import { text_edit } from "../../main/main-per-item";
-import { treeRebuild } from "../../../logic/tree/build";
 
 export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
     rightClick: null as null | React.MouseEvent<HTMLDivElement, MouseEvent>,
   });
+
   if (!node || !node.data) {
-    console.log("hello", node, prm);
     return <></>;
   }
   const item = node.data?.item;
@@ -122,9 +121,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         }
         active.item_id = item.id;
         p.ui.tree.search = "";
-        treeRebuild(p);
         p.render();
-        p.page.render();
         if ((item as IContent).type === "text") {
           setTimeout(() => {
             if (document.activeElement?.tagName === "INPUT") {

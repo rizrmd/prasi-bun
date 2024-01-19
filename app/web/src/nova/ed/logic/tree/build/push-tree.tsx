@@ -19,6 +19,7 @@ export const pushTreeNode = (
       });
   } else {
     const parent = metas[meta.parent?.id || ""];
+
     if (parent && parent.mitem) {
       parent.mitem.get("childs")?.forEach((mitem) => {
         if (mitem.get("id") === meta.item.id) {

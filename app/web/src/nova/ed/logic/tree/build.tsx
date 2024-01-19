@@ -53,7 +53,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                 }
 
                 assignMitem({
-                  p,
                   m,
                   root: item,
                   mitem,

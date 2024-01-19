@@ -26,10 +26,40 @@ export const initLoadComp = async (
                 comp_ids.add(id);
               }
             }
+
+            if (component?.props) {
+              for (const [name, prop] of Object.entries(component.props)) {
+                if (prop.meta?.type === "content-element" && prop.content) {
+                  genMeta(
+                    {
+                      ...p,
+                      on: {
+                        visit_component: ({ component }) => {
+                          if (component) {
+                            const { id } = component;
+                            if (!p.comps[id]) {
+                              if (!_loaded || (_loaded && !_loaded.has(id))) {
+                                comp_ids.add(id);
+                              }
+                            }
+                          }
+                        },
+                        visit(meta, vitem) {
+                          if (opt.visit) opt.visit(meta, vitem, shared);
+                        },
+                      },
+                      set_meta: false,
+                      note: "init-load-comp-prop",
+                    },
+                    { item: prop.content }
+                  );
+                }
+              }
+            }
           }
         },
-        visit(meta, item) {
-          if (opt.visit) opt.visit(meta, item, shared);
+        visit(meta, vitem) {
+          if (opt.visit) opt.visit(meta, vitem, shared);
         },
       },
       set_meta: false,
@@ -52,6 +82,7 @@ export const initLoadComp = async (
 
     for (const id of [...loaded]) {
       const comp = p.comps[id];
+
       if (comp) {
         await initLoadComp(p, comp, opt, loaded);
       }
