@@ -82,7 +82,16 @@ export const EdScriptWorkbench = () => {
 const CompTitleInstance = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
-  const item = p.page.meta[active.item_id].item as IItem;
+  let item = null as unknown as IItem;
+
+  if (active.comp_id) {
+    const comp = p.comp.list[active.comp_id];
+    if (comp && comp.meta) {
+      item = comp.meta[active.item_id].item;
+    }
+  } else {
+    item = p.page.meta[active.item_id].item;
+  }
 
   if (item && item.component?.id) {
     const props = item.component.props;
