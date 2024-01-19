@@ -4,7 +4,6 @@ import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta, PG } from "../ed-global";
 
 export const assignMitem = (arg: {
-  p: PG;
   m: IMeta;
   root: IItem;
   mitem: MItem;
@@ -16,7 +15,7 @@ export const assignMitem = (arg: {
     prop_val: FNCompDef
   ) => void;
 }) => {
-  const { p, m, root, mitem, meta } = arg;
+  const { m, root, mitem, meta } = arg;
 
   if (m.jsx_prop && m.parent?.instance_id) {
     const instance_meta = meta[m.parent?.instance_id];

@@ -3,7 +3,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
-import { EDGlobal, IMeta, active } from "../../logic/ed-global";
+import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { createEditScript } from "./prop-instance/edit-script";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
@@ -20,20 +20,14 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
   let _meta = meta;
   if (active.comp_id) {
-    if (
-      p.comp.list[active.comp_id] &&
-      p.comp.list[active.comp_id].meta &&
-      meta.item.originalId
-    ) {
-      const m = p.comp.list[active.comp_id].meta[meta.item.originalId];
-      if (m) {
-        _meta = m;
-      }
+    if (p.comp.list[active.comp_id]) {
+      _meta = getCompMeta(p, meta);
     }
   }
 
   const item = _meta?.item as IItem;
   if (!item) return <>Warning: Item not found</>;
+  if (!_meta.mitem) return <>Warning: MItem Not Found</>;
 
   let filtered = [] as { mprop: FMCompDef; cprop: FNCompDef; name: string }[];
   const mprops = _meta.mitem?.get("component")?.get("props");
@@ -215,4 +209,10 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
       </div>
     </div>
   );
+};
+
+const getCompMeta = (p: PG, imeta: IMeta) => {
+  let meta = null as unknown as IMeta;
+
+  return imeta;
 };

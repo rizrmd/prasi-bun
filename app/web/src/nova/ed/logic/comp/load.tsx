@@ -8,6 +8,8 @@ import { IMeta, PG } from "../ed-global";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
 import { isTextEditing } from "../active/is-editing";
+import { assignMitem } from "../tree/assign-mitem";
+import { createId } from "@paralleldrive/cuid2";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -43,13 +45,11 @@ export const loadCompSnapshot = async (
   comp_id: string,
   snapshot: Uint8Array
 ) => {
-  if (p.comp.list[comp_id] && p.comp.list[comp_id].doc) {
-    return;
-  }
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
   const mitem = doc.getMap("map").get("root");
   if (mitem) {
+    p.comp.loaded[comp_id] = mitem.toJSON() as IItem;
     if (typeof p.comp.list[comp_id]?.on_update === "function") {
       doc.off("update", p.comp.list[comp_id].on_update);
     }
@@ -159,30 +159,20 @@ export const updateComponentMeta = async (
         visit(m) {
           pushTreeNode(p, m, meta, tree);
 
-          if (m.parent) {
-            if (m.parent.id === "root") {
-              if (m.item.id === item.id) {
-                m.mitem = mitem;
-              }
-            } else {
-              const parent = meta[m.parent.id];
-              if (parent && parent.mitem) {
-                parent.mitem.get("childs")?.forEach((child) => {
-                  const cid = child.get("id");
-                  if (cid) {
-                    if (
-                      cid === m.item.id ||
-                      (m.instances &&
-                        m.instances[cid] &&
-                        m.instances[cid][m.item.id])
-                    ) {
-                      m.mitem = child;
-                    }
-                  }
-                });
-              }
-            }
-          }
+          assignMitem({
+            m,
+            root: item,
+            mitem,
+            meta,
+            new_prop_jsx(meta, mprops, prop_name, prop_val) {
+              transact.list.push(() => {
+                const map = new Y.Map();
+                if (prop_val.content) prop_val.content.id = createId();
+                syncronize(map, prop_val);
+                mprops.set(prop_name, map as any);
+              });
+            },
+          });
         },
       },
       note: "load-comp-scan-meta",
@@ -190,7 +180,19 @@ export const updateComponentMeta = async (
     { item, ignore_first_component: true }
   );
 
+  if (transact.list.length > 0) {
+    p.page.doc?.transact(() => {
+      for (const fn of transact.list) {
+        fn();
+      }
+    });
+  }
+
   p.comp.loaded[comp_id] = item;
 
   return { meta, tree };
+};
+
+const transact = {
+  list: [] as (() => void)[],
 };

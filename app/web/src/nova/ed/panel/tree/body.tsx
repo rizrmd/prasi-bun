@@ -19,7 +19,6 @@ export const EdTreeBody = () => {
   const local = useLocal({ tree: null as TreeMethods | null });
   const TypedTree = DNDTree<IMeta>;
 
-  active.hover.renderTree = local.render;
   expandTreeHook(p, local);
 
   let tree: NodeModel<IMeta>[] = [];

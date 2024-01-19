@@ -7,13 +7,12 @@ import {
   FMDimension,
   FMFont,
   FMLayout,
-  FMLinkTag,
   FMPadding,
   FNBackground,
   FNBorder,
   FNDimension,
   FNFont,
-  FNPadding,
+  FNPadding
 } from "./meta-fn";
 
 export type MetaItem = {
