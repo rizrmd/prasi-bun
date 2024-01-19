@@ -14,8 +14,6 @@ RUN ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 
 RUN npm install -g pm2
 
-COPY app/db/.env-prod app/db/.env
-
 RUN bun --version
 RUN bun install
 RUN bun run build
