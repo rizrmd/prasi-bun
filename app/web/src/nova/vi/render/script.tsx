@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViGlobal } from "./global";
@@ -12,8 +12,10 @@ export const ViScript: FC<{
   passprop?: any;
 }> = ({ meta, children, passprop }) => {
   const vi = useGlobal(ViGlobal, "VI");
-  const local = useLocal({});
-  meta.render = local.render;
+  const [_, _set] = useState({});
+  meta.render = () => {
+    _set({});
+  };
 
   let _pass = passprop;
   if (meta.item.component?.id) {

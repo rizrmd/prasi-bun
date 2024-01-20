@@ -11,96 +11,101 @@ export const apiProxy = (api_url: string) => {
     w.prasiApi = {};
   }
 
-  const base = new URL(api_url);
-  const base_url = `${base.protocol}//${base.host}`;
-  if (!w.prasiApi[base_url]) {
-    if (!apiProxyLoaded[base_url]) {
-      apiProxyLoaded[base_url] = loadApiProxyDef(base_url, true);
+  try {
+    const base = new URL(api_url);
+    const base_url = `${base.protocol}//${base.host}`;
+    if (!w.prasiApi[base_url]) {
+      if (!apiProxyLoaded[base_url]) {
+        apiProxyLoaded[base_url] = loadApiProxyDef(base_url, true);
+      }
     }
-  }
 
-  return new Proxy(
-    {},
-    {
-      get: (_, actionName: string) => {
-        const createFn = (actionName: string) => {
-          return function (
-            this: { api_url: string } | undefined,
-            ...rest: any
-          ) {
-            return new Promise<any>(async (resolve, reject) => {
-              try {
-                let api_ref = w.prasiApi[base_url];
+    return new Proxy(
+      {},
+      {
+        get: (_, actionName: string) => {
+          const createFn = (actionName: string) => {
+            return function (
+              this: { api_url: string } | undefined,
+              ...rest: any
+            ) {
+              return new Promise<any>(async (resolve, reject) => {
+                try {
+                  let api_ref = w.prasiApi[base_url];
 
-                if (
-                  !api_ref &&
-                  apiProxyLoaded &&
-                  typeof apiProxyLoaded[base_url] === "object"
-                ) {
-                  await apiProxyLoaded[base_url];
-                  api_ref = w.prasiApi[base_url];
-                }
-
-                if (api_ref) {
-                  if (!api_ref.apiEntry) api_ref.apiEntry = {};
-                  if (api_ref.apiEntry && !api_ref.apiEntry[actionName]) {
-                    reject(
-                      `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
-                        api_ref || {}
-                      ).join("\n   - ")}`
-                    );
-                    return;
+                  if (
+                    !api_ref &&
+                    apiProxyLoaded &&
+                    typeof apiProxyLoaded[base_url] === "object"
+                  ) {
+                    await apiProxyLoaded[base_url];
+                    api_ref = w.prasiApi[base_url];
                   }
-                }
 
-                let actionUrl = api_ref.apiEntry[actionName].url;
-                const actionParams = api_ref.apiEntry[actionName].args;
-                if (actionUrl && actionParams) {
-                  if (rest.length > 0 && actionParams.length > 0) {
-                    for (const [idx, p] of Object.entries(rest)) {
-                      const paramName = actionParams[parseInt(idx)];
-                      if (actionParams && actionParams.includes(paramName)) {
-                        if (
-                          !!p &&
-                          typeof p !== "string" &&
-                          typeof p !== "number"
-                        ) {
-                          continue;
-                        }
-                      }
-                      actionUrl = actionUrl.replace(`:${paramName}?`, p + "");
-                      actionUrl = actionUrl.replace(`:${paramName}`, p + "");
+                  if (api_ref) {
+                    if (!api_ref.apiEntry) api_ref.apiEntry = {};
+                    if (api_ref.apiEntry && !api_ref.apiEntry[actionName]) {
+                      reject(
+                        `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
+                          api_ref || {}
+                        ).join("\n   - ")}`
+                      );
+                      return;
                     }
                   }
 
-                  const url = `${base_url}${actionUrl}`;
+                  let actionUrl = api_ref.apiEntry[actionName].url;
+                  const actionParams = api_ref.apiEntry[actionName].args;
+                  if (actionUrl && actionParams) {
+                    if (rest.length > 0 && actionParams.length > 0) {
+                      for (const [idx, p] of Object.entries(rest)) {
+                        const paramName = actionParams[parseInt(idx)];
+                        if (actionParams && actionParams.includes(paramName)) {
+                          if (
+                            !!p &&
+                            typeof p !== "string" &&
+                            typeof p !== "number"
+                          ) {
+                            continue;
+                          }
+                        }
+                        actionUrl = actionUrl.replace(`:${paramName}?`, p + "");
+                        actionUrl = actionUrl.replace(`:${paramName}`, p + "");
+                      }
+                    }
 
-                  const result = await fetchSendApi(url, rest);
-                  resolve(result);
-                } else {
-                  console.error(`API Not Found: ${actionName.toString()}`);
+                    const url = `${base_url}${actionUrl}`;
+
+                    const result = await fetchSendApi(url, rest);
+                    resolve(result);
+                  } else {
+                    console.error(`API Not Found: ${actionName.toString()}`);
+                  }
+                } catch (e) {
+                  reject(e);
                 }
-              } catch (e) {
-                reject(e);
-              }
-            });
+              });
+            };
           };
-        };
-        if (actionName === "then") {
-          return new Proxy(
-            {},
-            {
-              get: (_, actionName: string) => {
-                return createFn(actionName);
-              },
-            }
-          );
-        }
+          if (actionName === "then") {
+            return new Proxy(
+              {},
+              {
+                get: (_, actionName: string) => {
+                  return createFn(actionName);
+                },
+              }
+            );
+          }
 
-        return createFn(actionName);
-      },
-    }
-  );
+          return createFn(actionName);
+        },
+      }
+    );
+  } catch (e) {
+    console.warn("Init API failed for URL: ", JSON.stringify(api_url));
+    return null;
+  }
 };
 
 const fetchSendApi = async (url: string, params: any) => {

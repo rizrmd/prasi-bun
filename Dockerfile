@@ -15,7 +15,6 @@ RUN echo $DATABASE_URL
 # RUN npm install -g node-gyp
 # RUN npm install -g node-gyp-build-optional-packages
 
-
 # RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.18"
 # RUN ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 
