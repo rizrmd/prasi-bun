@@ -2,9 +2,9 @@
 FROM ubuntu:latest as base
 WORKDIR /usr/src
 
-COPY . .
 
-ARG NODE_VERSION=18
+
+COPY . .
 
 RUN apt-get update
 RUN apt-get install -y curl unzip zip bash gnupg
@@ -19,7 +19,7 @@ RUN npm install -g node-gyp-build-optional-packages
 RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.0.18"
 RUN ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 
-RUN bun --version
+RUN bun repl -e 'console.log(process.env["DATABASE_URL"]);'  
 RUN bun install
 RUN bun run build
 RUN cd app/db && bun prisma db pull && bun prisma generate
