@@ -2,7 +2,7 @@
 FROM ubuntu:latest as base
 WORKDIR /usr/src
 
-
+RUN echo $DATABASE_URL
 
 COPY . .
 
