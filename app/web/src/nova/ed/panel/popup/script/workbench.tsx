@@ -41,7 +41,7 @@ export const EdScriptWorkbench = () => {
               onClick={() => {
                 if (scriptNav.canBack) {
                   active.script_nav.idx = active.script_nav.idx - 1;
-                  const item = active.script_nav.list.pop();
+                  const item = active.script_nav.list[active.script_nav.idx];
 
                   if (item) {
                     active.item_id = item.item_id;
