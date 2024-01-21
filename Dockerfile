@@ -5,7 +5,7 @@ WORKDIR /usr/src/prasi
 COPY . .
 RUN apt-get update
 RUN apt-get install curl gnupg -yq
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash \
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash 
 RUN apt-get install nodejs -yq
 RUN npm i -g node-gyp-build-optional-packages @parcel/watcher
 RUN bun install
