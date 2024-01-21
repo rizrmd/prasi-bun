@@ -9,6 +9,8 @@ export const EdMain = () => {
   const local = useLocal({
     cache: null as any,
     first_load: false,
+    width: 0,
+    height: 0,
   });
 
   let meta: undefined | IMeta = undefined;
@@ -62,17 +64,37 @@ export const EdMain = () => {
           contain: content;
         `
       )}
+      ref={(el) => {
+        if (el) {
+          const bound = el.getBoundingClientRect();
+          if (local.width !== bound.width || local.height !== bound.height) {
+            local.width = bound.width;
+            local.height = bound.height;
+            local.render();
+          }
+        }
+      }}
     >
-      <div className={mainStyle(p, meta)}>{local.cache}</div>
+      {meta && <div className={mainStyle(p, meta, local)}>{local.cache}</div>}
     </div>
   );
 };
 
-const mainStyle = (p: PG, meta?: IMeta) => {
+const mainStyle = (
+  p: PG,
+  meta: IMeta,
+  local: { width: number; height: number }
+) => {
   let is_active = meta ? isMetaActive(p, meta) : false;
 
+  const scale = parseInt(p.ui.zoom.replace("%", "")) / 100;
   return cx(
     "absolute inset-0 flex",
+    css`
+      width: ${(1 / scale) * 100}%;
+      transform: scale(${scale});
+      transform-origin: 0% 0% 0px;
+    `,
     active.hover.id &&
       css`
         .s-${active.hover.id} {
