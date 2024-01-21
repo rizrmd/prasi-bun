@@ -12,6 +12,6 @@ RUN apt-get install nodejs -yq
 
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp
 
-EXPOSE 4550/tcp
+EXPOSE 3000/tcp
 
 CMD [ "bun", "run", "docker.ts" ]
