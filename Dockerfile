@@ -11,5 +11,5 @@ RUN npm i -g node-gyp-build-optional-packages @parcel/watcher
 RUN bun install
 RUN bun run build
 
-EXPOSE 3000
+EXPOSE 4550
 CMD [ "bun run prod" ]
