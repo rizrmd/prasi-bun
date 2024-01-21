@@ -4,7 +4,10 @@ import { $ } from "execa";
 import { g } from "./global";
 
 export const preparePrisma = async () => {
-  if (await existsAsync(dir.path("app/db/.env"))) {
+  if (
+    (await existsAsync(dir.path("app/db/.env"))) ||
+    process.env.DATABASE_URL
+  ) {
     g.log.info("Prisma: db pull & generate");
     await $({ cwd: dir.path(`app/db`) })`bun prisma db pull`;
     await $({ cwd: dir.path(`app/db`) })`bun prisma generate`;
