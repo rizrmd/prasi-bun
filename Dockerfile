@@ -3,7 +3,7 @@ WORKDIR /app/docker
 
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
-
+RUN chown -R bun:bun /app/prasi
 COPY docker.ts docker.ts
 USER bun
 EXPOSE 3000/tcp
