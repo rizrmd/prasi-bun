@@ -3,6 +3,7 @@ FROM oven/bun:1.0.18-debian as base
 WORKDIR /usr/src/prasi
 
 COPY . .
+RUN apt-get update
 RUN apt-get install curl gnupg -yq
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash \
 RUN apt-get install nodejs -yq
