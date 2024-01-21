@@ -21,7 +21,7 @@ export const cssFont = (
     if (glbFont.loadedFonts.indexOf(font.family) < 0) {
       glbFont.loadedFonts.push(font.family);
       const doc = document;
-      const _href = `https://prasi.web.andromedia.co.id/_font/css2?family=${fontName}${weight}`;
+      const _href = `https://prasi.avolut.com/_font/css2?family=${fontName}${weight}`;
       if (!doc.querySelector(`link[href="${_href}]`)) {
         const link = doc.createElement("link");
         link.type = "text/css";
