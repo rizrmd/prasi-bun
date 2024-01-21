@@ -1,13 +1,8 @@
 FROM oven/bun:1.0.18-debian as base
-WORKDIR /usr/src/prasi
-RUN mkdir /usr/src/data
-COPY . .
+WORKDIR /app/docker
+RUN mkdir -p /app/prasi/repo
 
-RUN apt-get update
-RUN apt-get install -y zip 
-RUN bun i -g node-gyp-build-optional-packages
-RUN bun install
-
+COPY docker.ts docker.ts
 USER bun
 EXPOSE 4550/tcp
-CMD [ "bun", "run", "prod" ]
+CMD [ "bun", "run", "docker.tsx" ]
