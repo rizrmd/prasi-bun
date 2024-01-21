@@ -1,7 +1,6 @@
 FROM oven/bun:1.0.18-debian as base
-WORKDIR /tmp/repo
-COPY . /tmp/repo
-
+WORKDIR /app/prasi/repo
+COPY . .
 
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
@@ -13,12 +12,7 @@ RUN apt-get install nodejs -yq
 
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp pnpm
 RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
-RUN bun install
-RUN bun run build
-
-WORKDIR /app/prasi/repo
-RUN cp -r /tmp/repo /app/prasi/repo
 
 EXPOSE 4550/tcp
 
-CMD [ "bun", "run", "prod" ]
+CMD [ "deploy.sh" ]
