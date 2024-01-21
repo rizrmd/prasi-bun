@@ -13,6 +13,7 @@ RUN apt-get install nodejs -yq
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp
 RUN bun install
 RUN bun build
+RUN bun db-pull
 
 EXPOSE 4550/tcp
 
