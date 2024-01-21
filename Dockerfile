@@ -1,5 +1,6 @@
 FROM oven/bun:1.0.18-debian as base
 WORKDIR /usr/src/prasi
+RUN mkdir /usr/src/data
 COPY . .
 
 RUN apt-get update
