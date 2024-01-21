@@ -1,8 +1,7 @@
 FROM oven/bun:1.0.18-debian as base
-WORKDIR /app/prasi/repo
-COPY . .
+WORKDIR /tmp/repo
+COPY . /tmp/repo
 
-RUN ls /app/prasi/data
 
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
@@ -17,6 +16,9 @@ RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
 RUN bun install
 RUN bun run build
 RUN bun run db-pull
+
+WORKDIR /app/prasi/repo
+RUN cp -r /tmp/repo /app/prasi/repo
 
 EXPOSE 4550/tcp
 
