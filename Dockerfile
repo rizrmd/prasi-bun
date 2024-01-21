@@ -14,4 +14,4 @@ RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp
 
 EXPOSE 4550/tcp
 
-CMD [ "bun", "run", "docker.ts" ]
+CMD [ "bun", "run", "prod" ]
