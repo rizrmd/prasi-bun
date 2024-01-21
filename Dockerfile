@@ -5,4 +5,5 @@ RUN mkdir -p /app/prasi/repo
 COPY docker.ts docker.ts
 USER bun
 EXPOSE 3000/tcp
-CMD [ "bun", "run", "docker.tsx" ]
+EXPOSE 4550/tcp
+CMD [ "bun", "run", "docker.ts" ]
