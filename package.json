@@ -19,7 +19,8 @@
     "pkgs/*"
   ],
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "node-gyp-build-optional-packages": "^5.1.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
