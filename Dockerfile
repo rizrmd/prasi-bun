@@ -4,7 +4,7 @@ COPY docker.ts docker.ts
 
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
-
+RUN git config --global --add safe.directory /app/prasi/repo
 RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 
 RUN apt-get update
