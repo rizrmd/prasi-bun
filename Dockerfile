@@ -1,5 +1,5 @@
 FROM oven/bun:1.0.18-debian as base
-WORKDIR /app/prasi/repo
+WORKDIR /app/docker
 RUN chown -R bun:bun /app/prasi
 
 RUN apt-get update
@@ -14,4 +14,4 @@ RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp
 
 EXPOSE 4550/tcp
 
-CMD [ "bun", "run", "prod" ]
+CMD [ "bun", "run", "docker.ts" ]
