@@ -2,6 +2,8 @@ FROM oven/bun:1.0.18-debian as base
 WORKDIR /app/prasi/repo
 COPY . .
 
+RUN ls /app/prasi/data
+
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
 RUN git config --global --add safe.directory /app/prasi/repo
