@@ -1,13 +1,15 @@
 import { FC } from "react";
-import { active } from "./logic/ed-global";
+import { EDGlobal, active } from "./logic/ed-global";
 import { EdAddItem } from "./panel/header/mid/add-item";
 import { EdAddSection } from "./panel/header/mid/add-section";
 import { EdAddText } from "./panel/header/mid/add-text";
 import { EdCompPicker } from "./panel/header/mid/comp-picker";
 import { EdPagePicker } from "./panel/header/mid/page-picker";
 import { TopBtn } from "./panel/header/top-btn";
+import { useGlobal } from "web-utils";
 
 export const EdMid: FC<{}> = () => {
+  const ed = useGlobal(EDGlobal, "EDITORF");
   return (
     <div className="flex flex-col">
       <div
@@ -31,6 +33,27 @@ export const EdMid: FC<{}> = () => {
           </div>
         </div>
         <div className="flex items-center flex-1 justify-end">
+          <label className="border-r border-r-slate-300 text-slate-400 flex items-center pr-1 mr-1">
+            <div className=" px-1"> Zoom</div>
+            <select
+              value={ed.ui.zoom}
+              onChange={(e) => {
+                ed.ui.zoom = e.currentTarget.value;
+                localStorage.zoom = ed.ui.zoom;
+                ed.render();
+              }}
+            >
+              {["50%", "60%", "70%", "80%", "90%", "100%", "120%", "150%"].map(
+                (e) => {
+                  return (
+                    <option key={e} value={e}>
+                      {e}
+                    </option>
+                  );
+                }
+              )}
+            </select>
+          </label>
           <a href={`/vi/${params.site_id}/${params.page_id}`} target="_blank">
             <TopBtn style="slim" className="font-mono text-[9px]">
               PREVIEW

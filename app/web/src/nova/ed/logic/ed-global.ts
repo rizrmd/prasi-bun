@@ -182,6 +182,7 @@ export const EDGlobal = {
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   ui: {
+    zoom: localStorage.zoom || '100%',
     should_render: false,
     side: { prop: true },
     layout: {
