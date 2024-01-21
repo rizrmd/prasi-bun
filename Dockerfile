@@ -9,7 +9,6 @@ RUN curl -sL https://deb.nodesource.com/setup_20.x | bash
 RUN apt-get install nodejs -yq
 RUN npm i -g node-gyp-build-optional-packages @parcel/watcher
 RUN bun install
-RUN bun run build
 
 EXPOSE 4550
 CMD [ "bun run prod" ]
