@@ -225,6 +225,7 @@ model site {
   is_deleted     Boolean          @default(false)
   responsive     String           @default("all")
   npm_cache      String           @default(" ") @db.VarChar
+  code_mode      String           @default("old") @db.VarChar(5)
   code           code[]
   component_site component_site[]
   npm_site       npm_site[]

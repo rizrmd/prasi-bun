@@ -1,11 +1,9 @@
 import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
+import { prepCode } from "../editor/code/prep-code";
 import { activity } from "../entity/activity";
 import { SyncConnection } from "../type";
-import { prepCode } from "../editor/code/prep-code";
-import { docs } from "../entity/docs";
-import { snapshot } from "../entity/snapshot";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -40,10 +38,10 @@ export const site_load: SAction["site"]["load"] = async function (
         config: config as ESite["config"],
         domain: site.domain,
         js: site.js || "",
-        responsive: site.responsive,
+        responsive: site.responsive as ESite["responsive"],
         js_compiled: site.js_compiled || "",
-        layout: { id: layout?.id || "", snapshot: null },
-        code: { snapshot: null },
+        layout: { id: layout?.id || "", snapshot: null, meta: undefined },
+        code: { snapshot: null, mode: site.code_mode as "old" | "vsc" },
       };
     }
   }

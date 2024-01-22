@@ -25,6 +25,7 @@ export const EmptySite = {
   },
   code: {
     snapshot: null as null | Uint8Array,
+    mode: "old" as "old" | "vsc",
   },
 };
 
