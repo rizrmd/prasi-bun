@@ -4,8 +4,8 @@ import { g } from "../utils/global";
 import { dir } from "../utils/dir";
 
 const cache = {
-  dev: {} as Record<string, string>,
-  prod: {} as Record<string, string>,
+  dev: "",
+  prod: "",
 };
 
 export const _ = {
@@ -27,14 +27,14 @@ export const _ = {
 
         const mode = req.query_parameters["dev"] ? "dev" : "prod";
 
-        if (!cache[mode][url]) {
+        if (!cache[mode]) {
           let src = "";
           if (mode === "dev") {
             src = `\
 (() => {
-  const baseurl = new URL(location.href);
+  const baseurl = new URL("https://prasi.avolut.com/");
   baseurl.pathname = '';
-  const url = ${url} || baseurl.toString();
+  const url = ;
   const w = window;
   if (!w.prasiApi) {
     w.prasiApi = {};
@@ -52,9 +52,9 @@ export const _ = {
           } else {
             src = `\
 (() => {
-  const baseurl = new URL(location.href);
+  const baseurl = new URL("https://prasi.avolut.com/");
   baseurl.pathname = '';
-  const url = ${url} || baseurl.toString();
+  const url = baseurl.toString();
   const w = window;
   if (!w.prasiApi) {
     w.prasiApi = {};
@@ -65,10 +65,10 @@ export const _ = {
 })();`;
           }
 
-          cache[mode][url] = src;
+          cache[mode] = src;
         }
 
-        res.send(cache[mode][url]);
+        res.send(cache[mode]);
       },
     };
 
