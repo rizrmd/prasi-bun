@@ -8,7 +8,7 @@ import { treeRebuild } from "./tree/build";
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
     if (!p.site.domain && !p.site.name) {
-      p.status = "post-init";
+      p.status = "load-site";
       const site = await p.sync.site.load(p.site.id);
       if (!site) {
         p.status = "site-not-found";

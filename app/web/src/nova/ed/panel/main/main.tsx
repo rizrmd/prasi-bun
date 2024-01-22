@@ -60,9 +60,7 @@ export const EdMain = () => {
     <div
       className={cx(
         "flex flex-1 relative overflow-auto",
-        css`
-          contain: content;
-        `
+        p.mode === "mobile" ? "flex-col items-center" : ""
       )}
       ref={(el) => {
         if (el) {
@@ -75,23 +73,39 @@ export const EdMain = () => {
         }
       }}
     >
-      {meta && <div className={mainStyle(p, meta, local)}>{local.cache}</div>}
+      <div className={mainStyle(p, meta)}>{local.cache}</div>
     </div>
   );
 };
 
-const mainStyle = (
-  p: PG,
-  meta: IMeta,
-  local: { width: number; height: number }
-) => {
+const mainStyle = (p: PG, meta?: IMeta) => {
   let is_active = meta ? isMetaActive(p, meta) : false;
 
   const scale = parseInt(p.ui.zoom.replace("%", "")) / 100;
+
+  let width = `${(1 / scale) * 100}%`;
+  if (p.mode === "mobile") {
+    width = `${(1 / scale) * 375}px`;
+  }
+
   return cx(
-    "absolute inset-0 flex",
+    "absolute flex",
     css`
-      width: ${(1 / scale) * 100}%;
+      contain: content;
+    `,
+    p.mode === "mobile"
+      ? css`
+          border-left: 1px solid #ccc;
+          border-right: 1px solid #ccc;
+          background: white;
+          top: 0px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          bottom: 0px;
+        `
+      : "inset-0",
+    css`
+      width: ${width};
       transform: scale(${scale});
       transform-origin: 0% 0% 0px;
     `,

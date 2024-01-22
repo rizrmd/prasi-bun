@@ -9,11 +9,15 @@ export const edActionDelete = async (p: PG, item: IContent) => {
   if (meta) {
     const mitem = meta.mitem;
     if (mitem) {
-      mitem.parent.forEach((e, k) => {
-        if (e == mitem) {
-          deleteByParent(p, mitem, k);
-        }
+      mitem.doc?.transact(() => {
+        mitem.parent.forEach((e, k) => {
+          if (e == mitem) {
+            deleteByParent(p, mitem, k);
+          }
+        });
       });
+      await treeRebuild(p);
+      p.render();
     }
   }
 };
@@ -23,17 +27,19 @@ export const edActionDeleteById = async (p: PG, id: string) => {
   if (meta) {
     const mitem = meta.mitem;
     if (mitem) {
-      mitem.parent.forEach((e, k) => {
-        if (e == mitem) {
-          deleteByParent(p, mitem, k);
-        }
+      mitem.doc?.transact(() => {
+        mitem.parent.forEach((e, k) => {
+          if (e == mitem) {
+            deleteByParent(p, mitem, k);
+          }
+        });
       });
+      await treeRebuild(p);
+      p.render();
     }
   }
 };
 
 const deleteByParent = (p: PG, mitem: MItem, index: number) => {
-  const mchild = mitem.parent.get(index);
   mitem.parent.delete(index);
-  treeRebuild(p);
 };

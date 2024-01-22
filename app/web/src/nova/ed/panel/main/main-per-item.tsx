@@ -75,6 +75,9 @@ export const mainPerItemVisit = (
         }
       }
     };
+    if (parts.props.className && !parts.props.className.includes("el-active")) {
+      parts.props.className += " el-active";
+    }
 
     prop.onInput = (e) => {
       e.stopPropagation();
@@ -159,10 +162,6 @@ export const mainPerItemVisit = (
     p.render();
   };
 };
-
-function getCaret(el: any) {
-  return getSelectionOffset(el);
-}
 
 function setCaret(el: any, offset: any) {
   setSelectionOffset(el, offset[0], offset[1]);

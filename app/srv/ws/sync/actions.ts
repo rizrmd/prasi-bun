@@ -125,7 +125,7 @@ export const SyncActions = {
             prop_name: string;
             value: Uint8Array;
           }
-    ) => ({}) as boolean | ParsedScope,
+    ) => ({}) as boolean | ParsedScope | string,
     parse: async (code: string | Record<string, string>) =>
       ({}) as Record<string, ReturnType<typeof parseJs>>,
   },

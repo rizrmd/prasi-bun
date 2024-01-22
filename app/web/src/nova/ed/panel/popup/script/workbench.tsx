@@ -5,10 +5,12 @@ import { EdScriptMonaco } from "./monaco";
 import { EdScriptSnippet } from "./snippet";
 import { useEffect } from "react";
 import { Loading } from "../../../../../utils/ui/loading";
+import { Tooltip } from "../../../../../utils/ui/tooltip";
 
 export const EdScriptWorkbench = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ active_id: "" });
+  p.ui.popup.script.wb_render = local.render;
 
   useEffect(() => {
     if (!local.active_id) {
@@ -27,103 +29,144 @@ export const EdScriptWorkbench = () => {
     canBack: active.script_nav.list.length > 0,
   };
 
+  const is_error =
+    p.ui.popup.script.typings.status === "error" &&
+    p.ui.popup.script.mode === "js";
   return (
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
-        <div className="flex border-b items-stretch">
-          <div className="border-r px-2 flex items-center">
-            <div
-              className={cx(
-                scriptNav.canBack
-                  ? "cursor-pointer hover:text-blue-400"
-                  : "text-slate-200"
-              )}
-              onClick={() => {
-                if (scriptNav.canBack) {
-                  active.script_nav.idx = active.script_nav.idx - 1;
-                  const item = active.script_nav.list[active.script_nav.idx];
-
-                  if (item) {
-                    active.item_id = item.item_id;
-                    active.comp_id = item.comp_id || "";
-                    active.instance = {
-                      item_id: item.instance?.item_id || "",
-                      comp_id: item.instance?.comp_id || "",
-                    };
-                    p.render();
-                  }
-                }
-              }}
-            >
-              <ChevronLeft />
-            </div>
-            <div
-              className={cx(
-                scriptNav.canNext
-                  ? "cursor-pointer hover:text-blue-400"
-                  : "text-slate-200"
-              )}
-              onClick={() => {
-                if (scriptNav.canNext) {
-                  active.script_nav.idx = active.script_nav.idx + 1;
-                  const item = active.script_nav.list[active.script_nav.idx];
-
-                  if (item) {
-                    active.item_id = item.item_id;
-                    active.comp_id = item.comp_id || "";
-                    active.instance = {
-                      item_id: item.instance?.item_id || "",
-                      comp_id: item.instance?.comp_id || "",
-                    };
-                    p.render();
-                  }
-                }
-              }}
-            >
-              <ChevronRight />
-            </div>
-          </div>
-          {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
-          {p.ui.popup.script.type === "prop-instance" && <CompTitleInstance />}
-          {p.ui.popup.script.type === "item" && (
-            <>
-              <div className="flex p-2 space-x-1">
-                {[
-                  { type: "js", color: "#e9522c" },
-                  { type: "css", color: "#188228" },
-                  { type: "html", color: "#2c3e83" },
-                ].map((e) => {
-                  return (
-                    <div
-                      key={e.type}
-                      className={cx(
-                        css`
-                          color: ${e.color};
-                          border: 1px solid ${e.color};
-                        `,
-                        "uppercase text-white text-[12px] cursor-pointer flex items-center justify-center transition-all hover:opacity-100 w-[40px] text-center",
-                        p.ui.popup.script.mode === e.type
-                          ? css`
-                              background: ${e.color};
-                              color: white;
-                            `
-                          : "opacity-30"
-                      )}
-                      onClick={() => {
-                        p.ui.popup.script.mode = e.type as any;
-                        p.render();
-                      }}
-                    >
-                      {e.type}
-                    </div>
-                  );
-                })}
-              </div>
-              {p.ui.popup.script.mode === "js" &&
-                p.ui.popup.script.type === "item" && <EdScriptSnippet />}
-            </>
+        <div
+          className={cx(
+            "flex border-b items-stretch justify-between",
+            is_error && "bg-red-100"
           )}
+        >
+          <div className={cx("flex items-stretch")}>
+            <div className="border-r px-2 flex items-center">
+              <div
+                className={cx(
+                  scriptNav.canBack
+                    ? "cursor-pointer hover:text-blue-400"
+                    : "text-slate-200"
+                )}
+                onClick={() => {
+                  if (scriptNav.canBack) {
+                    active.script_nav.idx = active.script_nav.idx - 1;
+                    const item = active.script_nav.list[active.script_nav.idx];
+
+                    if (item) {
+                      active.item_id = item.item_id;
+                      active.comp_id = item.comp_id || "";
+                      active.instance = {
+                        item_id: item.instance?.item_id || "",
+                        comp_id: item.instance?.comp_id || "",
+                      };
+                      p.render();
+                    }
+                  }
+                }}
+              >
+                <ChevronLeft />
+              </div>
+              <div
+                className={cx(
+                  scriptNav.canNext
+                    ? "cursor-pointer hover:text-blue-400"
+                    : "text-slate-200"
+                )}
+                onClick={() => {
+                  if (scriptNav.canNext) {
+                    active.script_nav.idx = active.script_nav.idx + 1;
+                    const item = active.script_nav.list[active.script_nav.idx];
+
+                    if (item) {
+                      active.item_id = item.item_id;
+                      active.comp_id = item.comp_id || "";
+                      active.instance = {
+                        item_id: item.instance?.item_id || "",
+                        comp_id: item.instance?.comp_id || "",
+                      };
+                      p.render();
+                    }
+                  }
+                }}
+              >
+                <ChevronRight />
+              </div>
+            </div>
+            {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
+            {p.ui.popup.script.type === "prop-instance" && (
+              <CompTitleInstance />
+            )}
+            {p.ui.popup.script.type === "item" && (
+              <>
+                <div className="flex p-2 space-x-1">
+                  {[
+                    { type: "js", color: "#e9522c" },
+                    { type: "css", color: "#188228" },
+                    { type: "html", color: "#2c3e83" },
+                  ].map((e) => {
+                    return (
+                      <div
+                        key={e.type}
+                        className={cx(
+                          css`
+                            color: ${e.color};
+                            border: 1px solid ${e.color};
+                          `,
+                          "uppercase text-white text-[12px] cursor-pointer flex items-center justify-center transition-all hover:opacity-100 w-[40px] text-center",
+                          p.ui.popup.script.mode === e.type
+                            ? css`
+                                background: ${e.color};
+                                color: white;
+                              `
+                            : "opacity-30"
+                        )}
+                        onClick={() => {
+                          p.ui.popup.script.mode = e.type as any;
+                          p.render();
+                        }}
+                      >
+                        {e.type}
+                      </div>
+                    );
+                  })}
+                </div>
+                {p.ui.popup.script.mode === "js" &&
+                  p.ui.popup.script.type === "item" && <EdScriptSnippet />}
+              </>
+            )}
+          </div>
+          <div className="flex items-center text-xs pr-2">
+            {p.ui.popup.script.mode === "js" && (
+              <div>
+                {
+                  (
+                    {
+                      ok: <div className="text-green-700">Typings: OK</div>,
+                      loading: <div className="text-slate-500">Loading ⌛</div>,
+                      error: (
+                        <Tooltip
+                          content={
+                            <div className="font-mono whitespace-pre-wrap text-[11px]">
+                              {p.ui.popup.script.typings.err_msg}
+                            </div>
+                          }
+                          delay={0}
+                        >
+                          <div className="text-red-700 border-red-700 border bg-white bg-opacity-80 p-1">
+                            ⚠️ Typings: ERROR
+                          </div>
+                        </Tooltip>
+                      ),
+                    } as any
+                  )[p.ui.popup.script.typings.status]
+                }
+              </div>
+            )}
+          </div>
         </div>
+
         <div className="relative flex flex-1">
           {local.active_id === active.item_id ? (
             <EdScriptMonaco />
