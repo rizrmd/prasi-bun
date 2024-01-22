@@ -17,9 +17,9 @@ export const loadApiProxyDef = async (url: string, with_types: boolean) => {
         done();
       };
       if (with_types) {
-        script.src = `${base}/_prasi/load.js?url=${url}&dev=1`;
+        script.src = `${base}/_prasi/load.js?url=${url}&v2&dev=1`;
       } else {
-        script.src = `${base}/_prasi/load.js?url=${url}`;
+        script.src = `${base}/_prasi/load.js?url=${url}&v2`;
       }
       d.body.appendChild(script);
     });
