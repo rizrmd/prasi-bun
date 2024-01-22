@@ -12,6 +12,7 @@ import {
 	iconGear,
 	iconLoading,
 	iconLog,
+	iconNewTab,
 	iconTrash,
 } from "./icons";
 import { CodeNameItem, CodeNameList, codeName } from "./name-list";
@@ -256,6 +257,19 @@ const CodeBody = () => {
 								__html: p.ui.popup.code.loading ? iconLog : iconLoading,
 							}}
 						></div>
+					</Tooltip>
+					<Tooltip
+						content="Open in new tab"
+						delay={0}
+						placement="bottom"
+						className={cx("flex items-stretch relative border-l")}
+						onClick={() => {
+							window.open(
+								`${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`,
+							);
+						}}
+					>
+						<div dangerouslySetInnerHTML={{ __html: iconNewTab }}></div>
 					</Tooltip>
 				</div>
 				<div className="flex items-center">
