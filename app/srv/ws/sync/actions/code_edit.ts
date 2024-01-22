@@ -41,41 +41,45 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
       if (mitem) {
         if (arg.type === "adv") {
-          const res = await transform(`render(${src})`, {
-            jsx: "transform",
-            format: "cjs",
-            loader: "tsx",
-          });
-          doc?.transact(() => {
-            const mode = arg.mode;
-            let adv = mitem.get("adv");
-            if (!adv) {
-              mitem.set("adv", new Y.Map() as any);
-              adv = mitem.get("adv");
-            }
+          try {
+            const res = await transform(`render(${src})`, {
+              jsx: "transform",
+              format: "cjs",
+              loader: "tsx",
+            });
+            doc?.transact(() => {
+              const mode = arg.mode;
+              let adv = mitem.get("adv");
+              if (!adv) {
+                mitem.set("adv", new Y.Map() as any);
+                adv = mitem.get("adv");
+              }
 
-            if (adv) {
-              try {
-                if (adv) {
-                  adv.set(mode, src);
-                  if (mode === "js") {
-                    adv.set("jsBuilt", res.code);
+              if (adv) {
+                try {
+                  if (adv) {
+                    adv.set(mode, src);
+                    if (mode === "js") {
+                      adv.set("jsBuilt", res.code);
+                    }
+                  }
+                } catch (e) {
+                  g.log.error(e);
+                }
+
+                if (mode === "js") {
+                  const res = parseJs(adv.get("js")) || false;
+                  if (res) {
+                    mitem.set("script", res);
+                  } else {
+                    mitem.delete("script");
                   }
                 }
-              } catch (e) {
-                g.log.error(e);
               }
-
-              if (mode === "js") {
-                const res = parseJs(adv.get("js")) || false;
-                if (res) {
-                  mitem.set("script", res);
-                } else {
-                  mitem.delete("script");
-                }
-              }
-            }
-          });
+            });
+          } catch (e: any) {
+            return e.message.toString();
+          }
         } else {
           const mprop = mitem
             .get("component")
@@ -94,7 +98,9 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 mprop.set("value", src);
                 mprop.set("valueBuilt", res.code.substring(6));
               });
-            } catch (e) {}
+            } catch (e: any) {
+              return e.message.toString();
+            }
           }
         }
       }
@@ -134,8 +140,8 @@ export const code_edit: SAction["code"]["edit"] = async function (
                   }
                 }
               });
-            } catch (e) {
-              g.log.error(e);
+            } catch (e: any) {
+              return e.message.toString();
             }
           }
         }

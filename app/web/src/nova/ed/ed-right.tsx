@@ -19,7 +19,7 @@ export const EdRight = () => {
         css`
           width: ${p.ui.layout.right}px;
         `,
-        "border-l flex flex-col"
+        "border-l flex flex-col bg-white"
       )}
     >
       {!meta ? (

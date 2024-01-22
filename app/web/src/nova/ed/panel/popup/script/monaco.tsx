@@ -288,6 +288,8 @@ export const EdScriptMonaco: FC<{}> = () => {
       }
       onChange={(value) => {
         const stype = p.ui.popup.script.type;
+        p.ui.popup.script.typings.status = "loading";
+        p.ui.popup.script.wb_render();
         if ((value || "").includes(IMPORT_SEPARATOR)) {
           const valparts = (value || "").split(IMPORT_SEPARATOR + "\n");
           if (valparts.length === 2) local.value = valparts[1];
@@ -301,7 +303,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               `export const ${p.ui.popup.script.prop_name} = `.length
             );
           }
-        } else { 
+        } else {
           local.value = value || "";
         }
         local.render();
@@ -318,6 +320,8 @@ export const EdScriptMonaco: FC<{}> = () => {
               arg.page_id = p.page.cur.id;
             }
             let scope: boolean | ParsedScope = false;
+            p.ui.popup.script.typings.status = "ok";
+            p.ui.popup.script.typings.err_msg = "";
             if (stype === "prop-master") {
               p.sync.code.edit({
                 type: "prop-master",
@@ -327,7 +331,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 ...arg,
               });
             } else if (stype === "prop-instance") {
-              scope = await p.sync.code.edit({
+              const code_result = await p.sync.code.edit({
                 type: "prop-instance",
                 mode: mode,
                 prop_name: p.ui.popup.script.prop_name,
@@ -335,18 +339,32 @@ export const EdScriptMonaco: FC<{}> = () => {
                 value: compress(encode.encode(value || "")),
                 ...arg,
               });
+              if (typeof code_result === "string") {
+                p.ui.popup.script.typings.status = "error";
+                p.ui.popup.script.typings.err_msg = code_result;
+              } else if (typeof code_result === "object") {
+                scope = code_result;
+              }
             } else {
-              scope = await p.sync.code.edit({
+              const code_result = await p.sync.code.edit({
                 type: "adv",
                 mode: mode,
                 item_id: active.item_id,
                 value: compress(encode.encode(value || "")),
                 ...arg,
               });
+
+              if (typeof code_result === "string") {
+                p.ui.popup.script.typings.status = "error";
+                p.ui.popup.script.typings.err_msg = code_result;
+              } else if (typeof code_result === "object") {
+                scope = code_result;
+              }
             }
             if (typeof scope === "object") {
               meta.item.script = scope;
             }
+            p.ui.popup.script.wb_render();
           }
         };
         p.ui.popup.script.on_close = () => {

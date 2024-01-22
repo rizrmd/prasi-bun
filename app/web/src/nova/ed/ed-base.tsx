@@ -28,7 +28,7 @@ export const EdBase = () => {
 
   edRoute(p);
 
-  if (p.status === "post-init") {
+  if (p.status === "load-site") {
     return <Loading note={`page-${p.status}`} />;
   }
   if (p.status === "site-not-found" || p.status === "page-not-found") {
@@ -47,7 +47,12 @@ export const EdBase = () => {
         <EdPane type="left" min_size={200} />
         <div className="flex flex-1 flex-col items-stretch">
           <EdMid />
-          <div className="flex flex-1 items-stretch">
+          <div
+            className={cx(
+              "flex flex-1 items-stretch",
+              p.mode === "mobile" ? mobileCSS : "bg-white"
+            )}
+          >
             <EdMain />
             <EdPane type="right" min_size={240} />
             <EdRight />
@@ -137,4 +142,19 @@ const style = css`
       }
     }
   }
+`;
+
+export const mobileCSS = css`
+  background-color: white;
+  background-image: linear-gradient(45deg, #fafafa 25%, transparent 25%),
+    linear-gradient(-45deg, #fafafa 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #fafafa 75%),
+    linear-gradient(-45deg, transparent 75%, #fafafa 75%);
+
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
 `;

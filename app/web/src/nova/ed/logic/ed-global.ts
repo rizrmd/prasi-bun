@@ -132,7 +132,7 @@ export const EDGlobal = {
   clients: {} as Record<string, { id: string; username: string }>,
   status: "init" as
     | "init"
-    | "post-init"
+    | "load-site"
     | "reload"
     | "site-not-found"
     | "page-not-found"
@@ -228,6 +228,8 @@ export const EDGlobal = {
         prop_kind: "" as PropFieldKind,
         prop_name: "",
         on_close: () => {},
+        typings: { status: "ok" as "ok" | "loading" | "error", err_msg: "" },
+        wb_render: () => {},
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {

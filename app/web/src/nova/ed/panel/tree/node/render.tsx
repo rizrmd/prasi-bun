@@ -122,12 +122,14 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
         active.item_id = item.id;
         p.ui.tree.search = "";
         p.render();
+
         if ((item as IContent).type === "text") {
           setTimeout(() => {
             if (document.activeElement?.tagName === "INPUT") {
               return;
             }
             const el_active = document.querySelector(".el-active") as any;
+
             if (el_active) {
               setEndOfContenteditable(el_active);
             }
