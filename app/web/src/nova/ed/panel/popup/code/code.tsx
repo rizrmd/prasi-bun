@@ -101,10 +101,10 @@ export const EdPopCode = () => {
 const CodeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ namePicker: false, codeAssign: false });
-
+ 
   const vscode_url = isLocalhost()
     ? "http://localhost:3000?"
-    : "https://code.web.andromedia.co.id?tkn=prasi&";
+    : "https://prasi-vsc.avolut.com/?tkn=prasi&";
 
   return (
     <div className="relative w-full h-full flex flex-col">
