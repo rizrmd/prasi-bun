@@ -32,9 +32,8 @@ export const _ = {
           if (mode === "dev") {
             src = `\
 (() => {
-  const baseurl = new URL("https://prasi.avolut.com/");
-  baseurl.pathname = '';
-  const url = baseurl.toString();
+  //[[REPLACE]]
+  const url = \`\${baseurl.protocol}//\${baseurl.host}\`;
   const w = window;
   if (!w.prasiApi) {
     w.prasiApi = {};
@@ -52,9 +51,8 @@ export const _ = {
           } else {
             src = `\
 (() => {
-  const baseurl = new URL("https://prasi.avolut.com/");
-  baseurl.pathname = '';
-  const url = baseurl.toString();
+  //[[REPLACE]]
+  const url = \`\${baseurl.protocol}//\${baseurl.host}\`;
   const w = window;
   if (!w.prasiApi) {
     w.prasiApi = {};
@@ -65,7 +63,10 @@ export const _ = {
 })();`;
           }
 
-          cache[mode] = src;
+          cache[mode] = src.replace(
+            "//[[REPLACE]]",
+            `const baseurl = new URL(${url})`
+          );
         }
 
         res.send(cache[mode]);
