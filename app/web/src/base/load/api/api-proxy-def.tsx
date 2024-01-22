@@ -29,7 +29,7 @@ export const loadApiProxyDef = async (url: string, with_types: boolean) => {
       apiEntry: (await apiEntry.json()).srv,
     };
 
-    if (with_types) {
+    if (with_types) { 
       const apiTypes = await fetch(base + "/_prasi/api-types");
       w.prasiApi[url].apiTypes = await apiTypes.text();
       w.prasiApi[url].prismaTypes = {
