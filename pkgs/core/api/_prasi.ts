@@ -4,8 +4,8 @@ import { g } from "../utils/global";
 import { dir } from "../utils/dir";
 
 const cache = {
-  dev: "",
-  prod: "",
+  dev: {} as Record<string, string>,
+  prod: {} as Record<string, string>,
 };
 
 export const _ = {
@@ -25,8 +25,12 @@ export const _ = {
           ? JSON.stringify(req.query_parameters["url"])
           : "undefined";
 
-        if (!cache.dev) {
-          cache.dev = `\
+        const mode = req.query_parameters["dev"] ? "dev" : "prod";
+
+        if (!cache[mode][url]) {
+          let src = "";
+          if (mode === "dev") {
+            src = `\
 (() => {
   const baseurl = new URL(location.href);
   baseurl.pathname = '';
@@ -45,8 +49,8 @@ export const _ = {
     },
   };
 })();`;
-
-          cache.prod = `\
+          } else {
+            src = `\
 (() => {
   const baseurl = new URL(location.href);
   baseurl.pathname = '';
@@ -59,13 +63,12 @@ export const _ = {
     apiEntry: ${JSON.stringify(getApiEntry())},
   };
 })();`;
+          }
+
+          cache[mode][url] = src;
         }
 
-        if (req.query_parameters["dev"]) {
-          res.send(cache.dev);
-        } else {
-          res.send(cache.prod);
-        }
+        res.send(cache[mode][url]);
       },
     };
 
