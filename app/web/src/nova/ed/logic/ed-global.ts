@@ -17,7 +17,7 @@ export const EmptySite = {
   config: { api_url: "" },
   js: "",
   js_compiled: "",
-  responsive: "" as "desktop" | "mobile",
+  responsive: "" as "desktop-only" | "mobile-only" | "responsive",
   layout: {
     id: "--",
     snapshot: null as null | Uint8Array,

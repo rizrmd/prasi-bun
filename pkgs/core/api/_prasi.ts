@@ -34,7 +34,7 @@ export const _ = {
 (() => {
   const baseurl = new URL("https://prasi.avolut.com/");
   baseurl.pathname = '';
-  const url = ;
+  const url = baseurl.toString();
   const w = window;
   if (!w.prasiApi) {
     w.prasiApi = {};

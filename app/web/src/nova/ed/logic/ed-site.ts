@@ -7,6 +7,13 @@ export const loadSite = async (p: PG, site: ESite, note: string) => {
   const layout_changed = p.site.layout.id !== site.layout.id;
   p.site = site;
 
+  p.mode = "desktop";
+  if (p.site.responsive === "mobile-only") {
+    p.mode = "mobile";
+  } else if (p.site.responsive === "desktop-only") {
+    p.mode = "desktop";
+  }
+
   if (layout_changed) {
     const old_layout = p.page.list[old_layout_id];
 

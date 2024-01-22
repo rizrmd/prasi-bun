@@ -34,7 +34,6 @@ export const EdMid: FC<{}> = () => {
           </div>
         </div>
         <div className="flex items-stretch flex-1 justify-end">
-          {ed.mode}
           <label className=" text-slate-400 flex items-center pr-1">
             <div className=" px-1"> Zoom</div>
             <select
