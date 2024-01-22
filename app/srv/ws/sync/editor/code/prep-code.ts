@@ -113,10 +113,12 @@ export const prepDCode = async (site_id: string) => {
 	}
 
 	if (exists) {
-		Bun.spawn({
-			cmd: ["chmod", "777", "-R", "."],
-			cwd: dir.path(`${g.datadir}/site}`),
+		const chmod = Bun.spawn({
+			cmd: ["chmod", "-R", "777", "."],
+			cwd: dir.path(`${g.datadir}/site`),
 		});
+
+		await chmod.exited;
 
 		const src_bin = Y.encodeStateAsUpdate(docs.code[site_id].src as Doc);
 		const build_bin = Y.encodeStateAsUpdate(docs.code[site_id].build as Doc);

@@ -5,96 +5,96 @@ import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
 
 export const EdMain = () => {
-  const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({
-    cache: null as any,
-    first_load: false,
-    width: 0,
-    height: 0,
-  });
+	const p = useGlobal(EDGlobal, "EDITOR");
+	const local = useLocal({
+		cache: null as any,
+		first_load: false,
+		width: 0,
+		height: 0,
+	});
 
-  let meta: undefined | IMeta = undefined;
+	let meta: undefined | IMeta = undefined;
 
-  if (active.comp_id) {
-    if (p.comp.list[active.comp_id]) {
-      meta = p.comp.list[active.comp_id].meta[active.item_id];
-    } else {
-      active.comp_id = "";
-    }
-  } else {
-    meta = p.page.meta[active.item_id];
-  }
+	if (active.comp_id) {
+		if (p.comp.list[active.comp_id]) {
+			meta = p.comp.list[active.comp_id].meta[active.item_id];
+		} else {
+			active.comp_id = "";
+		}
+	} else {
+		meta = p.page.meta[active.item_id];
+	}
 
-  if (active.should_render_main) {
-    local.cache = (
-      <Vi
-        meta={p.page.meta}
-        api_url={p.site.config.api_url}
-        site_id={p.site.id}
-        page_id={p.page.cur.id}
-        entry={p.page.entry}
-        api={p.script.api}
-        db={p.script.db}
-        script={{ init_local_effect: p.script.init_local_effect }}
-        visit={(meta, parts) => {
-          return mainPerItemVisit(p, meta, parts);
-        }}
-        onStatusChanged={(status) => {
-          if (status !== "ready") {
-            active.should_render_main = true;
-            local.render();
-          } else {
-            if (!local.first_load) {
-              local.first_load = true;
-              active.should_render_main = true;
-              local.render();
-            }
-          }
-        }}
-      />
-    );
-    active.should_render_main = false;
-  }
+	if (active.should_render_main) {
+		local.cache = (
+			<Vi
+				meta={p.page.meta}
+				api_url={p.site.config.api_url}
+				site_id={p.site.id}
+				page_id={p.page.cur.id}
+				entry={p.page.entry}
+				api={p.script.api}
+				db={p.script.db}
+				script={{ init_local_effect: p.script.init_local_effect }}
+				visit={(meta, parts) => {
+					return mainPerItemVisit(p, meta, parts);
+				}}
+				onStatusChanged={(status) => {
+					if (status !== "ready") {
+						active.should_render_main = true;
+						local.render();
+					} else {
+						if (!local.first_load) {
+							local.first_load = true;
+							active.should_render_main = true;
+							local.render();
+						}
+					}
+				}}
+			/>
+		);
+		active.should_render_main = false;
+	}
 
-  return (
-    <div
-      className={cx(
-        "flex flex-1 relative overflow-auto",
-        p.mode === "mobile" ? "flex-col items-center" : ""
-      )}
-      ref={(el) => {
-        if (el) {
-          const bound = el.getBoundingClientRect();
-          if (local.width !== bound.width || local.height !== bound.height) {
-            local.width = bound.width;
-            local.height = bound.height;
-            local.render();
-          }
-        }
-      }}
-    >
-      <div className={mainStyle(p, meta)}>{local.cache}</div>
-    </div>
-  );
+	return (
+		<div
+			className={cx(
+				"flex flex-1 relative overflow-auto",
+				p.mode === "mobile" ? "flex-col items-center" : "",
+			)}
+			ref={(el) => {
+				if (el) {
+					const bound = el.getBoundingClientRect();
+					if (local.width !== bound.width || local.height !== bound.height) {
+						local.width = bound.width;
+						local.height = bound.height;
+						local.render();
+					}
+				}
+			}}
+		>
+			<div className={mainStyle(p, meta)}>{local.cache}</div>
+		</div>
+	);
 };
 
 const mainStyle = (p: PG, meta?: IMeta) => {
-  let is_active = meta ? isMetaActive(p, meta) : false;
+	let is_active = meta ? isMetaActive(p, meta) : false;
 
-  const scale = parseInt(p.ui.zoom.replace("%", "")) / 100;
+	const scale = parseInt(p.ui.zoom.replace("%", "")) / 100;
 
-  let width = `${(1 / scale) * 100}%`;
-  if (p.mode === "mobile") {
-    width = `${(1 / scale) * 375}px`;
-  }
+	let width = `${(1 / scale) * 100}%`;
+	if (p.mode === "mobile") {
+		width = `${(1 / scale) * 375}px`;
+	}
 
-  return cx(
-    "absolute flex",
-    css`
+	return cx(
+		"absolute flex",
+		css`
       contain: content;
     `,
-    p.mode === "mobile"
-      ? css`
+		p.mode === "mobile"
+			? css`
           border-left: 1px solid #ccc;
           border-right: 1px solid #ccc;
           background: white;
@@ -103,15 +103,22 @@ const mainStyle = (p: PG, meta?: IMeta) => {
           overflow-y: auto;
           bottom: 0px;
         `
-      : "inset-0",
-    css`
+			: "inset-0",
+		p.mode === "mobile"
+			? css`
+      width: ${width};
+      height: ${`${(1 / scale) * 100}%`};
+      transform: scale(${scale});
+      transform-origin: 50% 0% 0px;
+    `
+			: css`
       width: ${width};
       height: ${`${(1 / scale) * 100}%`};
       transform: scale(${scale});
       transform-origin: 0% 0% 0px;
     `,
-    active.hover.id &&
-      css`
+		active.hover.id &&
+			css`
         .s-${active.hover.id} {
           &::after {
             content: " ";
@@ -125,8 +132,8 @@ const mainStyle = (p: PG, meta?: IMeta) => {
           }
         }
       `,
-    is_active &&
-      css`
+		is_active &&
+			css`
         .s-${active.item_id} {
           outline: none;
 
@@ -141,6 +148,6 @@ const mainStyle = (p: PG, meta?: IMeta) => {
             border: 2px solid #1c88f3;
           }
         }
-      `
-  );
+      `,
+	);
 };
