@@ -106,6 +106,7 @@ const mainStyle = (p: PG, meta?: IMeta) => {
       : "inset-0",
     css`
       width: ${width};
+      height: ${`${(1 / scale) * 100}%`};
       transform: scale(${scale});
       transform-origin: 0% 0% 0px;
     `,

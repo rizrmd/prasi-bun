@@ -98,6 +98,12 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
         );
         p.ui.syncing = false;
 
+        p.page.entry = (doc as any)
+          .getMap("map")
+          .get("root")
+          ?.get("childs")
+          ?.map((e: any) => e.get("id")) as string[];
+
         if (p.ui.should_render) p.render();
       }
     };
