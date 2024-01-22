@@ -165,7 +165,6 @@ export const edInitSync = (p: PG) => {
               decompress(data.sv_local)
             );
             const sv_remote = Y.encodeStateVector(doc);
-
             const sv = Buffer.from(compress(sv_remote));
             const diff = Buffer.from(compress(diff_remote));
             const res = await p.sync.yjs.sv_remote(
@@ -185,7 +184,6 @@ export const edInitSync = (p: PG) => {
                   p.comp.list[data.id].meta = updated.meta;
                   p.comp.list[data.id].tree = updated.tree;
                 }
-
                 await treeRebuild(p, { note: "sv_remote" });
               }
               p.render();
