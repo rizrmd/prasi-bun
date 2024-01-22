@@ -40,7 +40,7 @@ export const EdBase = () => {
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className={cx("flex flex-col flex-1", style)}>
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
         <EdLeft />
@@ -66,3 +66,75 @@ export const EdBase = () => {
     </div>
   );
 };
+
+const style = css`
+  .toolbar-box {
+    display: flex;
+    align-items: stretch;
+    border-left: 1px solid #ececeb;
+    border-right: 1px solid #ececeb;
+    margin: 0px 0px 0px 5px;
+
+    .label {
+      display: flex;
+      user-select: none;
+      align-items: center;
+      font-size: 10px;
+      margin-top: 1px;
+      color: #999;
+      text-transform: uppercase;
+    }
+
+    .items {
+      display: flex;
+      align-items: stretch;
+      margin-left: 5px;
+      color: #555;
+      border-left: 1px solid transparent;
+
+      .item {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        border-right: 1px solid transparent;
+        padding: 5px;
+        border-radius: 0px;
+
+        &:hover {
+          background: #ececeb;
+        }
+
+        &.disabled {
+          color: #ccc;
+          cursor: default;
+        }
+      }
+
+      .item:last-child {
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px;
+      }
+    }
+
+    &.no-label {
+      padding-left: 0px;
+      margin-left: 0px;
+      .items {
+        margin-left: 0px;
+      }
+    }
+
+    &:hover {
+      border: 1px solid black;
+
+      .items {
+        color: #111;
+        border-left: 1px solid #ececeb;
+        .item {
+          border-right: 1px solid #ececeb;
+        }
+      }
+    }
+  }
+`;
