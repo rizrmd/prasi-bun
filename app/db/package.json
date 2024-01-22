@@ -1,7 +1,7 @@
 {
   "name": "db",
   "dependencies": {
-    "@prisma/client": "^5.7.1",
-    "prisma": "^5.7.1"
+    "@prisma/client": "^5.8.1",
+    "prisma": "^5.8.1"
   }
 }
