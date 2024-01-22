@@ -262,14 +262,20 @@ const CodeBody = () => {
 						content="Open in new tab"
 						delay={0}
 						placement="bottom"
-						className={cx("flex items-stretch relative border-l")}
+						className={cx("flex items-stretch relative")}
 						onClick={() => {
 							window.open(
 								`${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`,
-							);
+							); 
 						}}
 					>
-						<div dangerouslySetInnerHTML={{ __html: iconNewTab }}></div>
+						<div
+							className={cx(
+								"border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
+								"border-b-2 border-b-transparent",
+							)}
+							dangerouslySetInnerHTML={{ __html: iconNewTab }}
+						></div>
 					</Tooltip>
 				</div>
 				<div className="flex items-center">
