@@ -1,20 +1,18 @@
-import init from "wasm-gzip";
 import { ApiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
 import { jscript } from "../../../utils/script/jscript";
 import { PG } from "./ed-global";
 
 let w = window as unknown as {
-  db: ReturnType<typeof dbProxy>;
-  api: ApiProxy;
+	db: ReturnType<typeof dbProxy>;
+	api: ApiProxy;
 };
 
 export const edInit = async (p: PG) => {
-  p.status = "ready";
+	p.status = "ready";
 
-  await init();
-  jscript.init(p.render, { esbuild: false });
+	jscript.init(p.render, { esbuild: false });
 
-  p.script.loaded = true;
-  p.render();
+	p.script.loaded = true;
+	p.render();
 };
