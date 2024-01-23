@@ -85,8 +85,9 @@ export const snapshot = {
   async getOrCreate(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
     let res = this.db.get(id);
-    if (!res) {
-      await this.db.put(id, structuredClone(emptySnapshot as DocSnapshot));
+
+    if (!res || !res.id) {
+      await this.db.put(id, structuredClone(data as DocSnapshot));
       res = this.db.get(id);
     }
     return res as DocSnapshot;

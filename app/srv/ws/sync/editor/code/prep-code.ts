@@ -1,11 +1,15 @@
-import { existsAsync } from "fs-jetpack";
 import { Doc } from "yjs";
 import { DCode } from "../../../../../web/src/utils/types/root";
 import { readDirectoryRecursively } from "../../../../api/site-export";
 import { docs } from "../../entity/docs";
 import { snapshot } from "../../entity/snapshot";
+import { gzipAsync } from "../../entity/zlib";
 import { codeBuild } from "./build-code";
-import { CodeMode, code } from "./util";
+import { CodeMode, code } from "./util-code";
+import { user } from "../../entity/user";
+import { SyncType } from "../../type";
+import { sendWS } from "../../sync-handler";
+import { conns } from "../../entity/conn";
 
 export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
   await code
@@ -17,23 +21,47 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
     )
     .await();
 
-  let doc = docs.code[id_site];
+  let dcode = docs.code[id_site];
   if (!docs.code[id_site]) {
     docs.code[id_site] = {
       id: id_site,
       build: {},
     };
-    doc = docs.code[id_site];
+    dcode = docs.code[id_site];
   }
 
-  if (doc) {
-    if (!doc.build[mode]) {
+  if (dcode) {
+    if (!dcode.build[mode]) {
       const build_dir = code.path(id_site, mode, "build");
+      await codeBuild(id_site, mode);
+      dcode.build[mode] = codeLoad(id_site, build_dir);
+      const doc = dcode.build[mode] as Doc;
+      if (doc) {
+        doc.on("update", async (e, origin) => {
+          const bin = Y.encodeStateAsUpdate(doc);
 
-      if (!(await existsAsync(build_dir))) {
-        await codeBuild(id_site, mode);
+          if (snap && snap.type === "code") {
+            snap.build[mode].bin = bin;
+            snapshot.update({
+              id: id_site,
+              type: "code",
+              build: snap.build,
+            });
+          }
+
+          const sv_local = await gzipAsync(bin);
+          user.active.findAll({ site_id: id_site }).map((e) => {
+            const ws = conns.get(e.client_id)?.ws;
+            if (ws) {
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "remote_svlocal",
+                data: { type: "code", sv_local, id: id_site },
+              });
+            }
+          });
+        });
       }
-      doc.build[mode] = codeLoad(id_site, build_dir);
     }
 
     const build: Record<
@@ -43,9 +71,10 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
         bin: Uint8Array;
       }
     > = {};
-    for (const [k, v] of Object.entries(doc.build)) {
+
+    for (const [k, v] of Object.entries(dcode.build)) {
       const bin = Y.encodeStateAsUpdate(v as Doc);
-      build[k] = { bin, id_doc: v.clientID };
+      build[k] = { bin: bin, id_doc: v.clientID };
     }
 
     let snap = await snapshot.getOrCreate({
@@ -54,7 +83,9 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
       build,
     });
 
-    return snap;
+    if (snap.type === "code") {
+      return snap;
+    }
   }
 };
 
@@ -66,7 +97,7 @@ const codeLoad = (id: string, path: string) => {
 
   const dirs = readDirectoryRecursively(path);
   for (const [k, v] of Object.entries(dirs)) {
-    files.set(k, new Y.Text(v));
+    files.set(k, v);
   }
 
   doc.transact(() => {

@@ -1,7 +1,7 @@
 import { dir } from "dir";
 import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
-import { code } from "../ws/sync/editor/code/util";
+import { code } from "../ws/sync/editor/code/util-code";
 
 export const _ = {
   url: "/nova-load/:mode/:id/**",

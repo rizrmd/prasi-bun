@@ -7,11 +7,11 @@ import { Popover } from "../../../../../utils/ui/popover";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import {
-	iconChevronDown,
-	iconLoading,
-	iconLog,
-	iconNewTab,
-	iconTrash
+  iconChevronDown,
+  iconLoading,
+  iconLog,
+  iconNewTab,
+  iconTrash,
 } from "./icons";
 import { CodeNameItem, CodeNameList, codeName } from "./name-list";
 
@@ -116,7 +116,6 @@ const CodeBody = () => {
                 onPick={async (e) => {
                   local.namePicker = false;
                   p.ui.popup.code.name = e.name;
-                  p.ui.popup.code.id = "";
                   p.render();
                 }}
               />
@@ -142,41 +141,6 @@ const CodeBody = () => {
             ></div>
           </Popover>
 
-          {p.ui.popup.code.name !== "site" &&
-            p.ui.popup.code.name !== "SSR" && (
-              <>
-                <Tooltip
-                  content={"Delete Code Module"}
-                  className="flex items-center border-l relative hover:bg-red-50 cursor-pointer px-2 transition-all text-red-500"
-                  placement="bottom"
-                  onClick={async () => {
-                    if (
-                      prompt(
-                        "Are you sure want to delete this code?\ntype 'yes' to confirm:"
-                      ) === "yes"
-                    ) {
-                      await db.code.delete({
-                        where: { id: p.ui.popup.code.id },
-                      });
-
-                      codeName.list = codeName.list.filter(
-                        (e) => e.id !== p.ui.popup.code.id
-                      );
-
-                      p.ui.popup.code.name = codeName.list[0].name;
-                      p.ui.popup.code.id = codeName.list[0].id;
-                      p.render();
-                    }
-                  }}
-                >
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: iconTrash,
-                    }}
-                  ></div>
-                </Tooltip>
-              </>
-            )}
           <Tooltip
             content="STDOUT Log"
             delay={0}
@@ -211,9 +175,7 @@ const CodeBody = () => {
             placement="bottom"
             className={cx("flex items-stretch relative")}
             onClick={() => {
-              window.open(
-                `${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`
-              );
+              window.open(`${vscode_url}folder=/site/${p.site.id}/site/src`);
             }}
           >
             <div
@@ -271,13 +233,13 @@ const CodeBody = () => {
 
       {code_mode === "vsc" ? (
         <div className="flex flex-1 relative">
-          {!p.ui.popup.code.open || !p.ui.popup.code.id ? (
+          {!p.ui.popup.code.open ? (
             <Loading backdrop={false} />
           ) : (
             <>
               <iframe
                 className="flex flex-1 absolute inset-0 w-full h-full z-10"
-                src={`${vscode_url}folder=/site/code/${p.site.id}/${p.ui.popup.code.id}`}
+                src={`${vscode_url}folder=/site/${p.site.id}/site/src`}
               ></iframe>
               <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
                 Loading VSCode...
