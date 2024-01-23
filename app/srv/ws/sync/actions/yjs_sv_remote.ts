@@ -14,7 +14,11 @@ export const yjs_sv_remote: SAction["yjs"]["sv_remote"] = async function (
     console.log(`sv_remote not found`, mode, id);
     return;
   }
-  const doc = docs[mode][id].doc;
+  let doc = null;
+  if (mode !== "code") doc = docs[mode][id].doc;
+  else {
+    doc = docs.code[id].build.site;
+  }
   const diff_local = Y.encodeStateAsUpdate(doc as any, await gunzipAsync(sv));
   Y.applyUpdate(doc as any, await gunzipAsync(diff), "local");
   return { diff: await gzipAsync(diff_local) };

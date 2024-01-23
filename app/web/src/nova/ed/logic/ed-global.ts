@@ -5,7 +5,7 @@ import { SAction } from "../../../../../srv/ws/sync/actions";
 import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem } from "../../../utils/types/item";
-import { DComp, DPage } from "../../../utils/types/root";
+import { DCode, DComp, DPage } from "../../../utils/types/root";
 import { GenMetaP, IMeta as LogicMeta } from "../../vi/utils/types";
 
 export type IMeta = LogicMeta;
@@ -24,7 +24,15 @@ export const EmptySite = {
     meta: undefined as void | Record<string, IMeta>,
   },
   code: {
-    snapshot: null as null | Uint8Array,
+    snapshot: {} as
+      | undefined
+      | Record<
+          string,
+          {
+            id_doc: number;
+            bin: Uint8Array;
+          }
+        >,
     mode: "old" as "old" | "vsc",
   },
 };
@@ -183,7 +191,8 @@ export const EDGlobal = {
     >,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
-	global_prop: [] as string[],
+  code: {} as Record<string, { doc: null | DCode }>,
+  global_prop: [] as string[],
   ui: {
     zoom: localStorage.zoom || "100%",
     should_render: false,
@@ -211,7 +220,6 @@ export const EDGlobal = {
       code: {
         init: false,
         open: false,
-        id: "",
         name: "site",
         log: "",
         loading: false,

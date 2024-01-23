@@ -28,6 +28,6 @@ export type DComp = TypedDoc<{
 export type DCode = TypedDoc<{
   map: TypedMap<{
     id: string;
-    files: TypedMap<Record<string, Y.Text>>;
+    files: TypedMap<Record<string, string>>;
   }>;
 }>;

@@ -3,6 +3,7 @@ import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { prepCodeSnapshot } from "../editor/code/prep-code";
 import { SyncConnection } from "../type";
+import { gzipAsync } from "../entity/zlib";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -27,7 +28,13 @@ export const site_load: SAction["site"]["load"] = async function (
         select: { id: true },
       });
 
-      await prepCodeSnapshot(site_id, "site");
+      const snap = await prepCodeSnapshot(site_id, "site");
+      const compressed: any = {};
+      if (snap) {
+        for (const [key, value] of Object.entries(snap.build)) {
+          compressed[key] = { bin: await gzipAsync(value.bin) };
+        }
+      }
 
       return {
         id: site.id,
@@ -38,7 +45,10 @@ export const site_load: SAction["site"]["load"] = async function (
         responsive: site.responsive as ESite["responsive"],
         js_compiled: site.js_compiled || "",
         layout: { id: layout?.id || "", snapshot: null, meta: undefined },
-        code: { snapshot: null, mode: site.code_mode as "old" | "vsc" },
+        code: {
+          snapshot: compressed,
+          mode: site.code_mode as "old" | "vsc",
+        },
       };
     }
   }

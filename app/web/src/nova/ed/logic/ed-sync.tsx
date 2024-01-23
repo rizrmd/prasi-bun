@@ -64,47 +64,11 @@ export const edInitSync = (p: PG) => {
       site_id: params.site_id,
       page_id: params.page_id,
       events: {
-        code(arg) {
-          p.ui.popup.code.error = false;
-
-          if (arg.event === "code-loading") {
-            p.ui.popup.code.log = "";
-            p.ui.popup.code.loading = true;
-            p.render();
-          } else if (arg.event === "code-done") {
-            if (typeof arg.content === "string") {
-              if (arg.content !== "OK") {
-                p.ui.popup.code.error = true;
-              }
-
-              p.ui.popup.code.log += arg.content;
-            }
-            p.ui.popup.code.loading = false;
-
-            if (arg.src) {
-              const w = window as any;
-              const module = evalCJS(decoder.decode(decompress(arg.src)));
-              p.global_prop = Object.keys(module);
-              if (typeof module === "object") {
-                for (const [k, v] of Object.entries(module)) {
-                  w[k] = v;
-                }
-              }
-            }
-            p.render();
-          } else {
-            if (typeof arg.content === "string")
-              p.ui.popup.code.log += arg.content;
-            p.render();
-          }
-        },
-        activity(arg) {},
         opened() {
           if (w.offline) {
             console.log("reconnected!");
             w.offline = false;
             p.ui.syncing = true;
-            p.sync.activity("site", { type: "join", id: params.site_id });
             p.render();
           } else {
             w.offline = false;
@@ -158,6 +122,8 @@ export const edInitSync = (p: PG) => {
             doc = p.page.doc as Y.Doc;
           } else if (data.type === "comp" && p.comp.list[data.id]) {
             doc = p.comp.list[data.id].doc;
+          } else if (data.type === "code") {
+            doc = p.code.site.doc;
           }
 
           if (doc) {
@@ -179,7 +145,7 @@ export const edInitSync = (p: PG) => {
               Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
               if (data.type === "page") {
                 await treeRebuild(p, { note: "sv_remote" });
-              } else {
+              } else if (data.type === "comp") {
                 const updated = await updateComponentMeta(p, doc, data.id);
                 if (updated) {
                   p.comp.list[data.id].meta = updated.meta;
