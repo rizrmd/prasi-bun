@@ -78,34 +78,8 @@ declare global {
       }
 
       return new Response("NOT FOUND", { status: 404 });
-    } else if (action === "list") {
-      let list = await db.code.findMany({ where: { id_site: site_id } });
-
-      if (!list.find((e) => e.name === "site")) {
-        list.push(
-          await db.code.create({
-            data: {
-              id_site: site_id,
-              name: "site",
-            },
-          })
-        );
-      }
-
-      if (!list.find((e) => e.name === "SSR")) {
-        list.push(
-          await db.code.create({
-            data: {
-              id_site: site_id,
-              name: "SSR",
-            },
-          })
-        );
-      }
-
-      return list.map((e) => ({ name: e.name, id: e.id }));
     }
-
+    
     return "This is code.ts";
   },
 };

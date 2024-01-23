@@ -1,8 +1,6 @@
-import { IRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
 import { prepareComponentForPage } from "../editor/prep-comp-page";
 import { prepContentTree } from "../editor/prep-page";
-import { activity } from "../entity/activity";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
@@ -61,20 +59,11 @@ export const page_load: SAction["page"]["load"] = async function (
     select: "" as "" | "comp" | "item" | "section" | "text",
   };
 
-  const setActivityPage = async (id_site: string, id_page: string) => {
-    await activity.site.set(id_site, this.ws, async (data) => {
-      data.page_id = id_page;
-      return data;
-    });
-  };
-
   user.active.delAll({ client_id: this.client_id });
-  
+
   if (!snap && !ydoc) {
     const page = await db.page.findFirst({ where: { id } });
     if (page) {
-      await setActivityPage(page.id_site, page.id);
-
       const doc = new Y.Doc();
       let root = doc.getMap("map");
       const proot = await prepContentTree(page.id, page.content_tree, this);
@@ -122,7 +111,6 @@ export const page_load: SAction["page"]["load"] = async function (
   } else if (snap && !ydoc) {
     const doc = new Y.Doc();
     snapshot.set("page", id, "id_doc", doc.clientID);
-    await setActivityPage(snap.id_site, id);
 
     Y.applyUpdate(doc, snap.bin);
     let root = doc.getMap("map");
@@ -154,8 +142,6 @@ export const page_load: SAction["page"]["load"] = async function (
       comps,
     };
   } else if (snap && ydoc) {
-    await setActivityPage(snap.id_site, id);
-
     user.active.add({
       ...defaultActive,
       client_id: this.client_id,

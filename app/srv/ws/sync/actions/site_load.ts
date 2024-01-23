@@ -2,9 +2,7 @@ import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { prepCode } from "../editor/code/prep-code";
-import { activity } from "../entity/activity";
 import { SyncConnection } from "../type";
-import { broadcastCode } from "../editor/code/build";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -20,8 +18,6 @@ export const site_load: SAction["site"]["load"] = async function (
           ? { api_url: (site.config as any).api_url || "" }
           : { api_url: "" };
 
-      activity.site.room(site.id).join({ ws: this.ws });
-
       const layout = await db.page.findFirst({
         where: {
           id_site: site_id,
@@ -32,7 +28,6 @@ export const site_load: SAction["site"]["load"] = async function (
       });
 
       await prepCode(site_id, "site");
-      broadcastCode(site_id, this.ws);
 
       return {
         id: site.id,
