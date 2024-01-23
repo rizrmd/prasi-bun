@@ -21,14 +21,13 @@ export const SyncActionDefinition = {
     "diff_local": "12",
     "sv_remote": "13"
   },
-  "activity": "14",
   "client": {
-    "info": "15"
+    "info": "14"
   },
   "code": {
-    "load": "16",
-    "edit": "17",
-    "parse": "18"
+    "load": "15",
+    "edit": "16",
+    "parse": "17"
   }
 };
 export const SyncActionPaths = {
@@ -46,9 +45,8 @@ export const SyncActionPaths = {
   "11": "yjs.sv_local",
   "12": "yjs.diff_local",
   "13": "yjs.sv_remote",
-  "14": "activity",
-  "15": "client.info",
-  "16": "code.load",
-  "17": "code.edit",
-  "18": "code.parse"
+  "14": "client.info",
+  "15": "code.load",
+  "16": "code.edit",
+  "17": "code.parse"
 };

@@ -33,7 +33,6 @@ type SiteSnapshot = {
   type: "site";
   id: string;
   name: string;
-  src: { bin: Uint8Array; id_doc: number };
   build: { bin: Uint8Array; id_doc: number };
 };
 

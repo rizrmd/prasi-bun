@@ -1,26 +1,10 @@
 import { spawn } from "bun";
-import { activity } from "../../entity/activity";
 import { sendWS } from "../../sync-handler";
 import { SyncType } from "../../type";
-import { DBCode } from "./prep-code";
 import { Code } from "./watcher";
 
 const decoder = new TextDecoder();
-export const codePkgInstall = async (code: DBCode) => {
-  activity.site
-    .room(code.id_site)
-    .findAll({ site_js: code.name })
-    .forEach((item, ws) => {
-      sendWS(ws, {
-        type: SyncType.Event,
-        event: "code",
-        data: {
-          name: code.name,
-          id: code.id,
-          event: "code-loading",
-        },
-      });
-    });
+export const codePkgInstall = async (id_site: string, mode: string) => {
   try {
     const proc = spawn({
       cmd: ["bun", "i"],
