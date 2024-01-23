@@ -33,19 +33,26 @@ type SiteSnapshot = {
   type: "site";
   id: string;
   name: string;
-  build: { bin: Uint8Array; id_doc: number };
+};
+
+type CodeSnapshot = {
+  type: "code";
+  id: string;
+  build: Record<string, { id_doc: number; bin: Uint8Array }>;
 };
 
 type DocSnapshotMap = {
   page: PageSnapshot;
   comp: CompSnapshot;
   site: SiteSnapshot;
+  code: CodeSnapshot;
   "": EmptySnapshot;
 };
 export type DocSnapshot =
   | PageSnapshot
   | SiteSnapshot
   | CompSnapshot
+  | CodeSnapshot
   | EmptySnapshot;
 
 const emptySnapshot: DocSnapshot = {

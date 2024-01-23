@@ -1,7 +1,7 @@
 import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
-import { prepCode } from "../editor/code/prep-code";
+import { prepCodeSnapshot } from "../editor/code/prep-code";
 import { SyncConnection } from "../type";
 
 export const site_load: SAction["site"]["load"] = async function (
@@ -27,7 +27,7 @@ export const site_load: SAction["site"]["load"] = async function (
         select: { id: true },
       });
 
-      await prepCode(site_id, "site");
+      await prepCodeSnapshot(site_id, "site");
 
       return {
         id: site.id,
