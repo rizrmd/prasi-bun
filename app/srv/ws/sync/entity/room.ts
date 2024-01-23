@@ -70,14 +70,16 @@ export class Room<T extends Record<string, any>> {
     this.id = id;
   }
 
-  findAll(where: Partial<T>) {
+  findAll(where?: Partial<T>) {
     const clients = new Map<ServerWebSocket<WSData>, Partial<T>>();
     for (const [ws, data] of this.clients) {
       let match = true;
-      for (const key in where) {
-        if (data[key] !== where[key]) {
-          match = false;
-          break;
+      if (where) {
+        for (const key in where) {
+          if (data[key] !== where[key]) {
+            match = false;
+            break;
+          }
         }
       }
       if (match) clients.set(ws, data);

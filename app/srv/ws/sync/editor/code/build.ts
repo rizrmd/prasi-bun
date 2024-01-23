@@ -109,3 +109,48 @@ export const codeBuild = async (code: DBCode) => {
       });
   }
 };
+
+const code_id = {} as Record<string, { site: string; ssr: string }>;
+
+export const broadcastCode = async (id_site: string) => {
+  if (!code_id[id_site]) {
+    const res = await db.code.findMany({ where: { id_site } });
+    if (res.length > 0) {
+      code_id[id_site] = { site: "", ssr: "" };
+      for (const c of res) {
+        if (c.name === "site") {
+          code_id[c.id_site].site = c.id;
+        } else {
+          code_id[c.id_site].ssr = c.id;
+        }
+      }
+    }
+  }
+
+  if (code_id[id_site] && code_id[id_site].site) {
+    const id_code = code_id[id_site].site;
+    const outfile = dir.path(`${g.datadir}/site/build/${id_code}/index.js`);
+    const out = Bun.file(outfile);
+    const src = (await out.text()).replace(
+      "//# sourceMappingURL=index.js.map",
+      `//# sourceMappingURL=/nova-load/code/${id_code}/index.js.map`
+    );
+    const srcgz = await gzipAsync(encoder.encode(src));
+    activity.site
+      .room(id_site)
+      .findAll()
+      .forEach((item, ws) => {
+        sendWS(ws, {
+          type: SyncType.Event,
+          event: "code",
+          data: {
+            name: "site",
+            id: id_code,
+            event: "code-done",
+            src: srcgz,
+            content: "OK",
+          },
+        });
+      });
+  }
+};
