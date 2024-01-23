@@ -81,12 +81,10 @@ export const edInitSync = (p: PG) => {
             }
             p.ui.popup.code.loading = false;
 
-            console.log("mooko ");
             if (arg.src) {
               const w = window as any;
               const module = evalCJS(decoder.decode(decompress(arg.src)));
               p.global_prop = Object.keys(module);
-              console.log(module);
               if (typeof module === "object") {
                 for (const [k, v] of Object.entries(module)) {
                   w[k] = v;

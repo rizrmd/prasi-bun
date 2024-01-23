@@ -15,18 +15,52 @@ export const ViPreview = (arg: { pathname: string }) => {
     return <Loading note={p.status + "-page"} />;
   }
 
+  const mode = p.mode;
+
   return (
-    <Vi
-      meta={p.page.meta}
-      api_url={p.site.config.api_url}
-      site_id={p.site.id}
-      page_id={p.page.cur.id}
-      entry={p.page.entry}
-      api={p.script.api}
-      db={p.script.db}
-      render_stat="disabled"
-      script={{ init_local_effect: p.script.init_local_effect }}
-    />
+    <div className={cx("relative flex flex-1 items-center justify-center")}>
+      <div
+        className={cx(
+          "absolute flex flex-col items-stretch flex-1 bg-white ",
+          mode === "mobile"
+            ? css`
+                @media (min-width: 768px) {
+                  border-left: 1px solid #ccc;
+                  border-right: 1px solid #ccc;
+                  width: 375px;
+                  top: 0px;
+                  overflow-x: hidden;
+                  overflow-y: auto;
+                  bottom: 0px;
+                }
+                @media (max-width: 767px) {
+                  left: 0px;
+                  right: 0px;
+                  top: 0px;
+                  bottom: 0px;
+                  overflow-y: auto;
+                }
+              `
+            : "inset-0 overflow-auto",
+
+          css`
+            contain: content;
+          `
+        )}
+      >
+        <Vi
+          meta={p.page.meta}
+          api_url={p.site.config.api_url}
+          site_id={p.site.id}
+          page_id={p.page.cur.id}
+          entry={p.page.entry}
+          api={p.script.api}
+          db={p.script.db}
+          render_stat="disabled"
+          script={{ init_local_effect: p.script.init_local_effect }}
+        />
+      </div>
+    </div>
   );
 };
 
@@ -37,7 +71,7 @@ const viRoute = async (p: PG) => {
     }
 
     if (!p.site.domain && !p.site.name) {
-      p.status = "loading";
+      p.status = "load-site";
       const site = await p.sync.site.load(p.site.id);
       if (!site) {
         p.status = "site-not-found";
