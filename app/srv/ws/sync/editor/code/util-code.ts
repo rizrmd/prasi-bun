@@ -1,6 +1,6 @@
 import { dir } from "dir";
 import { BuildContext } from "esbuild";
-import { dirAsync, existsAsync, writeAsync } from "fs-jetpack";
+import { dirAsync, exists, existsAsync, writeAsync } from "fs-jetpack";
 import { dirname } from "path";
 import { g } from "utils/global";
 
@@ -15,10 +15,12 @@ export const code = {
   },
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
   prep(id_site: string, mode: CodeMode) {
-    Bun.spawn({
-      cmd: ["chmod", "-R", "777", "."],
-      cwd: dir.path(`${g.datadir}/site`),
-    });
+    if (exists(`${g.datadir}/site`)) {
+      Bun.spawn({
+        cmd: ["chmod", "-R", "777", "."],
+        cwd: dir.path(`${g.datadir}/site`),
+      });
+    }
     const promises: Promise<void>[] = [];
     return {
       path(type: "src" | "build", path: string) {
