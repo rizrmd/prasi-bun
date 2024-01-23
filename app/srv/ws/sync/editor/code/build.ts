@@ -9,6 +9,8 @@ import { activity } from "../../entity/activity";
 import { sendWS } from "../../sync-handler";
 import { SyncType } from "../../type";
 import { gzipAsync } from "../../entity/zlib";
+import { ServerWebSocket } from "bun";
+import { WSData } from "../../../../../../pkgs/core/server/create";
 
 const encoder = new TextEncoder();
 export const codeBuild = async (code: DBCode) => {
@@ -112,7 +114,10 @@ export const codeBuild = async (code: DBCode) => {
 
 const code_id = {} as Record<string, { site: string; ssr: string }>;
 
-export const broadcastCode = async (id_site: string) => {
+export const broadcastCode = async (
+  id_site: string,
+  ws?: ServerWebSocket<WSData>
+) => {
   if (!code_id[id_site]) {
     const res = await db.code.findMany({ where: { id_site } });
     if (res.length > 0) {
@@ -131,15 +136,14 @@ export const broadcastCode = async (id_site: string) => {
     const id_code = code_id[id_site].site;
     const outfile = dir.path(`${g.datadir}/site/build/${id_code}/index.js`);
     const out = Bun.file(outfile);
-    const src = (await out.text()).replace(
-      "//# sourceMappingURL=index.js.map",
-      `//# sourceMappingURL=/nova-load/code/${id_code}/index.js.map`
-    );
-    const srcgz = await gzipAsync(encoder.encode(src));
-    activity.site
-      .room(id_site)
-      .findAll()
-      .forEach((item, ws) => {
+    if (out) {
+      const src = (await out.text()).replace(
+        "//# sourceMappingURL=index.js.map",
+        `//# sourceMappingURL=/nova-load/code/${id_code}/index.js.map`
+      );
+      const srcgz = await gzipAsync(encoder.encode(src));
+
+      if (ws) {
         sendWS(ws, {
           type: SyncType.Event,
           event: "code",
@@ -151,6 +155,24 @@ export const broadcastCode = async (id_site: string) => {
             content: "OK",
           },
         });
-      });
+      } else {
+        activity.site
+          .room(id_site)
+          .findAll()
+          .forEach((item, ws) => {
+            sendWS(ws, {
+              type: SyncType.Event,
+              event: "code",
+              data: {
+                name: "site",
+                id: id_code,
+                event: "code-done",
+                src: srcgz,
+                content: "OK",
+              },
+            });
+          });
+      }
+    }
   }
 };
