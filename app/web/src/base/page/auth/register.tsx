@@ -19,7 +19,7 @@ export default page({
         const s = await api.session();
 
         if (s && s.id) {
-          navigate("/editor");
+          navigate("/ed");
         } else {
           form.init = true;
           form.render();
@@ -47,7 +47,7 @@ export default page({
               form.render();
               alert(s.reason);
             } else {
-              navigate("/editor");
+              navigate("/ed");
             }
           }}
           className={cx("border-[3px] border-black", formStyle)}

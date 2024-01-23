@@ -19,7 +19,7 @@ export default page({
         } else if (location.pathname.startsWith("/editor")) {
           const arr = location.pathname.split("/");
           if (arr.length <= 2) {
-            navigate("/editor/_/_");
+            navigate("/ed/_/_");
           } else if (arr.length === 3) {
             navigate(location.pathname + "/");
           }
@@ -27,7 +27,7 @@ export default page({
           if (isLocalhost()) {
             navigate("/ed");
           } else {
-            navigate("/editor/_/_");
+            navigate("/ed/_/_");
           }
         }
       } else {
