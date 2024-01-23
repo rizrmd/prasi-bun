@@ -95,7 +95,7 @@ else metaOptions = resOpt;
       }
     }
   }
-  
+
   return (
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={name} labelClick={labelClick} />
