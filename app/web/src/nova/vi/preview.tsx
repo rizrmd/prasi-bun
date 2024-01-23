@@ -5,14 +5,46 @@ import { reloadPage } from "../ed/logic/ed-route";
 import { loadSite } from "../ed/logic/ed-site";
 import { Vi } from "./vi";
 import init from "wasm-gzip";
+import { w } from "../../utils/types/general";
 
 export const ViPreview = (arg: { pathname: string }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
+  w.navigateOverride = (_href) => {
+    if (_href && _href.startsWith("/")) {
+      if (w.basepath.length > 1) {
+        _href = `${w.basepath}${_href}`;
+      }
+      if (
+        location.hostname === "prasi.app" ||
+        location.hostname === "prasi.avolut.com" ||
+        location.hostname.includes("ngrok") ||
+        location.hostname === "localhost" ||
+        location.hostname === "127.0.0.1" ||
+        location.hostname === "10.0.2.2" // android localhost
+      ) {
+        if (location.pathname.startsWith("/vi") && !_href.startsWith("/vi")) {
+          const patharr = location.pathname.split("/");
+          _href = `/vi/${patharr[2]}${_href}`;
+        }
+      }
+    }
+    return _href;
+  };
+
   viRoute(p);
 
   if (p.status !== "ready") {
-    return <Loading note={p.status + "-page"} />;
+    if (p.preview.show_loading) {
+      return <Loading note={p.status + "-page"} />;
+    } else {
+      setTimeout(() => {
+        p.preview.show_loading = true;
+        p.render();
+      }, 5000);
+
+      return null;
+    }
   }
 
   const mode = p.mode;

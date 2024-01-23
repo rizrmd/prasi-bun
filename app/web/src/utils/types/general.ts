@@ -23,6 +23,8 @@ export type PrasiAPI = {
 export const w = window as unknown as {
   isEditor: boolean;
   isMobile: boolean;
+  basepath: string;
+  navigateOverride: (s: string) => string;
   isDesktop: boolean;
   prasiApi: Record<string, PrasiAPI>;
   loadedFonts: string[];
