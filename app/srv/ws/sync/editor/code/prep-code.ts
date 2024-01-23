@@ -1,72 +1,64 @@
-import { dir } from "dir";
 import { existsAsync } from "fs-jetpack";
-import { g } from "utils/global";
 import { Doc } from "yjs";
 import { DCode } from "../../../../../web/src/utils/types/root";
 import { readDirectoryRecursively } from "../../../../api/site-export";
 import { docs } from "../../entity/docs";
 import { snapshot } from "../../entity/snapshot";
+import { codeBuild } from "./build-code";
 import { CodeMode, code } from "./util";
 
-export const prepCode = async (id_site: string, mode: CodeMode) => {
+export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
   await code
     .prep(id_site, mode)
-    .new_file("index.ts", "export const sample = 'hello_world'")
+    .new_file("index.tsx", "export const sample = 'hello_world'")
     .new_file(
       "package.json",
       JSON.stringify({ name: `${mode}-${id_site}`, dependencies: {} }, null, 2)
     )
     .await();
-};
 
-export const prepDCode = async (id_site: string) => {
-  let exists = false;
+  let doc = docs.code[id_site];
   if (!docs.code[id_site]) {
-    const path = {
-      src: dir.path(`${g.datadir}/site/code/${id_site}-site`),
-      build: dir.path(`${g.datadir}/site/build/${id_site}-site`),
+    docs.code[id_site] = {
+      id: id_site,
+      build: {},
     };
-
-    if ((await existsAsync(path.src)) && (await existsAsync(path.build))) {
-      docs.code[id_site] = {
-        id: id_site,
-        build: loadFolderAsDCode(id_site, path.build),
-      };
-      exists = true;
-    }
+    doc = docs.code[id_site];
   }
 
-  if (exists) {
-    const chmod = Bun.spawn({
-      cmd: ["chmod", "-R", "777", "."],
-      cwd: dir.path(`${g.datadir}/site`),
-    });
+  if (doc) {
+    if (!doc.build[mode]) {
+      const build_dir = code.path(id_site, mode, "build");
 
-    await chmod.exited;
+      if (!(await existsAsync(build_dir))) {
+        await codeBuild(id_site, mode);
+      }
+      doc.build[mode] = codeLoad(id_site, build_dir);
+    }
 
-    const build_bin = Y.encodeStateAsUpdate(docs.code[id_site].build as Doc);
+    const build: Record<
+      string,
+      {
+        id_doc: number;
+        bin: Uint8Array;
+      }
+    > = {};
+    for (const [k, v] of Object.entries(doc.build)) {
+      const bin = Y.encodeStateAsUpdate(v as Doc);
+      build[k] = { bin, id_doc: v.clientID };
+    }
 
     let snap = await snapshot.getOrCreate({
-      type: "site",
+      type: "code",
       id: id_site,
-      name: "",
-      build: {
-        bin: build_bin,
-        id_doc: docs.code[id_site].build.clientID,
-      },
+      build,
     });
 
-    if (snap && snap.type === "site") {
-      return {
-        bin: {
-          build: snap.build.bin,
-        },
-      };
-    }
+    return snap;
   }
 };
 
-const loadFolderAsDCode = (id: string, path: string) => {
+const codeLoad = (id: string, path: string) => {
   const doc = new Y.Doc() as DCode;
   const map = doc.getMap("map");
 
