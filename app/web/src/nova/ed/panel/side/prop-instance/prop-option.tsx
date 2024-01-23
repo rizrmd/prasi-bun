@@ -6,6 +6,7 @@ import { dbProxy } from "../../../../../base/load/db/db-proxy";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal } from "../../../logic/ed-global";
 import { EdPropLabel } from "./prop-label";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdPropInstanceOptions: FC<{
   name: string;
@@ -82,7 +83,8 @@ else metaOptions = resOpt;
       mprop.set("valueBuilt", val);
     });
 
-    setTimeout(p.render);
+    treeRebuild(p);
+    p.render();
   };
 
   let mode = prop.meta?.option_mode;
