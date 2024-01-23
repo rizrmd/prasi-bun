@@ -21,6 +21,7 @@ export const EdPopCompGroup = () => {
   if (!p.ui.popup.comp_group) return null;
   const pop = p.ui.popup.comp_group;
   const group = p.comp.group[p.site.id];
+
   return (
     <Menu
       mouseEvent={pop.mouse_event}

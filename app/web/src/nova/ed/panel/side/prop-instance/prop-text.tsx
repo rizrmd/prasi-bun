@@ -5,15 +5,18 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useLocal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { FMCompDef } from "../../../../../utils/types/meta-fn";
 import { EdPropLabel } from "./prop-label";
+import { treeRebuild } from "../../../logic/tree/build";
+import { EDGlobal } from "../../../logic/ed-global";
 
 export const EdPropInstanceText: FC<{
   name: string;
   mprop: FMCompDef;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 }> = ({ name, mprop, labelClick }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
   const val = mprop.get("value");
 
   const local = useLocal({
@@ -43,7 +46,9 @@ export const EdPropInstanceText: FC<{
               mprop.set("value", `\`${local.value}\``);
               mprop.set("valueBuilt", `\`${local.value}\``);
             });
-          }, 1000);
+            treeRebuild(p);
+            p.render();
+          }, 200);
         }}
       />
     </div>

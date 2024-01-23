@@ -3,6 +3,7 @@ import { FC, ReactNode } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { compPicker, reloadCompPicker } from "./comp-reload";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export type CompItem = {
   id: string;
@@ -140,6 +141,7 @@ export const edPageTreeRender: NodeRender<CompItem> = (
                     data: { id_component_group: group_id },
                   });
                   await reloadCompPicker(p);
+                  treeRebuild(p);
                   p.render();
                 },
               };
@@ -151,8 +153,8 @@ export const edPageTreeRender: NodeRender<CompItem> = (
               p.ui.popup.comp.open = null;
               active.item_id = compPicker.active_id;
               compPicker.active_id = "";
-
-              p.page.render();
+              treeRebuild(p);
+              p.render();
             }
           }}
         >
