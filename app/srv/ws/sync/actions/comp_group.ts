@@ -6,7 +6,7 @@ export const comp_group: SAction["comp"]["group"] = async function (
   id_site
 ) {
   const result: Awaited<ReturnType<SAction["comp"]["group"]>> = {};
-  const groups = await db.component_group.findMany({
+  let groups = await db.component_group.findMany({
     where: {
       component_site: {
         some: {
@@ -19,6 +19,46 @@ export const comp_group: SAction["comp"]["group"] = async function (
       id: true,
     },
   });
+
+  if (groups.length === 0) {
+    await db.component_group.create({
+      data: {
+        name: "All",
+        component_site: {
+          create: {
+            id_site,
+            is_owner: true,
+          },
+        },
+      },
+    });
+
+    await db.component_group.create({
+      data: {
+        name: "__TRASH__",
+        component_site: {
+          create: {
+            id_site,
+            is_owner: true,
+          },
+        },
+      },
+    });
+    
+    groups = await db.component_group.findMany({
+      where: {
+        component_site: {
+          some: {
+            id_site,
+          },
+        },
+      },
+      select: {
+        name: true,
+        id: true,
+      },
+    });
+  }
 
   for (const g of groups) {
     result[g.id] = {
