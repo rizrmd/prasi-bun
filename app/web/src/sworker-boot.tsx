@@ -27,58 +27,6 @@ export const sworkerRegister = async (react: { root: null | ReactRoot }) => {
       };
       cacheCurrentPage();
 
-      const curver = localStorage.getItem("prasi-version");
-      if (version !== curver && curver && react.root && sw) {
-        react.root.render(
-          <>
-            <Root />
-            <div
-              className={cx(
-                css`
-                  position: fixed;
-                  bottom: 20px;
-                  left: 0px;
-                  right: 0px;
-                  z-index: 999;
-                `,
-                "flex justify-center cursor-pointer"
-              )}
-              onClick={() => {
-                sw.unregister().then(() => {
-                  window.location.reload();
-                });
-                if (react.root)
-                  react.root.render(
-                    <>
-                      <Root />
-                      <div
-                        className={cx(
-                          css`
-                            position: fixed;
-                            bottom: 20px;
-                            left: 0px;
-                            right: 0px;
-                            z-index: 999;
-                          `,
-                          "flex justify-center"
-                        )}
-                      >
-                        <div className="bg-blue-400 text-white px-4 py-2 rounded-full text-sm">
-                          Updating App...
-                        </div>
-                      </div>
-                    </>
-                  );
-              }}
-            >
-              <div className="bg-orange-600 text-white px-4 py-2 rounded-full text-sm select-none">
-                New Version Available. Click to Update
-              </div>
-            </div>
-          </>
-        );
-      }
-
       navigator.serviceWorker.addEventListener("message", (e) => {
         cacheCurrentPage();
         if (react.root) {
