@@ -1,15 +1,12 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import { style } from "@hyrious/esbuild-plugin-style";
-import { dir } from "dir";
 import { context } from "esbuild";
-import { existsAsync, dirAsync, removeAsync, writeAsync } from "fs-jetpack";
-import { CodeMode, code } from "./util-code";
-import { user } from "../../entity/user";
-import { docs } from "../../entity/docs";
+import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { DCode } from "../../../../../web/src/utils/types/root";
 import { readDirectoryRecursively } from "../../../../api/site-export";
+import { docs } from "../../entity/docs";
+import { CodeMode, code } from "./util-code";
 
-const encoder = new TextEncoder();
 export const codeBuild = async (id_site: any, mode: CodeMode) => {
   const src_path = code.path(id_site, mode, "src");
   if (!(await existsAsync(src_path))) return;
@@ -33,6 +30,7 @@ export const codeBuild = async (id_site: any, mode: CodeMode) => {
       minify: true,
       treeShaking: true,
       format: "cjs",
+      logLevel: "silent",
       sourcemap: true,
       plugins: [
         style(),
@@ -71,7 +69,9 @@ export const codeBuild = async (id_site: any, mode: CodeMode) => {
   if (esbuild) {
     try {
       await esbuild.rebuild();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   const out = Bun.file(build_file);
