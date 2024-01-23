@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, Suspense, useState } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../ed/logic/ed-global";
 import { viLoad } from "./load/load";
@@ -19,7 +19,7 @@ export const Vi: FC<{
   script?: { init_local_effect: Record<string, boolean> };
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
-  onStatusChanged?: (status: VG["status"]) => void;
+  on_status_changed?: (status: VG["status"]) => void;
 }> = ({
   meta,
   entry,
@@ -30,10 +30,10 @@ export const Vi: FC<{
   visit,
   script,
   render_stat: rs,
-  onStatusChanged,
+  on_status_changed,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
-  vi.on_status_changes = onStatusChanged;
+  vi.on_status_changes = on_status_changed;
 
   if (rs === "disabled") {
     render_stat.enabled = false;

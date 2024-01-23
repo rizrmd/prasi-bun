@@ -29,7 +29,7 @@ export const EdAddItem = () => {
 
         const json = {
           id: createId(),
-          name: `New Item`,
+          name: `new_item`,
           type: "item",
           dim: { w: "full", h: "full" },
           childs: [],

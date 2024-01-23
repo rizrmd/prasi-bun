@@ -52,7 +52,6 @@ export const ViRender: FC<{
   }
 
   if (!meta) return null;
-
   if (meta.item.hidden) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {

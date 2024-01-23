@@ -11,6 +11,7 @@ import { PanelLink } from "./panel/link";
 import { PanelPadding } from "./panel/padding";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const EdStyleAll = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -27,7 +28,7 @@ export const EdStyleAll = () => {
         let mitem = meta.mitem;
 
         if (mitem) {
-          p.ui.should_render = true;
+          active.should_render_main = true;
           mitem.doc?.transact(() => {
             if (mitem) {
               if (p.mode === "mobile") {
