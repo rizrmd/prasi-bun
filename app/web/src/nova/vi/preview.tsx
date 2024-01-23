@@ -82,6 +82,7 @@ export const ViPreview = (arg: { pathname: string }) => {
       >
         <Vi
           meta={p.page.meta}
+          mode={p.mode}
           api_url={p.site.config.api_url}
           site_id={p.site.id}
           page_id={p.page.cur.id}
