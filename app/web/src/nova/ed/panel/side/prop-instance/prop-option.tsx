@@ -87,6 +87,15 @@ else metaOptions = resOpt;
 
   let mode = prop.meta?.option_mode;
   if (!mode) mode = "button";
+
+  if (metaOptions && metaOptions.length > 0) {
+    for (const [k, v] of Object.entries(metaOptions)) {
+      if (typeof v === "string") {
+        metaOptions[k as any] = { label: v, value: v };
+      }
+    }
+  }
+  
   return (
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={name} labelClick={labelClick} />
