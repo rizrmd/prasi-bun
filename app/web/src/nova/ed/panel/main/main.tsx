@@ -3,6 +3,7 @@ import { Vi } from "../../../vi/vi";
 import { isMetaActive } from "../../logic/active/is-meta.active";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
+import { w } from "../../../../utils/types/general";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -12,6 +13,11 @@ export const EdMain = () => {
     width: 0,
     height: 0,
   });
+
+  w.navigateOverride = (_href) => {
+    if (_href.startsWith("/ed")) return _href;
+    return "";
+  };
 
   let meta: undefined | IMeta = undefined;
 

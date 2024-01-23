@@ -146,6 +146,9 @@ export const EDGlobal = {
     | "site-not-found"
     | "page-not-found"
     | "ready",
+  preview: {
+    show_loading: false,
+  },
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),
   site_dts: "",

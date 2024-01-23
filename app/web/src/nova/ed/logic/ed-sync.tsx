@@ -9,19 +9,64 @@ import { treeRebuild } from "./tree/build";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 import { updateComponentMeta } from "./comp/load";
+import { createRouter, RadixRouter } from "radix3";
 
 const decoder = new TextDecoder();
+
+const page = {
+  list: [] as { id: string; url: string }[],
+  route: null as null | RadixRouter<{ id: string; url: string }>,
+};
 
 export const edInitSync = (p: PG) => {
   const session = JSON.parse(
     localStorage.getItem("prasi-session") || "null"
   ) as { data: { user: { id: string; username: string } } };
-  if (!session) {
+  if (!session && location.pathname.startsWith("/ed/")) {
     navigate("/login");
     return <Loading note="logging in" />;
   }
   p.user.id = session.data.user.id;
   p.user.username = session.data.user.username;
+
+  if (!params.page_id && location.pathname.startsWith("/vi/")) {
+    p.preview.show_loading = false;
+    if (page.list.length === 0) {
+      db.page
+        .findMany({
+          where: {
+            id_site: params.site_id,
+            is_deleted: false,
+            is_default_layout: false,
+          },
+          select: {
+            id: true,
+            url: true,
+          },
+        })
+        .then((list) => {
+          page.list = list;
+          edInitSync(p);
+        });
+
+      return;
+    } else {
+      if (!page.route) {
+        page.route = createRouter();
+        for (const e of page.list) {
+          page.route.insert(e.url, e);
+        }
+      }
+
+      const arrpath = location.pathname.split("/");
+      const pathname = "/" + arrpath.slice(3).join("/");
+
+      const res = page.route.lookup(pathname);
+      if (res) {
+        params.page_id = res.id;
+      }
+    }
+  }
 
   if (p.sync) {
     if (p.site.id === "--loading--") return false;
@@ -42,7 +87,11 @@ export const edInitSync = (p: PG) => {
       return false;
     }
 
-    if (!params.page_id && params.site_id) {
+    if (
+      !params.page_id &&
+      params.site_id &&
+      location.pathname.startsWith("/ed/")
+    ) {
       db.page
         .findFirst({
           where: {
@@ -99,7 +148,9 @@ export const edInitSync = (p: PG) => {
           if (params.site_id !== e.site_id || params.page_id !== e.page_id) {
             p.site.id = e.site_id;
             p.page.cur.id = e.page_id;
-            navigate(`/ed/${e.site_id}/${e.page_id}`);
+            if (location.pathname.startsWith("/ed/")) {
+              navigate(`/ed/${e.site_id}/${e.page_id}`);
+            }
           } else {
             p.site.id = e.site_id;
             p.page.cur.id = e.page_id;
