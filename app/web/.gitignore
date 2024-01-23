@@ -179,3 +179,5 @@ app/web/.parcel-cache
 app/static
 .data
 .data/*
+
+timestamp.ts

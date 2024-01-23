@@ -9,58 +9,66 @@ import { syncActionDefinition } from "utils/sync-def";
 import { user } from "../../app/srv/ws/sync/entity/user";
 import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
 import { initSrv } from "../../app/srv/init";
+import { createId } from "@paralleldrive/cuid2";
 import { prepareApiRoutes } from "./server/api/api-scan";
+import { writeAsync } from "fs-jetpack";
+import { dir } from "dir";
 
 g.status = "init";
 
+await writeAsync(
+	dir.path("app/web/timestamp.ts"),
+	`export const version = "${createId().substring(0, 7)}";`,
+);
+
 if (!g.Y) {
-  g.Y = await import("yjs");
-  g.syncronize = (await import("y-pojo")).syncronize;
+	g.Y = await import("yjs");
+	g.syncronize = (await import("y-pojo")).syncronize;
 
-  await createLogger();
-  g.api = {};
-  g.mode = process.argv.includes("dev") ? "dev" : "prod";
-  g.datadir = g.mode == "prod" ? "../data" : "data";
-  g.port = parseInt(process.env.PORT || "4550");
+	await createLogger();
+	g.api = {};
+	g.mode = process.argv.includes("dev") ? "dev" : "prod";
+	g.datadir = g.mode == "prod" ? "../data" : "data";
+	g.port = parseInt(process.env.PORT || "4550");
 
-  g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
-  if (g.mode === "dev") {
-    await startDevWatcher();
-  }
+	g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
+	if (g.mode === "dev") {
+		await startDevWatcher();
+	}
 
-  /** init lmdb */
-  user.conf.init();
-  snapshot.init();
+	/** init lmdb */
+	user.conf.init();
+	snapshot.init();
 }
 
 const db = g.db;
 if (!db) {
-  await preparePrisma();
-  await ensureNotRunning();
-  const db = g.db;
-  if (db) {
-    db.$connect()
-      .catch((e: any) => {
-        g.log.error(`[DB ERROR]\n${e.message}`);
-      })
-      .then(() => {
-        g.log.info("Database connected");
-      });
-  }
+	await preparePrisma();
+	await ensureNotRunning();
+	const db = g.db;
+	if (db) {
+		db.$connect()
+			.catch((e: any) => {
+				g.log.error(`[DB ERROR]\n${e.message}`);
+			})
+			.then(() => {
+				g.log.info("Database connected");
+			});
+	}
 }
 
 if (!g.apiPrepared) {
-  await initSrv();
-  await syncActionDefinition();
-  g.log.info("WS Action defined");
-  await prepareApiRoutes();
-  await prepareAPITypes();
-  g.log.info("API Prepared");
-  g.apiPrepared = true;
+	await initSrv();
+	await syncActionDefinition();
+	g.log.info("WS Action defined");
+	await prepareApiRoutes();
+	await prepareAPITypes();
+	g.log.info("API Prepared");
+	g.apiPrepared = true;
 }
 
 if (!g.parcel) {
-  await parcelBuild();
+	await parcelBuild();
 }
 
 const { createServer } = await import("./server/create");

@@ -10,36 +10,36 @@ import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
 
 const start = async () => {
-  const base = `${location.protocol}//${location.host}`;
-  let react = {
-    root: null as null | ReactRoot,
-  };
-  w.mobile = registerMobile();
+	const base = `${location.protocol}//${location.host}`;
+	let react = {
+		root: null as null | ReactRoot,
+	};
+	w.mobile = registerMobile();
 
-  const cur = new URL(location.href);
-  const base_url = `${cur.protocol}//${cur.host}`;
-  w.db = dbProxy(base_url);
+	const cur = new URL(location.href);
+	const base_url = `${cur.protocol}//${cur.host}`;
+	w.db = dbProxy(base_url);
 
-  try {
-    await loadApiProxyDef(base_url, false);
-    w.api = apiProxy(base_url);
-  } catch (e) {
-    console.warn("Failed to load API:", base_url);
-  }
+	try {
+		await loadApiProxyDef(base_url, false);
+		w.api = apiProxy(base_url);
+	} catch (e) {
+		console.warn("Failed to load API:", base_url);
+	}
 
-  w.serverurl = base;
+	w.serverurl = base;
 
-  sworkerRegister(react);
-  defineReact();
-  await defineWindow(false);
-  sworkerAddCache(base);
+	sworkerRegister(react);
+	defineReact();
+	await defineWindow(false);
+	sworkerAddCache(base);
 
-  const el = document.getElementById("root");
+	const el = document.getElementById("root");
 
-  if (el) {
-    react.root = createRoot(el);
-    react.root.render(<Root />);
-  }
+	if (el) {
+		react.root = createRoot(el);
+		react.root.render(<Root />);
+	}
 };
 
 start();
