@@ -1,5 +1,8 @@
-export const viScriptArg = (vi: { site: { db: any; api: any } }) => ({
-  isMobile: false,
-  isDesktop: true,
-  isEditor: true,
+export const viScriptArg = (vi: {
+  mode: "mobile" | "desktop";
+  site: { db: any; api: any };
+}) => ({
+  isMobile: vi.mode === "mobile",
+  isDesktop: vi.mode === "desktop",
+  isEditor: location.pathname.startsWith("/ed/"),
 });

@@ -9,6 +9,7 @@ import { render_stat } from "./render/render";
 
 export const Vi: FC<{
   meta: Record<string, IMeta>;
+  mode: "mobile" | "desktop";
   comp_load?: (comp_id: string) => Promise<void>;
   entry: string[];
   api_url: string;
@@ -26,6 +27,7 @@ export const Vi: FC<{
   api_url,
   site_id,
   api,
+  mode,
   db,
   visit,
   script,
@@ -33,6 +35,7 @@ export const Vi: FC<{
   on_status_changed,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
+  vi.mode = mode;
   vi.on_status_changes = on_status_changed;
 
   if (rs === "disabled") {
