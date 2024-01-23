@@ -11,6 +11,8 @@ import { SyncType } from "../../type";
 import { gzipAsync } from "../../entity/zlib";
 import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../../pkgs/core/server/create";
+import { user } from "../../entity/user";
+import { conns } from "../../entity/conn";
 
 const encoder = new TextEncoder();
 export const codeBuild = async (code: DBCode) => {
@@ -60,7 +62,6 @@ export const codeBuild = async (code: DBCode) => {
           },
         });
       });
-    const result = await Code.build.ctx[id_code].rebuild();
     const out = Bun.file(outfile);
     const src = (await out.text()).replace(
       "//# sourceMappingURL=index.js.map",
@@ -68,30 +69,23 @@ export const codeBuild = async (code: DBCode) => {
     );
     Bun.write(out, src);
     const srcgz = await gzipAsync(encoder.encode(src));
+    user.active.findAll({ site_id: code.id_site }).map((e) => {
+      const ws = conns.get(e.client_id)?.ws;
 
-    activity.site
-      .room(code.id_site)
-      .findAll({ site_js: code.name })
-      .forEach((item, ws) => {
+      if (ws) {
         sendWS(ws, {
           type: SyncType.Event,
           event: "code",
           data: {
-            name: code.name,
-            id: code.id,
+            name: "site",
+            id: id_code,
             event: "code-done",
             src: srcgz,
-            content:
-              result.errors.length > 0
-                ? `${result.errors.join("\n")}`
-                : `${
-                    result.warnings.length > 0
-                      ? result.warnings.join("\n")
-                      : "OK"
-                  }`,
+            content: "OK",
           },
         });
-      });
+      }
+    });
   } catch (e: any) {
     console.error(e);
     activity.site
@@ -137,10 +131,7 @@ export const broadcastCode = async (
     const outfile = dir.path(`${g.datadir}/site/build/${id_code}/index.js`);
     const out = Bun.file(outfile);
     if (out) {
-      const src = (await out.text()).replace(
-        "//# sourceMappingURL=index.js.map",
-        `//# sourceMappingURL=/nova-load/code/${id_code}/index.js.map`
-      );
+      const src = await out.text();
       const srcgz = await gzipAsync(encoder.encode(src));
 
       if (ws) {
@@ -156,10 +147,10 @@ export const broadcastCode = async (
           },
         });
       } else {
-        activity.site
-          .room(id_site)
-          .findAll()
-          .forEach((item, ws) => {
+        user.active.findAll({ site_id: id_site }).map((e) => {
+          const ws = conns.get(e.client_id)?.ws;
+
+          if (ws) {
             sendWS(ws, {
               type: SyncType.Event,
               event: "code",
@@ -171,7 +162,8 @@ export const broadcastCode = async (
                 content: "OK",
               },
             });
-          });
+          }
+        });
       }
     }
   }

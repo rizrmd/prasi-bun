@@ -10,9 +10,6 @@ let w = window as unknown as {
 
 export const edInit = async (p: PG) => {
 	p.status = "ready";
-
 	jscript.init(p.render, { esbuild: false });
-
 	p.script.loaded = true;
-	p.render();
 };
