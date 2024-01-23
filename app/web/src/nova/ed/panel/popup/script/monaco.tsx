@@ -97,10 +97,19 @@ export const EdScriptMonaco: FC<{}> = () => {
           }
 
           if (p.ui.popup.script.mode === "js") {
+            const w = window as any;
             const types: any = {};
-            for (const prop of p.global_prop) {
-              types[prop] = "any";
+            for (const prop_name of p.global_prop) {
+              if (prop_name === "_types") continue;
+              types[prop_name] = "any";
             }
+
+            if (w._types) {
+              for (const [k, v] of Object.entries(w._types)) {
+                types[k] = v;
+              }
+            }
+
             await monacoTypings(
               {
                 site_dts: p.site_dts,
