@@ -1,8 +1,9 @@
 import { NodeModel, RenderParams } from "@minoru/react-dnd-treeview";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, IMeta, active } from "../../../../logic/ed-global";
+import { IItem, MItem } from "../../../../../../utils/types/item";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
+import { EDGlobal, IMeta, PG, active } from "../../../../logic/ed-global";
 import { treeRebuild } from "../../../../logic/tree/build";
 
 export const EdTreeName = ({
@@ -101,13 +102,15 @@ export const EdTreeName = ({
             }
           }}
           onChange={(e) => {
-            local.rename = e.target.value.replace(/[\W_]+/g, "_");
+            local.rename = e.target.value
+              .replace(/[^a-zA-Z\:\d\s:]+/g, "_")
+              .toLowerCase();
             p.render();
           }}
         />
       ) : (
         <div className="flex flex-col">
-          <Name name={name} is_jsx_prop={is_jsx_prop} />
+          <Name name={name} is_jsx_prop={is_jsx_prop} meta={node.data} />
           {/* <div className={"text-[9px] text-gray-500 -mt-1"}>
             {node.id} - {item.originalId}
           </div> */}
@@ -117,20 +120,22 @@ export const EdTreeName = ({
   );
 };
 
-const Name: FC<{ name: string; is_jsx_prop: boolean }> = ({
+const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
   name,
   is_jsx_prop,
+  meta,
 }) => {
   if (is_jsx_prop) {
     return (
-      <div className="flex items-center space-x-1">
+      <div className={cx("flex items-center space-x-1 pr-1")}>
         <Tooltip
           content={`Type: JSX Prop`}
           className="flex text-purple-500 border border-purple-400 items-center justify-center font-mono text-[6px] px-[2px]"
         >
           P
         </Tooltip>
-        <div>{name}</div>
+        <div className="flex-1">{name}</div>
+        {meta && meta.mitem && <GenerateJSX mitem={meta.mitem} />}
       </div>
     );
   }
@@ -152,4 +157,77 @@ const Name: FC<{ name: string; is_jsx_prop: boolean }> = ({
   }
 
   return <div>{name}</div>;
+};
+
+const GenerateJSX: FC<{ mitem: MItem }> = ({ mitem }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+  return (
+    <Tooltip
+      content="Generate JSX"
+      onClick={() => {
+        const genJSX = findDefaultJSX(p, mitem);
+        const ijson = mitem.toJSON() as IItem;
+        mitem.doc?.transact(() => {
+          syncronize(mitem as any, {
+            ...genJSX,
+            name: ijson.name,
+            id: ijson.id,
+            hidden: false,
+            originalId: ijson.originalId,
+          });
+        });
+        treeRebuild(p);
+        p.render();
+      }}
+    >
+      <div
+        className="action-script px-1 py-[2px] rounded-sm text-purple-500 bg-white border border-purple-400 opacity-0 transition-all hover:bg-purple-700 hover:text-white hover:border-purple-700"
+        dangerouslySetInnerHTML={{
+          __html: `<svg width="9px" height="9px" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.69667 0.0403541C8.90859 0.131038 9.03106 0.354857 8.99316 0.582235L8.0902 6.00001H12.5C12.6893 6.00001 12.8625 6.10701 12.9472 6.27641C13.0319 6.4458 13.0136 6.6485 12.8999 6.80001L6.89997 14.8C6.76167 14.9844 6.51521 15.0503 6.30328 14.9597C6.09135 14.869 5.96888 14.6452 6.00678 14.4178L6.90974 9H2.49999C2.31061 9 2.13748 8.893 2.05278 8.72361C1.96809 8.55422 1.98636 8.35151 2.09999 8.2L8.09997 0.200038C8.23828 0.0156255 8.48474 -0.0503301 8.69667 0.0403541ZM3.49999 8.00001H7.49997C7.64695 8.00001 7.78648 8.06467 7.88148 8.17682C7.97648 8.28896 8.01733 8.43723 7.99317 8.5822L7.33027 12.5596L11.5 7.00001H7.49997C7.353 7.00001 7.21347 6.93534 7.11846 6.8232C7.02346 6.71105 6.98261 6.56279 7.00678 6.41781L7.66968 2.44042L3.49999 8.00001Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`,
+        }}
+      ></div>
+    </Tooltip>
+  );
+};
+
+export const findDefaultJSX = (p: PG, mitem: MItem): IItem => {
+  let resetJSXProp: any = false;
+  if (mitem && mitem.parent && (mitem.parent as any).get("content")) {
+    let name = "";
+    (mitem as any).parent.parent.forEach((e: any, k: any) => {
+      if (e === mitem.parent) {
+        name = k;
+      }
+    });
+
+    if (name) {
+      try {
+        const cid = (mitem as any).parent.parent.parent.get("id");
+        const comp = p.comp.list[cid].doc;
+        if (comp) {
+          const mchilds = comp
+            .getMap("map")
+            .get("root")
+            ?.get("childs")
+            ?.toJSON() as IItem[];
+          for (const c of mchilds) {
+            if (
+              c &&
+              c.name &&
+              c.name.startsWith("jsx:") &&
+              c.name.substring(4).trim() === name
+            ) {
+              c.hidden = false;
+              c.name = name;
+              c.id = mitem.get("id") || "";
+              c.originalId = mitem.get("originalId") || "";
+              resetJSXProp = c;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
+  return resetJSXProp;
 };

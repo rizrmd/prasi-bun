@@ -33,7 +33,7 @@ export const EdAddText = () => {
 
           const json = {
             id: createId(),
-            name: `New Text`,
+            name: `new_text`,
             type: "text",
             dim: { w: "full", h: "full" },
             layout: { align: "center", dir: "col", gap: 0 },
@@ -68,7 +68,7 @@ export const EdAddText = () => {
               if (mitem.get("type") === "section") {
                 const json = {
                   id: createId(),
-                  name: `New Item`,
+                  name: `new_item`,
                   type: "item",
                   dim: { w: "full", h: "full" },
                   childs: [],

@@ -34,10 +34,12 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   for (const path of paths) {
     if (path.includes(meta)) {
       for (const m of path) {
-        if (m.instances) {
-          cur_path.length = 0;
+        if (m) {
+          if (m.instances) {
+            cur_path.length = 0;
+          }
+          cur_path.push(m);
         }
-        cur_path.push(m);
       }
       break;
     }

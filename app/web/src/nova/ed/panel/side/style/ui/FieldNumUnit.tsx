@@ -70,8 +70,6 @@ export const FieldNumUnit: FC<{
     local.render();
   }, [value, unit]);
 
-  const [txPending, tx] = useTransition();
-
   useEffect(() => {
     // Only change the value if the drag was actually started.
     const onUpdate = (event: any) => {
@@ -86,9 +84,7 @@ export const FieldNumUnit: FC<{
 
         local.render();
 
-        tx(() => {
-          update(local.val + local.unit);
-        });
+        update(local.val + local.unit);
       }
     };
 
@@ -105,7 +101,7 @@ export const FieldNumUnit: FC<{
       document.removeEventListener("pointermove", onUpdate);
       document.removeEventListener("pointerup", onEnd);
     };
-  }, [local.drag.clientX, local.drag.old, local.val]);
+  }, [local.drag.clientX, local.drag.old, local.val, update]);
 
   const onStart = useCallback(
     (event: React.MouseEvent) => {

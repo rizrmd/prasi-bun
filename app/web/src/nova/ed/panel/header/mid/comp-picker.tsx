@@ -105,7 +105,7 @@ const addComponent = (mitem: MItem | MSection, comp: IItem) => {
 const addSection = (root: MRoot) => {
   const json = {
     id: createId(),
-    name: `New Section`,
+    name: `new_section`,
     type: "section",
     dim: { w: "full", h: "full" },
     childs: [],

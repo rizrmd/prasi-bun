@@ -36,7 +36,7 @@ export const cssFont = (
     font.family = glbFont.defaultFont;
   }
 
-  return cx(
+  const res = cx(
     font.color &&
       `
         color: ${font.color};
@@ -69,4 +69,6 @@ export const cssFont = (
         font-family: ${font.family};
       `
   );
+
+  return res;
 };

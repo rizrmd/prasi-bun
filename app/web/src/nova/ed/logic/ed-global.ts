@@ -195,7 +195,6 @@ export const EDGlobal = {
   global_prop: [] as string[],
   ui: {
     zoom: localStorage.zoom || "100%",
-    should_render: false,
     side: { prop: true },
     layout: {
       left: parseInt(localStorage.getItem("prasi-layout-left") || "250"),

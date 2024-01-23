@@ -17,6 +17,7 @@ import { CPInstance } from "./props/CPInstance";
 import { CPMaster } from "./props/CPMaster";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
+import { treeRebuild } from "../../../../nova/ed/logic/tree/build";
 
 export const ESide = () => {
   const p = useGlobal(EditorGlobal, "EDITOR");

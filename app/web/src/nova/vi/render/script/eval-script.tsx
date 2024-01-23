@@ -84,13 +84,7 @@ const JsxProp: FC<{
   meta: IMeta;
   passprop: any;
 }> = ({ fn, meta, passprop }) => {
-  const local = useLocal({ init: false, result: null as any });
-
-  if (!local.init) {
-    local.init = true;
-    local.result = fn({ passprop, meta });
-  }
-  return local.result;
+  return fn({ passprop, meta });
 };
 
 export const replacement = {
