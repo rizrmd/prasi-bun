@@ -3,7 +3,7 @@ export const isLocalhost = () => {
     "localhost",
     "127.0.0.1",
     "192.168",
-    "trycloudflare.com",
+    // "trycloudflare.com",
     "ngrok",
   ].find((e) => location.hostname.includes(e));
 };
