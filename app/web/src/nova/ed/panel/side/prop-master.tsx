@@ -5,7 +5,7 @@ import {
   PlaceholderRender,
   getBackendOptions,
 } from "@minoru/react-dnd-treeview";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
@@ -20,14 +20,19 @@ const propRef = {
 
 export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({});
   const item = meta?.item as IItem;
+  const [_, set] = useState({});
+  const render = () => {
+    set({});
+  };
+  propPopover.render = render;
   if (!item) return null;
 
   const TypedTree = DNDTree<PropItem>;
 
   let filtered = [] as NodeModel<PropItem>[];
   let mprops = meta.mitem?.get("component")?.get("props");
+
   if (!mprops) {
     const mcomp = meta.mitem?.get("component");
     if (mcomp) {
@@ -119,8 +124,8 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
               render={(node, params) => (
                 <EdPropCompTreeItem
                   node={node}
+                  render={render}
                   params={params}
-                  render={local.render}
                 />
               )}
               rootId={"root"}

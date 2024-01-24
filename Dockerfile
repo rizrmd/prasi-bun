@@ -1,6 +1,5 @@
 FROM oven/bun:1.0.18-debian as base
 WORKDIR /app/prasi/repo
-COPY . .
 
 RUN apt-get update
 RUN apt-get install git curl gnupg zip unzip -yq
@@ -12,6 +11,8 @@ RUN apt-get install nodejs -yq
 
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp pnpm
 RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
+
+COPY . .
 RUN bun install
 RUN bun run build
 

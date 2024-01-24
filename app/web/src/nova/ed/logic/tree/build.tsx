@@ -58,12 +58,14 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                   mitem,
                   meta,
                   new_prop_jsx(meta, mprops, prop_name, prop_val) {
-                    transact.list.push(() => {
-                      const map = new Y.Map();
-                      if (prop_val.content) prop_val.content.id = createId();
-                      syncronize(map, prop_val);
-                      mprops.set(prop_name, map as any);
-                    });
+                    // if (prop_val.meta?.type === "content-element") {
+                    //   transact.list.push(() => {
+                    //     const map = new Y.Map();
+                    //     if (prop_val.content) prop_val.content.id = createId();
+                    //     syncronize(map, prop_val);
+                    //     mprops.set(prop_name, map as any);
+                    //   });
+                    // }
                   },
                 });
               }

@@ -10,6 +10,7 @@ import { pushTreeNode } from "../tree/build/push-tree";
 import { isTextEditing } from "../active/is-editing";
 import { assignMitem } from "../tree/assign-mitem";
 import { createId } from "@paralleldrive/cuid2";
+import { waitUntil } from "web-utils";
 
 export const loadcomp = {
   timeout: 0 as any,
@@ -45,6 +46,8 @@ export const loadCompSnapshot = async (
   comp_id: string,
   snapshot: Uint8Array
 ) => {
+  if (p.comp.list[comp_id]) return;
+
   const doc = new Y.Doc() as DComp;
   Y.applyUpdate(doc as any, decompress(snapshot));
   const mitem = doc.getMap("map").get("root");
@@ -102,8 +105,6 @@ export const loadCompSnapshot = async (
               if (isTextEditing()) {
                 return;
               }
-              treeRebuild(p, { note: "load-comp" });
-              p.render();
             }
           },
         };
@@ -142,7 +143,7 @@ export const updateComponentMeta = async (
         let result = Object.entries(comps);
 
         for (const [id_comp, comp] of result) {
-          if (comp && comp.snapshot) {
+          if (comp && comp.snapshot && !p.comp.list[id_comp]) {
             await loadCompSnapshot(p, id_comp, comp.snapshot);
           }
         }
@@ -156,7 +157,7 @@ export const updateComponentMeta = async (
       meta,
       mode: "comp",
       on: {
-        visit(m) {
+        async visit(m) {
           pushTreeNode(p, m, meta, tree);
 
           assignMitem({
