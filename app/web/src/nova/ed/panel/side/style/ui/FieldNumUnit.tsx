@@ -157,6 +157,7 @@ export const FieldNumUnit: FC<{
             value={typeof disabled === "string" ? disabled : local.val}
             onChange={(e) => {
               local.val = parseInt(e.currentTarget.value) || 0;
+              local.render();
               update(local.val + local.unit);
             }}
           />
