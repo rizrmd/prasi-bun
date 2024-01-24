@@ -81,7 +81,7 @@ const AlignItem: FC<{
           active === align &&
             css`
               .icon {
-                display: flex;
+                display: flex !important;
               }
               .point {
                 display: none;
@@ -90,7 +90,7 @@ const AlignItem: FC<{
           css`
             &:hover {
               .icon {
-                display: flex;
+                display: flex !important;
                 opacity: 0.5;
               }
               .point {
@@ -103,7 +103,16 @@ const AlignItem: FC<{
           onChange(align);
         }}
       >
-        <AlignIcon dir={dir} pos={pos as any} className={"icon hidden"} />
+        <AlignIcon
+          dir={dir}
+          pos={pos as any}
+          className={cx(
+            "icon",
+            css`
+              display: none;
+            `
+          )}
+        />
         <div className="w-[2px] h-[2px] bg-slate-400 point"></div>
       </div>
     </Tooltip>
