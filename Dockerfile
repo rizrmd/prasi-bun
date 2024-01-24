@@ -12,6 +12,10 @@ RUN apt-get install nodejs -yq
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp pnpm
 RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
 
+COPY bun.lockb .
+COPY package.json .
+RUN bun install
+
 COPY . .
 RUN bun install
 RUN bun run build
