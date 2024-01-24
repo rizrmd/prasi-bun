@@ -20,7 +20,6 @@ export const EdPropCompTreeItem: FC<{
   render: () => void;
 }> = ({ node, params, render }) => {
   const local = useLocal({ closing: false });
-  propPopover.render[node.text] = local.render;
 
   if (node.id === "root") {
     return <></>;

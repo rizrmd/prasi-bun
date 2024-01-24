@@ -11,7 +11,7 @@ import { fillID } from "../../../logic/tree/fill-id";
 
 export const propPopover = {
   name: "",
-  render: {} as Record<string, () => void>,
+  render: () => {},
 };
 
 export const EdPropPopoverForm: FC<{
@@ -23,10 +23,30 @@ export const EdPropPopoverForm: FC<{
   const mmeta = mprop.get("meta");
   const local = useLocal({
     name,
+    rename_timeout: null as any,
   });
 
   if (!mmeta) return null;
   const type = mmeta.get("type");
+
+  const rename = () => {
+    const keys = Object.keys(mprop.parent?.toJSON());
+    if ([...keys, ...invalidKeyword].includes(local.name)) {
+      alert(`Cannot use "${local.name}" as name`);
+      local.name = name;
+      local.render();
+      return;
+    }
+
+    mprop.doc?.transact(() => {
+      const parent = mprop.parent as TypedMap<Record<string, FMCompDef>>;
+      parent.set(local.name, parent.get(name)?.clone() as any);
+      parent.delete(name);
+    });
+    propPopover.name = local.name;
+    propPopover.render();
+  };
+
   return (
     <div
       className={cx(
@@ -72,6 +92,7 @@ export const EdPropPopoverForm: FC<{
                 } else {
                   mmeta.set("type", e.type as any);
                 }
+                propPopover.render();
               }}
             >
               {e.label}
@@ -91,26 +112,12 @@ export const EdPropPopoverForm: FC<{
             local.name = e.currentTarget.value
               .toLowerCase()
               .replace(/\W/gi, "_");
+
             local.render();
           }}
           onBlur={() => {
             if (local.name !== name) {
-              const keys = Object.keys(mprop.parent?.toJSON());
-              if ([...keys, ...invalidKeyword].includes(local.name)) {
-                alert(`Cannot use "${local.name}" as name`);
-                local.name = name;
-                local.render();
-                return;
-              }
-              mprop.doc?.transact(() => {
-                const parent = mprop.parent as TypedMap<
-                  Record<string, FMCompDef>
-                >;
-                parent.set(local.name, parent.get(name)?.clone() as any);
-                parent.delete(name);
-              });
-              propPopover.name = local.name;
-              local.render();
+              rename();
             }
           }}
           onKeyDown={(e) => {

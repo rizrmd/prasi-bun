@@ -40,7 +40,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
         doc.on("update", async (e, origin) => {
           const bin = Y.encodeStateAsUpdate(doc);
 
-          if (snap && snap.type === "code") {
+          if (typeof snap !== "undefined" && snap.type === "code") {
             snap.build[mode].bin = bin;
             snapshot.update({
               id: id_site,
