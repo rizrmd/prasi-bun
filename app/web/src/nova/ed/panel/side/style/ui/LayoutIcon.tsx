@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { FNLayout } from "../../../../../utils/types/meta-fn";
+import { FNLayout } from "../../../../../../utils/types/meta-fn";
 
 export const AlignIcon: FC<{
   dir: FNLayout["dir"];
