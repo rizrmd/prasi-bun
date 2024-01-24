@@ -29,9 +29,17 @@ export const EdScriptWorkbench = () => {
     canBack: active.script_nav.list.length > 0,
   };
 
+  if (p.ui.popup.script.type === "item") {
+    setTimeout(() => {
+      p.ui.popup.script.mode = p.ui.popup.script.lastMode;
+      p.render();
+    }, 200);
+  }
+
   const is_error =
     p.ui.popup.script.typings.status === "error" &&
     p.ui.popup.script.mode === "js";
+
   return (
     <div className="flex flex-1 items-stretch">
       <div className="flex flex-1 flex-col ">
@@ -115,7 +123,7 @@ export const EdScriptWorkbench = () => {
                             border: 1px solid ${e.color};
                           `,
                           "uppercase text-white text-[12px] cursor-pointer flex items-center justify-center transition-all hover:opacity-100 w-[40px] text-center",
-                          p.ui.popup.script.mode === e.type
+                          p.ui.popup.script.lastMode === e.type
                             ? css`
                                 background: ${e.color};
                                 color: white;
@@ -124,6 +132,7 @@ export const EdScriptWorkbench = () => {
                         )}
                         onClick={() => {
                           p.ui.popup.script.mode = e.type as any;
+                          p.ui.popup.script.lastMode = e.type as any;
                           p.render();
                         }}
                       >

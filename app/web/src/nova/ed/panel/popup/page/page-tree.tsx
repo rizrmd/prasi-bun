@@ -3,7 +3,7 @@ import { FC, ReactNode } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../../logic/ed-global";
 import { pagePicker, reloadPagePicker } from "./page-reload";
-
+import { validate } from "uuid";
 export type PageItem = {
   id: string;
   name: string;
@@ -76,7 +76,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                       data: {
                         name: local.rename_to,
                         id_site: p.site.id,
-                        parent_id: rename_id,
+                        parent_id: validate(rename_id) ? rename_id : null,
                       },
                     });
                   }

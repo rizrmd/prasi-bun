@@ -1,4 +1,4 @@
-import { transform } from "esbuild";
+import { TransformResult, transform } from "esbuild";
 import { g } from "utils/global";
 import { Doc } from "yjs";
 import { MContent } from "../../../../web/src/utils/types/general";
@@ -41,14 +41,17 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
       if (mitem) {
         if (arg.type === "adv") {
+          const mode = arg.mode;
           try {
-            const res = await transform(`render(${src})`, {
-              jsx: "transform",
-              format: "cjs",
-              loader: "tsx",
-            });
+            let res = undefined as undefined | TransformResult;
+            if (mode === "js") {
+              res = await transform(`render(${src})`, {
+                jsx: "transform",
+                format: "cjs",
+                loader: "tsx",
+              });
+            }
             doc?.transact(() => {
-              const mode = arg.mode;
               let adv = mitem.get("adv");
               if (!adv) {
                 mitem.set("adv", new Y.Map() as any);
@@ -59,7 +62,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 try {
                   if (adv) {
                     adv.set(mode, src);
-                    if (mode === "js") {
+                    if (mode === "js" && res) {
                       adv.set("jsBuilt", res.code);
                     }
                   }

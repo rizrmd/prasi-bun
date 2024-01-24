@@ -33,6 +33,8 @@ export const FieldNumUnit: FC<{
 }) => {
   const local = useLocal({
     val: 0,
+    val_str: "",
+    focus: false,
     unit: "",
     drag: { clientX: 0, old: 0 },
     dragging: false,
@@ -56,6 +58,9 @@ export const FieldNumUnit: FC<{
         }
       }
       if (!parseInt(val)) unt = "";
+    }
+    if (!local.focus) {
+      local.val_str = val;
     }
     local.val = parseInt(val) || 0;
     if (positiveOnly && local.val < 0) {
@@ -154,9 +159,18 @@ export const FieldNumUnit: FC<{
               !!disabled && "text-center text-gray-400"
             )}
             disabled={!!disabled}
-            value={typeof disabled === "string" ? disabled : local.val}
+            value={typeof disabled === "string" ? disabled : local.val_str}
+            onFocus={() => {
+              local.focus = true;
+              local.render();
+            }}
+            onBlur={() => {
+              local.focus = false;
+              local.render();
+            }}
             onChange={(e) => {
-              local.val = parseInt(e.currentTarget.value) || 0;
+              local.val_str = e.currentTarget.value;
+              local.val = parseInt(local.val_str) || 0;
               local.render();
               update(local.val + local.unit);
             }}
