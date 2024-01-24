@@ -103,7 +103,7 @@ const AlignItem: FC<{
           onChange(align);
         }}
       >
-        <AlignIcon dir={dir} pos={pos as any} className={"icon opacity-0"} />
+        <AlignIcon dir={dir} pos={pos as any} className={"icon hidden"} />
         <div className="w-[2px] h-[2px] bg-slate-400 point"></div>
       </div>
     </Tooltip>
