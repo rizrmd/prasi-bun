@@ -17,6 +17,7 @@ type PROPS = React.DetailedHTMLProps<
 
 export const viParts = (
   vi: {
+    mode: "desktop" | "mobile";
     meta: Record<string, IMeta>;
   },
   meta: IMeta,
@@ -26,7 +27,7 @@ export const viParts = (
 
   const props: PROPS = {
     className: produceCSS(item, {
-      mode: "desktop",
+      mode: vi.mode,
     }),
   };
 
