@@ -8,10 +8,14 @@ import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import {
   iconChevronDown,
+  iconDownload,
   iconLoading,
   iconLog,
   iconNewTab,
+  iconScrollOff,
+  iconScrollOn,
   iconTrash,
+  iconUpload,
 } from "./icons";
 import { CodeNameItem, CodeNameList, codeName } from "./name-list";
 
@@ -141,7 +145,7 @@ const CodeBody = () => {
             ></div>
           </Popover>
 
-          <Tooltip
+          {/* <Tooltip
             content="STDOUT Log"
             delay={0}
             placement="bottom"
@@ -168,7 +172,75 @@ const CodeBody = () => {
                 __html: p.ui.popup.code.loading ? iconLog : iconLoading,
               }}
             ></div>
+          </Tooltip> */}
+          <Tooltip
+            content={`Startup Script: ${
+              !p.ui.popup.code.startup_running ? "OFF" : "Running"
+            }`}
+            className={cx("flex items-stretch relative border-l")}
+            delay={0}
+            placement="bottom"
+          >
+            <div
+              className={cx(
+                "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
+                p.ui.popup.code.startup_running
+                  ? "border-b-2 border-b-green-700 bg-green-50"
+                  : "border-b-2 border-b-transparent"
+              )}
+              dangerouslySetInnerHTML={{
+                __html: p.ui.popup.code.startup_running
+                  ? iconScrollOn
+                  : iconScrollOff,
+              }}
+              onClick={() => {
+                p.ui.popup.code.startup_running =
+                  !p.ui.popup.code.startup_running;
+                p.render();
+              }}
+            ></div>
           </Tooltip>
+
+          <Tooltip
+            content={`Upload zip, will overwrite files.`}
+            className={cx(
+              "flex items-stretch relative cursor-pointer hover:bg-blue-50 "
+            )}
+            delay={0}
+            placement="bottom"
+          >
+            <input
+              type="file"
+              className="w-full h-full absolute inset-0 opacity-0 cursor-pointer text-[0px]"
+            ></input>
+            <div
+              className={cx(
+                "border-r flex text-center items-center cursor-pointer px-2 transition-all pointer-events-none"
+              )}
+              dangerouslySetInnerHTML={{
+                __html: iconUpload,
+              }}
+            ></div>
+          </Tooltip>
+
+          <Tooltip
+            content={`Download zip, excluding node_modules.`}
+            className={cx(
+              "flex items-stretch relative cursor-pointer hover:bg-blue-50 "
+            )}
+            delay={0}
+            placement="bottom"
+          >
+            <div
+              className={cx(
+                "border-r flex text-center items-center cursor-pointer px-2 transition-all cursor-pointer"
+              )}
+              dangerouslySetInnerHTML={{
+                __html: iconDownload,
+              }}
+            ></div>
+          </Tooltip>
+
           <Tooltip
             content="Open in new tab"
             delay={0}
