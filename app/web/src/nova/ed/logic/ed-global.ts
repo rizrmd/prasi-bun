@@ -225,6 +225,7 @@ export const EDGlobal = {
         name: "site",
         log: "",
         loading: false,
+        startup_running: false,
         error: false,
         show_log: false,
         list: {} as Record<string, string>,

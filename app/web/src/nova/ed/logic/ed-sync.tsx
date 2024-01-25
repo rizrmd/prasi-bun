@@ -23,48 +23,81 @@ export const edInitSync = (p: PG) => {
     localStorage.getItem("prasi-session") || "null"
   ) as { data: { user: { id: string; username: string } } };
   if (!session && location.pathname.startsWith("/ed/")) {
-    navigate("/login");
+    location.href = "/login";
     return <Loading note="logging in" />;
   }
   p.user.id = session.data.user.id;
   p.user.username = session.data.user.username;
 
-  if (!params.page_id && location.pathname.startsWith("/vi/")) {
-    p.preview.show_loading = false;
-    if (page.list.length === 0) {
-      db.page
-        .findMany({
-          where: {
-            id_site: params.site_id,
-            is_deleted: false,
-            is_default_layout: false,
-          },
-          select: {
-            id: true,
-            url: true,
-          },
-        })
-        .then((list) => {
-          page.list = list;
-          edInitSync(p);
-        });
+  if (!params.page_id) {
+    if (location.pathname.startsWith("/vi/")) {
+      p.preview.show_loading = false;
+      if (page.list.length === 0) {
+        db.page
+          .findMany({
+            where: {
+              id_site: params.site_id,
+              is_deleted: false,
+              is_default_layout: false,
+            },
+            select: {
+              id: true,
+              url: true,
+            },
+          })
+          .then((list) => {
+            page.list = list;
+            edInitSync(p);
+          });
 
-      return;
-    } else {
-      if (!page.route) {
-        page.route = createRouter();
-        for (const e of page.list) {
-          page.route.insert(e.url, e);
+        return;
+      } else {
+        if (!page.route) {
+          page.route = createRouter();
+          for (const e of page.list) {
+            page.route.insert(e.url, e);
+          }
+        }
+
+        const arrpath = location.pathname.split("/");
+        const pathname = "/" + arrpath.slice(3).join("/");
+
+        const res = page.route.lookup(pathname);
+        if (res) {
+          params.page_id = res.id;
         }
       }
-
-      const arrpath = location.pathname.split("/");
-      const pathname = "/" + arrpath.slice(3).join("/");
-
-      const res = page.route.lookup(pathname);
-      if (res) {
-        params.page_id = res.id;
+    } else if (location.pathname.startsWith("/ed")) {
+      if (!params.site_id) {
+        db.page
+          .findFirst({
+            where: {
+              is_deleted: false,
+              is_default_layout: false,
+              site: {
+                id_user: p.user.id,
+              },
+            },
+            select: { id: true, id_site: true },
+          })
+          .then((e) => {
+            if (e) location.href = `/ed/${e.id_site}/${e.id}`;
+          });
+      } else {
+        db.page
+          .findFirst({
+            where: {
+              is_deleted: false,
+              is_default_layout: false,
+              id_site: params.site_id,
+            },
+            select: { id: true, id_site: true },
+          })
+          .then((e) => {
+            if (e) location.href = `/ed/${e.id_site}/${e.id}`;
+          });
       }
+      return false;
     }
   }
 
@@ -102,7 +135,7 @@ export const edInitSync = (p: PG) => {
           select: { id: true },
         })
         .then((e) => {
-          if (e) navigate(`/ed/${params.site_id}/${e.id}`);
+          if (e) location.href = `/ed/${params.site_id}/${e.id}`;
         });
       return false;
     }
@@ -149,7 +182,7 @@ export const edInitSync = (p: PG) => {
             p.site.id = e.site_id;
             p.page.cur.id = e.page_id;
             if (location.pathname.startsWith("/ed/")) {
-              navigate(`/ed/${e.site_id}/${e.page_id}`);
+              location.href = `/ed/${e.site_id}/${e.page_id}`;
             }
           } else {
             p.site.id = e.site_id;
