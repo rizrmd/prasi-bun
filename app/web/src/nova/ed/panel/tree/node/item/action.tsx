@@ -97,7 +97,7 @@ export const EdTreeAction = ({
 
       {comp.enabled && (
         <>
-          {comp.id !== active.comp_id && (
+          {comp.id !== active.comp_id && p.ui.comp_editable && (
             <Tooltip content="Edit Component">
               <div
                 className="flex items-center border border-slate-500 bg-white rounded-sm text-[10px] px-[2px] cursor-pointer hover:bg-purple-100 hover:border-purple-600"
