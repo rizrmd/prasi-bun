@@ -79,33 +79,35 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
         <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
           {_meta.item.name}
         </div>
-        <div
-          className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
-          onClick={() => {
-            const item = _meta.item as IItem;
+        {p.ui.comp_editable && (
+          <div
+            className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
+            onClick={() => {
+              const item = _meta.item as IItem;
 
-            const comp_id = item.component?.id;
+              const comp_id = item.component?.id;
 
-            if (comp_id) {
-              if (!p.comp.list[comp_id]) return;
+              if (comp_id) {
+                if (!p.comp.list[comp_id]) return;
 
-              active.instance.item_id = item.id;
-              active.instance.comp_id = active.comp_id;
+                active.instance.item_id = item.id;
+                active.instance.comp_id = active.comp_id;
 
-              active.comp_id = comp_id || "";
-              const root = p.comp.list[comp_id].tree.find(
-                (e) => e.parent === "root"
-              );
-              if (root && typeof root.id === "string") {
-                active.item_id = root.id || "";
+                active.comp_id = comp_id || "";
+                const root = p.comp.list[comp_id].tree.find(
+                  (e) => e.parent === "root"
+                );
+                if (root && typeof root.id === "string") {
+                  active.item_id = root.id || "";
+                }
+
+                p.render();
               }
-
-              p.render();
-            }
-          }}
-        >
-          Edit Component
-        </div>
+            }}
+          >
+            Edit Component
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 relative overflow-y-auto overflow-x-hidden">

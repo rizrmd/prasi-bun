@@ -8,6 +8,7 @@ import { EdPagePicker } from "./panel/header/mid/page-picker";
 import { TopBtn } from "./panel/header/top-btn";
 import { useGlobal } from "web-utils";
 import { ResponsiveToggle } from "./panel/header/right/responsive-toggle";
+import { EdCompEditable } from "./panel/header/mid/comp-editable";
 
 export const EdMid: FC<{}> = () => {
   const ed = useGlobal(EDGlobal, "EDITORF");
@@ -31,6 +32,7 @@ export const EdMid: FC<{}> = () => {
             <EdAddItem />
             <EdAddText />
             <EdCompPicker />
+            <EdCompEditable />
           </div>
         </div>
         <div className="flex items-stretch flex-1 justify-end">

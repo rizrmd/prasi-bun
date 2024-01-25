@@ -197,6 +197,7 @@ export const EDGlobal = {
   code: {} as Record<string, { doc: null | DCode }>,
   global_prop: [] as string[],
   ui: {
+    comp_editable: localStorage.getItem("prasi-comp-editable") === "yes",
     zoom: localStorage.zoom || "100%",
     side: { prop: true },
     layout: {
