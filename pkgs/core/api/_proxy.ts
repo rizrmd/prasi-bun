@@ -9,6 +9,8 @@ export const _ = {
     headers: any;
     body: any;
   }) {
+    if (!arg.url) return new Response(null, { status: 403 });
+
     const res = await fetch(
       arg.url,
       arg.body

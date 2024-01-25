@@ -34,10 +34,13 @@ export const EdPopPage = () => {
         const parents: string[] = [];
         let cur = pagePicker.tree.find((e) => e.id === p.page.cur.id);
 
+        const processed_id = new Set<string>();
         if (pagePicker.rename_id) {
           let cur = pagePicker.tree.find((e) => e.id === pagePicker.rename_id);
           while (cur) {
             if (typeof cur.id === "string") {
+              if (processed_id.has(cur.id)) break;
+              else processed_id.add(cur.id);
               if (parents.includes(cur.id)) {
                 continue;
               }
@@ -49,6 +52,8 @@ export const EdPopPage = () => {
         } else {
           while (cur) {
             if (typeof cur.id === "string") {
+              if (processed_id.has(cur.id)) break;
+              else processed_id.add(cur.id);
               if (parents.includes(cur.id)) {
                 continue;
               }
