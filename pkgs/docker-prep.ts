@@ -36,7 +36,11 @@ if (!g.dockerPrepared) {
 
   if (!(await existsAsync(dir.path("_tmp_docker")))) {
     for (const file of Object.keys(dir.read(dir.path``))) {
-      if (file.startsWith("app/") || file.startsWith("pkgs/")) {
+      if (
+        file.startsWith("app/") ||
+        file.startsWith("pkgs/") ||
+        ["bun.lockb", "package.json"].includes(file)
+      ) {
         if (file.endsWith("package.json")) {
           await dirAsync(dir.path("_tmp_docker", path.dirname(file)));
           await copyAsync(dir.path(file), dir.path("_tmp_docker", file), {
@@ -45,13 +49,9 @@ if (!g.dockerPrepared) {
         }
       }
     }
-    await copyAsync(
-      dir.path("bun.lockb"),
-      dir.path("_tmp_docker", "bun.lockb")
-    );
 
     await $({ cwd: dir.path("_tmp_docker") })`zip -r ../docker .`;
     await $`mv docker.zip dockerzip`;
     await removeAsync(dir.path("_tmp_docker"));
   }
-} 
+}
