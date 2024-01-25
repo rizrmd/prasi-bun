@@ -4,6 +4,7 @@ import { fetchViaProxy } from "../proxy";
 
 export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
   const url = trim(_url, "/");
+  console.log(url, _url);
   const raw = await fetchViaProxy(urlPath(url, "/_prasi/_"));
   let ver = "";
   if (raw && (raw as any).prasi) {
@@ -25,7 +26,7 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
 
       const ts = localStorage.getItem("api-ts-" + url);
 
-      if (with_types) {
+      if (with_types) { 
         script.src = `${base}/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}`;
       } else {
         script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
