@@ -12,8 +12,11 @@ RUN apt-get install nodejs -yq
 RUN npm i -g @parcel/watcher node-gyp-build-optional-packages node-gyp pnpm
 RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
 
-COPY . .
+COPY dockerzip .
+RUN unzip -o dockerzip
 RUN bun install
+
+COPY . .
 RUN bun run build
 
 EXPOSE 4550/tcp
