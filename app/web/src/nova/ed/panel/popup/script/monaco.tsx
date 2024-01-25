@@ -8,11 +8,11 @@ import { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/pars
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
+import { Loading } from "../../../../../utils/ui/loading";
 import { getActiveMeta } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
 import { declareScope } from "./scope/scope";
-import { Loading } from "../../../../../utils/ui/loading";
 // @ts-ignore
 import { constrainedEditor } from "constrained-editor-plugin/dist/esm/constrainedEditor";
 import { addScope } from "./scope/add-scope";
@@ -95,7 +95,6 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             }
           }
-
           if (p.ui.popup.script.mode === "js") {
             const w = window as any;
             const types: any = {};

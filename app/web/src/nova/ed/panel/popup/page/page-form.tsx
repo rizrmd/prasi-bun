@@ -125,7 +125,10 @@ export const EdFormPage: FC<{
               }}
               onChange={(e) => {
                 if (local.fillUrl) {
-                  form.url = `/${e.replace(/\W/g, "/").replace(/\/\/+/g, "/")}`;
+                  form.url = `/${e
+                    .replace(/\W/g, "/")
+                    .replace(/\/\/+/g, "/")
+                    .replace(/\s/g, "_")}`;
                 }
                 form.render();
               }}
