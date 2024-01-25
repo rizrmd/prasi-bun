@@ -101,10 +101,16 @@ export const loadCompSnapshot = async (
                 p.comp.list[comp_id].meta = updated.meta;
                 p.comp.list[comp_id].tree = updated.tree;
               }
+              p.comp.loaded[comp_id] = doc
+                .getMap("map")
+                .get("root")
+                ?.toJSON() as IItem;
 
               if (isTextEditing()) {
                 return;
               }
+              treeRebuild(p);
+              p.render();
             }
           },
         };
@@ -191,7 +197,7 @@ export const updateComponentMeta = async (
 
   p.comp.loaded[comp_id] = item;
 
-  return { meta, tree };
+  return { meta, tree, item };
 };
 
 const transact = {

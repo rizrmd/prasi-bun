@@ -232,6 +232,7 @@ export const edInitSync = (p: PG) => {
               } else if (data.type === "comp") {
                 const updated = await updateComponentMeta(p, doc, data.id);
                 if (updated) {
+                  console.log(updated.item);
                   p.comp.list[data.id].meta = updated.meta;
                   p.comp.list[data.id].tree = updated.tree;
                 }
