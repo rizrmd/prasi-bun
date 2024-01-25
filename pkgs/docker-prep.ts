@@ -36,11 +36,13 @@ if (!g.dockerPrepared) {
 
   if (!(await existsAsync(dir.path("_tmp_docker")))) {
     for (const file of Object.keys(dir.read(dir.path``))) {
-      if (file.endsWith("package.json")) {
-        await dirAsync(dir.path("_tmp_docker", path.dirname(file)));
-        await copyAsync(dir.path(file), dir.path("_tmp_docker", file), {
-          overwrite: true,
-        });
+      if (file.startsWith("app/") || file.startsWith("pkgs/")) {
+        if (file.endsWith("package.json")) {
+          await dirAsync(dir.path("_tmp_docker", path.dirname(file)));
+          await copyAsync(dir.path(file), dir.path("_tmp_docker", file), {
+            overwrite: true,
+          });
+        }
       }
     }
     await copyAsync(
@@ -52,4 +54,4 @@ if (!g.dockerPrepared) {
     await $`mv docker.zip dockerzip`;
     await removeAsync(dir.path("_tmp_docker"));
   }
-}
+} 
