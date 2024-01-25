@@ -6,6 +6,7 @@ import { EdApiDB } from "./api-db";
 import { EdApiDeploy } from "./api-deploy";
 import { EdApiDomain } from "./api-domain";
 import { apiRef, apiUrl, checkAPI, dev, server } from "./api-utils";
+import trim from "lodash.trim";
 
 export const EdPopApi = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -101,7 +102,7 @@ export const EdApiServer = forwardRef<
     if (local.api_url !== p.site.config.api_url) {
       server.status = "saving";
       p.render();
-      p.site.config.api_url = local.api_url;
+      p.site.config.api_url = trim(local.api_url, "/");
       await p.sync.site.update(p.site.id, {
         config: { api_url: local.api_url },
       });
@@ -162,6 +163,7 @@ export const EdApiServer = forwardRef<
             value={local.api_url}
             onChange={(e) => {
               local.api_url = e.currentTarget.value;
+              local.api_url = trim(local.api_url, "/");
               local.render();
             }}
             onFocus={(e) => {

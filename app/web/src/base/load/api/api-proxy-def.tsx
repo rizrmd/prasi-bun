@@ -1,7 +1,9 @@
+import trim from "lodash.trim";
 import { w } from "../../../utils/types/general";
 import { fetchViaProxy } from "../proxy";
 
-export const loadApiProxyDef = async (url: string, with_types: boolean) => {
+export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
+  const url = trim(_url, "/");
   const raw = await fetchViaProxy(urlPath(url, "/_prasi/_"));
   let ver = "";
   if (raw && (raw as any).prasi) {
@@ -16,10 +18,17 @@ export const loadApiProxyDef = async (url: string, with_types: boolean) => {
       script.onload = async () => {
         done();
       };
+
+      if (!localStorage.getItem("api-ts-" + url)) {
+        localStorage.setItem("api-ts-" + url, Date.now().toString());
+      }
+
+      const ts = localStorage.getItem("api-ts-" + url);
+
       if (with_types) {
-        script.src = `${base}/_prasi/load.js?url=${url}&v3&dev=1`;
+        script.src = `${base}/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}`;
       } else {
-        script.src = `${base}/_prasi/load.js?url=${url}&v3`;
+        script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
       }
       d.body.appendChild(script);
     });
@@ -29,7 +38,7 @@ export const loadApiProxyDef = async (url: string, with_types: boolean) => {
       apiEntry: (await apiEntry.json()).srv,
     };
 
-    if (with_types) { 
+    if (with_types) {
       const apiTypes = await fetch(base + "/_prasi/api-types");
       w.prasiApi[url].apiTypes = await apiTypes.text();
       w.prasiApi[url].prismaTypes = {
