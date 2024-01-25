@@ -51,6 +51,11 @@ export const EdApiDB = ({
                 server.status = "ready";
                 render();
                 alert("DB PULL & GENERATE: OK\nRESTART: OK");
+
+                localStorage.setItem(
+                  "api-ts-" + p.site.config.api_url,
+                  Date.now().toString()
+                );
               }}
             >
               DB Pull
