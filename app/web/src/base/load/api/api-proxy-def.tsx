@@ -4,7 +4,6 @@ import { fetchViaProxy } from "../proxy";
 
 export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
   const url = trim(_url, "/");
-  console.log(url, _url);
   const raw = await fetchViaProxy(urlPath(url, "/_prasi/_"));
   let ver = "";
   if (raw && (raw as any).prasi) {

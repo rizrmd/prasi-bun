@@ -6,25 +6,27 @@ import { Loading } from "../../utils/ui/loading";
 import init from "wasm-gzip";
 
 export default page({
-	url: "/ed/:site_id/:page_id",
-	component: ({}) => {
-		const p = useGlobal(EDGlobal, "EDITOR");
+  url: "/ed/:site_id/:page_id",
+  component: ({}) => {
+    const p = useGlobal(EDGlobal, "EDITOR");
 
-		const w = window as any;
-		if (!w.Y) {
-			(async () => {
-				await init();
-				(window as any).Y = await import("yjs");
-				(window as any).syncronize = (await import("y-pojo")).syncronize;
-				p.render();
-			})();
-			return <Loading note="init" />;
-		}
+    const w = window as any;
+    if (!w.Y) {
+      (async () => {
+        await init();
+        (window as any).Y = await import("yjs");
+        (window as any).syncronize = (await import("y-pojo")).syncronize;
+        p.render();
+      })();
+      return <Loading note="init" />;
+    }
 
-		if (!edInitSync(p)) {
-			return <Loading note="connecting-ws" />;
-		}
+    w.isEditor = true;
 
-		return <EdBase />;
-	},
+    if (!edInitSync(p)) {
+      return <Loading note="connecting-ws" />;
+    }
+
+    return <EdBase />;
+  },
 });

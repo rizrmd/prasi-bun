@@ -7,6 +7,7 @@ import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
 import { render_stat } from "./render/render";
 
+const w = window as any;
 export const Vi: FC<{
   meta: Record<string, IMeta>;
   mode: "mobile" | "desktop";
@@ -36,6 +37,10 @@ export const Vi: FC<{
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
   vi.mode = mode;
+
+  w.isMobile = mode === "mobile";
+  w.isDesktop = mode === "desktop";
+
   vi.on_status_changes = on_status_changed;
 
   if (rs === "disabled") {
