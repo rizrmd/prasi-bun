@@ -129,6 +129,7 @@ const viRoute = async (p: PG) => {
         p.page.doc = cur.doc;
       }
 
+      p.script.init_local_effect = {};
       await reloadPage(p, params.page_id, "load-route");
     }
   }
