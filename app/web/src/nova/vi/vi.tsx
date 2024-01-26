@@ -1,12 +1,12 @@
-import { FC, Suspense, useEffect, useState } from "react";
+import { FC, Suspense, useEffect } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../ed/logic/ed-global";
 import { viLoad } from "./load/load";
 import { VG, ViGlobal } from "./render/global";
+import { render_stat } from "./render/render";
+import { nav } from "./render/script/extract-nav";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
-import { render_stat } from "./render/render";
-import { IRoot } from "../../utils/types/root";
 
 const w = window as any;
 export const Vi: FC<{
@@ -46,11 +46,20 @@ export const Vi: FC<{
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
   w.preload = (urls: string[]) => {
+    if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
     for (const url of urls) {
       vi.page.navs[page_id].add(url);
     }
+    clearTimeout(nav.timeout);
+    nav.timeout = setTimeout(() => {
+      if (vi.on_nav_loaded) {
+        vi.on_nav_loaded({
+          urls: Array.from(vi.page.navs[page_id]),
+        });
+      }
+    }, 100);
   };
-  
+
   vi.page.cur.id = page_id;
   vi.on_status_changes = on_status_changed;
 

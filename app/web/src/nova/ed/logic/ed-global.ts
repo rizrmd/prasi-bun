@@ -7,7 +7,7 @@ import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem } from "../../../utils/types/item";
 import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
 import { GenMetaP, IMeta as LogicMeta } from "../../vi/utils/types";
-
+import { createRouter } from "radix3";
 export type IMeta = LogicMeta;
 
 export const EmptySite = {
@@ -148,10 +148,11 @@ export const EDGlobal = {
     | "ready",
   preview: {
     url_cache: new Set<string>(),
-    page_cache: {} as Record<string, IRoot>,
+    route_cache: createRouter<{ url: string; id: string }>(),
+    page_cache: {} as Record<string, { root: IRoot; url: string }>,
     meta_cache: {} as Record<
       string,
-      { entry: string[]; meta: Record<string, IMeta> }
+      { entry: string[]; meta: Record<string, IMeta>; url: string }
     >,
     show_loading: false,
   },
