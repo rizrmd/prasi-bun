@@ -1,16 +1,15 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
+import { createId } from "@paralleldrive/cuid2";
 import { compress, decompress } from "wasm-gzip";
 import { IItem } from "../../../../utils/types/item";
 import { DComp } from "../../../../utils/types/root";
 import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
+import { isTextEditing } from "../active/is-editing";
 import { IMeta, PG } from "../ed-global";
+import { assignMitem } from "../tree/assign-mitem";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
-import { isTextEditing } from "../active/is-editing";
-import { assignMitem } from "../tree/assign-mitem";
-import { createId } from "@paralleldrive/cuid2";
-import { waitUntil } from "web-utils";
 
 export const loadcomp = {
   timeout: 0 as any,

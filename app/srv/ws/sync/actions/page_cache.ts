@@ -43,10 +43,14 @@ export const page_cache: SAction["page"]["cache"] = async function (
       if (found && !exclude_page_id.includes(found.id)) {
         const row = await db.page.findFirst({
           where: { id: found.id },
-          select: { content_tree: true },
+          select: { content_tree: true, url: true },
         });
         if (row) {
-          result[found.id] = row.content_tree;
+          result[found.id] = {
+            root: row.content_tree,
+            url: row.url,
+            org_url: url,
+          };
         }
       }
     }

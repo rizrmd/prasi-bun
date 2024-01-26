@@ -8,6 +8,9 @@ import init, { decompress } from "wasm-gzip";
 import { w } from "../../utils/types/general";
 import { IRoot } from "../../utils/types/root";
 import { treeCacheBuild } from "../ed/logic/tree/build";
+import { loadComponent } from "../ed/logic/comp/load";
+import { get } from "idb-keyval";
+import { nav } from "./render/script/extract-nav";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
@@ -52,10 +55,11 @@ export const ViPreview = (arg: { pathname: string }) => {
 
   const mode = p.mode;
 
-  if (!w.isEditor) {
+  if (!w.isEditor && !p.preview.meta_cache[params.page_id]) {
     p.preview.meta_cache[params.page_id] = {
       meta: p.page.meta,
       entry: p.page.entry,
+      url: p.page.cur.url,
     };
   }
 
@@ -113,20 +117,23 @@ export const ViPreview = (arg: { pathname: string }) => {
             }
 
             if (load_urls.length > 0) {
-              console.log(load_urls);
               const res = await p.sync.page.cache(
                 p.site.id,
                 load_urls,
                 Object.keys(p.preview.page_cache)
               );
+
               if (res) {
                 const pages = JSON.parse(
                   decoder.decode(decompress(res.gzip)) || "{}"
-                );
+                ) as Record<
+                  string,
+                  { root: IRoot; url: string; org_url: string }
+                >;
 
                 for (const [id, page] of Object.entries(pages)) {
-                  p.preview.page_cache[id] = page as IRoot;
-                  treeCacheBuild(p, params.page_id);
+                  p.preview.page_cache[id] = page;
+                  await treeCacheBuild(p, id);
                 }
               }
             }
@@ -172,7 +179,17 @@ const viRoute = async (p: PG) => {
       p.script.init_local_effect = {};
 
       if (!w.isEditor) {
-        const page_cache = p.preview.meta_cache[params.page_id];
+        let page_cache = p.preview.meta_cache[params.page_id];
+
+        let should_render = false;
+        if (!page_cache) {
+          const idb_cache = await get(`page-${params.page_id}`, nav.store);
+          if (idb_cache) {
+            page_cache = idb_cache;
+            p.preview.meta_cache[params.page_id] = idb_cache;
+          }
+          should_render = true;
+        }
 
         if (page_cache) {
           p.page.meta = page_cache.meta;
@@ -182,7 +199,7 @@ const viRoute = async (p: PG) => {
             p.page.cur = { id: params.page_id } as any;
           }
           p.status = "ready";
-          p.render();
+          if (should_render) p.render();
           return;
         }
       }

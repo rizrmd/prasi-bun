@@ -1,30 +1,74 @@
+import { get, set } from "idb-keyval";
 import { IContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
+import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
+import { nav } from "../../../vi/render/script/extract-nav";
+import { loadCompSnapshot, loadComponent } from "../comp/load";
 import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
 
 export const treeCacheBuild = async (p: PG, page_id: string) => {
-  const root = p.preview.page_cache[page_id];
+  const page_cache = p.preview.page_cache[page_id];
+  if (page_cache && !p.preview.meta_cache[page_id]) {
+    const meta_cache = {
+      meta: {} as Record<string, IMeta>,
+      entry: [] as string[],
+      url: page_cache.url,
+    };
 
-  const meta_cache = {
-    meta: {} as Record<string, IMeta>,
-    entry: [] as string[],
-  };
-  for (const item of root.childs) {
-    meta_cache.entry.push(item.id);
-    genMeta(
+    await initLoadComp(
       {
-        note: "tree-rebuild",
         comps: p.comp.loaded,
         meta: meta_cache.meta,
         mode: "page",
       },
-      { item: item as IContent }
+      page_cache.root as unknown as IItem,
+      {
+        async load(comp_ids) {
+          const ids = comp_ids.filter((id) => !p.comp.loaded[id]);
+          const comps = await p.sync.comp.load(ids, true);
+          let result = Object.entries(comps);
+
+          for (const [id_comp, comp] of result) {
+            const cached = await get(`comp-${id_comp}`, nav.store);
+            if (cached) {
+              p.comp.loaded[id_comp] = cached;
+            }
+            if (comp && comp.snapshot && !p.comp.list[id_comp]) {
+              if (p.comp.loaded[id_comp]) {
+                loadCompSnapshot(p, id_comp, comp.snapshot).then(() => {
+                  if (p.comp.loaded[id_comp]) {
+                    set(`comp-${id_comp}`, p.comp.loaded[id_comp], nav.store);
+                  }
+                });
+              } else {
+                await loadCompSnapshot(p, id_comp, comp.snapshot);
+                if (p.comp.loaded[id_comp]) {
+                  set(`comp-${id_comp}`, p.comp.loaded[id_comp], nav.store);
+                }
+              }
+            }
+          }
+        },
+      }
     );
+    for (const item of page_cache.root.childs) {
+      meta_cache.entry.push(item.id);
+      genMeta(
+        {
+          note: "cache-rebuild",
+          comps: p.comp.loaded,
+          meta: meta_cache.meta,
+          mode: "page",
+        },
+        { item: item as IContent }
+      );
+    }
+    p.preview.meta_cache[page_id] = meta_cache;
+    set(`page-${page_id}`, meta_cache, nav.store);
   }
-  p.preview.meta_cache[page_id] = meta_cache;
 };
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
