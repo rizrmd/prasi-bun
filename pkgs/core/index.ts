@@ -13,7 +13,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { prepareApiRoutes } from "./server/api/api-scan";
 import { writeAsync } from "fs-jetpack";
 import { dir } from "dir";
-import "../docker-prep";
+// import "../docker-prep";
 
 g.status = "init";
 
