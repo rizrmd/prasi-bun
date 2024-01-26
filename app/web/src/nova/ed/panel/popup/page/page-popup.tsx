@@ -175,7 +175,7 @@ export const EdPopPage = () => {
                               id: opt.dragSourceId as string,
                             },
                             data: {
-                              parent_id: (opt.dropTargetId === "ROOT" ||
+                              parent_id: (opt.dropTargetId === "root" ||
                               !opt.dropTargetId
                                 ? null
                                 : opt.dropTargetId) as string,
