@@ -45,6 +45,12 @@ export const Vi: FC<{
 
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
+  w.preload = (urls: string[]) => {
+    for (const url of urls) {
+      vi.page.navs[page_id].add(url);
+    }
+  };
+  
   vi.page.cur.id = page_id;
   vi.on_status_changes = on_status_changed;
 
