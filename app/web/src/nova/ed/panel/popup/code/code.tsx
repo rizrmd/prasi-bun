@@ -9,15 +9,12 @@ import { EDGlobal } from "../../../logic/ed-global";
 import {
   iconChevronDown,
   iconDownload,
-  iconLoading,
-  iconLog,
   iconNewTab,
   iconScrollOff,
   iconScrollOn,
-  iconTrash,
-  iconUpload,
+  iconUpload
 } from "./icons";
-import { CodeNameItem, CodeNameList, codeName } from "./name-list";
+import { CodeNameItem, CodeNameList } from "./name-list";
 
 export const code = {
   mode: "" as "" | "old" | "new",
