@@ -8,6 +8,7 @@ export * from "./comp_group";
 export * from "./comp_load";
 export * from "./page_list";
 export * from "./page_load";
+export * from "./page_cache";
 export * from "./yjs_um";
 export * from "./yjs_sv_local";
 export * from "./yjs_diff_local";

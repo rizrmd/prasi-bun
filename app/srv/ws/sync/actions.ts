@@ -52,6 +52,8 @@ export const SyncActions = {
     list: async (id_site: string) =>
       ({}) as Record<string, Exclude<page, "content_tree">>,
     load: async (id: string) => ({}) as EPage | void,
+    cache: async (site_id: string, urls: string[], exclude_page_id: string[]) =>
+      ({}) as { gzip: Uint8Array } | null,
   },
   yjs: {
     um: async (

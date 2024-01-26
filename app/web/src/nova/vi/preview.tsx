@@ -4,9 +4,12 @@ import { EDGlobal, PG, active } from "../ed/logic/ed-global";
 import { reloadPage } from "../ed/logic/ed-route";
 import { loadSite } from "../ed/logic/ed-site";
 import { Vi } from "./vi";
-import init from "wasm-gzip";
+import init, { decompress } from "wasm-gzip";
 import { w } from "../../utils/types/general";
+import { IRoot } from "../../utils/types/root";
+import { treeCacheBuild } from "../ed/logic/tree/build";
 
+const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -48,6 +51,13 @@ export const ViPreview = (arg: { pathname: string }) => {
   }
 
   const mode = p.mode;
+
+  if (!w.isEditor) {
+    p.preview.meta_cache[params.page_id] = {
+      meta: p.page.meta,
+      entry: p.page.entry,
+    };
+  }
 
   return (
     <div className={cx("relative flex flex-1 items-center justify-center")}>
@@ -91,6 +101,36 @@ export const ViPreview = (arg: { pathname: string }) => {
           db={p.script.db}
           render_stat="disabled"
           script={{ init_local_effect: p.script.init_local_effect }}
+          on_nav_loaded={async ({ urls }) => {
+            const load_urls: string[] = [];
+            if (p.preview.url_cache) {
+              for (const url of urls) {
+                if (!p.preview.url_cache.has(url)) {
+                  load_urls.push(url);
+                  p.preview.url_cache.add(url);
+                }
+              }
+            }
+
+            if (load_urls.length > 0) {
+              console.log(load_urls);
+              const res = await p.sync.page.cache(
+                p.site.id,
+                load_urls,
+                Object.keys(p.preview.page_cache)
+              );
+              if (res) {
+                const pages = JSON.parse(
+                  decoder.decode(decompress(res.gzip)) || "{}"
+                );
+
+                for (const [id, page] of Object.entries(pages)) {
+                  p.preview.page_cache[id] = page as IRoot;
+                  treeCacheBuild(p, params.page_id);
+                }
+              }
+            }
+          }}
         />
       </div>
     </div>
@@ -130,6 +170,23 @@ const viRoute = async (p: PG) => {
       }
 
       p.script.init_local_effect = {};
+
+      if (!w.isEditor) {
+        const page_cache = p.preview.meta_cache[params.page_id];
+
+        if (page_cache) {
+          p.page.meta = page_cache.meta;
+          p.page.entry = page_cache.entry;
+
+          if (p.page.cur.id !== params.page_id) {
+            p.page.cur = { id: params.page_id } as any;
+          }
+          p.status = "ready";
+          p.render();
+          return;
+        }
+      }
+
       await reloadPage(p, params.page_id, "load-route");
     }
   }

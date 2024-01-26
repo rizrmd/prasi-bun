@@ -3,9 +3,16 @@ import { VG } from "../global";
 import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
 import { replaceWithObject, replacement } from "./eval-script";
+import { extractNavigate } from "./extract-nav";
 
 export const viEvalProps = (
-  vi: { meta: VG["meta"]; site: { db: any; api: any } },
+  vi: {
+    mode: VG["mode"];
+    meta: VG["meta"];
+    site: { db: any; api: any };
+    page: VG["page"];
+    on_nav_loaded?: VG["on_nav_loaded"];
+  },
   meta: IMeta,
   passprop: any
 ) => {
@@ -83,6 +90,10 @@ export const viEvalProps = (
               passprop[name] = val;
             }
             continue;
+          }
+
+          if (prop.value) {
+            extractNavigate(vi, prop.value);
           }
 
           const js = prop.valueBuilt || "";
