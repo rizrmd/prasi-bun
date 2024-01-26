@@ -59,14 +59,16 @@ export const FieldNumUnit: FC<{
       }
       if (!parseInt(val)) unt = "";
     }
-    if (!local.focus) {
-      local.val_str = val;
-    }
     local.val = parseInt(val) || 0;
     if (positiveOnly && local.val < 0) {
       local.val = Math.max(0, local.val);
     }
     local.unit = unit || unt || "px";
+
+
+    if (!local.focus) {
+      local.val_str = local.val + "";
+    }
     local.render();
   }, [value, unit]);
 
@@ -166,6 +168,7 @@ export const FieldNumUnit: FC<{
             }}
             onBlur={() => {
               local.focus = false;
+              local.val_str = local.val + "";
               local.render();
             }}
             onChange={(e) => {
