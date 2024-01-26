@@ -251,14 +251,16 @@ export const PageManager = () => {
                   data.pages = newTree;
                   local.render();
 
+                  const is_drop_root =
+                    opt.dropTargetId === "ROOT" || opt.dropTargetId === "root";
+
                   if (!opt.dragSource?.droppable) {
                     await db.page.update({
                       where: {
                         id: opt.dragSourceId as string,
                       },
                       data: {
-                        id_folder: (opt.dropTargetId === "ROOT" ||
-                        !opt.dropTargetId
+                        id_folder: (is_drop_root || !opt.dropTargetId
                           ? null
                           : opt.dropTargetId) as string,
                       },
@@ -270,8 +272,7 @@ export const PageManager = () => {
                         id: opt.dragSourceId as string,
                       },
                       data: {
-                        parent_id: (opt.dropTargetId === "ROOT" ||
-                        !opt.dropTargetId
+                        parent_id: (is_drop_root || !opt.dropTargetId
                           ? null
                           : opt.dropTargetId) as string,
                       },
@@ -643,11 +644,9 @@ const Elbow = () => (
     xmlns="http://www.w3.org/2000/svg"
     width={10}
     height={10}
-    className={cx(
-      css`
-        opacity: 0.3;
-      `
-    )}
+    className={cx(css`
+      opacity: 0.3;
+    `)}
     fill="none"
     viewBox="0 0 15 15"
   >

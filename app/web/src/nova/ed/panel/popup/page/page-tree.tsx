@@ -76,9 +76,12 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                       data: {
                         name: local.rename_to,
                         id_site: p.site.id,
-                        parent_id: validate(rename_id) ? rename_id : null,
+                        parent_id: validate(pagePicker.new_parent_id)
+                          ? pagePicker.new_parent_id
+                          : null,
                       },
                     });
+                    pagePicker.new_parent_id = "";
                   }
                 } else {
                   await db.page_folder.update({
@@ -126,7 +129,9 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                         type: "folder",
                       },
                     });
+
                     pagePicker.rename_id = "NEW";
+                    pagePicker.new_parent_id = item.id;
                     p.render();
                   }}
                 >

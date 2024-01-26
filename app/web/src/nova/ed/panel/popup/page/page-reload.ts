@@ -17,7 +17,8 @@ export const pagePicker = {
   status: "ready" as "loading" | "ready",
   search: "",
   render: () => {},
-  rename_id: ""
+  rename_id: "",
+  new_parent_id: ""
 };
 
 export const reloadPagePicker = async (p: PG) => {
