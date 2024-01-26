@@ -8,13 +8,18 @@ import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
+import { extractNavigate } from "./extract-nav";
+import { w } from "../../../../utils/types/general";
 
 export const viEvalScript = (
   vi: {
+    page: VG["page"];
+    mode: VG["mode"];
     site: { db: any; api: any };
     meta: VG["meta"];
     visit?: VG["visit"];
     script?: { init_local_effect: any };
+    on_nav_loaded?: VG["on_nav_loaded"];
   },
   meta: IMeta,
   passprop: any
@@ -64,6 +69,10 @@ export const viEvalScript = (
         arg[k] = <JsxProp fn={jprop.fn} passprop={passprop} meta={meta} />;
       }
     }
+  }
+
+  if (!w.isEditor && meta.item.adv?.js) {
+    extractNavigate(vi, meta.item.adv.js);
   }
 
   const js = meta.item.adv?.jsBuilt || "";

@@ -1,9 +1,31 @@
-import { createId } from "@paralleldrive/cuid2";
+import { IContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { genMeta } from "../../../vi/meta/meta";
 import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
+
+export const treeCacheBuild = async (p: PG, page_id: string) => {
+  const root = p.preview.page_cache[page_id];
+
+  const meta_cache = {
+    meta: {} as Record<string, IMeta>,
+    entry: [] as string[],
+  };
+  for (const item of root.childs) {
+    meta_cache.entry.push(item.id);
+    genMeta(
+      {
+        note: "tree-rebuild",
+        comps: p.comp.loaded,
+        meta: meta_cache.meta,
+        mode: "page",
+      },
+      { item: item as IContent }
+    );
+  }
+  p.preview.meta_cache[page_id] = meta_cache;
+};
 
 export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   if (document.activeElement) {

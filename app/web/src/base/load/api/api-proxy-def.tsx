@@ -25,7 +25,7 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
 
       const ts = localStorage.getItem("api-ts-" + url);
 
-      if (with_types) { 
+      if (with_types) {
         script.src = `${base}/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}`;
       } else {
         script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;

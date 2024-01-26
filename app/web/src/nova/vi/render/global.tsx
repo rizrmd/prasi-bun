@@ -1,4 +1,3 @@
-import { IItem } from "../../../utils/types/item";
 import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
 
@@ -25,6 +24,13 @@ export const ViGlobal = {
     | undefined
     | ((meta: IMeta, parts: ReturnType<typeof viParts>) => void),
   on_status_changes: undefined as void | ((status: ViStatus) => void),
+  page: {
+    cur: { id: "" },
+    navs: {} as Record<string, Set<string>>,
+  },
+  on_nav_loaded: undefined as
+    | undefined
+    | ((arg: { urls: string[] }) => Promise<void>),
 };
 
 export type VG = typeof ViGlobal & { render: () => void };

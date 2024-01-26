@@ -5,7 +5,7 @@ import { SAction } from "../../../../../srv/ws/sync/actions";
 import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem } from "../../../utils/types/item";
-import { DCode, DComp, DPage } from "../../../utils/types/root";
+import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
 import { GenMetaP, IMeta as LogicMeta } from "../../vi/utils/types";
 
 export type IMeta = LogicMeta;
@@ -147,6 +147,12 @@ export const EDGlobal = {
     | "page-not-found"
     | "ready",
   preview: {
+    url_cache: new Set<string>(),
+    page_cache: {} as Record<string, IRoot>,
+    meta_cache: {} as Record<
+      string,
+      { entry: string[]; meta: Record<string, IMeta> }
+    >,
     show_loading: false,
   },
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,

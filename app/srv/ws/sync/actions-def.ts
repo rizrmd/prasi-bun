@@ -13,21 +13,22 @@ export const SyncActionDefinition = {
   },
   "page": {
     "list": "8",
-    "load": "9"
+    "load": "9",
+    "cache": "10"
   },
   "yjs": {
-    "um": "10",
-    "sv_local": "11",
-    "diff_local": "12",
-    "sv_remote": "13"
+    "um": "11",
+    "sv_local": "12",
+    "diff_local": "13",
+    "sv_remote": "14"
   },
   "client": {
-    "info": "14"
+    "info": "15"
   },
   "code": {
-    "load": "15",
-    "edit": "16",
-    "parse": "17"
+    "load": "16",
+    "edit": "17",
+    "parse": "18"
   }
 };
 export const SyncActionPaths = {
@@ -41,12 +42,13 @@ export const SyncActionPaths = {
   "7": "comp.load",
   "8": "page.list",
   "9": "page.load",
-  "10": "yjs.um",
-  "11": "yjs.sv_local",
-  "12": "yjs.diff_local",
-  "13": "yjs.sv_remote",
-  "14": "client.info",
-  "15": "code.load",
-  "16": "code.edit",
-  "17": "code.parse"
+  "10": "page.cache",
+  "11": "yjs.um",
+  "12": "yjs.sv_local",
+  "13": "yjs.diff_local",
+  "14": "yjs.sv_remote",
+  "15": "client.info",
+  "16": "code.load",
+  "17": "code.edit",
+  "18": "code.parse"
 };
