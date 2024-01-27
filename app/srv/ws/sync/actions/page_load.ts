@@ -106,7 +106,7 @@ export const page_load: SAction["page"]["load"] = async function (
         url: page.url,
         name: page.name,
         snapshot: await gzipAsync(bin),
-        comps: await prepareComponentForPage(id, this, false),
+        comps: (await prepareComponentForPage(id, this, false)) || {},
       };
     }
   } else if (snap && !ydoc) {
@@ -140,7 +140,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps,
+      comps: comps || {},
     };
   } else if (snap && ydoc) {
     user.active.add({
@@ -156,7 +156,7 @@ export const page_load: SAction["page"]["load"] = async function (
       url: snap.url,
       name: snap.name,
       snapshot: await gzipAsync(snap.bin),
-      comps: await prepareComponentForPage(id, this, true),
+      comps: (await prepareComponentForPage(id, this, true)) || {},
     };
   }
 };
