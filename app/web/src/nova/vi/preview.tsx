@@ -15,10 +15,30 @@ import { loadSite } from "../ed/logic/ed-site";
 import { treeCacheBuild } from "../ed/logic/tree/build";
 import { nav } from "./render/script/extract-nav";
 import { Vi } from "./vi";
+import parseUA from "ua-parser-js";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+
+  if (p.site.id) {
+    if (!p.mode && !!p.site.responsive) {
+      if (
+        p.site.responsive !== "mobile-only" &&
+        p.site.responsive !== "desktop-only"
+      ) {
+        const parsed = parseUA();
+        p.mode = parsed.device.type === "mobile" ? "mobile" : "desktop";
+        if (localStorage.getItem("prasi-editor-mode")) {
+          p.mode = localStorage.getItem("prasi-editor-mode") as any;
+        }
+      } else if (p.site.responsive === "mobile-only") {
+        p.mode = "mobile";
+      } else if (p.site.responsive === "desktop-only") {
+        p.mode = "desktop";
+      }
+    }
+  }
 
   w.navigateOverride = (_href) => {
     if (_href && _href.startsWith("/")) {
