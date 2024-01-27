@@ -83,14 +83,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
               }
             });
 
-            if (save_to === "comp") {
+            if (save_to === "comp" && comp_id) {
               await db.component.update({
                 where: { id: comp_id },
                 data: {
                   content_tree: root.toJSON(),
                 },
               });
-            } else {
+            } else if (page_id) {
               await db.page.update({
                 where: { id: page_id },
                 data: {
@@ -120,14 +120,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 mprop.set("valueBuilt", res.code.substring(6));
               });
 
-              if (save_to === "comp") {
+              if (save_to === "comp" && comp_id) {
                 await db.component.update({
                   where: { id: comp_id },
                   data: {
                     content_tree: root.toJSON(),
                   },
                 });
-              } else {
+              } else if (page_id) {
                 await db.page.update({
                   where: { id: page_id },
                   data: {
