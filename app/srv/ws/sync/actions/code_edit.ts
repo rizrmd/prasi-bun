@@ -9,7 +9,13 @@ import { docs } from "../entity/docs";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 import { parseJs } from "../editor/parser/parse-js";
+import { snapshot } from "../entity/snapshot";
 const decoder = new TextDecoder();
+
+const timeout = {
+  page: {} as Record<string, any>,
+  comp: {} as Record<string, any>,
+};
 
 export const code_edit: SAction["code"]["edit"] = async function (
   this: SyncConnection,
@@ -84,14 +90,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
             });
 
             if (save_to === "comp" && comp_id) {
-              await db.component.update({
+              db.component.update({
                 where: { id: comp_id },
                 data: {
                   content_tree: root.toJSON(),
                 },
               });
             } else if (page_id) {
-              await db.page.update({
+              db.page.update({
                 where: { id: page_id },
                 data: {
                   content_tree: root.toJSON(),
@@ -121,14 +127,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
               });
 
               if (save_to === "comp" && comp_id) {
-                await db.component.update({
+                db.component.update({
                   where: { id: comp_id },
                   data: {
                     content_tree: root.toJSON(),
                   },
                 });
               } else if (page_id) {
-                await db.page.update({
+                db.page.update({
                   where: { id: page_id },
                   data: {
                     content_tree: root.toJSON(),
