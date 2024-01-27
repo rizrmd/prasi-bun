@@ -79,15 +79,11 @@ export const ViPreview = (arg: { pathname: string }) => {
 
   const mode = p.mode;
 
-  if (!w.isEditor && !p.preview.meta_cache[params.page_id]) {
-    savePageMetaCache(p, p.page.meta);
-  }
-
   return (
     <div className={cx("relative flex flex-1 items-center justify-center")}>
       <div
         className={cx(
-          "absolute flex flex-col items-stretch flex-1 bg-white ",
+          "absolute flex flex-col items-stretch flex-1 bg-white main-content-preview",
           mode === "mobile"
             ? css`
                 @media (min-width: 768px) {
@@ -148,7 +144,6 @@ export const ViPreview = (arg: { pathname: string }) => {
             if (load_urls.length > 0) {
               const res = await p.sync.page.cache(p.site.id, load_urls, [
                 ...Object.keys(p.preview.page_cache),
-                p.page.cur.id,
               ]);
 
               if (res) {
@@ -170,6 +165,10 @@ export const ViPreview = (arg: { pathname: string }) => {
       </div>
     </div>
   );
+};
+
+const preview = {
+  first_render: true,
 };
 
 const viRoute = async (p: PG) => {
@@ -216,28 +215,30 @@ const viRoute = async (p: PG) => {
 
       p.script.init_local_effect = {};
 
-      if (!w.isEditor && p.page.cur.id !== params.page_id) {
-        let page_cache = p.preview.meta_cache[params.page_id];
+      if (!w.isEditor) {
+        if (preview.first_render) {
+          preview.first_render = false;
+        } else {
+          let page_cache = p.preview.meta_cache[params.page_id];
 
-        let should_render = false;
-        if (!page_cache) {
-          const idb_cache = await get(`page-${params.page_id}`, nav.store);
-          if (idb_cache) {
-            page_cache = idb_cache;
-            p.preview.meta_cache[params.page_id] = idb_cache;
+          if (!page_cache) {
+            const idb_cache = await get(`page-${params.page_id}`, nav.store);
+            if (idb_cache) {
+              page_cache = idb_cache;
+              p.preview.meta_cache[params.page_id] = idb_cache;
+            }
           }
-          should_render = true;
-        }
 
-        if (page_cache) {
-          p.page.meta = page_cache.meta;
-          p.page.entry = page_cache.entry;
+          if (page_cache) {
+            p.page.meta = page_cache.meta;
+            p.page.entry = page_cache.entry;
 
-          if (p.page.cur.id !== params.page_id) {
-            p.page.cur = { id: params.page_id } as any;
+            if (p.page.cur.id !== params.page_id) {
+              p.page.cur = { id: params.page_id } as any;
+            }
+            p.status = "ready";
+            return;
           }
-          p.status = "ready";
-          if (should_render) p.render();
         }
       }
 

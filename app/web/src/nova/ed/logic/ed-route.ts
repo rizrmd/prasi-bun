@@ -129,7 +129,12 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
   }
 };
 
-export const reloadPage = async (p: PG, page_id: string, note: string) => {
+export const reloadPage = async (
+  p: PG,
+  page_id: string,
+  note: string,
+  should_render?: boolean
+) => {
   p.status = "reload";
   const remotePage = await p.sync.page.load(page_id);
 
@@ -219,7 +224,7 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
   }
 
   p.status = "ready";
-  p.render();
+  if (should_render !== false) p.render();
 };
 
 export const loadPageMetaCache = async (p: PG, page_id: string) => {

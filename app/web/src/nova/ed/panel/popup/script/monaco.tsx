@@ -305,9 +305,10 @@ export const EdScriptMonaco: FC<{}> = () => {
         const stype = p.ui.popup.script.type;
         p.ui.popup.script.typings.status = "loading";
         p.ui.popup.script.wb_render();
+
         if ((value || "").includes(IMPORT_SEPARATOR)) {
-          const valparts = (value || "").split(IMPORT_SEPARATOR + "\n");
-          if (valparts.length === 2) local.value = valparts[1];
+          const valparts = (value || "").split(IMPORT_SEPARATOR);
+          if (valparts.length > 1) local.value = valparts[1];
           if (
             stype === "prop-instance" &&
             local.value.includes(
@@ -361,6 +362,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 scope = code_result;
               }
             } else {
+              console.log(value);
               const code_result = await p.sync.code.edit({
                 type: "adv",
                 mode: mode,
