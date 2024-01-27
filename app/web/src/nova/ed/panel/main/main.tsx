@@ -4,6 +4,7 @@ import { isMetaActive } from "../../logic/active/is-meta.active";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
 import { w } from "../../../../utils/types/general";
+import parseUA from "ua-parser-js";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -29,6 +30,25 @@ export const EdMain = () => {
     }
   } else {
     meta = p.page.meta[active.item_id];
+  }
+
+  if (p.site.id) {
+    if (!p.mode && !!p.site.responsive) {
+      if (
+        p.site.responsive !== "mobile-only" &&
+        p.site.responsive !== "desktop-only"
+      ) {
+        const parsed = parseUA();
+        p.mode = parsed.device.type === "mobile" ? "mobile" : "desktop";
+        if (localStorage.getItem("prasi-editor-mode")) {
+          p.mode = localStorage.getItem("prasi-editor-mode") as any;
+        }
+      } else if (p.site.responsive === "mobile-only") {
+        p.mode = "mobile";
+      } else if (p.site.responsive === "desktop-only") {
+        p.mode = "desktop";
+      }
+    }
   }
 
   if (active.should_render_main) {
