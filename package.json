@@ -13,7 +13,7 @@
     "local-prod": "bun run build && bun run db-pull && bun run ./pkgs/core/index.ts",
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",
     "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts",
-    "postprepare": "bun run --silent ./pkgs/docker-prep.ts"
+    "prep": "bun run --silent ./pkgs/docker-prep.ts"
   },
   "workspaces": [
     "app/*",
