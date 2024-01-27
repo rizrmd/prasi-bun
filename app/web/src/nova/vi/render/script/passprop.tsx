@@ -20,9 +20,6 @@ export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
           meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
         }
       }
-
-      if (is_changed) {
-      }
     }
 
     return modifyChild(arg, meta.script?.scope);
@@ -30,10 +27,6 @@ export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
 };
 
 export const modifyChild = (arg: any, passprop?: any) => {
-  for (const [k, v] of Object.entries(arg)) {
-    if (k === "key" || k === "idx" || k === "continue") continue;
-  }
-
   let prop: any = {};
   if (Array.isArray(arg)) {
     prop.children = arg;
@@ -41,15 +34,15 @@ export const modifyChild = (arg: any, passprop?: any) => {
     prop = arg;
   }
 
-  const childs = [];
   if (Array.isArray(prop.children)) {
+    const childs = [];
     for (const child of prop.children) {
       childs.push(modify(child, prop, passprop));
     }
-  } else {
-    childs.push(modify(prop.children, prop, passprop));
+    return childs;
   }
-  return childs;
+
+  return modify(prop.children, prop, passprop);
 };
 
 const modify = (el: ReactNode, arg: any, passprop?: any) => {
