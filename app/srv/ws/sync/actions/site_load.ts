@@ -32,7 +32,7 @@ export const site_load: SAction["site"]["load"] = async function (
       let layout_id = "";
       if (layouts.length === 1) {
         layout_id = layouts[0].id;
-      } else {
+      } else if (layouts.length > 1) {
         for (const layout of layouts) {
           if (layout.is_default_layout) {
             layout_id = layout.id;
