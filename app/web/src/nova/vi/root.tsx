@@ -26,6 +26,7 @@ export const ViRoot: FC<{}> = ({}) => {
     <div className="flex flex-1 flex-col relative">
       {entry.map((id) => {
         const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
+        console.log(is_layout, vi.layout, vi.meta, id);
         if (meta) {
           if (Element) {
             return (

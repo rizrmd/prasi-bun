@@ -2,9 +2,11 @@ import { apiProxy } from "../../../base/load/api/api-proxy";
 import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
 import { dbProxy } from "../../../base/load/db/db-proxy";
 import importModule from "../../../render/editor/tools/dynamic-import";
+import { VG } from "../render/global";
 import { viScriptArg } from "../render/script/arg";
 
 export const viLoadLegacy = async (vi: {
+  mode: VG["mode"];
   site: {
     id: string;
     api_url: string;
@@ -77,7 +79,7 @@ export const viLoadLegacy = async (vi: {
         return res;
       };
       const scope = {
-        ...viScriptArg({ site: vi.site }),
+        ...viScriptArg({ site: vi.site, mode: vi.mode }),
         types: {},
         exports: w.exports,
         load: importModule,
