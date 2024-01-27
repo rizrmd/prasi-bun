@@ -49,6 +49,7 @@ export const diffLocal = (ws: any, msg: any) => {
           }
         }, 1500);
       } else if (msg.mode === "comp") {
+        clearTimeout(eg.edit.comp[msg.id].saveTimeout);
         eg.edit.comp[msg.id].saveTimeout = setTimeout(async () => {
           const comp = eg.edit.comp[msg.id].doc.getMap("map").toJSON();
           await db.component.update({
