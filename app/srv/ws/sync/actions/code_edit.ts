@@ -87,7 +87,23 @@ export const code_edit: SAction["code"]["edit"] = async function (
                   }
                 }
               }
-            }, "server");
+            });
+
+            if (save_to === "comp" && comp_id) {
+              db.component.update({
+                where: { id: comp_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
+              });
+            } else if (page_id) {
+              db.page.update({
+                where: { id: page_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
+              });
+            }
           } catch (e: any) {
             return e.message.toString();
           }
@@ -109,6 +125,22 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 mprop.set("value", src);
                 mprop.set("valueBuilt", res.code.substring(6));
               });
+
+              if (save_to === "comp" && comp_id) {
+                db.component.update({
+                  where: { id: comp_id },
+                  data: {
+                    content_tree: root.toJSON(),
+                  },
+                });
+              } else if (page_id) {
+                db.page.update({
+                  where: { id: page_id },
+                  data: {
+                    content_tree: root.toJSON(),
+                  },
+                });
+              }
             } catch (e: any) {
               return e.message.toString();
             }
@@ -150,6 +182,12 @@ export const code_edit: SAction["code"]["edit"] = async function (
                     meta.set("optionsBuilt", res.code.substring(6));
                   }
                 }
+              });
+              await db.component.update({
+                where: { id: comp_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
               });
             } catch (e: any) {
               return e.message.toString();
