@@ -122,11 +122,10 @@ export const ViPreview = (arg: { pathname: string }) => {
             }
 
             if (load_urls.length > 0) {
-              const res = await p.sync.page.cache(
-                p.site.id,
-                load_urls,
-                Object.keys(p.preview.page_cache)
-              );
+              const res = await p.sync.page.cache(p.site.id, load_urls, [
+                ...Object.keys(p.preview.page_cache),
+                p.page.cur.id,
+              ]);
 
               if (res) {
                 const pages = JSON.parse(
