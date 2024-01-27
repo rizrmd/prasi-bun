@@ -94,6 +94,7 @@ export const PageManager = () => {
         where: {
           id_site: p.site.id,
           is_deleted: false,
+          name: { not: { startsWith: "layout:" } },
         },
         select: {
           id: true,

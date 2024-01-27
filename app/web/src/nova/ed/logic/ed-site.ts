@@ -1,11 +1,8 @@
 import { viLoadLegacy } from "../../vi/load/load-legacy";
 import { viLoadSnapshot } from "../../vi/load/load-snapshot";
 import { ESite, PG } from "./ed-global";
-import { reloadPage } from "./ed-route";
 
 export const loadSite = async (p: PG, site: ESite, note: string) => {
-  const old_layout_id = p.site.layout.id;
-  const layout_changed = p.site.layout.id !== site.layout.id;
   p.site = site;
 
   p.mode = "desktop";
@@ -15,45 +12,33 @@ export const loadSite = async (p: PG, site: ESite, note: string) => {
     p.mode = "desktop";
   }
 
-  if (layout_changed) {
-    const old_layout = p.page.list[old_layout_id];
-
-    if (old_layout && old_layout.on_update) {
-      old_layout.doc.off("update", old_layout.on_update);
-    }
-
-    if (!p.script.db && !p.script.api) {
-      if (p.site.code.mode === "old") {
-        await viLoadLegacy({
-          site: {
-            api_url: p.site.config.api_url,
-            id: p.site.id,
-            api: {
-              get() {
-                return p.script.api;
-              },
-              set(val) {
-                p.script.api = val;
-              },
+  if (!p.script.db && !p.script.api) {
+    if (p.site.code.mode === "old") {
+      await viLoadLegacy({
+        site: {
+          api_url: p.site.config.api_url,
+          id: p.site.id,
+          api: {
+            get() {
+              return p.script.api;
             },
-            db: {
-              get() {
-                return p.script.db;
-              },
-              set(val) {
-                p.script.db = val;
-              },
+            set(val) {
+              p.script.api = val;
             },
           },
-          render: () => {},
-        });
-      } else {
-        await viLoadSnapshot(p);
-      }
-    }
-
-    if (site.layout.id) {
-      await reloadPage(p, site.layout.id, "load-layout");
+          db: {
+            get() {
+              return p.script.db;
+            },
+            set(val) {
+              p.script.db = val;
+            },
+          },
+        },
+        render: () => {},
+      });
+    } else {
+      await viLoadSnapshot(p);
     }
   }
 };

@@ -1,16 +1,20 @@
-import { useGlobal } from "web-utils";
-import { Loading } from "../../utils/ui/loading";
-import { EDGlobal, PG, active } from "../ed/logic/ed-global";
-import { reloadPage } from "../ed/logic/ed-route";
-import { loadSite } from "../ed/logic/ed-site";
-import { Vi } from "./vi";
+import { get } from "idb-keyval";
 import init, { decompress } from "wasm-gzip";
+import { useGlobal } from "web-utils";
 import { w } from "../../utils/types/general";
 import { IRoot } from "../../utils/types/root";
+import { Loading } from "../../utils/ui/loading";
+import { EDGlobal, PG } from "../ed/logic/ed-global";
+import {
+  loadPageMetaCache,
+  reloadLayout,
+  reloadPage,
+  savePageMetaCache,
+} from "../ed/logic/ed-route";
+import { loadSite } from "../ed/logic/ed-site";
 import { treeCacheBuild } from "../ed/logic/tree/build";
-import { loadComponent } from "../ed/logic/comp/load";
-import { get, set } from "idb-keyval";
 import { nav } from "./render/script/extract-nav";
+import { Vi } from "./vi";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
@@ -47,7 +51,7 @@ export const ViPreview = (arg: { pathname: string }) => {
       setTimeout(() => {
         p.preview.show_loading = true;
         p.render();
-      }, 5000);
+      }, 1000);
 
       return null;
     }
@@ -56,16 +60,7 @@ export const ViPreview = (arg: { pathname: string }) => {
   const mode = p.mode;
 
   if (!w.isEditor && !p.preview.meta_cache[params.page_id]) {
-    p.preview.meta_cache[params.page_id] = {
-      meta: p.page.meta,
-      entry: p.page.entry,
-      url: p.page.cur.url,
-    };
-    set(
-      `page-${params.page_id}`,
-      p.preview.meta_cache[params.page_id],
-      nav.store
-    );
+    savePageMetaCache(p, p.page.meta);
   }
 
   return (
@@ -108,6 +103,15 @@ export const ViPreview = (arg: { pathname: string }) => {
           entry={p.page.entry}
           api={p.script.api}
           db={p.script.db}
+          layout={
+            p.site.layout.id && p.site.layout.meta
+              ? {
+                  id: p.site.layout.id,
+                  meta: p.site.layout.meta,
+                  entry: p.site.layout.entry,
+                }
+              : undefined
+          }
           render_stat="disabled"
           script={{ init_local_effect: p.script.init_local_effect }}
           on_nav_loaded={async ({ urls }) => {
@@ -164,6 +168,16 @@ const viRoute = async (p: PG) => {
       }
 
       await loadSite(p, site, "from-route");
+      if (p.site.layout.id) {
+        if (!p.page.list[p.site.layout.id]) {
+          const page_cache = await loadPageMetaCache(p, p.site.layout.id);
+          if (page_cache) {
+            reloadLayout(p, p.site.layout.id, "load-route");
+          } else {
+            await reloadLayout(p, p.site.layout.id, "load-route");
+          }
+        }
+      }
     }
 
     if (
@@ -204,7 +218,6 @@ const viRoute = async (p: PG) => {
           }
           p.status = "ready";
           if (should_render) p.render();
-          return;
         }
       }
 

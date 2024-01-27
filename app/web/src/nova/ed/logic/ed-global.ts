@@ -20,8 +20,8 @@ export const EmptySite = {
   responsive: "" as "desktop-only" | "mobile-only" | "responsive",
   layout: {
     id: "--",
-    snapshot: null as null | Uint8Array,
     meta: undefined as void | Record<string, IMeta>,
+    entry: [] as string[],
   },
   code: {
     snapshot: {} as
@@ -57,7 +57,7 @@ export type IScopeComp = Record<
     scope: IScope;
   }
 >;
-const EmptyPage = {
+export const EmptyPage = {
   id: "",
   name: "",
   url: "",

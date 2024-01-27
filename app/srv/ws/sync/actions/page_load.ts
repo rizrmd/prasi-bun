@@ -38,7 +38,8 @@ export const page_load: SAction["page"]["load"] = async function (
 
       const sv_local = await gzipAsync(update);
 
-      user.active.findAll({ page_id: id }).map((e) => {
+      const users = user.active.findAll({ page_id: id });
+      users.map((e) => {
         if (origin !== um) {
           if (e.client_id === origin) return;
         }

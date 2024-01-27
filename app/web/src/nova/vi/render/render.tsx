@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, Fragment, ReactNode } from "react";
 import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ErrorBox } from "../utils/error-box";
@@ -15,9 +15,11 @@ export const ViRender: FC<{
   meta: IMeta;
   children?: ReactNode;
   passprop?: any;
-}> = ({ meta, children, passprop }) => {
+  is_layout: boolean;
+}> = ({ meta, children, passprop, is_layout }) => {
   if (render_stat.enabled) {
     const rstat_meta = render_stat.meta;
+
     if (!rstat_meta[meta.item.id]) {
       rstat_meta[meta.item.id] = {
         last_render: Math.floor(Date.now() / 1000),
@@ -57,29 +59,46 @@ export const ViRender: FC<{
   if (meta.item.adv?.js || meta.item.component?.id) {
     return (
       <ErrorBox meta={meta}>
-        <ViScript meta={meta} passprop={passprop}>
-          {children}
-        </ViScript>
+        <ViScript
+          meta={meta}
+          is_layout={is_layout}
+          passprop={passprop}
+        ></ViScript>
       </ErrorBox>
     );
   }
 
   return (
     <ErrorBox meta={meta}>
-      <ViChild meta={meta} passprop={passprop}>
-        {children}
-      </ViChild>
+      <ViChild meta={meta} passprop={passprop} is_layout={is_layout}></ViChild>
     </ErrorBox>
   );
 };
 
 export const ViChild: FC<{
   meta: IMeta;
-  children?: ReactNode;
+  is_layout: boolean;
   passprop?: any;
-}> = ({ meta, children, passprop }) => {
+}> = ({ meta, passprop, is_layout }) => {
   const vi = useGlobal(ViGlobal, "VI");
-  const parts = viParts(vi, meta, passprop);
+
+  if (is_layout && meta.item.name === "children") {
+    const childs: ReactNode[] = [];
+    for (const item_id of vi.entry) {
+      const meta = vi.meta[item_id];
+      const parts = viParts(vi, meta, false, passprop);
+      if (vi.visit) vi.visit(meta, parts);
+      childs.push(<div {...parts.props} />);
+    }
+    return (
+      <>
+        {childs.map((e, idx) => (
+          <Fragment key={idx}>{e}</Fragment>
+        ))}
+      </>
+    );
+  }
+  const parts = viParts(vi, meta, is_layout, passprop);
   if (vi.visit) vi.visit(meta, parts);
 
   return <div {...parts.props} />;

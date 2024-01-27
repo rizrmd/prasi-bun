@@ -11,7 +11,8 @@ import { pushTreeNode } from "./build/push-tree";
 
 export const treeCacheBuild = async (p: PG, page_id: string) => {
   const page_cache = p.preview.page_cache[page_id];
-  if (page_cache && !p.preview.meta_cache[page_id]) {
+
+  if (page_cache) {
     const meta_cache = {
       meta: {} as Record<string, IMeta>,
       entry: [] as string[],

@@ -15,6 +15,7 @@ export const viEvalScript = (
   vi: {
     page: VG["page"];
     mode: VG["mode"];
+    layout: VG["layout"];
     site: { db: any; api: any };
     meta: VG["meta"];
     visit?: VG["visit"];
@@ -22,9 +23,10 @@ export const viEvalScript = (
     on_nav_loaded?: VG["on_nav_loaded"];
   },
   meta: IMeta,
+  is_layout: boolean,
   passprop: any
 ) => {
-  const parts = viParts(vi, meta, passprop);
+  const parts = viParts(vi, meta, is_layout, passprop);
 
   if (vi.visit) vi.visit(meta, parts);
 
@@ -32,7 +34,7 @@ export const viEvalScript = (
     meta.script = {
       scope: passprop,
       result: null,
-      Local: createViLocal(vi, meta),
+      Local: createViLocal(vi, is_layout, meta),
       PassProp: createViPassProp(vi, meta),
     };
   } else {

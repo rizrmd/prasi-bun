@@ -19,14 +19,30 @@ export const site_load: SAction["site"]["load"] = async function (
           ? { api_url: (site.config as any).api_url || "" }
           : { api_url: "" };
 
-      const layout = await db.page.findFirst({
+      const layouts = await db.page.findMany({
         where: {
           id_site: site_id,
-          is_deleted: false,
-          is_default_layout: true,
+          name: {
+            startsWith: "layout:",
+          },
         },
-        select: { id: true },
+        select: { id: true, is_default_layout: true },
       });
+
+      let layout_id = "";
+      if (layouts.length === 1) {
+        layout_id = layouts[0].id;
+      } else {
+        for (const layout of layouts) {
+          if (layout.is_default_layout) {
+            layout_id = layout.id;
+            break;
+          }
+        }
+        if (!layout_id) {
+          layout_id = layouts[0].id;
+        }
+      }
 
       const snap = await prepCodeSnapshot(site_id, "site");
       const compressed: any = {};
@@ -44,7 +60,11 @@ export const site_load: SAction["site"]["load"] = async function (
         js: site.js || "",
         responsive: site.responsive as ESite["responsive"],
         js_compiled: site.js_compiled || "",
-        layout: { id: layout?.id || "", snapshot: null, meta: undefined },
+        layout: {
+          id: layout_id || "",
+          meta: undefined,
+          entry: [],
+        },
         code: {
           snapshot: compressed,
           mode: site.code_mode as "old" | "vsc",

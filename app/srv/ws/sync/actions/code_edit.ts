@@ -84,15 +84,15 @@ export const code_edit: SAction["code"]["edit"] = async function (
             });
 
             if (save_to === "comp") {
-              await db.page.update({
-                where: { id: page_id },
+              await db.component.update({
+                where: { id: comp_id },
                 data: {
                   content_tree: root.toJSON(),
                 },
               });
             } else {
-              await db.component.update({
-                where: { id: comp_id },
+              await db.page.update({
+                where: { id: page_id },
                 data: {
                   content_tree: root.toJSON(),
                 },
@@ -121,15 +121,15 @@ export const code_edit: SAction["code"]["edit"] = async function (
               });
 
               if (save_to === "comp") {
-                await db.page.update({
-                  where: { id: page_id },
+                await db.component.update({
+                  where: { id: comp_id },
                   data: {
                     content_tree: root.toJSON(),
                   },
                 });
               } else {
-                await db.component.update({
-                  where: { id: comp_id },
+                await db.page.update({
+                  where: { id: page_id },
                   data: {
                     content_tree: root.toJSON(),
                   },
