@@ -19,8 +19,11 @@ export const ViRoot: FC<{}> = ({}) => {
     );
   }
 
-  const is_layout = !!vi.layout?.entry;
-  const entry = vi.layout?.entry ? vi.layout.entry : vi.entry;
+  const is_layout = !!vi.layout?.entry && vi.layout.entry.length > 0;
+  let entry = vi.entry;
+  if (is_layout) {
+    entry = vi.layout?.entry;
+  }
 
   return (
     <div className="flex flex-1 flex-col relative">
