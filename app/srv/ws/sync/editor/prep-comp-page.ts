@@ -16,26 +16,31 @@ export const prepareComponentForPage = async (
   const _doc = doc ? doc : docs.page[page_id].doc;
   const root = _doc.getMap("map").get("root")?.toJSON() as IRoot;
 
-  const result = {} as Record<string, EComp>;
+  if (root) {
+    const result = {} as Record<string, EComp>;
 
-  if (reload_components) {
-    root.component_ids = await loadCompForPage(root, sync);
-    if (doc) {
-      _doc.getMap("map").get("root")?.set("component_ids", root.component_ids);
-    }
-  }
-
-  if (root.component_ids) {
-    for (const id of root.component_ids) {
-      if (!docs.comp[id]) {
-        await loadComponent(id, sync);
-      }
-      const snap = snapshot.get("comp", id);
-      if (snap) {
-        result[id] = { id, snapshot: await gzipAsync(snap.bin) };
+    if (reload_components) {
+      root.component_ids = await loadCompForPage(root, sync);
+      if (doc) {
+        _doc
+          .getMap("map")
+          .get("root")
+          ?.set("component_ids", root.component_ids);
       }
     }
-  }
 
-  return result;
+    if (root.component_ids) {
+      for (const id of root.component_ids) {
+        if (!docs.comp[id]) {
+          await loadComponent(id, sync);
+        }
+        const snap = snapshot.get("comp", id);
+        if (snap) {
+          result[id] = { id, snapshot: await gzipAsync(snap.bin) };
+        }
+      }
+    }
+
+    return result;
+  }
 };
