@@ -7,6 +7,7 @@ import { extractNavigate } from "./extract-nav";
 
 export const viEvalProps = (
   vi: {
+    layout: VG["layout"];
     mode: VG["mode"];
     meta: VG["meta"];
     site: { db: any; api: any };
@@ -14,6 +15,7 @@ export const viEvalProps = (
     on_nav_loaded?: VG["on_nav_loaded"];
   },
   meta: IMeta,
+  is_layout: boolean,
   passprop: any
 ) => {
   if (meta.item.component?.id) {
@@ -41,7 +43,9 @@ export const viEvalProps = (
               fn: (arg: { passprop: any; meta: IMeta }) => {
                 const id = prop.content?.id;
                 if (id) {
-                  const m = vi.meta[id];
+                  const m = is_layout ? vi.layout?.meta[id] : vi.meta[id];
+
+                  if (!m) return null;
 
                   const instances = meta.instances;
                   if (!arg.meta.item.originalId || !instances) {
@@ -78,7 +82,13 @@ export const viEvalProps = (
                       }
                     }
                   }
-                  return <ViRender meta={m} passprop={arg.passprop} />;
+                  return (
+                    <ViRender
+                      meta={m}
+                      passprop={arg.passprop}
+                      is_layout={is_layout}
+                    />
+                  );
                 }
                 return null;
               },

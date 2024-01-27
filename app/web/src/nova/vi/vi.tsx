@@ -19,6 +19,7 @@ export const Vi: FC<{
   page_id: string;
   api?: any;
   db?: any;
+  layout?: VG["layout"];
   script?: { init_local_effect: Record<string, boolean> };
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
@@ -38,9 +39,11 @@ export const Vi: FC<{
   render_stat: rs,
   on_status_changed,
   on_nav_loaded,
+  layout,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
   vi.mode = mode;
+  vi.entry = entry;
   vi.on_nav_loaded = on_nav_loaded;
 
   w.isMobile = mode === "mobile";
@@ -60,6 +63,7 @@ export const Vi: FC<{
     }, 100);
   };
 
+  vi.layout = layout;
   vi.page.cur.id = page_id;
   vi.on_status_changes = on_status_changed;
 
@@ -97,7 +101,7 @@ export const Vi: FC<{
   return (
     <ErrorBox>
       <Suspense>
-        <ViRoot entry={entry} />
+        <ViRoot />
       </Suspense>
     </ErrorBox>
   );

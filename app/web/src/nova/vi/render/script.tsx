@@ -1,5 +1,5 @@
-import { FC, ReactNode, useEffect, useState } from "react";
-import { useGlobal, useLocal } from "web-utils";
+import { FC, ReactNode, useState } from "react";
+import { useGlobal } from "web-utils";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViGlobal } from "./global";
 import { ViChild } from "./render";
@@ -8,9 +8,9 @@ import { viEvalScript } from "./script/eval-script";
 
 export const ViScript: FC<{
   meta: IMeta;
-  children: ReactNode;
+  is_layout: boolean;
   passprop?: any;
-}> = ({ meta, children, passprop }) => {
+}> = ({ meta, passprop, is_layout }) => {
   const vi = useGlobal(ViGlobal, "VI");
   const [_, _set] = useState({});
   meta.render = () => {
@@ -20,17 +20,13 @@ export const ViScript: FC<{
   let _pass = passprop;
   if (meta.item.component?.id) {
     if (!_pass) _pass = {};
-    viEvalProps(vi, meta, _pass);
+    viEvalProps(vi, meta, is_layout, _pass);
   }
 
   if (meta.item.adv?.js) {
-    viEvalScript(vi, meta, _pass);
+    viEvalScript(vi, meta, is_layout, _pass);
     if (meta.script) return meta.script.result;
   }
 
-  return (
-    <ViChild meta={meta} passprop={_pass}>
-      {children}
-    </ViChild>
-  );
+  return <ViChild meta={meta} passprop={_pass} is_layout={is_layout}></ViChild>;
 };

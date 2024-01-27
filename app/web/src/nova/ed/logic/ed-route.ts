@@ -1,9 +1,11 @@
 import { compress, decompress } from "wasm-gzip";
 import { isTextEditing } from "./active/is-editing";
 import { loadCompSnapshot } from "./comp/load";
-import { PG, active } from "./ed-global";
+import { IMeta, PG, active } from "./ed-global";
 import { loadSite } from "./ed-site";
-import { treeRebuild } from "./tree/build";
+import { treeCacheBuild, treeRebuild } from "./tree/build";
+import { get, set } from "idb-keyval";
+import { nav } from "../../vi/render/script/extract-nav";
 
 export const edRoute = async (p: PG) => {
   if (p.status === "ready" || p.status === "init") {
@@ -34,6 +36,95 @@ export const edRoute = async (p: PG) => {
       }
 
       await reloadPage(p, params.page_id, "load-route");
+    }
+  }
+};
+
+export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
+  const remotePage = await p.sync.page.load(layout_id);
+
+  if (remotePage) {
+    if (remotePage.comps) {
+      for (const [id_comp, c] of Object.entries(remotePage.comps)) {
+        if (c && c.snapshot) {
+          await loadCompSnapshot(p, id_comp, c.snapshot);
+        }
+      }
+    }
+    if (remotePage.snapshot) {
+      const doc = new Y.Doc();
+      Y.applyUpdate(doc, decompress(remotePage.snapshot));
+
+      let page = p.page.list[remotePage.id];
+      if (!page) {
+        p.page.list[remotePage.id] = {} as any;
+        page = p.page.list[remotePage.id];
+      }
+
+      if (page.on_update && page.doc) {
+        page.doc.off("update", page.on_update);
+      }
+
+      page.on_update = async (bin: Uint8Array, origin: any) => {
+        if (origin === "local") return;
+
+        const res = await p.sync.yjs.sv_local(
+          "page",
+          layout_id,
+          Buffer.from(compress(bin))
+        );
+
+        if (res) {
+          const diff_local = Y.encodeStateAsUpdate(
+            doc as any,
+            decompress(res.sv)
+          );
+          Y.applyUpdate(doc as any, decompress(res.diff), "local");
+
+          if (!isTextEditing()) {
+            await treeRebuild(p, { note: note + " page-on-update" });
+          }
+
+          await p.sync.yjs.diff_local(
+            "page",
+            p.page.cur.id,
+            Buffer.from(compress(diff_local))
+          );
+
+          p.preview.page_cache[layout_id] = {
+            root,
+            url: "~~@$#%^#@~LAYOUT~~@$#%^#@~",
+          };
+          await treeCacheBuild(p, layout_id);
+          p.render();
+
+          const meta_cache = p.preview.meta_cache[layout_id];
+          if (meta_cache) {
+            p.site.layout.meta = meta_cache.meta;
+            p.site.layout.entry = meta_cache.entry;
+            savePageMetaCache(p, meta_cache.meta);
+          }
+        }
+      };
+
+      const root = (doc.getMap("map").get("root") as any)?.toJSON();
+      if (root) {
+        p.preview.page_cache[layout_id] = {
+          root,
+          url: "~~@$#%^#@~LAYOUT~~@$#%^#@~",
+        };
+        await treeCacheBuild(p, layout_id);
+
+        const meta_cache = p.preview.meta_cache[layout_id];
+
+        if (meta_cache) {
+          p.site.layout.meta = meta_cache.meta;
+          p.site.layout.entry = meta_cache.entry;
+
+          savePageMetaCache(p, meta_cache.meta);
+        }
+        p.render();
+      }
     }
   }
 };
@@ -129,4 +220,34 @@ export const reloadPage = async (p: PG, page_id: string, note: string) => {
 
   p.status = "ready";
   p.render();
+};
+
+export const loadPageMetaCache = async (p: PG, page_id: string) => {
+  const idb_cache = await get(`page-${page_id}`, nav.store);
+  if (idb_cache) {
+    p.preview.meta_cache[page_id] = idb_cache;
+    return p.preview.meta_cache[page_id];
+  }
+};
+
+export const savePageMetaCache = async (p: PG, meta: Record<string, IMeta>) => {
+  const cleaned_meta: Record<string, IMeta> = {};
+  for (const [k, v] of Object.entries(meta)) {
+    cleaned_meta[k] = {
+      item: v.item,
+      instances: v.instances,
+      parent: v.parent,
+      jsx_prop: v.jsx_prop,
+    };
+  }
+  p.preview.meta_cache[params.page_id] = {
+    meta: cleaned_meta,
+    entry: p.page.entry,
+    url: p.page.cur.url,
+  };
+  set(
+    `page-${params.page_id}`,
+    p.preview.meta_cache[params.page_id],
+    nav.store
+  );
 };

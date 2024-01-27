@@ -6,6 +6,7 @@ export const ViGlobal = {
   ts: 0,
   status: "init" as ViStatus,
   meta: {} as Record<string, IMeta>,
+  entry: [] as string[],
   tick: 0,
   mode: "desktop" as "mobile" | "desktop",
   site: {
@@ -24,6 +25,13 @@ export const ViGlobal = {
     | undefined
     | ((meta: IMeta, parts: ReturnType<typeof viParts>) => void),
   on_status_changes: undefined as void | ((status: ViStatus) => void),
+  layout: undefined as
+    | {
+        id: string;
+        meta: Record<string, IMeta>;
+        entry: string[];
+      }
+    | undefined,
   page: {
     cur: { id: "" },
     navs: {} as Record<string, Set<string>>,

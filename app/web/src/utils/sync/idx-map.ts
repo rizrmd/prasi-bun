@@ -20,7 +20,7 @@ export const IndexedMap = {
           all[pk] = {};
         }
         const _id = hash_sum(item) as any;
-
+ 
         const items = all[pk] as Record<string, OBJ>;
         items[_id] = item;
 

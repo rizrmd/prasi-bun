@@ -5,9 +5,7 @@ import { ViGlobal } from "./render/global";
 import { ViRender } from "./render/render";
 import { ErrorBox } from "./utils/error-box";
 
-export const ViRoot: FC<{
-  entry: string[];
-}> = ({ entry }) => {
+export const ViRoot: FC<{}> = ({}) => {
   const vi = useGlobal(ViGlobal, "VI");
   const local = useLocal({ tick: Date.now() });
 
@@ -21,15 +19,18 @@ export const ViRoot: FC<{
     );
   }
 
+  const is_layout = !!vi.layout?.entry;
+  const entry = vi.layout?.entry ? vi.layout.entry : vi.entry;
+
   return (
     <div className="flex flex-1 flex-col relative">
       {entry.map((id) => {
-        const meta = vi.meta[id];
+        const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
         if (meta) {
           if (Element) {
             return (
               <ErrorBox key={meta.item.id}>
-                <ViRender meta={meta} />
+                <ViRender meta={meta} is_layout={is_layout} />
               </ErrorBox>
             );
           }

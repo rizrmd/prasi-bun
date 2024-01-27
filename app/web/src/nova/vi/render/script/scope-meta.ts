@@ -2,8 +2,9 @@ import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 
 export const getScopeMeta = (
-  vi: { meta: VG["meta"] },
+  vi: { meta: VG["meta"]; layout: VG["layout"] },
   meta: IMeta,
+  is_layout: boolean,
   debug?: boolean
 ) => {
   let cur = meta;
@@ -14,10 +15,13 @@ export const getScopeMeta = (
     { type: "local" | "passprop" | "jsxprop"; meta: IMeta }
   > = {};
   if (cur && cur.parent) {
-    while (cur.parent) {
-      scopes_meta.unshift(cur);
-      if (!vi.meta[cur.parent.id]) break;
-      cur = vi.meta[cur.parent.id];
+    const metas = is_layout ? vi.layout?.meta : vi.meta;
+    if (metas) {
+      while (cur.parent) {
+        scopes_meta.unshift(cur);
+        if (!metas[cur.parent.id]) break;
+        cur = metas[cur.parent.id];
+      }
     }
   }
 

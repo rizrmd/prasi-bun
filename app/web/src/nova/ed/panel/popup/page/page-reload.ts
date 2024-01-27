@@ -18,14 +18,17 @@ export const pagePicker = {
   search: "",
   render: () => {},
   rename_id: "",
-  new_parent_id: ""
+  new_parent_id: "",
 };
 
 export const reloadPagePicker = async (p: PG) => {
   pagePicker.status = "loading";
 
   const pages = await db.page.findMany({
-    where: { id_site: p.site.id, is_deleted: false },
+    where: {
+      id_site: p.site.id,
+      is_deleted: false,
+    },
     select: {
       id: true,
       name: true,

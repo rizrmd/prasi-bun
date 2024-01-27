@@ -3,6 +3,7 @@ import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViRender } from "./render";
+import { VG } from "./global";
 
 export type ViParts = {
   mode: "mobile" | "desktop";
@@ -19,9 +20,15 @@ export const viParts = (
   vi: {
     mode: "desktop" | "mobile";
     meta: Record<string, IMeta>;
+    layout?: {
+      id: string;
+      meta: Record<string, IMeta>;
+      entry: string[];
+    };
   },
   meta: IMeta,
-  passprop?: any
+  is_layout: boolean,
+  passprop: any
 ) => {
   const item = meta.item;
 
@@ -46,7 +53,17 @@ export const viParts = (
         if (!item) return null;
         const { id } = item;
 
-        return <ViRender key={id} meta={vi.meta[id]} passprop={passprop} />;
+        const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
+        if (!meta) return null;
+
+        return (
+          <ViRender
+            key={id}
+            meta={meta}
+            is_layout={is_layout}
+            passprop={passprop}
+          />
+        );
       });
   }
 
