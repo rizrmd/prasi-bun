@@ -117,7 +117,7 @@ const mainStyle = (p: PG, meta?: IMeta) => {
   }
 
   return cx(
-    "absolute flex",
+    "absolute flex main-editor-content",
     css`
       contain: content;
     `,
