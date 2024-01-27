@@ -9,7 +9,7 @@ import { w } from "../../utils/types/general";
 import { IRoot } from "../../utils/types/root";
 import { treeCacheBuild } from "../ed/logic/tree/build";
 import { loadComponent } from "../ed/logic/comp/load";
-import { get } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import { nav } from "./render/script/extract-nav";
 
 const decoder = new TextDecoder();
@@ -61,6 +61,11 @@ export const ViPreview = (arg: { pathname: string }) => {
       entry: p.page.entry,
       url: p.page.cur.url,
     };
+    set(
+      `page-${params.page_id}`,
+      p.preview.meta_cache[params.page_id],
+      nav.store
+    );
   }
 
   return (
