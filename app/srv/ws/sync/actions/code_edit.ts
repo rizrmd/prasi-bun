@@ -22,6 +22,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
     let root = undefined as undefined | MRoot | MItem;
     let doc = undefined as undefined | Doc;
+    let save_to = "page";
     if (page_id) {
       const ref = docs.page[page_id];
       if (ref) {
@@ -29,6 +30,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
         doc = ref.doc as Doc;
       }
     } else if (comp_id) {
+      save_to = "comp";
       const ref = docs.comp[comp_id];
       if (ref) {
         root = ref.doc.getMap("map").get("root");
@@ -80,6 +82,22 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 }
               }
             });
+
+            if (save_to === "comp") {
+              await db.page.update({
+                where: { id: page_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
+              });
+            } else {
+              await db.component.update({
+                where: { id: comp_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
+              });
+            }
           } catch (e: any) {
             return e.message.toString();
           }
@@ -101,6 +119,22 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 mprop.set("value", src);
                 mprop.set("valueBuilt", res.code.substring(6));
               });
+
+              if (save_to === "comp") {
+                await db.page.update({
+                  where: { id: page_id },
+                  data: {
+                    content_tree: root.toJSON(),
+                  },
+                });
+              } else {
+                await db.component.update({
+                  where: { id: comp_id },
+                  data: {
+                    content_tree: root.toJSON(),
+                  },
+                });
+              }
             } catch (e: any) {
               return e.message.toString();
             }
@@ -142,6 +176,12 @@ export const code_edit: SAction["code"]["edit"] = async function (
                     meta.set("optionsBuilt", res.code.substring(6));
                   }
                 }
+              });
+              await db.component.update({
+                where: { id: comp_id },
+                data: {
+                  content_tree: root.toJSON(),
+                },
               });
             } catch (e: any) {
               return e.message.toString();

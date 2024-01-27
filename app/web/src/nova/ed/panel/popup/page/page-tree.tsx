@@ -161,7 +161,11 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                     if (confirm("Clone page ?")) {
                       local.render();
                       const page = (await db.page.findFirst({
-                        where: { id: node.id as string },
+                        where: {
+                          id: node.id as string,
+                          is_deleted: false,
+                          is_default_layout: false,
+                        },
                       })) as any;
 
                       delete page.id;
