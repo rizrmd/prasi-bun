@@ -5,16 +5,10 @@ import { ESite, PG } from "./ed-global";
 export const loadSite = async (p: PG, site: ESite, note: string) => {
   p.site = site;
 
-  p.mode = "desktop";
-  if (p.site.responsive === "mobile-only") {
-    p.mode = "mobile";
-  } else if (p.site.responsive === "desktop-only") {
-    p.mode = "desktop";
-  }
-
   if (!p.script.db && !p.script.api) {
     if (p.site.code.mode === "old") {
       await viLoadLegacy({
+        mode: p.mode,
         site: {
           api_url: p.site.config.api_url,
           id: p.site.id,
