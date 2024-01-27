@@ -1,7 +1,6 @@
 import { IContent } from "../../../../utils/types/general";
 import {
-  getSelectionOffset,
-  setSelectionOffset,
+  setSelectionOffset
 } from "../../../../utils/ui/selection";
 import { VG } from "../../../vi/render/global";
 import { activateMeta } from "../../logic/active/activate-meta";

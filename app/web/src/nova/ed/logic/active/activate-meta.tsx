@@ -13,7 +13,7 @@ export const activateMeta = (p: PG, meta: IMeta) => {
     return;
   }
 
-  if (meta.parent && parent_comp_id) {
+  if (meta.parent && parent_comp_id && !!p.ui.comp_editable) {
     if (active.comp_id) {
       if (active.comp_id === parent_comp_id) {
         if (meta.item.originalId) {
