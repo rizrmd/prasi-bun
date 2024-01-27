@@ -40,14 +40,15 @@ export const EdMain = () => {
       ) {
         const parsed = parseUA();
         p.mode = parsed.device.type === "mobile" ? "mobile" : "desktop";
-        if (localStorage.getItem("prasi-editor-mode")) {
-          p.mode = localStorage.getItem("prasi-editor-mode") as any;
-        }
       } else if (p.site.responsive === "mobile-only") {
         p.mode = "mobile";
       } else if (p.site.responsive === "desktop-only") {
         p.mode = "desktop";
       }
+    }
+
+    if (localStorage.getItem("prasi-editor-mode")) {
+      p.mode = localStorage.getItem("prasi-editor-mode") as any;
     }
   }
 
