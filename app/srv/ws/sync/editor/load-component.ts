@@ -1,5 +1,4 @@
 import { IItem } from "../../../../web/src/utils/types/item";
-import { DComp } from "../../../../web/src/utils/types/root";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
@@ -57,6 +56,9 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
     const comp = await db.component.findFirst({ where: { id: comp_id } });
     if (comp) {
       const item = comp.content_tree as IItem;
+      if (item.name === "card") {
+        console.log(item);
+      }
       if (item && item.component?.id !== comp.id) {
         item.component = { id: comp.id, props: {} };
       }
