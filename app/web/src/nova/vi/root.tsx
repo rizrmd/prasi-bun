@@ -21,7 +21,7 @@ export const ViRoot: FC<{}> = ({}) => {
 
   const is_layout = !!vi.layout?.entry && vi.layout.entry.length > 0;
   let entry = vi.entry;
-  if (is_layout) {
+  if (is_layout && vi.layout?.entry) {
     entry = vi.layout?.entry;
   }
 
