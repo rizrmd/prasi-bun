@@ -216,7 +216,7 @@ const viRoute = async (p: PG) => {
 
       p.script.init_local_effect = {};
 
-      if (!w.isEditor) {
+      if (!w.isEditor && p.page.cur.id !== params.page_id) {
         let page_cache = p.preview.meta_cache[params.page_id];
 
         let should_render = false;

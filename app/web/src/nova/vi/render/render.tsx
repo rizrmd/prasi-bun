@@ -86,9 +86,22 @@ export const ViChild: FC<{
     const childs: ReactNode[] = [];
     for (const item_id of vi.entry) {
       const meta = vi.meta[item_id];
-      const parts = viParts(vi, meta, false, passprop);
-      if (vi.visit) vi.visit(meta, parts);
-      childs.push(<div {...parts.props} />);
+
+      if (meta.item.adv?.js || meta.item.component?.id) {
+        childs.push(
+          <ErrorBox meta={meta}>
+            <ViScript
+              meta={meta}
+              is_layout={is_layout}
+              passprop={passprop}
+            ></ViScript>
+          </ErrorBox>
+        );
+      } else {
+        const parts = viParts(vi, meta, false, passprop);
+        if (vi.visit) vi.visit(meta, parts);
+        childs.push(<div {...parts.props} />);
+      }
     }
     return (
       <>
