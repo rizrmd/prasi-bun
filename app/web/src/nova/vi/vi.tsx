@@ -48,8 +48,9 @@ export const Vi: FC<{
 
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
-  w.preload = (urls: string[]) => {
+  w.preload = (_urls: string | string[]) => {
     if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
+    const urls = typeof _urls === "string" ? [_urls] : _urls;
     for (const url of urls) {
       vi.page.navs[page_id].add(url);
     }
@@ -61,6 +62,8 @@ export const Vi: FC<{
         });
       }
     }, 100);
+
+    return "";
   };
 
   vi.layout = layout;

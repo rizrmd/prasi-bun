@@ -65,6 +65,13 @@ export const edInitSync = (p: PG) => {
         const res = page.route.lookup(pathname);
         if (res) {
           params.page_id = res.id;
+          if (res.params) {
+            for (const [k, v] of Object.entries(res.params)) {
+              if (!["site_id", "page_id"].includes(k)) {
+                params[k] = v;
+              }
+            }
+          }
         }
       }
     } else if (location.pathname.startsWith("/ed")) {

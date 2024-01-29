@@ -56,6 +56,7 @@ export const viEvalScript = (
     render: (jsx: ReactNode) => {
       script.result = <Suspense>{jsx}</Suspense>;
     },
+    params,
     ...viScriptArg(vi),
     ...exports,
     ...passprop,
