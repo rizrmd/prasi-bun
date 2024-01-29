@@ -9,6 +9,7 @@ import { registerMobile } from "./render/live/logic/mobile";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
 
+
 const start = async () => {
 	const base = `${location.protocol}//${location.host}`;
 	let react = {

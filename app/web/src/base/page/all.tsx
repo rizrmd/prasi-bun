@@ -8,6 +8,7 @@ import { isLocalhost } from "../../utils/ui/is-localhost";
 export default page({
   url: "**",
   component: ({}) => {
+
     const p = useGlobal(EDGlobal, "EDITOR");
     useEffect(() => {
       if (localStorage.getItem("prasi-session")) {
