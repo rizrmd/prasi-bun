@@ -100,8 +100,23 @@ export const edInitSync = (p: PG) => {
             },
             select: { id: true, id_site: true },
           })
-          .then((e) => {
-            if (e) location.href = `/ed/${e.id_site}/${e.id}`;
+          .then(async (e) => {
+            if (e) location.href = `/ed/${params.site_id}/${e.id}`;
+            else {
+              const res = await db.page.create({
+                data: {
+                  content_tree: {
+                    childs: [],
+                    id: "root",
+                    type: "root",
+                  },
+                  name: "home",
+                  url: "/",
+                  site: { connect: { id: params.site_id } },
+                },
+              });
+              if (res) location.href = `/ed/${params.site_id}/${res.id}`;
+            }
           });
       }
       return false;
