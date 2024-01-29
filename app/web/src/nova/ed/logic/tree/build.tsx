@@ -8,6 +8,8 @@ import { loadCompSnapshot, loadComponent } from "../comp/load";
 import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
+import { createId } from "@paralleldrive/cuid2";
+import { FMCompDef } from "../../../../utils/types/meta-fn";
 
 export const treeCacheBuild = async (p: PG, page_id: string) => {
   const page_cache = p.preview.page_cache[page_id];
@@ -125,14 +127,11 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
                   mitem,
                   meta,
                   new_prop_jsx(meta, mprops, prop_name, prop_val) {
-                    // if (prop_val.meta?.type === "content-element") {
-                    //   transact.list.push(() => {
-                    //     const map = new Y.Map();
-                    //     if (prop_val.content) prop_val.content.id = createId();
-                    //     syncronize(map, prop_val);
-                    //     mprops.set(prop_name, map as any);
-                    //   });
-                    // }
+                    if (!mprops.get(prop_name)) {
+                      const map = new Y.Map();
+                      syncronize(map, prop_val);
+                      mprops.set(prop_name, map as FMCompDef);
+                    }
                   },
                 });
               }
@@ -141,14 +140,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
         },
         { item }
       );
-
-      if (transact.list.length > 0) {
-        p.page.doc?.transact(() => {
-          for (const fn of transact.list) {
-            fn();
-          }
-        });
-      }
     }
   }
 
@@ -182,8 +173,4 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
       }
     }
   }
-};
-
-const transact = {
-  list: [] as (() => void)[],
 };

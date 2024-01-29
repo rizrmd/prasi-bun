@@ -25,6 +25,7 @@ export type FNComponent = {
 
 export type FNCompDef = {
   idx: number;
+  typings: string;
   type: string;
   value: any;
   valueBuilt: any;
