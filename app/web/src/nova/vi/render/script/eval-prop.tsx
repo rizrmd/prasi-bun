@@ -30,6 +30,7 @@ export const viEvalProps = (
       api: vi.site.api,
       ...viScriptArg(vi),
       ...passprop,
+      params
     };
 
     meta.item.script.props = {};
