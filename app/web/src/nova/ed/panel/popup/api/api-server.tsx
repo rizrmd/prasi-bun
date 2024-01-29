@@ -163,7 +163,12 @@ export const EdApiServer = forwardRef<
             value={local.api_url}
             onChange={(e) => {
               local.api_url = e.currentTarget.value;
-              local.api_url = trim(local.api_url, "/");
+              if (
+                local.api_url.startsWith("http://") ||
+                local.api_url.startsWith("https://")
+              ) {
+                local.api_url = trim(local.api_url, "/");
+              }
               local.render();
             }}
             onFocus={(e) => {
