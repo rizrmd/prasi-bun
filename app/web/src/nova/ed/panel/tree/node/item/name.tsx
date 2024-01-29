@@ -85,20 +85,29 @@ export const EdTreeName = ({
           onKeyDown={(e) => {
             e.stopPropagation();
             if (e.key === "Enter" || e.key === "Escape") {
-              if (e.key === "Escape") {
-                local.rename = item.name;
-              } else {
-                item.name = local.rename;
+              if (item.component?.id) {
+                if (!confirm("Rename component?")) {
+                  p.ui.tree.rename_id = "";
+                  p.render();
+                  return;
+                }
               }
-
-              p.ui.tree.rename_id = "";
-              p.render();
               setTimeout(() => {
-                const el = document.querySelector(
-                  `.tree-${item.id}`
-                ) as HTMLInputElement;
-                if (el) el.focus();
-              });
+                if (e.key === "Escape") {
+                  local.rename = item.name;
+                } else {
+                  item.name = local.rename;
+                }
+
+                p.ui.tree.rename_id = "";
+                p.render();
+                setTimeout(() => {
+                  const el = document.querySelector(
+                    `.tree-${item.id}`
+                  ) as HTMLInputElement;
+                  if (el) el.focus();
+                });
+              }, 50);
             }
           }}
           onChange={(e) => {
