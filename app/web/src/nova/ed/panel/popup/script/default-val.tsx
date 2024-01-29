@@ -44,6 +44,8 @@ async () => {
 }`;
         } else if (kind === "visible") {
           val = mprop.get("visible") || "true";
+        }  else if (kind === "typings") {
+          val = mprop.get("typings") || "const typings = {}";
         } else if (kind === "option") {
           val =
             mprop.get("meta")?.get("options") ||

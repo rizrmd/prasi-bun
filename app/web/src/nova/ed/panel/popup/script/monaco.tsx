@@ -16,6 +16,7 @@ import { declareScope } from "./scope/scope";
 // @ts-ignore
 import { constrainedEditor } from "constrained-editor-plugin/dist/esm/constrainedEditor";
 import { addScope } from "./scope/add-scope";
+import { FNCompDef } from "../../../../../utils/types/meta-fn";
 
 const scriptEdit = {
   timeout: null as any,
@@ -95,6 +96,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             }
           }
+
           if (p.ui.popup.script.mode === "js") {
             const w = window as any;
             const types: any = {};
@@ -109,20 +111,20 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             }
 
-            await monacoTypings(
-              {
-                site_dts: p.site_dts,
-                script: {
-                  siteTypes: p.script.site_types,
-                },
-                site: p.site.config,
-              },
-              monaco,
-              {
-                types,
-                values: {},
+            let component = { id: "", props: {} as Record<string, FNCompDef> };
+            if (meta?.item.component?.id && meta.item.component.props) {
+              component.id = meta.item.component.id;
+              component.props = meta.item.component.props;
+            }
+            if (meta?.parent?.comp_id && meta.parent.instance_id) {
+              const comp_meta = p.page.meta[meta.parent.instance_id];
+
+              if (comp_meta && comp_meta.item.component?.id) {
+                component.id = comp_meta.item.component.id;
+                component.props = comp_meta.item.component.props;
               }
-            );
+            }
+
             if (meta) {
               switch (type) {
                 case "prop-master":
@@ -143,25 +145,24 @@ export const EdScriptMonaco: FC<{}> = () => {
                       monaco.Uri.parse("file:///active.tsx")
                     );
                     editor.setModel(nmodel);
-                    const constrainedInstance = constrainedEditor(monaco);
-                    constrainedInstance.initializeIn(editor);
-                    const model = editor.getModel();
-                    constrainedInstance.removeRestrictionsIn(model);
-                    const frange = model?.getFullModelRange();
-                    if (frange) {
-                      // const ranges = [
-                      //   {
-                      //     range: [
-                      //       end_hide + 1,
-                      //       `export const ${p.ui.popup.script.prop_name} = `
-                      //         .length,
-                      //       frange.getEndPosition().lineNumber,
-                      //       frange.getEndPosition().column,
-                      //     ],
-                      //     allowMultiline: true,
-                      //   },
-                      // ];
-                      // constrainedInstance.addRestrictionsTo(model, ranges);
+
+                    if (component.id) {
+                      const prop_name = p.ui.popup.script.prop_name;
+                      const prop = component.props[prop_name];
+                      if (typeof prop.typings === "string") {
+                        const typings_src = prop.typings.substring(
+                          `const typings = `.length
+                        );
+                        const typings_fn = new Function(
+                          `return ${typings_src}`
+                        );
+                        const typings = typings_fn();
+                        for (const [k, v] of Object.entries(typings)) {
+                          if (typeof v === "string") {
+                            types[k] = v;
+                          }
+                        }
+                      }
                     }
                   }
                   break;
@@ -199,10 +200,44 @@ export const EdScriptMonaco: FC<{}> = () => {
                       const range = new monaco.Range(1, 1, end_hide, 1);
                       (editor as any).setHiddenAreas([range]);
                     }
+
+                    if (component.id && meta.jsx_prop?.name) {
+                      const prop_name = meta.jsx_prop.name;
+                      const prop = component.props[prop_name];
+                      if (typeof prop.typings === "string") {
+                        const typings_src = prop.typings.substring(
+                          `const typings = `.length
+                        );
+                        const typings_fn = new Function(
+                          `return ${typings_src}`
+                        );
+                        const typings = typings_fn();
+                        for (const [k, v] of Object.entries(typings)) {
+                          if (typeof v === "string") {
+                            types[k] = v;
+                          }
+                        }
+                      }
+                    }
                   }
                   break;
               }
             }
+
+            await monacoTypings(
+              {
+                site_dts: p.site_dts,
+                script: {
+                  siteTypes: p.script.site_types,
+                },
+                site: p.site.config,
+              },
+              monaco,
+              {
+                types,
+                values: {},
+              }
+            );
             await jsMount(editor, monaco, p);
           } else {
             const model = monaco.editor.createModel(
@@ -362,7 +397,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                 scope = code_result;
               }
             } else {
-              console.log(value);
               const code_result = await p.sync.code.edit({
                 type: "adv",
                 mode: mode,

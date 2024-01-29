@@ -161,11 +161,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
           const mprop = mprops?.get(prop_name);
           if (mprop) {
             try {
-              const res = await transform(`return ${src}`, {
-                jsx: "transform",
-                format: "cjs",
-                loader: "tsx",
-              });
+              const res =
+                prop_kind !== "typings"
+                  ? await transform(`return ${src}`, {
+                      jsx: "transform",
+                      format: "cjs",
+                      loader: "tsx",
+                    })
+                  : { code: src };
               doc?.transact(() => {
                 if (prop_kind === "value") {
                   mprop.set("value", src);
@@ -175,6 +178,8 @@ export const code_edit: SAction["code"]["edit"] = async function (
                   mprop.set("genBuilt", res.code.substring(6));
                 } else if (prop_kind === "visible") {
                   mprop.set("visible", src);
+                } else if (prop_kind === "typings") {
+                  mprop.set("typings", src);
                 } else if (prop_kind === "option") {
                   const meta = mprop.get("meta");
                   if (meta) {

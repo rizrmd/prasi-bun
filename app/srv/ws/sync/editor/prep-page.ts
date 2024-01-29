@@ -90,11 +90,13 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
                 userSyncComponent(sync, id);
               }
 
-              result.add(id);
-              mcomps[id] = docs.comp[id].doc
-                .getMap("map")
-                .get("root")
-                ?.toJSON() as IItem;
+              if (docs.comp[id]) {
+                result.add(id);
+                mcomps[id] = docs.comp[id].doc
+                  .getMap("map")
+                  .get("root")
+                  ?.toJSON() as IItem;
+              }
             }
           },
         }

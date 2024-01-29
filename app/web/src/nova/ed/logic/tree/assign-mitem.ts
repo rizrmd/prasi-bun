@@ -60,11 +60,18 @@ export const assignMitem = (arg: {
 
       if (m.item.component?.props) {
         for (const [prop_name, v] of Object.entries(m.item.component.props)) {
-          const mprop = m.mitem?.get("component")?.get("props")?.get(prop_name);
+          let mprop = m.mitem?.get("component")?.get("props")?.get(prop_name);
+          if (!mprop) {
+            const mprops = m.mitem?.get("component")?.get("props");
+            if (mprops) {
+              arg.new_prop_jsx(m, mprops, prop_name, v);
+            }
+          }
 
           if (v.content) {
             if (mprop) {
               const pmeta = meta[v.content.id];
+
               if (pmeta) {
                 pmeta.mitem = mprop.get("content");
               }
