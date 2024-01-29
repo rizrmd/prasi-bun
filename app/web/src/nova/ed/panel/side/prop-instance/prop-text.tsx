@@ -55,16 +55,19 @@ export const EdPropInstanceText: FC<{
   );
 };
 
-const unquote = (text: string) => {
-  const str = text.trim();
-  const first = str[0];
+const unquote = (text: any) => {
+  if (typeof text === "string") {
+    const str = text.trim();
+    const first = str[0];
 
-  if (['"', "'", "`"].includes(first)) {
-    if (first === str[str.length - 1]) {
-      return str.slice(1, -1);
+    if (['"', "'", "`"].includes(first)) {
+      if (first === str[str.length - 1]) {
+        return str.slice(1, -1);
+      }
     }
+    return str;
   }
-  return str;
+  return "";
 };
 
 export function AutoHeightTextarea({
