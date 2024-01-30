@@ -34,17 +34,23 @@ export const EdTreeSearch = () => {
         local.render();
       }}
     >
-      <div className="flex items-stretch h-[24px] ">
+      <form
+        className="flex items-stretch h-[24px] "
+        autoComplete="off"
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <input
-          name="search-tree"
+          name="search-tree-prasi"
           ref={(ref) => {
             local.sref = ref;
           }}
           type="search"
-          autoComplete="off"
+          autoComplete="new-password"
           className={cx("flex-1 outline-none px-2 text-[13px] ")}
           placeholder="Search..."
-          value={p.ui.tree.search}
+          value={p.ui.tree.search || ""}
           spellCheck={false}
           onInput={(e) => {
             local.cursor = e.currentTarget.selectionStart;
@@ -70,7 +76,7 @@ export const EdTreeSearch = () => {
             }
           }}
         />
-      </div>
+      </form>
       {(local.focus || local.hover || p.ui.tree.search) && (
         <div className="p-1 bg-white text-xs border-t flex space-x-1 justify-between">
           <div className="flex space-x-1">

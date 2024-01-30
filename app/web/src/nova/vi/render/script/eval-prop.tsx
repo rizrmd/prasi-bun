@@ -94,7 +94,7 @@ export const viEvalProps = (
                 return null;
               },
             };
-
+            
             arg[name] = val;
 
             if (passprop) {
