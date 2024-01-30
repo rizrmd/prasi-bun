@@ -28,7 +28,7 @@ export const SyncActionDefinition = {
   "code": {
     "load": "16",
     "edit": "17",
-    "parse": "18"
+    "action": "18"
   }
 };
 export const SyncActionPaths = {
@@ -50,5 +50,5 @@ export const SyncActionPaths = {
   "15": "client.info",
   "16": "code.load",
   "17": "code.edit",
-  "18": "code.parse"
+  "18": "code.action"
 };

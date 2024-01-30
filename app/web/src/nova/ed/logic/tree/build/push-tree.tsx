@@ -22,11 +22,16 @@ export const pushTreeNode = (
 
     if (parent && parent.mitem) {
       parent.mitem.get("childs")?.forEach((mitem) => {
-        if (mitem.get("id") === meta.item.id) {
+        if (mitem && mitem.get && mitem.get("id") === meta.item.id) {
           meta.mitem = mitem;
         }
       });
     }
+  }
+
+  if (!meta.item || !meta.item.id) {
+    console.warn("Emptry Tree Item ", meta);
+    return null;
   }
 
   if (tree.find((t) => t.id === meta.item.id)) {
