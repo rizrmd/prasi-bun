@@ -12,7 +12,7 @@ import {
   iconNewTab,
   iconScrollOff,
   iconScrollOn,
-  iconUpload
+  iconUpload,
 } from "./icons";
 import { CodeNameItem, CodeNameList } from "./name-list";
 
@@ -46,6 +46,15 @@ export const EdPopCode = () => {
     }
   }, []);
 
+  if (p.ui.popup.code.startup_status === "init" && p.sync.code.action) {
+    p.ui.popup.code.startup_status = "loading";
+    p.sync.code
+      .action({ type: "startup-check", site_id: p.site.id })
+      .then((res) => {
+        console.log(res);
+      });
+  }
+
   return (
     <Modal
       fade={false}
@@ -75,6 +84,9 @@ export const EdPopCode = () => {
                   )
                 ) {
                   code.mode = "new";
+                  db.code.create({
+                    data: { id_site: p.site.id, name: "site" },
+                  });
                   p.ui.popup.code.open = false;
                   p.render();
                 }
@@ -95,7 +107,10 @@ export const EdPopCode = () => {
 
 const CodeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ namePicker: false, codeAssign: false });
+  const local = useLocal({
+    namePicker: false,
+    codeAssign: false,
+  });
 
   const vscode_url = isLocalhost()
     ? "http://localhost:3000?"
@@ -171,31 +186,54 @@ const CodeBody = () => {
             ></div>
           </Tooltip> */}
           <Tooltip
-            content={`Startup Script: ${
-              !p.ui.popup.code.startup_running ? "OFF" : "Running"
-            }`}
+            content={`Startup Script: ${p.ui.popup.code.startup_status}`}
             className={cx("flex items-stretch relative border-l")}
             delay={0}
             placement="bottom"
           >
-            <div
-              className={cx(
-                "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
-                p.ui.popup.code.startup_running
-                  ? "border-b-2 border-b-green-700 bg-green-50"
-                  : "border-b-2 border-b-transparent"
-              )}
-              dangerouslySetInnerHTML={{
-                __html: p.ui.popup.code.startup_running
-                  ? iconScrollOn
-                  : iconScrollOff,
-              }}
-              onClick={() => {
-                p.ui.popup.code.startup_running =
-                  !p.ui.popup.code.startup_running;
-                p.render();
-              }}
-            ></div>
+            {["loading", "init"].includes(p.ui.popup.code.startup_status) ? (
+              <div
+                className={cx(
+                  "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all"
+                )}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-hourglass"
+                >
+                  <path d="M5 22h14" />
+                  <path d="M5 2h14" />
+                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                </svg>
+              </div>
+            ) : (
+              <div
+                className={cx(
+                  "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
+                  p.ui.popup.code.startup_status
+                    ? "border-b-2 border-b-green-700 bg-green-50"
+                    : "border-b-2 border-b-transparent"
+                )}
+                dangerouslySetInnerHTML={{
+                  __html: p.ui.popup.code.startup_status
+                    ? iconScrollOn
+                    : iconScrollOff,
+                }}
+                onClick={() => {
+                  p.ui.popup.code.startup_status = "loading";
+                  p.render();
+                }}
+              ></div>
+            )}
           </Tooltip>
 
           <Tooltip

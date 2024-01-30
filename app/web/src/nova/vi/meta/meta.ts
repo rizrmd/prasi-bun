@@ -38,24 +38,28 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
 
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
-      const carg: GenMetaArg = {
-        item: v,
-        is_root: false,
-        root: arg.root || arg.item,
-        parent: {
-          item: meta.item,
-          instance_id: arg.parent?.instance_id,
-          comp: arg.parent?.comp,
-          root_instances: arg.parent?.root_instances,
-        },
-      };
-      if (arg.jsx_prop) {
-        carg.jsx_prop = {
-          ...arg.jsx_prop,
+      if (v.id) {
+        const carg: GenMetaArg = {
+          item: v,
           is_root: false,
+          root: arg.root || arg.item,
+          parent: {
+            item: meta.item,
+            instance_id: arg.parent?.instance_id,
+            comp: arg.parent?.comp,
+            root_instances: arg.parent?.root_instances,
+          },
         };
+        if (arg.jsx_prop) {
+          carg.jsx_prop = {
+            ...arg.jsx_prop,
+            is_root: false,
+          };
+        }
+        genMeta(p, carg);
+      } else {
+        console.warn("invalid item", v);
       }
-      genMeta(p, carg);
     }
   }
 };

@@ -120,7 +120,10 @@ export const SyncActions = {
             value: Uint8Array;
           }
     ) => ({}) as boolean | ParsedScope | string,
-    parse: async (code: string | Record<string, string>) =>
-      ({}) as Record<string, ReturnType<typeof parseJs>>,
+    action: async (arg: { type: "startup-check"; site_id: string }) =>
+      ({}) as {
+        type: "startup-check";
+        status: "disabled" | "running" | "stopped";
+      },
   },
 };

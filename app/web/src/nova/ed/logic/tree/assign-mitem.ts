@@ -51,7 +51,7 @@ export const assignMitem = (arg: {
           }
         } else {
           parent.mitem.get("childs")?.forEach((child) => {
-            if (child.get("id") === m.item.id) {
+            if (child && child.get && child.get("id") === m.item.id) {
               m.mitem = child;
             }
           });
