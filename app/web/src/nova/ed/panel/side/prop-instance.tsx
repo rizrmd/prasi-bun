@@ -47,8 +47,26 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
       const cprop = m.toJSON() as any;
       const type = m.get("meta")?.get("type") || "text";
       const visible = mprop?.get("visible") || "";
-      if (visible) {
-        return;
+
+      if (visible && visible !== "true") {
+        try {
+          const arg: any = {};
+          if (meta.item.script?.props) {
+            for (const [k, v] of Object.entries(meta.item.script?.props)) {
+              eval(`arg.${k} = ${v.value}`);
+            }
+          }
+
+          const visible_fn = new Function(
+            ...Object.keys(arg),
+            `return ${visible}`
+          );
+          const res = visible_fn(...Object.values(arg));
+          if (!res) {
+            return;
+          }
+        } catch (e) {
+        }
       }
 
       if (!local.showJSX && type === "content-element") {
