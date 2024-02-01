@@ -51,7 +51,12 @@ export const EdPopCode = () => {
     p.sync.code
       .action({ type: "startup-check", site_id: p.site.id })
       .then((res) => {
-        console.log(res);
+        if (res) {
+          if (res.type === "startup-check") {
+            p.ui.popup.code.startup_status = res.status;
+            p.render();
+          }
+        }
       });
   }
 
@@ -63,6 +68,7 @@ export const EdPopCode = () => {
         localStorage.removeItem("vsc_opened");
 
         if (!open) {
+          p.ui.popup.code.startup_status = "init";
           p.ui.popup.code.open = false;
           p.render();
         }
@@ -139,7 +145,7 @@ const CodeBody = () => {
             popoverClassName="bg-white shadow-md"
             className={cx(
               "flex items-center px-2 w-[200px] hover:bg-blue-50  space-x-1",
-              "cursor-pointer justify-between"
+              "cursor-pointer justify-between border-r "
             )}
             open={local.namePicker}
             onOpenChange={(open) => {
@@ -185,56 +191,97 @@ const CodeBody = () => {
               }}
             ></div>
           </Tooltip> */}
-          <Tooltip
-            content={`Startup Script: ${p.ui.popup.code.startup_status}`}
-            className={cx("flex items-stretch relative border-l")}
-            delay={0}
-            placement="bottom"
-          >
-            {["loading", "init"].includes(p.ui.popup.code.startup_status) ? (
-              <div
-                className={cx(
-                  "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all"
-                )}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  className="lucide lucide-hourglass"
+          {p.ui.popup.code.startup_status !== "disabled" && (
+            <Tooltip
+              content={`Startup Script: ${p.ui.popup.code.startup_status}`}
+              className={cx("flex items-stretch relative border-r ")}
+              delay={0}
+              placement="bottom"
+            >
+              {["loading", "init"].includes(p.ui.popup.code.startup_status) ? (
+                <div
+                  className={cx(
+                    "flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all"
+                  )}
                 >
-                  <path d="M5 22h14" />
-                  <path d="M5 2h14" />
-                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
-                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
-                </svg>
-              </div>
-            ) : (
-              <div
-                className={cx(
-                  "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
-                  p.ui.popup.code.startup_status
-                    ? "border-b-2 border-b-green-700 bg-green-50"
-                    : "border-b-2 border-b-transparent"
-                )}
-                dangerouslySetInnerHTML={{
-                  __html: p.ui.popup.code.startup_status
-                    ? iconScrollOn
-                    : iconScrollOff,
-                }}
-                onClick={() => {
-                  p.ui.popup.code.startup_status = "loading";
-                  p.render();
-                }}
-              ></div>
-            )}
-          </Tooltip>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    className="lucide lucide-hourglass"
+                  >
+                    <path d="M5 22h14" />
+                    <path d="M5 2h14" />
+                    <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+                    <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                  </svg>
+                </div>
+              ) : (
+                <div
+                  className={cx(
+                    "flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
+                    p.ui.popup.code.startup_status === "running"
+                      ? "border-b-2 border-b-green-700 bg-green-50"
+                      : "border-b-2 border-b-transparent"
+                  )}
+                  dangerouslySetInnerHTML={{
+                    __html: p.ui.popup.code.startup_status
+                      ? iconScrollOn
+                      : iconScrollOff,
+                  }}
+                  onClick={() => {
+                    if (p.ui.popup.code.startup_status === "stopped") {
+                      p.ui.popup.code.startup_status = "loading";
+                      p.render();
+                      p.sync.code
+                        .action({ type: "startup-run", site_id: p.site.id })
+                        .then(() => {
+                          p.sync.code
+                            .action({
+                              type: "startup-check",
+                              site_id: p.site.id,
+                            })
+                            .then((res) => {
+                              if (res) {
+                                if (res.type === "startup-check") {
+                                  p.ui.popup.code.startup_status = res.status;
+                                  p.render();
+                                }
+                              }
+                            });
+                        });
+                    } else {
+                      p.ui.popup.code.startup_status = "loading";
+                      p.render();
+                      p.sync.code
+                        .action({ type: "startup-stop", site_id: p.site.id })
+                        .then(() => {
+                          p.sync.code
+                            .action({
+                              type: "startup-check",
+                              site_id: p.site.id,
+                            })
+                            .then((res) => {
+                              if (res) {
+                                if (res.type === "startup-check") {
+                                  p.ui.popup.code.startup_status = res.status;
+                                  p.render();
+                                }
+                              }
+                            });
+                        });
+                    }
+                  }}
+                ></div>
+              )}
+            </Tooltip>
+          )}
 
           <Tooltip
             content={`Upload zip, will overwrite files.`}

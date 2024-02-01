@@ -120,10 +120,26 @@ export const SyncActions = {
             value: Uint8Array;
           }
     ) => ({}) as boolean | ParsedScope | string,
-    action: async (arg: { type: "startup-check"; site_id: string }) =>
-      ({}) as {
-        type: "startup-check";
-        status: "disabled" | "running" | "stopped";
-      },
+    action: async (
+      arg: { site_id: string } & (
+        | { type: "startup-check" }
+        | { type: "startup-run" }
+        | { type: "startup-stop" }
+      )
+    ) =>
+      ({}) as
+        | undefined
+        | {
+            type: "startup-check";
+            status: "disabled" | "running" | "stopped";
+          }
+        | {
+            type: "startup-run";
+            status: "running" | "stopped";
+          }
+        | {
+            type: "startup-stop";
+            status: "running" | "stopped";
+          },
   },
 };

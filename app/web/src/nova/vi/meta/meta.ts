@@ -58,7 +58,6 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
         }
         genMeta(p, carg);
       } else {
-        console.warn("invalid item", v);
       }
     }
   }
