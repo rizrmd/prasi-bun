@@ -47,13 +47,17 @@ export const extractProp = (prop: {
 
   for (const [k, v] of Object.entries(props)) {
     if (v.type) {
-      let const_or_type = "const";
-      let str = v.type;
-      if (v.type.startsWith("type:")) {
-        str = v.type.substring("type:".length);
-        const_or_type = "type";
+      if (k === "_raw") {
+        propTypes.push(v.type);
+      } else {
+        let const_or_type = "const";
+        let str = v.type;
+        if (v.type.startsWith("type:")) {
+          str = v.type.substring("type:".length);
+          const_or_type = "type";
+        }
+        propTypes.push(`${const_or_type} ${k}: ${trim(str, "; \n")};`);
       }
-      propTypes.push(`${const_or_type} ${k}: ${trim(str, "; \n")};`);
     } else if (v.val) {
       if (typeof v.val === "object" && isValidElement(v.val)) {
         propTypes.push(`const ${k}: ReactElement;`);
