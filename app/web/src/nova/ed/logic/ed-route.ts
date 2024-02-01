@@ -216,6 +216,14 @@ export const reloadPage = async (
         .get("root")
         ?.get("childs")
         ?.map((e) => e.get("id")) as string[];
+
+      if (!Array.isArray(p.page.entry)) {
+        p.sync.code
+          .action({ type: "flush-page-cache", page_id: page_id })
+          .then(() => {
+            location.reload();
+          });
+      }
     }
 
     if (p.page.doc) {

@@ -4,6 +4,8 @@ import { waitUntil } from "web-utils";
 import { SAction } from "../actions";
 import { code } from "../editor/code/util-code";
 import { SyncConnection } from "../type";
+import { snapshot } from "../entity/snapshot";
+import { docs } from "../entity/docs";
 
 const code_startup = {
   process: {} as Record<string, ExecaChildProcess>,
@@ -53,6 +55,15 @@ export const code_action: SAction["code"]["action"] = async function (
         cs.kill();
         await waitUntil(1000);
       }
+      break;
+    }
+    case "flush-page-cache": {
+      const { page_id } = arg;
+      snapshot.del("page", page_id);
+      if (docs.page[page_id] && docs.page[page_id].doc) {
+        docs.page[page_id].doc.destroy();
+      }
+      delete docs.page[page_id];
       break;
     }
   }
