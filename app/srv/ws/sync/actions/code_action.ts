@@ -42,8 +42,9 @@ export const code_action: SAction["code"]["action"] = async function (
         code_startup.process[arg.site_id] = spawn({
           cmd: ["npm", "run", "startup"],
           cwd: code.path(arg.site_id, "site", "src"),
+          stdio: ["inherit", "inherit", "inherit"],
         });
-        code_startup.process[arg.site_id].exited.then(() => {
+        code_startup.process[arg.site_id].exited.then((e) => {
           delete code_startup.process[arg.site_id];
         });
         await waitUntil(1000);
