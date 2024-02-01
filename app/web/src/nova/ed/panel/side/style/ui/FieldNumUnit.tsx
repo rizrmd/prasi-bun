@@ -1,10 +1,4 @@
-import React, {
-  FC,
-  ReactElement,
-  useCallback,
-  useEffect,
-  useTransition,
-} from "react";
+import React, { FC, ReactElement, useCallback, useEffect } from "react";
 import { useLocal } from "web-utils";
 
 export const FieldNumUnit: FC<{
@@ -64,7 +58,6 @@ export const FieldNumUnit: FC<{
       local.val = Math.max(0, local.val);
     }
     local.unit = unit || unt || "px";
-
 
     if (!local.focus) {
       local.val_str = local.val + "";
@@ -162,7 +155,8 @@ export const FieldNumUnit: FC<{
             )}
             disabled={!!disabled}
             value={typeof disabled === "string" ? disabled : local.val_str}
-            onFocus={() => {
+            onFocus={(e) => {
+              e.currentTarget.select();
               local.focus = true;
               local.render();
             }}
