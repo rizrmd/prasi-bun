@@ -1,14 +1,14 @@
-import { spawn } from "bun";
-import { ExecaChildProcess, $ } from "execa";
+import { Subprocess, spawn } from "bun";
+import { $ } from "execa";
 import { waitUntil } from "web-utils";
 import { SAction } from "../actions";
 import { code } from "../editor/code/util-code";
-import { SyncConnection } from "../type";
-import { snapshot } from "../entity/snapshot";
 import { docs } from "../entity/docs";
+import { snapshot } from "../entity/snapshot";
+import { SyncConnection } from "../type";
 
 const code_startup = {
-  process: {} as Record<string, ExecaChildProcess>,
+  process: {} as Record<string, Subprocess>,
 };
 
 export const code_action: SAction["code"]["action"] = async function (
@@ -39,10 +39,11 @@ export const code_action: SAction["code"]["action"] = async function (
     case "startup-run": {
       const cs = code_startup.process[arg.site_id];
       if (!cs) {
-        code_startup.process[arg.site_id] = $({
+        code_startup.process[arg.site_id] = spawn({
+          cmd: ["npm", "run", "startup"],
           cwd: code.path(arg.site_id, "site", "src"),
-        })`npm run startup`;
-        code_startup.process[arg.site_id].on("exit", () => {
+        });
+        code_startup.process[arg.site_id].exited.then(() => {
           delete code_startup.process[arg.site_id];
         });
         await waitUntil(1000);
