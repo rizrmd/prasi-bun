@@ -33,7 +33,6 @@ export const baseTypings = `
   const children: RNode;
 
   const PassProp: FC<Record<string, any> & { children: React.ReactNode }>;
-  const PassChild: FC<{ name: string }>;
   const Preload: FC<{ url: string[] }>;
   const apiurl: string;
   const pageid: string;

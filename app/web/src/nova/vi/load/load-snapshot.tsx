@@ -43,7 +43,7 @@ export const viLoadSnapshot = async (p: PG) => {
   }
 };
 
-const applyEnv = (p: PG, src?: string) => {
+export const applyEnv = (p: PG, src?: string) => {
   if (src) {
     const w = window as any;
     const module = evalCJS(src);

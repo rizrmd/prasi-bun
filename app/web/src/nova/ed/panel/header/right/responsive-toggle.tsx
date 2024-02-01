@@ -1,21 +1,33 @@
 import { useGlobal } from "web-utils";
 import { w } from "../../../../../utils/types/general";
 import { ToolbarBox } from "../../../../../utils/ui/box";
+import { applyEnv } from "../../../../vi/load/load-snapshot";
 import { EDGlobal } from "../../../logic/ed-global";
+import { treeRebuild } from "../../../logic/tree/build";
 
 export const ResponsiveToggle = () => {
-  const c = useGlobal(EDGlobal, "EDITOR");
-  const mode = c.mode;
+  const p = useGlobal(EDGlobal, "EDITOR");
+  const mode = p.mode;
   const activeModeClassName = "border-b-2 border-blue-500";
+
+  const render = () => {
+    const code = p.code["site"].doc;
+    if (code) {
+      const src = code.getMap("map").get("files")?.get("index.js");
+      applyEnv(p, src);
+      treeRebuild(p);
+      p.render();
+    }
+  };
 
   const box = {
     mobile: {
       onClick() {
-        c.mode = "mobile";
+        p.mode = "mobile";
         w.isMobile = true;
         w.isDesktop = false;
         localStorage.setItem("prasi-editor-mode", "mobile");
-        c.render();
+        render();
       },
       className: cx(mode === "mobile" && activeModeClassName),
       content: (
@@ -37,11 +49,11 @@ export const ResponsiveToggle = () => {
     },
     desktop: {
       onClick() {
-        c.mode = "desktop";
+        p.mode = "desktop";
         w.isMobile = false;
         w.isDesktop = true;
         localStorage.setItem("prasi-editor-mode", "desktop");
-        c.render();
+        render();
       },
       className: cx(mode === "desktop" && activeModeClassName),
       content: (
@@ -63,9 +75,9 @@ export const ResponsiveToggle = () => {
     },
   };
   const items: any[] = [];
-  if (c.site.responsive === "mobile-only") {
+  if (p.site.responsive === "mobile-only") {
     items.push(box.mobile);
-  } else if (c.site.responsive === "desktop-only") {
+  } else if (p.site.responsive === "desktop-only") {
     items.push(box.desktop);
   } else {
     items.push(box.mobile);
