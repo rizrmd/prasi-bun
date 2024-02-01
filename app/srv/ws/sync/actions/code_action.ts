@@ -39,6 +39,8 @@ export const code_action: SAction["code"]["action"] = async function (
         code_startup.process[arg.site_id] = spawn({
           cmd: ["npm", "run", "startup"],
           cwd: code.path(arg.site_id, "site", "src"),
+          stdout: "inherit",
+          stderr: "inherit",
         });
         await waitUntil(1000);
       }
