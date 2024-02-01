@@ -1,11 +1,12 @@
-import { Subprocess, spawn } from "bun";
-import { SAction } from "../actions";
-import { SyncConnection } from "../type";
-import { code } from "../editor/code/util-code";
+import { spawn } from "bun";
+import { ExecaChildProcess, $ } from "execa";
 import { waitUntil } from "web-utils";
+import { SAction } from "../actions";
+import { code } from "../editor/code/util-code";
+import { SyncConnection } from "../type";
 
 const code_startup = {
-  process: {} as Record<string, Subprocess>,
+  process: {} as Record<string, ExecaChildProcess>,
 };
 
 export const code_action: SAction["code"]["action"] = async function (
@@ -36,18 +37,9 @@ export const code_action: SAction["code"]["action"] = async function (
     case "startup-run": {
       const cs = code_startup.process[arg.site_id];
       if (!cs || (cs && cs.killed)) {
-        code_startup.process[arg.site_id] = spawn({
-          cmd: ["npm", "run", "startup"],
+        code_startup.process[arg.site_id] = $({
           cwd: code.path(arg.site_id, "site", "src"),
-          stdin: "inherit",
-          stdout: "inherit",
-          stderr: "inherit",
-        });
-        code_startup.process[arg.site_id].exited.then((exitCode) => {
-          console.log(
-            `startup script site id ${arg.site_id}, exited: ${exitCode}`
-          );
-        });
+        })`npm run startup`;
         await waitUntil(1000);
       }
       break;
@@ -56,7 +48,7 @@ export const code_action: SAction["code"]["action"] = async function (
       const cs = code_startup.process[arg.site_id];
       if (cs && !cs.killed) {
         cs.kill();
-        await cs.exited;
+        await waitUntil(1000);
       }
       break;
     }
