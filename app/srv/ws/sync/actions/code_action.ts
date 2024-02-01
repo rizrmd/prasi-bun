@@ -34,11 +34,8 @@ export const code_action: SAction["code"]["action"] = async function (
       return { type, status: cs.killed ? "stopped" : "running" };
     }
     case "startup-run": {
-      if (
-        !code_startup.process[arg.site_id] ||
-        (code_startup.process[arg.site_id] &&
-          !code_startup.process[arg.site_id].killed)
-      ) {
+      const cs = code_startup.process[arg.site_id];
+      if (!cs || (cs && cs.killed)) {
         code_startup.process[arg.site_id] = spawn({
           cmd: ["npm", "run", "startup"],
           cwd: code.path(arg.site_id, "site", "src"),
