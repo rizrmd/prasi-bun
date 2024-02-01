@@ -36,10 +36,13 @@ export const code_action: SAction["code"]["action"] = async function (
     }
     case "startup-run": {
       const cs = code_startup.process[arg.site_id];
-      if (!cs || (cs && cs.killed)) {
+      if (!cs) {
         code_startup.process[arg.site_id] = $({
           cwd: code.path(arg.site_id, "site", "src"),
         })`npm run startup`;
+        code_startup.process[arg.site_id].on("exit", () => {
+          delete code_startup.process[arg.site_id];
+        });
         await waitUntil(1000);
       }
       break;
