@@ -25,22 +25,22 @@ export const ViRoot: FC<{}> = ({}) => {
     entry = vi.layout?.entry;
   }
 
-
   return (
     <div className="flex flex-1 flex-col relative">
-      {entry.map((id) => {
-        const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
-        if (meta) {
-          if (Element) {
-            return (
-              <ErrorBox key={meta.item.id}>
-                <ViRender meta={meta} is_layout={is_layout} />
-              </ErrorBox>
-            );
+      {Array.isArray(entry) &&
+        entry.map((id) => {
+          const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
+          if (meta) {
+            if (Element) {
+              return (
+                <ErrorBox key={meta.item.id}>
+                  <ViRender meta={meta} is_layout={is_layout} />
+                </ErrorBox>
+              );
+            }
           }
-        }
-        return null;
-      })}
+          return null;
+        })}
     </div>
   );
 };
