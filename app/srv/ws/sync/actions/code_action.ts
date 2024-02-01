@@ -1,5 +1,4 @@
 import { Subprocess, spawn } from "bun";
-import { $ } from "execa";
 import { waitUntil } from "web-utils";
 import { SAction } from "../actions";
 import { code } from "../editor/code/util-code";
@@ -42,7 +41,7 @@ export const code_action: SAction["code"]["action"] = async function (
         code_startup.process[arg.site_id] = spawn({
           cmd: ["npm", "run", "startup"],
           cwd: code.path(arg.site_id, "site", "src"),
-          stdio: ["inherit", "inherit", "inherit"],
+          stdio: ["pipe", "inherit", "inherit"],
         });
         code_startup.process[arg.site_id].exited.then((e) => {
           delete code_startup.process[arg.site_id];
