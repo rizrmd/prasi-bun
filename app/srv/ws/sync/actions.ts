@@ -121,11 +121,13 @@ export const SyncActions = {
           }
     ) => ({}) as boolean | ParsedScope | string,
     action: async (
-      arg: { site_id: string } & (
-        | { type: "startup-check" }
-        | { type: "startup-run" }
-        | { type: "startup-stop" }
-      )
+      arg:
+        | ({ site_id: string } & (
+            | { type: "startup-check" }
+            | { type: "startup-run" }
+            | { type: "startup-stop" }
+          ))
+        | { type: "flush-page-cache"; page_id: string }
     ) =>
       ({}) as
         | undefined
