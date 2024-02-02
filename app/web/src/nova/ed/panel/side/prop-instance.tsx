@@ -62,10 +62,13 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             `return ${visible}`
           );
           const res = visible_fn(...Object.values(arg));
+
+          console.log(key, visible, res);
           if (!res) {
             return;
           }
         } catch (e) {
+          console.log("vis err", e);
         }
       }
 
