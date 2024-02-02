@@ -150,18 +150,22 @@ export const EdScriptMonaco: FC<{}> = () => {
                       const prop_name = p.ui.popup.script.prop_name;
                       const prop = component.props[prop_name];
                       if (typeof prop.typings === "string") {
-                        const typings_src = prop.typings.substring(
-                          `const typings = `.length
-                        );
-                        const typings_fn = new Function(
-                          `return ${typings_src}`
-                        );
-                        const typings = typings_fn();
-                        for (const [k, v] of Object.entries(typings)) {
-                          if (typeof v === "string") {
-                            types[k] = v;
+                        try {
+                          const typings_src = prop.typings.substring(
+                            `const typings = `.length
+                          );
+                          const typings_fn = new Function(
+                            `return ${typings_src}`
+                          );
+                          const typings = typings_fn();
+                          if (typeof typings === "object") {
+                            for (const [k, v] of Object.entries(typings)) {
+                              if (typeof v === "string") {
+                                types[k] = v;
+                              }
+                            }
                           }
-                        }
+                        } catch (e) {}
                       }
                     }
                   }
