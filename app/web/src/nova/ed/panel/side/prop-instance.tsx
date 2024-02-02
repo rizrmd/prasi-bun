@@ -46,7 +46,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
       const cprop = m.toJSON() as any;
       const type = m.get("meta")?.get("type") || "text";
-      const visible = mprop?.get("visible") || "";
+      const visible = m?.get("visible") || "";
 
       if (visible && visible !== "true") {
         try {
@@ -63,12 +63,11 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
           );
           const res = visible_fn(...Object.values(arg));
 
-          console.log(key, visible, res);
           if (!res) {
             return;
           }
         } catch (e) {
-          console.log("vis err", e);
+          return;
         }
       }
 
