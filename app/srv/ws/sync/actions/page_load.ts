@@ -8,11 +8,13 @@ import { user } from "../entity/user";
 import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
 import { SyncConnection, SyncType } from "../type";
-
+import { validate } from "uuid";
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
   id: string
 ) {
+  if (!id || (id && !validate(id))) return;
+  
   let snap = snapshot.get("page", id);
   let ydoc = docs.page[id];
 
