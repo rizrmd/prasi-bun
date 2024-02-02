@@ -154,7 +154,9 @@ const connect = (
           url.pathname = "/sync";
           url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
 
-          const ws = new WebSocket(url.toString());
+          const ws = new WebSocket(
+            `${url.protocol}//${url.hostname}${url.pathname}`
+          );
 
           ws.onopen = () => {
             sendWs(ws, { type: SyncType.UserID, user_id, site_id, page_id });
