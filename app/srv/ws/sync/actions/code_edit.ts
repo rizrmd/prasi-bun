@@ -10,6 +10,7 @@ import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
 import { parseJs } from "../editor/parser/parse-js";
 import { snapshot } from "../entity/snapshot";
+import { validate } from "uuid";
 const decoder = new TextDecoder();
 
 const timeout = {
@@ -96,7 +97,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
                   content_tree: root.toJSON(),
                 },
               });
-            } else if (page_id) {
+            } else if (page_id && validate(page_id)) {
               db.page.update({
                 where: { id: page_id },
                 data: {
@@ -133,7 +134,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
                     content_tree: root.toJSON(),
                   },
                 });
-              } else if (page_id) {
+              } else if (page_id && validate(page_id)) {
                 db.page.update({
                   where: { id: page_id },
                   data: {
