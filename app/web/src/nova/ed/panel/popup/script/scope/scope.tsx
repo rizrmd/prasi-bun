@@ -7,6 +7,7 @@ type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
 
 export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
+  const vars: Record<string, string> = {};
   const metas = active.comp_id
     ? p.comp.list[active.comp_id]?.meta
     : p.page.meta;
@@ -59,6 +60,10 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
           const ${k}__local = ${v.val};
           export const ${k}: typeof ${k}__local & { render: ()=>void } = ${k}__local as any;`;
         }
+
+        if (src) {
+          vars[k] = `${m.item.id}_${k}_${v.type}`;
+        }
         exports[`${m.item.id}_${k}_${v.type}.tsx`] = src;
       }
     }
@@ -91,7 +96,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     prev_m = m;
   }
 
-  return { exports, imports };
+  return { exports, imports, vars };
 };
 
 const map_childs = (
