@@ -139,6 +139,39 @@ export const EdScriptMonaco: FC<{}> = () => {
                   break;
                 case "prop-instance":
                   {
+                    let parent_meta = null;
+                    const parent_id = meta.parent?.id;
+                    if (parent_id) {
+                      if (active.comp_id) {
+                        parent_meta =
+                          p.comp.list[active.comp_id].meta[parent_id];
+                      } else {
+                        parent_meta = p.page.meta[parent_id];
+                      }
+                    }
+                    if (parent_meta) {
+                      const scope = declareScope(p, parent_meta, monaco);
+                      for (const [k, v] of Object.entries(scope.exports)) {
+                        addScope(p, monaco, `file:///${k}`, v);
+                      }
+                      addScope(
+                        p,
+                        monaco,
+                        `file:///prop-global.d.ts`,
+                        `\
+${Object.entries(scope.vars).map(([var_name, var_from]) => {
+  return `import {${var_name} as ___${var_name}} from "./${var_from}"`;
+})}
+declare global {
+  ${Object.entries(scope.vars).map(([var_name]) => {
+    return `const ${var_name} = ___${var_name}`;
+  })}
+}
+`
+                      );
+
+                    }
+
                     const nmodel = monaco.editor.createModel(
                       val,
                       "typescript",
