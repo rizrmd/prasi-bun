@@ -250,6 +250,7 @@ export const edInitSync = (p: PG) => {
             if (res) {
               Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
               if (data.type === "page") {
+                delete p.preview.meta_cache[data.id]
                 await treeRebuild(p, { note: "sv_remote" });
               } else if (data.type === "comp") {
                 const updated = await updateComponentMeta(p, doc, data.id);

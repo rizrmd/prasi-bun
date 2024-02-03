@@ -198,7 +198,6 @@ const viRoute = async (p: PG) => {
         }
       }
     }
-
     if (
       p.page.cur.id !== params.page_id ||
       !p.page.cur.snapshot ||
@@ -237,10 +236,10 @@ const viRoute = async (p: PG) => {
               p.page.cur = { id: params.page_id } as any;
             }
             p.status = "ready";
-            return;
           }
         }
       }
+
 
       await reloadPage(p, params.page_id, "load-route");
     }

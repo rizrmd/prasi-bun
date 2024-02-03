@@ -155,7 +155,7 @@ const connect = (
           url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
 
           const ws = new WebSocket(
-            `${url.protocol}//${url.hostname}${url.pathname}`
+            `${url.protocol}//${url.host}${url.pathname}`
           );
 
           ws.onopen = () => {
