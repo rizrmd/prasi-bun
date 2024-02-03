@@ -1,3 +1,5 @@
+import { w } from "../../../../../../utils/types/general";
+
 function toAbsoluteURL(url: string) {
   const a = document.createElement("a");
   a.setAttribute("href", url); // <a href="hoge.html">
@@ -28,7 +30,7 @@ export function importModule(url: string) {
       resolve((window as any)[vector]);
       destructor();
     };
-    const absURL = toAbsoluteURL(url);
+    const absURL = w.basehost ? w.basehost + url : toAbsoluteURL(url);
     const loader = `import * as m from "${absURL}"; window.${vector} = m;`; // export Module
     const blob = new Blob([loader], { type: "text/javascript" });
     script.src = URL.createObjectURL(blob);

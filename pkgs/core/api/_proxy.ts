@@ -1,5 +1,5 @@
-import { g } from "utils/global";
 import { gzipAsync } from "../../../app/srv/ws/sync/entity/zlib";
+import { CORS_HEADERS } from "../server/serve-api";
 
 export const _ = {
   url: "/_proxy/*",
@@ -38,6 +38,6 @@ export const _ = {
       delete headers["content-encoding"];
     }
 
-    return new Response(body, { headers });
+    return new Response(body, { headers: { ...headers, ...CORS_HEADERS } });
   },
 };

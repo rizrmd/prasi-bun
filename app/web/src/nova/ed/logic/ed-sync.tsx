@@ -26,9 +26,13 @@ export const edInitSync = (p: PG) => {
     location.href = "/login";
     return <Loading note="logging in" />;
   }
-  p.user.id = session.data.user.id;
-  p.user.username = session.data.user.username;
-
+  if (session?.data?.user) {
+    p.user.id = session.data.user.id;
+    p.user.username = session.data.user.username;
+  } else {
+    p.user.id = "ab1390f5-40d5-448e-a8c3-84b0fb600930";
+    p.user.username = "anonymous";
+  }
   if (!params.page_id) {
     if (location.pathname.startsWith("/vi/")) {
       p.preview.show_loading = false;
@@ -164,7 +168,7 @@ export const edInitSync = (p: PG) => {
   }
   if (!p.sync) {
     clientStartSync({
-      user_id: session.data.user.id,
+      user_id: p.user.id,
       site_id: params.site_id,
       page_id: params.page_id,
       events: {
@@ -250,7 +254,7 @@ export const edInitSync = (p: PG) => {
             if (res) {
               Y.applyUpdate(doc, decompress(res.diff), "sv_remote");
               if (data.type === "page") {
-                delete p.preview.meta_cache[data.id]
+                delete p.preview.meta_cache[data.id];
                 await treeRebuild(p, { note: "sv_remote" });
               } else if (data.type === "comp") {
                 const updated = await updateComponentMeta(p, doc, data.id);

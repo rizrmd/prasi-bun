@@ -1,4 +1,5 @@
 import { g } from "utils/global";
+import { CORS_HEADERS } from "../serve-api";
 
 const parseQueryParams = (ctx: any) => {
   const pageHref = ctx.req.url;
@@ -69,10 +70,14 @@ export const createResponse = (existingRes: any, body: any) => {
       res.headers.set("content-type", "application/json");
     }
   }
-
+ 
   const cur = existingRes as Response;
   for (const [key, value] of cur.headers.entries()) {
     res.headers.set(key, value);
+  }
+
+  for (const [k, v] of Object.entries(CORS_HEADERS)) {
+    res.headers.set(k, v);
   }
 
   return res;

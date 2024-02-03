@@ -2,6 +2,11 @@ import { createRouter } from "radix3";
 import { g } from "utils/global";
 import { createResponse } from "./api/api-ctx";
 
+export const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-headers": "content-type",
+};
+
 export const serveAPI = {
   init: async () => {
     g.router = createRouter({ strictTrailingSlash: false });
@@ -38,6 +43,12 @@ export const serveAPI = {
           });
 
       if (req.method !== "GET") {
+        if (req.method === "OPTIONS") {
+          return new Response("OK", {
+            headers: CORS_HEADERS,
+          });
+        }
+
         if (
           !req.headers.get("content-type")?.startsWith("multipart/form-data")
         ) {
@@ -82,9 +93,13 @@ export const serveAPI = {
       const finalResponse = await current.fn(...args);
 
       if (finalResponse instanceof Response) {
+        for (const [k, v] of Object.entries(CORS_HEADERS)) {
+          finalResponse.headers.set(k, v);
+        }
+
         return finalResponse;
       }
-
+ 
       if (finalResponse) {
         return createResponse(current.res, finalResponse);
       }
@@ -100,6 +115,10 @@ export const serveAPI = {
         current.res.headers.forEach((v, k) => {
           res.headers.set(k, v);
         });
+
+        for (const [k, v] of Object.entries(CORS_HEADERS)) {
+          res.headers.set(k, v);
+        }
 
         return res;
       }

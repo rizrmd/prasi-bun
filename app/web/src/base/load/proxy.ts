@@ -1,7 +1,7 @@
 (BigInt.prototype as any).toJSON = function (): string {
   return `BigInt::` + this.toString();
 };
-let w = window;
+let w = window as any;
 
 export const fetchViaProxy = async (
   url: string,
@@ -64,7 +64,7 @@ export const fetchViaProxy = async (
       return raw;
     }
   } else {
-    const res = await fetch(`/_proxy`, {
+    const res = await fetch(`${w.basehost ? w.basehost : ""}/_proxy`, {
       method: "POST",
       body: JSON.stringify([
         {
