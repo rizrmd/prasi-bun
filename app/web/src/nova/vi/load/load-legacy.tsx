@@ -1,7 +1,7 @@
 import { apiProxy } from "../../../base/load/api/api-proxy";
 import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
 import { dbProxy } from "../../../base/load/db/db-proxy";
-import importModule from "../../../render/editor/tools/dynamic-import";
+import importModule from "../../ed/panel/side/style/tools/dynamic-import";
 import { VG } from "../render/global";
 import { viScriptArg } from "../render/script/arg";
 
