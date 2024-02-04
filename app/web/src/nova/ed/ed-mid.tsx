@@ -9,9 +9,10 @@ import { TopBtn } from "./panel/header/top-btn";
 import { useGlobal } from "web-utils";
 import { ResponsiveToggle } from "./panel/header/right/responsive-toggle";
 import { EdCompEditable } from "./panel/header/mid/comp-editable";
+import { MobileQRButton } from "./panel/side/style/tools/mobile-qr";
 
 export const EdMid: FC<{}> = () => {
-  const ed = useGlobal(EDGlobal, "EDITORF");
+  const p = useGlobal(EDGlobal, "EDITORF");
   return (
     <div className="flex flex-col">
       <div
@@ -36,14 +37,15 @@ export const EdMid: FC<{}> = () => {
           </div>
         </div>
         <div className="flex items-stretch flex-1 justify-end">
+          {p.site.responsive !== "desktop-only" && <MobileQRButton />}
           <label className=" text-slate-400 flex items-center pr-1">
             <div className=" px-1"> Zoom</div>
             <select
-              value={ed.ui.zoom}
+              value={p.ui.zoom}
               onChange={(e) => {
-                ed.ui.zoom = e.currentTarget.value;
-                localStorage.zoom = ed.ui.zoom;
-                ed.render();
+                p.ui.zoom = e.currentTarget.value;
+                localStorage.zoom = p.ui.zoom;
+                p.render();
               }}
             >
               {["50%", "60%", "70%", "80%", "90%", "100%", "120%", "150%"].map(
