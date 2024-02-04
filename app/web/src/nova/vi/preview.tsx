@@ -65,16 +65,7 @@ export const ViPreview = (arg: { pathname: string }) => {
   viRoute(p);
 
   if (p.status !== "ready") {
-    if (p.preview.show_loading) {
-      return <Loading note={p.status + "-page"} />;
-    } else {
-      setTimeout(() => {
-        p.preview.show_loading = true;
-        p.render();
-      }, 1000);
-
-      return null;
-    }
+    return <Loading note={p.status + "-page"} />;
   }
 
   const mode = p.mode;
@@ -220,26 +211,31 @@ const viRoute = async (p: PG) => {
         } else {
           let page_cache = p.preview.meta_cache[params.page_id];
 
+          let should_render = false;
           if (!page_cache) {
             const idb_cache = await get(`page-${params.page_id}`, nav.store);
             if (idb_cache) {
               page_cache = idb_cache;
               p.preview.meta_cache[params.page_id] = idb_cache;
+              should_render = true;
             }
           }
 
-          if (page_cache) {
+          if (page_cache && page_cache.entry.length > 0) {
             p.page.meta = page_cache.meta;
             p.page.entry = page_cache.entry;
 
             if (p.page.cur.id !== params.page_id) {
               p.page.cur = { id: params.page_id } as any;
             }
+
             p.status = "ready";
+            p.sync.page.load(params.page_id);
+            if (should_render) p.render();
+            return;
           }
         }
       }
-
 
       await reloadPage(p, params.page_id, "load-route");
     }
