@@ -30,7 +30,12 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
       } else {
         script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
       }
-      d.body.appendChild(script);
+
+      if (!document.querySelector(`script[src="${script.src}"]`)) {
+        d.body.appendChild(script);
+      } else {
+        done();
+      }
     });
   } else {
     const apiEntry = await fetch(base + "/_prasi/api-entry");

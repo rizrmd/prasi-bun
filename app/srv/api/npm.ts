@@ -8,8 +8,17 @@ import { g } from "utils/global";
 
 export const _ = {
   url: "/npm/:mode/:id/*",
-  async api(mode: "site" | "page", id: string) {
+  async api(mode: "site" | "page" | "apk-qr", id: string) {
     const { req, res, mode: _mode } = apiContext(this);
+
+    if (mode === "apk-qr") {
+      const file_apk = Bun.file(dir.path(`${g.datadir}/prasi-wrap.apk`));
+      if (!await file_apk.exists()) {
+        return new Response('not found');
+      }
+      return new Response(file_apk);
+    }
+
     let path = dir.path(`${g.datadir}/npm/${mode}/${id}/${req.params._}`);
 
     const contentType = mime.lookup(path);
