@@ -46,6 +46,7 @@ export const ViPreview = (arg: { pathname: string }) => {
         _href = `${w.basepath}${_href}`;
       }
       if (
+        location.hostname.split(".").length === 4 ||
         location.hostname === "prasi.app" ||
         location.hostname === "prasi.avolut.com" ||
         location.hostname.includes("ngrok") ||

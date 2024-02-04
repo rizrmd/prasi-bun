@@ -33,51 +33,55 @@ export const edInitSync = (p: PG) => {
     p.user.id = "ab1390f5-40d5-448e-a8c3-84b0fb600930";
     p.user.username = "anonymous";
   }
-  if (!params.page_id) {
-    if (location.pathname.startsWith("/vi/")) {
-      if (page.list.length === 0) {
-        db.page
-          .findMany({
-            where: {
-              id_site: params.site_id,
-              is_deleted: false,
-              is_default_layout: false,
-            },
-            select: {
-              id: true,
-              url: true,
-            },
-          })
-          .then((list) => {
-            page.list = list;
-            edInitSync(p);
-          });
 
-        return;
-      } else {
-        if (!page.route) {
-          page.route = createRouter();
-          for (const e of page.list) {
-            page.route.insert(e.url, e);
-          }
-        }
+  if (location.pathname.startsWith("/vi/")) {
+    if (page.list.length === 0) {
+      db.page
+        .findMany({
+          where: {
+            id_site: params.site_id,
+            is_deleted: false,
+            is_default_layout: false,
+          },
+          select: {
+            id: true,
+            url: true,
+          },
+        })
+        .then((list) => {
+          page.list = list;
+          edInitSync(p);
+        });
 
-        const arrpath = location.pathname.split("/");
-        const pathname = "/" + arrpath.slice(3).join("/");
+      return;
+    }
+    if (!page.route) {
+      page.route = createRouter();
+      for (const e of page.list) {
+        page.route.insert(e.url, e);
+      }
+    }
 
-        const res = page.route.lookup(pathname);
-        if (res) {
-          params.page_id = res.id;
-          if (res.params) {
-            for (const [k, v] of Object.entries(res.params)) {
-              if (!["site_id", "page_id"].includes(k)) {
-                params[k] = v;
-              }
+    const arrpath = location.pathname.split("/");
+    const pathname = "/" + arrpath.slice(3).join("/");
+
+    if (!params.page_id) {
+      const res = page.route.lookup(pathname);
+      if (res) {
+        params.page_id = res.id;
+        if (res.params) {
+          for (const [k, v] of Object.entries(res.params)) {
+            if (!["site_id", "page_id"].includes(k)) {
+              params[k] = v;
             }
           }
         }
       }
-    } else if (location.pathname.startsWith("/ed")) {
+    }
+  }
+
+  if (!params.page_id) {
+    if (location.pathname.startsWith("/ed")) {
       if (!params.site_id) {
         db.page
           .findFirst({
