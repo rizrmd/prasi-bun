@@ -154,7 +154,6 @@ export const EDGlobal = {
       string,
       { entry: string[]; meta: Record<string, IMeta>; url: string }
     >,
-    show_loading: false,
   },
   sync: null as unknown as Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),

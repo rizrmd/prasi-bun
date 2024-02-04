@@ -35,7 +35,6 @@ export const edInitSync = (p: PG) => {
   }
   if (!params.page_id) {
     if (location.pathname.startsWith("/vi/")) {
-      p.preview.show_loading = false;
       if (page.list.length === 0) {
         db.page
           .findMany({
