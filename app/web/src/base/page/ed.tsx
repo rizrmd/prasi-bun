@@ -23,7 +23,7 @@ export default page({
 
     w.isEditor = true;
 
-    if (!edInitSync(p)) {
+    if (!edInitSync(p) && !p.sync) {
       return <Loading note="connecting-ws" />;
     }
 
