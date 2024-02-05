@@ -43,8 +43,12 @@ export const EdBase = () => {
     <div className={cx("flex flex-col flex-1", style)}>
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
-        <EdLeft />
-        <EdPane type="left" min_size={200} />
+        {p.status === "ready" && (
+          <>
+            <EdLeft />
+            <EdPane type="left" min_size={200} />
+          </>
+        )}
         <div className="flex flex-1 flex-col items-stretch">
           <EdMid />
           <div
@@ -53,9 +57,15 @@ export const EdBase = () => {
               p.mode === "mobile" ? mobileCSS : "bg-white"
             )}
           >
-            <EdMain />
-            <EdPane type="right" min_size={240} />
-            <EdRight />
+            {p.status !== "ready" ? (
+              <Loading note={`page-${p.status}`} />
+            ) : (
+              <>
+                <EdMain />
+                <EdPane type="right" min_size={240} />
+                <EdRight />
+              </>
+            )}
           </div>
         </div>
       </div>
