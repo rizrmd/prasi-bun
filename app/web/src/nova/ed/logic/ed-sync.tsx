@@ -283,7 +283,10 @@ export const edInitSync = (p: PG) => {
 
     return false;
   } else {
-    if (params.page_id !== p.page.cur.id) {
+    if (
+      params.page_id !== p.page.cur.id &&
+      location.pathname.startsWith("/ed")
+    ) {
       reloadPage(p, params.page_id, "change page");
       return false;
     }
