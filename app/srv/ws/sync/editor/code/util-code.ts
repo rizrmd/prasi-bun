@@ -15,10 +15,10 @@ export const code = {
   },
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
   prep(id_site: string, mode: CodeMode) {
-    if (exists(`${g.datadir}/site`)) {
+    if (exists(`${g.datadir}`)) {
       Bun.spawn({
         cmd: ["chmod", "-R", "777", "."],
-        cwd: dir.path(`${g.datadir}/site`),
+        cwd: dir.path(`${g.datadir}`),
       });
     }
     const promises: Promise<void>[] = [];
