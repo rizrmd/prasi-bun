@@ -39,9 +39,14 @@ export const edMonacoDefaultVal = (p: PG, adv: FNAdv, mitem: MItem) => {
           val =
             mprop.get("gen") ||
             `\
-async () => {
-  return \`""\`;
-}`;
+[
+  // suggeestion
+  async () => { },
+  // generate
+  async () => {
+    return \`""\`;
+  },
+]`;
         } else if (kind === "visible") {
           val = mprop.get("visible") || "true";
         }  else if (kind === "typings") {

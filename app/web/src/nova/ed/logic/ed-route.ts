@@ -8,7 +8,7 @@ import { get, set } from "idb-keyval";
 import { nav } from "../../vi/render/script/extract-nav";
 
 export const edRoute = async (p: PG) => {
-  if (p.status === "ready" || p.status === "init") {
+  if (p.sync && (p.status === "ready" || p.status === "init")) {
     if (!p.site.domain && !p.site.name) {
       p.status = "load-site";
       const site = await p.sync.site.load(p.site.id);
@@ -41,6 +41,7 @@ export const edRoute = async (p: PG) => {
 };
 
 export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
+  if (!p.sync) return;
   const remotePage = await p.sync.page.load(layout_id);
 
   if (remotePage) {
@@ -66,7 +67,7 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
       }
 
       page.on_update = async (bin: Uint8Array, origin: any) => {
-        if (origin === "local") return;
+        if (origin === "local" || !p.sync) return;
 
         const res = await p.sync.yjs.sv_local(
           "page",
@@ -135,6 +136,7 @@ export const reloadPage = async (
   note: string,
   should_render?: boolean
 ) => {
+  if (!p.sync) return;
   p.status = "reload";
   const remotePage = await p.sync.page.load(page_id);
 
@@ -168,7 +170,7 @@ export const reloadPage = async (
     }
 
     page.on_update = async (bin: Uint8Array, origin: any) => {
-      if (origin === "local") return;
+      if (origin === "local" || !p.sync) return;
 
       const res = await p.sync.yjs.sv_local(
         "page",

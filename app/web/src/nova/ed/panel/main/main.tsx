@@ -50,60 +50,61 @@ export const EdMain = () => {
     if (localStorage.getItem("prasi-editor-mode")) {
       p.mode = localStorage.getItem("prasi-editor-mode") as any;
     }
-  }
 
-  if (active.should_render_main) {
-    local.cache = (
-      <Vi
-        meta={p.page.meta}
-        mode={p.mode}
-        api_url={p.site.config.api_url}
-        site_id={p.site.id}
-        page_id={p.page.cur.id}
-        entry={p.page.entry}
-        api={p.script.api}
-        db={p.script.db}
-        script={{ init_local_effect: p.script.init_local_effect }}
-        visit={(meta, parts) => {
-          return mainPerItemVisit(p, meta, parts);
-        }}
-        on_status_changed={(status) => {
-          if (status !== "ready") {
-            active.should_render_main = true;
-            local.render();
-          } else {
-            if (!local.first_load) {
-              local.first_load = true;
+    if (active.should_render_main) {
+      local.cache = (
+        <Vi
+          meta={p.page.meta}
+          mode={p.mode}
+          api_url={p.site.config.api_url}
+          site_id={p.site.id}
+          page_id={p.page.cur.id}
+          entry={p.page.entry}
+          api={p.script.api}
+          db={p.script.db}
+          script={{ init_local_effect: p.script.init_local_effect }}
+          visit={(meta, parts) => {
+            return mainPerItemVisit(p, meta, parts);
+          }}
+          on_status_changed={(status) => {
+            if (status !== "ready") {
               active.should_render_main = true;
+              local.render();
+            } else {
+              if (!local.first_load) {
+                local.first_load = true;
+                active.should_render_main = true;
+                local.render();
+              }
+            }
+          }}
+        />
+      );
+      active.should_render_main = false;
+    }
+
+    return (
+      <div
+        className={cx(
+          "flex flex-1 relative overflow-auto",
+          p.mode === "mobile" ? "flex-col items-center" : ""
+        )}
+        ref={(el) => {
+          if (el) {
+            const bound = el.getBoundingClientRect();
+            if (local.width !== bound.width || local.height !== bound.height) {
+              local.width = bound.width;
+              local.height = bound.height;
               local.render();
             }
           }
         }}
-      />
+      >
+        <div className={mainStyle(p, meta)}>{local.cache}</div>
+      </div>
     );
-    active.should_render_main = false;
   }
-
-  return (
-    <div
-      className={cx(
-        "flex flex-1 relative overflow-auto",
-        p.mode === "mobile" ? "flex-col items-center" : ""
-      )}
-      ref={(el) => {
-        if (el) {
-          const bound = el.getBoundingClientRect();
-          if (local.width !== bound.width || local.height !== bound.height) {
-            local.width = bound.width;
-            local.height = bound.height;
-            local.render();
-          }
-        }
-      }}
-    >
-      <div className={mainStyle(p, meta)}>{local.cache}</div>
-    </div>
-  );
+  return null;
 };
 
 const mainStyle = (p: PG, meta?: IMeta) => {
