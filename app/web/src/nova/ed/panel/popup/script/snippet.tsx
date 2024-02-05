@@ -74,6 +74,7 @@ effect={async (local) => {
         &lt;Map /&gt;
       </Button>
       <Button
+        className={cx(btn_style)}
         onClick={() => {
           p.script.do_edit(
             `\
@@ -86,6 +87,7 @@ effect={async (local) => {
         &lt;If /&gt;
       </Button>
       <Button
+        className={cx(btn_style)}
         onClick={() => {
           p.script.do_edit(
             `\
