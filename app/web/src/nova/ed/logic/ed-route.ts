@@ -172,6 +172,12 @@ export const reloadPage = async (
     page.on_update = async (bin: Uint8Array, origin: any) => {
       if (origin === "local" || !p.sync) return;
 
+      if (page.page.id !== remotePage.id) {
+        alert("Page ID Mismatch!\n Refreshing to preventing data loss...");
+        location.reload();
+        return;
+      }
+      
       const res = await p.sync.yjs.sv_local(
         "page",
         p.page.cur.id,

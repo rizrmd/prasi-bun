@@ -26,16 +26,20 @@ export const loadComponent = async (p: PG, id_comp: string, sync?: boolean) => {
     loadcomp.pending.add(id_comp);
     clearTimeout(loadcomp.timeout);
     loadcomp.timeout = setTimeout(async () => {
-      const comps = await p.sync.comp.load([...loadcomp.pending], sync);
-      let result = Object.entries(comps);
+      const comps = await p.sync?.comp.load([...loadcomp.pending], sync);
+      if (comps) {
+        let result = Object.entries(comps);
 
-      for (const [id_comp, comp] of result) {
-        if (comp && comp.snapshot) {
-          await loadCompSnapshot(p, id_comp, comp.snapshot);
+        for (const [id_comp, comp] of result) {
+          if (comp && comp.snapshot) {
+            await loadCompSnapshot(p, id_comp, comp.snapshot);
+          }
         }
+        loadcomp.pending.clear();
+        resolve(result.length > 0);
+      } else {
+        resolve(false);
       }
-      loadcomp.pending.clear();
-      resolve(result.length > 0);
     }, 150);
   });
 };
@@ -73,7 +77,7 @@ export const loadCompSnapshot = async (
               return;
             }
 
-            const res = await p.sync.yjs.sv_local(
+            const res = await p.sync?.yjs.sv_local(
               "comp",
               comp_id,
               Buffer.from(compress(bin))
@@ -86,7 +90,7 @@ export const loadCompSnapshot = async (
               );
               Y.applyUpdate(doc as any, decompress(res.diff), "local");
 
-              await p.sync.yjs.diff_local(
+              await p.sync?.yjs.diff_local(
                 "comp",
                 comp_id,
                 Buffer.from(compress(diff_local))
@@ -144,12 +148,14 @@ export const updateComponentMeta = async (
     {
       load: async (comp_ids: string[]) => {
         const ids = comp_ids.filter((id) => !p.comp.loaded[id]);
-        const comps = await p.sync.comp.load(ids, true);
-        let result = Object.entries(comps);
+        const comps = await p.sync?.comp.load(ids, true);
+        if (comps) {
+          let result = Object.entries(comps);
 
-        for (const [id_comp, comp] of result) {
-          if (comp && comp.snapshot && !p.comp.list[id_comp]) {
-            await loadCompSnapshot(p, id_comp, comp.snapshot);
+          for (const [id_comp, comp] of result) {
+            if (comp && comp.snapshot && !p.comp.list[id_comp]) {
+              await loadCompSnapshot(p, id_comp, comp.snapshot);
+            }
           }
         }
       },

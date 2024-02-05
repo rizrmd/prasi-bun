@@ -4,8 +4,6 @@ import { PG } from "../../ed/logic/ed-global";
 import { evalCJS } from "../../ed/logic/ed-sync";
 import { treeRebuild } from "../../ed/logic/tree/build";
 
-const decoder = new TextDecoder();
-
 export const viLoadSnapshot = async (p: PG) => {
   let api_url = p.site.config.api_url;
 
