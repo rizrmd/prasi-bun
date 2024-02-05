@@ -80,7 +80,7 @@ export const edInitSync = (p: PG) => {
     }
   }
 
-  if (!params.page_id) {
+  if (!params.page_id && !p.page.cur.id) {
     if (location.pathname.startsWith("/ed")) {
       if (!params.site_id) {
         db.page
@@ -150,6 +150,7 @@ export const edInitSync = (p: PG) => {
     }
 
     if (
+      !p.page.cur.id &&
       !params.page_id &&
       params.site_id &&
       location.pathname.startsWith("/ed/")
@@ -169,7 +170,8 @@ export const edInitSync = (p: PG) => {
       return false;
     }
   }
-  if (!p.sync) {
+  if (!p.sync && !p.sync_assigned) {
+    p.sync_assigned = true;
     clientStartSync({
       user_id: p.user.id,
       site_id: params.site_id,
@@ -208,10 +210,12 @@ export const edInitSync = (p: PG) => {
           }
 
           if (params.site_id !== e.site_id || params.page_id !== e.page_id) {
-            p.site.id = e.site_id;
-            p.page.cur.id = e.page_id;
-            if (location.pathname.startsWith("/ed/")) {
-              location.href = `/ed/${e.site_id}/${e.page_id}`;
+            if (!p.page.cur.id) {
+              p.site.id = e.site_id;
+              p.page.cur.id = e.page_id;
+              if (location.pathname.startsWith("/ed/")) {
+                location.href = `/ed/${e.site_id}/${e.page_id}`;
+              }
             }
           } else {
             p.site.id = e.site_id;
@@ -239,7 +243,7 @@ export const edInitSync = (p: PG) => {
             doc = p.code.site.doc;
           }
 
-          if (doc) {
+          if (doc && p.sync) {
             const diff_remote = Y.encodeStateAsUpdate(
               doc,
               decompress(data.sv_local)

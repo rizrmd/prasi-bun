@@ -397,6 +397,8 @@ declare global {
         local.render();
         clearTimeout(scriptEdit.timeout);
         const applyChanges = async () => {
+          if (!p.sync) return;
+          
           const value = local.value;
           const meta = getActiveMeta(p);
           const mode = p.ui.popup.script.mode;

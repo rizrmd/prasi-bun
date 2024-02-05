@@ -32,7 +32,7 @@ export const EdPopCode = () => {
   }, [p.ui.popup.code.open]);
 
   useEffect(() => {
-    if (code.mode === "") {
+    if (code.mode === "" && p.site.id) {
       db.code.findFirst({ where: { id_site: p.site.id } }).then((e) => {
         code.mode = e ? "new" : "old";
 
@@ -44,9 +44,9 @@ export const EdPopCode = () => {
         p.render();
       });
     }
-  }, []);
+  }, [p.site.id]);
 
-  if (p.ui.popup.code.startup_status === "init" && p.sync.code.action) {
+  if (p.ui.popup.code.startup_status === "init" && p.sync?.code.action) {
     p.ui.popup.code.startup_status = "loading";
     p.sync.code
       .action({ type: "startup-check", site_id: p.site.id })
@@ -236,13 +236,16 @@ const CodeBody = () => {
                       : iconScrollOff,
                   }}
                   onClick={() => {
-                    if (p.ui.popup.code.startup_status === "stopped") {
+                    if (
+                      p.ui.popup.code.startup_status === "stopped" &&
+                      p.sync
+                    ) {
                       p.ui.popup.code.startup_status = "loading";
                       p.render();
                       p.sync.code
                         .action({ type: "startup-run", site_id: p.site.id })
                         .then(() => {
-                          p.sync.code
+                          p.sync?.code
                             .action({
                               type: "startup-check",
                               site_id: p.site.id,
@@ -259,10 +262,10 @@ const CodeBody = () => {
                     } else {
                       p.ui.popup.code.startup_status = "loading";
                       p.render();
-                      p.sync.code
+                      p.sync?.code
                         .action({ type: "startup-stop", site_id: p.site.id })
                         .then(() => {
-                          p.sync.code
+                          p.sync?.code
                             .action({
                               type: "startup-check",
                               site_id: p.site.id,

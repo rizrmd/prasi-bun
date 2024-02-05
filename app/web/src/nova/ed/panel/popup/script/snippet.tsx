@@ -73,6 +73,41 @@ effect={async (local) => {
       >
         &lt;Map /&gt;
       </Button>
+      <Button
+        onClick={() => {
+          p.script.do_edit(
+            `\
+<>{true && <div {...props}>{children}</div>}</>   
+`,
+            false
+          );
+        }}
+      >
+        &lt;If /&gt;
+      </Button>
+      <Button
+        onClick={() => {
+          p.script.do_edit(
+            `\
+<>
+{
+/**if condition */
+true ? (
+/** then  */
+<div {...props}>{children}</div>
+) : (
+/** else  */
+<div {...props}>ELSE CONDITION</div>
+)
+}
+</>
+`,
+            false
+          );
+        }}
+      >
+        &lt;If Else /&gt;
+      </Button>
     </div>
   );
 };

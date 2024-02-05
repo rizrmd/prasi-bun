@@ -129,18 +129,30 @@ export const EdPropPopoverForm: FC<{
       </div>
 
       {type === "content-element" && (
-        <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
-          <div className="uppercase text-xs label self-stretch flex items-center">
-            Visible
+        <>
+          <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
+            <div className="uppercase text-xs">TYPINGS</div>
+            <div
+              className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
+              onClick={createEditScript(p, "typings", mprop, name)}
+            >
+              EDIT CODE
+            </div>
           </div>
+          
+          <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
+            <div className="uppercase text-xs label self-stretch flex items-center">
+              Visible
+            </div>
 
-          <div
-            className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-            onClick={createEditScript(p, "visible", mprop, name)}
-          >
-            EDIT CODE
+            <div
+              className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
+              onClick={createEditScript(p, "visible", mprop, name)}
+            >
+              EDIT CODE
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {type !== "content-element" && (
@@ -174,6 +186,16 @@ export const EdPropPopoverForm: FC<{
             <div
               className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
               onClick={createEditScript(p, "visible", mprop, name)}
+            >
+              EDIT CODE
+            </div>
+          </div>
+
+          <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
+            <div className="uppercase text-xs">TYPINGS</div>
+            <div
+              className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
+              onClick={createEditScript(p, "typings", mprop, name)}
             >
               EDIT CODE
             </div>
@@ -232,16 +254,6 @@ export const EdPropPopoverForm: FC<{
           </div>
         </div>
       )}
-
-      <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
-        <div className="uppercase text-xs">TYPINGS</div>
-        <div
-          className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px]"
-          onClick={createEditScript(p, "typings", mprop, name)}
-        >
-          EDIT CODE
-        </div>
-      </div>
     </div>
   );
 };

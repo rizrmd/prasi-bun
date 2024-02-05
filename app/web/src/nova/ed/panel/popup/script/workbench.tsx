@@ -6,6 +6,7 @@ import { EdScriptSnippet } from "./snippet";
 import { useEffect } from "react";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
+import { EdPropGen } from "./prop-gen";
 
 export const EdScriptWorkbench = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -146,9 +147,10 @@ export const EdScriptWorkbench = () => {
               </>
             )}
           </div>
-          <div className="flex items-center text-xs pr-2">
+          <div className="flex items-stretch text-xs pr-2">
+            {p.ui.popup.script.type === "prop-instance" && <EdPropGen />}
             {p.ui.popup.script.mode === "js" && (
-              <div>
+              <div className="flex items-center">
                 {
                   (
                     {

@@ -134,7 +134,7 @@ export const ViPreview = (arg: { pathname: string }) => {
             }
 
             if (load_urls.length > 0) {
-              const res = await p.sync.page.cache(p.site.id, load_urls, [
+              const res = await p.sync?.page.cache(p.site.id, load_urls, [
                 ...Object.keys(p.preview.page_cache),
               ]);
 
@@ -164,7 +164,7 @@ const preview = {
 };
 
 const viRoute = async (p: PG) => {
-  if (p.status === "ready" || p.status === "init") {
+  if (p.sync && (p.status === "ready" || p.status === "init")) {
     if (p.status === "init") {
       await init();
     }
