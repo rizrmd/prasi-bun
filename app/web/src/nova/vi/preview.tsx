@@ -65,7 +65,7 @@ export const ViPreview = (arg: { pathname: string }) => {
 
   viRoute(p);
 
-  if (p.status !== "ready") {
+  if (p.status !== "ready" && p.status !== "reload") {
     return <Loading note={p.status + "-page"} />;
   }
 

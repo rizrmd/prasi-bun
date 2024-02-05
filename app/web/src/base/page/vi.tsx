@@ -28,8 +28,8 @@ export default page({
       })();
       return <Loading note="init" />;
     }
-    
-    if (!edInitSync(p)) {
+
+    if (!edInitSync(p) && !p.sync) {
       return <Loading note="connecting-ws" />;
     }
 

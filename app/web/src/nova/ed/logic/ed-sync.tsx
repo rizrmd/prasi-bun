@@ -81,7 +81,7 @@ export const edInitSync = (p: PG) => {
     }
   }
 
-  if (!params.page_id && !p.page.cur.id) {
+  if (!params.page_id) {
     if (location.pathname.startsWith("/ed")) {
       if (!params.site_id) {
         db.page
