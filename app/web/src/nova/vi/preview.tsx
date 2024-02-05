@@ -210,6 +210,20 @@ const viRoute = async (p: PG) => {
         if (preview.first_render) {
           preview.first_render = false;
         } else {
+          if (p.page.doc) {
+            let page = p.page.list[params.page_id];
+            if (!page) {
+              p.page.list[params.page_id] = {} as any;
+              page = p.page.list[params.page_id];
+            }
+
+            if (page && page.on_update) {
+              page.doc.off("update", page.on_update);
+              page.doc.destroy();
+              delete p.page.list[params.page_id];
+            }
+          }
+
           let page_cache = p.preview.meta_cache[params.page_id];
 
           let should_render = false;
@@ -231,7 +245,6 @@ const viRoute = async (p: PG) => {
             }
 
             p.status = "ready";
-            p.sync.page.load(params.page_id);
             if (should_render) p.render();
             return;
           }
