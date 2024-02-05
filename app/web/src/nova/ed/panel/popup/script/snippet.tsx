@@ -80,7 +80,7 @@ effect={async (local) => {
             `\
 <>{true && <div {...props}>{children}</div>}</>   
 `,
-            false
+            true
           );
         }}
       >
@@ -104,7 +104,7 @@ true ? (
 }
 </>
 `,
-            false
+            true
           );
         }}
       >

@@ -1,10 +1,7 @@
 import trim from "lodash.trim";
 import { isValidElement } from "react";
 
-export const extractProp = (prop: {
-  values: Record<string, any>;
-  types: Record<string, string>;
-}) => {
+export const extractProp = (prop: { values: Record<string, any> }) => {
   const propTypes: string[] = [];
   const props: Record<string, { val?: any; type?: string }> = {};
 
