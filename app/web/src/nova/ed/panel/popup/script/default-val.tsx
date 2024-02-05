@@ -41,15 +41,20 @@ export const edMonacoDefaultVal = (p: PG, adv: FNAdv, mitem: MItem) => {
             `\
 [
   // suggeestion
-  async () => { },
+  async () => { 
+    return { 
+      label: '',
+      list: [],  
+    }
+  },
   // generate
-  async () => {
+  async (opt: string) => {
     return \`""\`;
   },
 ]`;
         } else if (kind === "visible") {
           val = mprop.get("visible") || "true";
-        }  else if (kind === "typings") {
+        } else if (kind === "typings") {
           val = mprop.get("typings") || "const typings = {}";
         } else if (kind === "option") {
           val =
