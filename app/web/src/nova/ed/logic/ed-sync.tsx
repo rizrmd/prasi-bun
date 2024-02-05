@@ -26,6 +26,7 @@ export const edInitSync = (p: PG) => {
     location.href = "/login";
     return <Loading note="logging in" />;
   }
+
   if (session?.data?.user) {
     p.user.id = session.data.user.id;
     p.user.username = session.data.user.username;
@@ -281,6 +282,11 @@ export const edInitSync = (p: PG) => {
     });
 
     return false;
+  } else {
+    if (params.page_id !== p.page.cur.id) {
+      reloadPage(p, params.page_id, "change page");
+      return false;
+    }
   }
   return true;
 };
