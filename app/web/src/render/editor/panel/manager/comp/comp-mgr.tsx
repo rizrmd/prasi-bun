@@ -261,7 +261,7 @@ export const CompManager: FC = () => {
                   local.loading = true;
                   local.render();
 
-                  await db.component_site.create({
+                  await _db.component_site.create({
                     data: {
                       id_component_group: group_id,
                       id_site: p.site?.id || "",
@@ -522,7 +522,7 @@ export const CompManager: FC = () => {
                                   if (confirm("Are you sure ?")) {
                                     delete local.group[g.info.id];
                                     local.render();
-                                    await db.component_site.delete({
+                                    await _db.component_site.delete({
                                       where: {
                                         id_component_group_id_site: {
                                           id_component_group: g.info.id,

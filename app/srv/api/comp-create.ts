@@ -59,7 +59,7 @@ export const _ = {
 
     let gid = group_id;
     if (!gid) {
-      let group = await db.component_group.findFirst({
+      let group = await _db.component_group.findFirst({
         where: {
           component_site: {
             some: {
@@ -79,7 +79,7 @@ export const _ = {
       });
 
       if (!group) {
-        group = await db.component_group.create({
+        group = await _db.component_group.create({
           data: {
             name: "All",
             component_site: {
@@ -97,7 +97,7 @@ export const _ = {
       gid = group.id;
     }
     if (element) {
-      const newcomp = await db.component.create({
+      const newcomp = await _db.component.create({
         data: {
           name: element.get("name") || "",
           content_tree: element.toJSON(),
@@ -122,7 +122,7 @@ export const _ = {
             },
           },
         };
-        await db.component.update({
+        await _db.component.update({
           data: {
             content_tree: content_tree,
           },
@@ -147,7 +147,7 @@ export const _ = {
         );
 
         if (comp_id) {
-          await db.component.update({
+          await _db.component.update({
             where: {
               id: comp_id,
             },
@@ -159,7 +159,7 @@ export const _ = {
             },
           });
         } else if (page && page.id) {
-          await db.page.update({
+          await _db.page.update({
             where: {
               id: page.id,
             },

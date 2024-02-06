@@ -24,7 +24,7 @@ export const _ = {
       }
     }
 
-    // const site = await db.site.findFirst({
+    // const site = await _db.site.findFirst({
     //   where: { id: site_id },
     //   select: { js: true },
     // });

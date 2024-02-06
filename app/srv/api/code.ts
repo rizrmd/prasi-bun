@@ -11,7 +11,7 @@ export const _ = {
     const { req, res } = apiContext(this);
 
     if (action === "reload-api") {
-      const site = await db.site.findFirst({
+      const site = await _db.site.findFirst({
         select: { config: true },
         where: { id: site_id },
       });
