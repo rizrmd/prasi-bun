@@ -102,6 +102,26 @@ export const code_action: SAction["code"]["action"] = async function (
         Bun.file(path.join(dir, "runtime/library.d.ts")),
         res.prisma["runtime/library.d.ts"]
       );
+      await Bun.write(
+        Bun.file(path.join(dir, "global.d.ts")),
+        `
+import prisma from "./typings/prisma";
+import type * as SRVAPI from "gen/srv/api/srv";
+
+declare global {
+  const db: prisma.PrismaClient;
+
+  type Api = typeof SRVAPI;
+  type ApiName = keyof Api;
+  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] };
+}
+      `
+      );
+
+      Bun.spawn({
+        cmd: ["chmod", "-R", "777", "."],
+        cwd: dir,
+      });
 
       break;
     }
