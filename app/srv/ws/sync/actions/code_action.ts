@@ -120,7 +120,7 @@ declare global {
 
       Bun.spawn({
         cmd: ["chmod", "-R", "777", "."],
-        cwd: dir,
+        cwd: code.path(arg.site_id, "site", "src"),
       });
 
       break;
