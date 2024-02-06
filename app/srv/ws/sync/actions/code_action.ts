@@ -5,7 +5,11 @@ import { code } from "../editor/code/util-code";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { SyncConnection } from "../type";
+import { dirAsync } from "fs-jetpack";
+import path from "path";
+import { gunzipAsync } from "../entity/zlib";
 
+const decoder = new TextDecoder();
 const code_startup = {
   process: {} as Record<string, Subprocess>,
 };
@@ -65,6 +69,40 @@ export const code_action: SAction["code"]["action"] = async function (
         docs.page[page_id].doc.destroy();
       }
       delete docs.page[page_id];
+      break;
+    }
+    case "check-typings": {
+      const dir = code.path(arg.site_id, "site", "src", "typings");
+      try {
+        if (
+          (await Bun.file(path.join(dir, "hash")).text()) ===
+          arg.hash.toString()
+        ) {
+          return { type: "check-typings", hash: true };
+        }
+      } catch (e) {}
+      return { type: "check-typings", hash: false };
+    }
+    case "push-typings": {
+      const dir = code.path(arg.site_id, "site", "src", "typings");
+      await dirAsync(dir);
+      await dirAsync(path.join(dir, "runtime"));
+      Bun.write(Bun.file(path.join(dir, "hash")), arg.hash.toString());
+      const res = JSON.parse(decoder.decode(await gunzipAsync(arg.body)));
+      await Bun.write(Bun.file(path.join(dir, "api.d.ts")), res.api);
+      await Bun.write(
+        Bun.file(path.join(dir, "prisma.d.ts")),
+        res.prisma["prisma.d.ts"]
+      );
+      await Bun.write(
+        Bun.file(path.join(dir, "runtime/index.d.ts")),
+        res.prisma["runtime/index.d.ts"]
+      );
+      await Bun.write(
+        Bun.file(path.join(dir, "runtime/library.d.ts")),
+        res.prisma["runtime/library.d.ts"]
+      );
+
       break;
     }
   }

@@ -1,6 +1,7 @@
 import trim from "lodash.trim";
 import { w } from "../../../utils/types/general";
 import { fetchViaProxy } from "../proxy";
+import { compress } from "wasm-gzip";
 
 export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
   const url = trim(_url, "/");
