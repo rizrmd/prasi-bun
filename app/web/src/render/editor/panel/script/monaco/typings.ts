@@ -47,7 +47,7 @@ declare module "ts:runtime/library" {
         `\
 declare module "ts:prisma" {
   ${prisma["prisma.d.ts"].replace(
-    `import * as runtime from './runtime/library';`,
+    `import * as runtime from './runtime/library.js';`,
     `import * as runtime from 'ts:runtime/library';`
   )}
 }`,

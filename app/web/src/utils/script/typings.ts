@@ -19,7 +19,7 @@ export const monacoTypings = async (
   if (!map.has(prop.values)) {
     map.set(prop.values, true);
   } else {
-    return; 
+    return;
   }
 
   const prasi_api = w.prasiApi[p.site.api_url];
@@ -50,10 +50,15 @@ declare module "ts:runtime/library" {
           monaco,
           `\
 declare module "ts:prisma" {
-  ${prisma["prisma.d.ts"].replace(
-    `import * as runtime from './runtime/library';`,
-    `import * as runtime from 'ts:runtime/library';`
-  )}
+  ${prisma["prisma.d.ts"]
+    .replace(
+      `import * as runtime from './runtime/library.js';`,
+      `import * as runtime from 'ts:runtime/library';`
+    )
+    .replace(
+      `import * as runtime from './runtime/library';`,
+      `import * as runtime from 'ts:runtime/library';`
+    )}
 }`,
           `ts:prisma.d.ts`
         );
