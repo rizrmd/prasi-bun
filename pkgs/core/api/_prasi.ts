@@ -84,7 +84,7 @@ export const _ = {
 
 export const getApiEntry = () => {
   const res: any = {};
-  for (const [k, v] of Object.entries(g.api)) {
+  for (const [k, v] of Object.entries(g._api)) {
     const name = k.substring(0, k.length - 3).replace(/\W/gi, "_");
     res[name] = { ...v, name, path: `app/srv/api/${v.path}` };
   }

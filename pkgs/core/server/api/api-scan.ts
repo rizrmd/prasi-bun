@@ -21,7 +21,7 @@ export const prepareApiRoutes = async () => {
               fn: api._.api,
               path: importPath.substring((root || path).length + 1),
             };
-            g.api[filename] = route;
+            g._api[filename] = route;
           } catch (e) {
             g.log.warn(
               `Failed to import app/srv/api${importPath.substring(

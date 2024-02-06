@@ -23,7 +23,7 @@ export const routeEditor = (p: PG, page_id: string) => {
             p.status = "ready";
             p.render();
           };
-          await api.page_reload(page_id);
+          await _api.page_reload(page_id);
         } else {
           p.status = "ready";
           p.render();

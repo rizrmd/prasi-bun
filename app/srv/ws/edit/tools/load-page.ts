@@ -3,7 +3,7 @@ import { Page } from "../../../../web/src/utils/types/general";
 
 export const loadPage = async (page_id: string) => {
   if (page_id && validate(page_id)) {
-    let page = (await db.page.findFirst({
+    let page = (await _db.page.findFirst({
       where: { id: page_id },
       select: {
         id: true,

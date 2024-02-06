@@ -25,7 +25,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
     if (root) {
       if (mode === "page") {
         if (validate(id) && id) {
-          await db.page.update({
+          await _db.page.update({
             where: { id },
             data: {
               content_tree: root.toJSON(),
@@ -33,7 +33,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
           });
         }
       } else if (mode === "comp") {
-        await db.component.update({
+        await _db.component.update({
           where: { id },
           data: {
             content_tree: root.toJSON(),

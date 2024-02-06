@@ -39,13 +39,13 @@ export const ETreeRightClick: FC<{
   const isActiveComponent = rootComp && rootComp.id === item?.id && rootComp.id;
 
   if (local.compGroups.list && local.compGroups.list.length === 0) {
-    db.component_group
+    _db.component_group
       .findMany({
         where: { component_site: { some: { id_site: p.site.id } } },
       })
       .then(async (comps) => {
         if (comps && comps.length === 0) {
-          const res = await db.component_group.create({
+          const res = await _db.component_group.create({
             data: {
               component_site: {
                 create: {
@@ -336,7 +336,7 @@ export const ETreeRightClick: FC<{
                   local.compGroups.choose = (group_id) => {
                     p.compLoading[item.id] = true;
                     p.render();
-                    api
+                    _api
                       .comp_create({
                         item_id: item.originalId || item.id,
                         site_id: p.site.id || "",

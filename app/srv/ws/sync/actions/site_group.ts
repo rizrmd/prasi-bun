@@ -1,7 +1,7 @@
 import { SyncConnection } from "../type";
 
 export const site_group = async function (this: SyncConnection) {
-  const res = db.org.findMany({
+  const res = _db.org.findMany({
     where: {
       org_user: { some: { id_user: this.user_id } },
     },

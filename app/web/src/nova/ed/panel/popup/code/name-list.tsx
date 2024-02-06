@@ -44,7 +44,7 @@ export const CodeNameList: FC<{
     },
     async () => {
       codeName.loading = true;
-      codeName.list = await api.code(p.site.id, "list");
+      codeName.list = await _api.code(p.site.id, "list");
       codeName.loading = false;
       local.render();
     }
@@ -94,7 +94,7 @@ export const CodeNameList: FC<{
                 local.newopen = false;
                 local.render();
 
-                const nc = await db.code.create({
+                const nc = await _db.code.create({
                   data: {
                     id_site: p.site.id,
                     name: local.newname,

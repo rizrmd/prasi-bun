@@ -27,7 +27,7 @@ if (!g.Y) {
   g.syncronize = (await import("y-pojo")).syncronize;
 
   await createLogger();
-  g.api = {};
+  g._api = {};
   g.mode = process.argv.includes("dev") ? "dev" : "prod";
   g.datadir = g.mode == "prod" ? "../data" : "data";
   g.port = parseInt(process.env.PORT || "4550");
@@ -42,11 +42,11 @@ if (!g.Y) {
   snapshot.init();
 }
 
-const db = g.db;
+const db = g._db;
 if (!db) {
   await preparePrisma();
   await ensureNotRunning();
-  const db = g.db;
+  const db = g._db;
   if (db) {
     db.$connect()
       .catch((e: any) => {

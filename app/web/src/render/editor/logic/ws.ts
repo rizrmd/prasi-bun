@@ -41,7 +41,7 @@ export const editorWS = async (p: PG) => {
       p.wsRetry.localIP &&
       ["localhost", "127.0.0.1"].includes(wsurl.hostname)
     ) {
-      const ips = await api.local_ip();
+      const ips = await _api.local_ip();
       wsurl.hostname = ips[0];
     }
 

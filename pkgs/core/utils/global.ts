@@ -15,12 +15,12 @@ type SingleRoute = {
 export const g = global as unknown as {
   status: "init" | "ready";
   datadir: string;
-  db: PrismaClient;
+  _db: PrismaClient;
   dburl: string;
   mode: "dev" | "prod";
   server: Server;
   log: Logger;
-  api: Record<string, SingleRoute>;
+  _api: Record<string, SingleRoute>;
   domains: null | Record<string, string>;
   router: RadixRouter<SingleRoute>;
   port: number;

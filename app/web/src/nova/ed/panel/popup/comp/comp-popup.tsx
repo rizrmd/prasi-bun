@@ -169,7 +169,7 @@ export const EdPopComp = () => {
                                 typeof opt.dragSourceId === "string" &&
                                 typeof opt.dropTargetId === "string"
                               ) {
-                                db.component.update({
+                                _db.component.update({
                                   where: {
                                     id: opt.dragSourceId,
                                   },

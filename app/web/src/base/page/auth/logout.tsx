@@ -4,7 +4,7 @@ import { Loading } from "../../../utils/ui/loading";
 export default page({
   url: "/logout",
   component: ({}) => {
-    api.logout().then(() => {
+    _api.logout().then(() => {
       location.href = "/login";
     });
 

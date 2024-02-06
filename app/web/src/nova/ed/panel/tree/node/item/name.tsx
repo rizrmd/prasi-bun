@@ -68,7 +68,7 @@ export const EdTreeName = ({
             }
 
             if (active.comp_id === item.component?.id) {
-              db.component.update({
+              _db.component.update({
                 where: {
                   id: active.comp_id,
                 },

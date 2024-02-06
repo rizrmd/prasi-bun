@@ -31,9 +31,9 @@ export const buildNpm = async ({
   let items = _items;
   if (!items) {
     if (mode === "site") {
-      items = await db.npm_site.findMany({ where: { id_site: id } });
+      items = await _db.npm_site.findMany({ where: { id_site: id } });
     } else {
-      items = await db.npm_page.findMany({ where: { id_page: id } });
+      items = await _db.npm_page.findMany({ where: { id_page: id } });
     }
   }
   const packages: Record<string, string> = {};
@@ -157,7 +157,7 @@ packages:
 
     if (mode === "page") {
       delete glb.npm.page[id];
-      await db.npm_page.updateMany({
+      await _db.npm_page.updateMany({
         where: {
           id_page: id,
         },
@@ -165,7 +165,7 @@ packages:
       });
       const p = eg.edit.page[id];
       if (p) {
-        await db.page.update({
+        await _db.page.update({
           where: {
             id,
           },
@@ -178,7 +178,7 @@ packages:
     } else if (mode === "site") {
       delete glb.npm.site[id];
 
-      await db.npm_site.updateMany({
+      await _db.npm_site.updateMany({
         where: {
           id_site: id,
         },

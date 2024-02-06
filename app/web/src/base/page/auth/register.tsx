@@ -16,7 +16,7 @@ export default page({
         init: false,
       },
       async () => {
-        const s = await api.session();
+        const s = await _api.session();
 
         if (s && s.id) {
           navigate("/ed");
@@ -36,7 +36,7 @@ export default page({
             e.preventDefault();
             form.submitting = true;
             form.render();
-            const s = await api.register({
+            const s = await _api.register({
               username: form.username,
               password: form.password,
               email: form.email,

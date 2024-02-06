@@ -15,7 +15,7 @@ export default page({
         init: false,
       },
       async () => {
-        const s = await api.session();
+        const s = await _api.session();
         if (s && s.id) {
           const rto = (window as any).redirectTo;
           if (rto) {
@@ -40,7 +40,7 @@ export default page({
             e.preventDefault();
             form.submitting = true;
             form.render();
-            const s = await api.login(form.username, form.password);
+            const s = await _api.login(form.username, form.password);
 
             if (s.status === "failed") {
               form.submitting = false;

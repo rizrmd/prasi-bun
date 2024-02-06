@@ -21,7 +21,7 @@ export const InternalAPI: FC<{
 
   const reloadStatus = () => {
     if (p.site) {
-      const s = api.srvapi_check.bind({ apiUrl: "https://api.prasi.app" });
+      const s = _api.srvapi_check.bind({ apiUrl: "https://api.prasi.app" });
       s(p.site.id).then((e: any) => {
         local.status = e;
         checkApi(e === "started");
@@ -83,7 +83,7 @@ export const InternalAPI: FC<{
               className="border border-slate-500 hover:bg-red-100 hover:border-red-500 px-2 rounded cursor-pointer"
               onClick={async () => {
                 if (p.site) {
-                  const s = api.srvapi_op.bind({
+                  const s = _api.srvapi_op.bind({
                     apiUrl: "https://api.prasi.app",
                   });
 
@@ -99,7 +99,7 @@ export const InternalAPI: FC<{
               className="border border-slate-500 hover:bg-purple-100 hover:border-purple-500 px-2 rounded cursor-pointer"
               onClick={async () => {
                 if (p.site) {
-                  const s = api.srvapi_op.bind({
+                  const s = _api.srvapi_op.bind({
                     apiUrl: "https://api.prasi.app",
                   });
 
@@ -124,7 +124,7 @@ export const InternalAPI: FC<{
               className="border border-slate-500 hover:bg-green-100 hover:border-green-500 px-2 rounded cursor-pointer"
               onClick={async () => {
                 if (p.site) {
-                  const s = api.srvapi_op.bind({
+                  const s = _api.srvapi_op.bind({
                     apiUrl: "https://api.prasi.app",
                   });
 
@@ -164,7 +164,7 @@ export const InternalAPI: FC<{
                     w.prasiApiDbPull = true;
                     local.render();
 
-                    await api.srvapi_dbpull(
+                    await _api.srvapi_dbpull(
                       p.site.id,
                       p.site.api_prasi.db || ""
                     );
@@ -205,7 +205,7 @@ export const InternalAPI: FC<{
                 if (confirm("Are you sure ?")) {
                   local.loading = true;
                   local.render();
-                  await api.srvapi_destroy(p.site.id);
+                  await _api.srvapi_destroy(p.site.id);
                   p.site.api_url = "";
                   p.site.api_prasi.db = "";
                   p.site.api_prasi.port = "";

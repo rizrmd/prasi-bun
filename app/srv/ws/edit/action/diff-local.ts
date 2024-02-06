@@ -31,7 +31,7 @@ export const diffLocal = (ws: any, msg: any) => {
           if (msg.id) {
             const page = eg.edit.page[msg.id].doc.getMap("map").toJSON();
             try {
-              await db.page.update({
+              await _db.page.update({
                 where: { id: page.id },
                 data: {
                   content_tree: page.content_tree,
@@ -52,7 +52,7 @@ export const diffLocal = (ws: any, msg: any) => {
         clearTimeout(eg.edit.comp[msg.id].saveTimeout);
         eg.edit.comp[msg.id].saveTimeout = setTimeout(async () => {
           const comp = eg.edit.comp[msg.id].doc.getMap("map").toJSON();
-          await db.component.update({
+          await _db.component.update({
             where: {
               id: msg.id,
             },
@@ -68,7 +68,7 @@ export const diffLocal = (ws: any, msg: any) => {
         eg.edit.site[msg.id].saveTimeout = setTimeout(async () => {
           const site = eg.edit.site[msg.id].doc.getMap("site").toJSON();
           delete site.page;
-          await db.site.update({
+          await _db.site.update({
             where: {
               id: msg.id,
             },

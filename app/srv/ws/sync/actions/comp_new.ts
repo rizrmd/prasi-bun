@@ -115,7 +115,7 @@ export const comp_new: SAction["comp"]["new"] = async function (
 };
 
 const createComp = async (item: any, group_id: string) => {
-  const comp = await db.component.create({
+  const comp = await _db.component.create({
     data: {
       name: item.name,
       content_tree: {},
@@ -133,7 +133,7 @@ const createComp = async (item: any, group_id: string) => {
       props: {},
       ref_ids: {},
     };
-    await db.component.update({
+    await _db.component.update({
       where: { id: comp.id },
       data: { content_tree: item },
     });

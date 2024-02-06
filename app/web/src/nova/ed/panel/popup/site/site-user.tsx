@@ -29,7 +29,7 @@ export const EdPopUser = ({
     async () => {
       if (!user.loading) {
         user.loading = new Promise(async (done) => {
-          const res = await db.user.findMany({
+          const res = await _db.user.findMany({
             select: {
               id: true,
               username: true,

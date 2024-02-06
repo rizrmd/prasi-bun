@@ -157,7 +157,7 @@ export const EdPopPage = () => {
                         p.render();
 
                         if (!opt.dragSource?.droppable) {
-                          await db.page.update({
+                          await _db.page.update({
                             where: {
                               id: opt.dragSourceId as string,
                             },
@@ -170,7 +170,7 @@ export const EdPopPage = () => {
                             select: { id: true },
                           });
                         } else {
-                          await db.page_folder.update({
+                          await _db.page_folder.update({
                             where: {
                               id: opt.dragSourceId as string,
                             },

@@ -47,7 +47,7 @@ export const NPMImport = () => {
   if (!w.npmImport.init) {
     w.npmImport.init = true;
     w.npmImport.loading = Promise.all([
-      db.npm_site
+      _db.npm_site
         .findMany({
           where: {
             id_site: p.site.id,
@@ -56,7 +56,7 @@ export const NPMImport = () => {
         .then((e) => {
           w.npmImport.site = e;
         }),
-      db.npm_page
+      _db.npm_page
         .findMany({
           where: {
             id_page: p.page.id,
@@ -92,7 +92,7 @@ export const NPMImport = () => {
                 );
                 const j = await f.json();
                 const version = j.versions[0].version;
-                const res = await db.npm_site.create({
+                const res = await _db.npm_site.create({
                   data: {
                     id_site: p.site?.id || "",
                     module: e.name,
@@ -113,7 +113,7 @@ export const NPMImport = () => {
             mode="page"
             onChange={async (e) => {
               if (p.page) {
-                const res = await db.npm_page.create({
+                const res = await _db.npm_page.create({
                   data: {
                     id_page: p.page.id || "",
                     module: e.name,
@@ -148,7 +148,7 @@ const NPMModule: FC<{
   if (!p.page) return <></>;
   useEffect(() => {
     if (p.page)
-      api
+      _api
         .npm_size(mode, mode === "site" ? p.site.id || "" : p.page.id)
         .then((e: string) => {
           local.size = parseInt(e) || 0;
@@ -168,7 +168,7 @@ const NPMModule: FC<{
       list = w.npmImport.page[p.page.id];
     } else {
       local.loading = true;
-      db.npm_page
+      _db.npm_page
         .findMany({
           where: {
             id_page: p.page.id,
@@ -243,7 +243,7 @@ const NPMModule: FC<{
                   local.bundling = true;
                   local.bundleError = "";
                   local.render();
-                  const res = (await api.npm_bundle(
+                  const res = (await _api.npm_bundle(
                     mode,
                     mode === "site" ? p.site.id || "" : p.page ? p.page.id : ""
                   )) as any;
@@ -377,7 +377,7 @@ const NPMModule: FC<{
                 );
                 const j = await f.json();
                 const version = j.versions[0].version;
-                const res = await db.npm_site.create({
+                const res = await _db.npm_site.create({
                   data: {
                     id_site: p.site?.id || "",
                     module: val,
@@ -406,7 +406,7 @@ const NPMModule: FC<{
                 mode={mode}
                 remove={async (e) => {
                   if (mode === "site") {
-                    await db.npm_site.delete({
+                    await _db.npm_site.delete({
                       where: { id: BigInt(e.id) },
                     });
                     w.npmImport.site = w.npmImport.site.filter(
@@ -414,7 +414,7 @@ const NPMModule: FC<{
                     );
                   } else {
                     if (p.page) {
-                      await db.npm_page.delete({
+                      await _db.npm_page.delete({
                         where: { id: BigInt(e.id) },
                       });
 
@@ -610,14 +610,14 @@ const MainImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,
@@ -695,14 +695,14 @@ const CustomImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,
@@ -776,14 +776,14 @@ const NamedImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,

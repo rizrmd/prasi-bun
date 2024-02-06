@@ -22,7 +22,7 @@ export const SiteManager = () => {
   });
 
   const reloadSites = async () => {
-    const orgs = await db.org_user.findMany({
+    const orgs = await _db.org_user.findMany({
       where: {
         id_user: p.session.data.user.id,
       },
@@ -44,7 +44,7 @@ export const SiteManager = () => {
       for (const org of orgs) {
         local.orgs[org.org.id] = org.org;
       }
-      const sites = await db.site.findMany({
+      const sites = await _db.site.findMany({
         where: {
           id_org: {
             in: Object.keys(local.orgs),

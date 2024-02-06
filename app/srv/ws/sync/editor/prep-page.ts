@@ -106,7 +106,7 @@ export const loadCompForPage = async (ctree: IRoot, sync: SyncConnection) => {
 
   if (Object.keys(should_save).length > 0) {
     for (const [comp_id, v] of Object.entries(should_save)) {
-      await db.component.update({
+      await _db.component.update({
         where: { id: comp_id },
         data: {
           content_tree: v,

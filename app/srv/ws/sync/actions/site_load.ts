@@ -10,7 +10,7 @@ export const site_load: SAction["site"]["load"] = async function (
   site_id: string
 ) {
   if (validate(site_id)) {
-    const site = await db.site.findFirst({ where: { id: site_id } });
+    const site = await _db.site.findFirst({ where: { id: site_id } });
     if (site) {
       if (this.conf) this.conf.site_id = site.id;
 
@@ -19,7 +19,7 @@ export const site_load: SAction["site"]["load"] = async function (
           ? { api_url: (site.config as any).api_url || "" }
           : { api_url: "" };
 
-      const layouts = await db.page.findMany({
+      const layouts = await _db.page.findMany({
         where: {
           id_site: site_id,
           name: {

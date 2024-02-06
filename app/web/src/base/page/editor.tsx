@@ -35,7 +35,7 @@ export default page({
               if (!!ses) {
                 done();
               }
-              let e = await api.session();
+              let e = await _api.session();
               if (!e) {
                 (window as any).redirectTo = location.pathname;
                 navigate("/login");
@@ -56,7 +56,7 @@ export default page({
             local.session = ses;
 
             if (!site_id) {
-              const res = await db.site.findFirst({
+              const res = await _db.site.findFirst({
                 where: {
                   is_deleted: false,
                   org: {
@@ -70,7 +70,7 @@ export default page({
                 },
               });
               if (res) {
-                const page = await db.page.findFirst({
+                const page = await _db.page.findFirst({
                   where: {
                     id_site: res.id,
                     is_deleted: false,
@@ -91,7 +91,7 @@ export default page({
                 return;
               }
             } else if (!page_id) {
-              let res = await db.page.findFirst({
+              let res = await _db.page.findFirst({
                 where: {
                   id_site: site_id,
                   is_deleted: false,
@@ -102,7 +102,7 @@ export default page({
               });
 
               if (!res) {
-                res = await db.page.create({
+                res = await _db.page.create({
                   data: {
                     content_tree: {
                       childs: [],

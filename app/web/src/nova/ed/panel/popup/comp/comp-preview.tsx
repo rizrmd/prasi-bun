@@ -35,7 +35,7 @@ export const EdCompPreview = () => {
       if (root) {
         if (root.text !== found.text) {
           found.text = root.text;
-          db.component.update({
+          _db.component.update({
             where: { id: comp_id },
             data: { name: found.text },
           });
@@ -71,7 +71,7 @@ export const EdCompPreview = () => {
                   p.ui.popup.comp_group = {
                     mouse_event: e,
                     async on_pick(group_id) {
-                      await db.component.update({
+                      await _db.component.update({
                         where: { id: comp_id },
                         data: { id_component_group: group_id },
                       });
@@ -100,7 +100,7 @@ export const EdCompPreview = () => {
                 e.stopPropagation();
                 if (isTrashed) {
                   if (confirm("Permanently delete this component?")) {
-                    await db.component.delete({
+                    await _db.component.delete({
                       where: { id: p.ui.popup.comp.preview_id },
                     });
                     const idx =
@@ -117,7 +117,7 @@ export const EdCompPreview = () => {
                   }
                 } else {
                   if (confirm("Move component to trash?")) {
-                    await db.component.update({
+                    await _db.component.update({
                       where: { id: comp_id },
                       data: { id_component_group: compPicker.trash_id },
                     });

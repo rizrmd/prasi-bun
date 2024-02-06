@@ -33,7 +33,7 @@ export const EdPopCode = () => {
 
   useEffect(() => {
     if (code.mode === "" && p.site.id) {
-      db.code.findFirst({ where: { id_site: p.site.id } }).then((e) => {
+      _db.code.findFirst({ where: { id_site: p.site.id } }).then((e) => {
         code.mode = e ? "new" : "old";
 
         if (localStorage.vsc_opened === "yes") {
@@ -90,7 +90,7 @@ export const EdPopCode = () => {
                   )
                 ) {
                   code.mode = "new";
-                  db.code.create({
+                  _db.code.create({
                     data: { id_site: p.site.id, name: "site" },
                   });
                   p.ui.popup.code.open = false;
@@ -355,7 +355,7 @@ const CodeBody = () => {
                   )
                 ) {
                   localStorage.vsc_opened = "yes";
-                  await db.site.update({
+                  await _db.site.update({
                     where: { id: p.site.id },
                     data: { code_mode: "old" },
                   });
@@ -416,7 +416,7 @@ const CodeBody = () => {
                 )
               ) {
                 localStorage.vsc_opened = "yes";
-                await db.site.update({
+                await _db.site.update({
                   where: { id: p.site.id },
                   data: { code_mode: "vsc" },
                 });

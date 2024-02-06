@@ -37,7 +37,7 @@ export const edInitSync = (p: PG) => {
 
   if (location.pathname.startsWith("/vi/")) {
     if (page.list.length === 0) {
-      db.page
+      _db.page
         .findMany({
           where: {
             id_site: params.site_id,
@@ -84,7 +84,7 @@ export const edInitSync = (p: PG) => {
   if (!params.page_id) {
     if (location.pathname.startsWith("/ed")) {
       if (!params.site_id) {
-        db.page
+        _db.page
           .findFirst({
             where: {
               is_deleted: false,
@@ -99,7 +99,7 @@ export const edInitSync = (p: PG) => {
             if (e) location.href = `/ed/${e.id_site}/${e.id}`;
           });
       } else {
-        db.page
+        _db.page
           .findFirst({
             where: {
               is_deleted: false,
@@ -111,7 +111,7 @@ export const edInitSync = (p: PG) => {
           .then(async (e) => {
             if (e) location.href = `/ed/${params.site_id}/${e.id}`;
             else {
-              const res = await db.page.create({
+              const res = await _db.page.create({
                 data: {
                   content_tree: {
                     childs: [],
@@ -156,7 +156,7 @@ export const edInitSync = (p: PG) => {
       params.site_id &&
       location.pathname.startsWith("/ed/")
     ) {
-      db.page
+      _db.page
         .findFirst({
           where: {
             is_deleted: false,

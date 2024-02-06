@@ -65,13 +65,13 @@ export const page_load: SAction["page"]["load"] = async function (
   user.active.delAll({ client_id: this.client_id });
 
   if (!snap && !ydoc) {
-    const page = await db.page.findFirst({ where: { id } });
+    const page = await _db.page.findFirst({ where: { id } });
     if (page) {
       const doc = new Y.Doc();
       let root = doc.getMap("map");
       const proot = await prepContentTree(page.id, page.content_tree, this);
       if (validate(id) && id) {
-        await db.page.update({ where: { id }, data: { content_tree: proot } });
+        await _db.page.update({ where: { id }, data: { content_tree: proot } });
       }
       syncronize(root, { id, root: proot });
 

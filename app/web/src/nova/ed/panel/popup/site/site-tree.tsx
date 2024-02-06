@@ -98,7 +98,7 @@ export const EdSiteTree = ({
                       node.text = gitem.name;
                       gitem.renaming = false;
                       local.render();
-                      await db.org.update({
+                      await _db.org.update({
                         where: { id: gitem.id },
                         data: { name: gitem.name },
                       });
@@ -139,14 +139,14 @@ export const EdSiteTree = ({
               <EdPopUser
                 users={gitem.users}
                 onDel={async (u) => {
-                  await db.org_user.deleteMany({
+                  await _db.org_user.deleteMany({
                     where: { id_org: gitem.id, id_user: u.id },
                   });
                   gitem.users = gitem.users.filter((e) => e.id !== u.id);
                   local.render();
                 }}
                 onAdd={async (u) => {
-                  await db.org_user.create({
+                  await _db.org_user.create({
                     data: { id_org: gitem.id, id_user: u.id },
                   });
                   gitem.users = [...gitem.users, u];
@@ -168,10 +168,10 @@ export const EdSiteTree = ({
                   className="text-[12px] bg-white border rounded px-2 hover:bg-red-100 text-red-600 cursor-pointer min-h-[20px] flex items-center"
                   onClick={async () => {
                     if (confirm("Remove this organization ?")) {
-                      await db.org_user.deleteMany({
+                      await _db.org_user.deleteMany({
                         where: { id_org: gitem.id },
                       });
-                      await db.org.delete({
+                      await _db.org.delete({
                         where: {
                           id: gitem.id,
                         },
@@ -336,7 +336,7 @@ export const EdSiteTree = ({
           const from = dragSource?.data;
           if (target && from) {
             if (target.type === "group") {
-              await db.site.update({
+              await _db.site.update({
                 where: {
                   id: from.id,
                 },

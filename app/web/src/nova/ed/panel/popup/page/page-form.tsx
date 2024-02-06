@@ -62,7 +62,7 @@ export const EdFormPage: FC<{
               let id_folder = form.id_folder;
               if (!id_folder || id_folder === "ROOT") id_folder = null;
               if (!form.id) {
-                const res = await db.page.create({
+                const res = await _db.page.create({
                   data: {
                     content_tree: {
                       childs: [],
@@ -77,7 +77,7 @@ export const EdFormPage: FC<{
                 });
                 onSave(res, true);
               } else {
-                const res = await db.page.update({
+                const res = await _db.page.update({
                   data: {
                     name: form.name,
                     url: form.url || "",
@@ -191,7 +191,7 @@ export const EdFormPage: FC<{
                 className="bg-red-600 w-[40px] flex justify-center items-center"
                 onClick={async () => {
                   if (confirm("Are you sure ?")) {
-                    const res = await db.page.update({
+                    const res = await _db.page.update({
                       where: {
                         id: page.id,
                       },

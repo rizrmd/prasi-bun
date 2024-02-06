@@ -53,7 +53,7 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   };
 
   if (!snap && !ydoc) {
-    const comp = await db.component.findFirst({ where: { id: comp_id } });
+    const comp = await _db.component.findFirst({ where: { id: comp_id } });
     if (comp) {
       const item = comp.content_tree as IItem;
       if (item && item.component?.id !== comp.id) {

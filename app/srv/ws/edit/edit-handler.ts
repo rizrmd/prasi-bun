@@ -36,7 +36,7 @@ export const editHandler: WebSocketHandler<WSData> = {
             clearTimeout(site.saveTimeout);
             site.saveTimeout = setTimeout(async () => {
               const js = JSON.parse(msg.src);
-              await db.site.update({
+              await _db.site.update({
                 where: {
                   id: msg.id_site,
                 },

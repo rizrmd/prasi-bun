@@ -6,8 +6,8 @@ declare global {
   const params: any;
   const css: typeof goober.css;
   const cx: (...arg: any[]) => string;
-  const api: any;
-  const db: PrismaClient;
+  const _api: any;
+  const _db: PrismaClient;
   const prasiContext: any;
   const serverurl: string;
 }

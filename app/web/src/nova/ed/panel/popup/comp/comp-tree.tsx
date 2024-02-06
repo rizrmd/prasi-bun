@@ -81,13 +81,13 @@ export const edPageTreeRender: NodeRender<CompItem> = (
               item.name = local.rename_to;
               if (item.id === "") {
                 if (item.name) {
-                  db.page_folder.create({
+                  _db.page_folder.create({
                     data: { name: local.rename_to, id_site: p.site.id },
                   });
                 }
                 await reloadCompPicker(p);
               } else {
-                db.page_folder.update({
+                _db.page_folder.update({
                   where: { id: item.id },
                   data: { name: local.rename_to },
                 });
@@ -136,7 +136,7 @@ export const edPageTreeRender: NodeRender<CompItem> = (
               p.ui.popup.comp_group = {
                 mouse_event: e,
                 async on_pick(group_id) {
-                  await db.component.update({
+                  await _db.component.update({
                     where: { id: item.id },
                     data: { id_component_group: group_id },
                   });

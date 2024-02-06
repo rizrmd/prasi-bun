@@ -16,7 +16,7 @@ export const loadSite = async (idOrDomain: string) => {
     rname = "prasi.app";
   }
 
-  const res = await db.site.findFirst({
+  const res = await _db.site.findFirst({
     where: isValidUUID(rname)
       ? {
           id: rname,
@@ -73,11 +73,11 @@ export const loadSite = async (idOrDomain: string) => {
 const createPage = async (
   site: site & { page: page[] },
   page: WithOptional<
-    Parameters<typeof db.page.create>[0]["data"],
+    Parameters<typeof _db.page.create>[0]["data"],
     "content_tree"
   >
 ) => {
-  const raw = await db.page.create({
+  const raw = await _db.page.create({
     data: {
       ...(page as any),
       content_tree: page.content_tree ? page.content_tree : blank,
