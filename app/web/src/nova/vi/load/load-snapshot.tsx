@@ -1,9 +1,11 @@
-import { decompress } from "wasm-gzip";
+import { compress, decompress } from "wasm-gzip";
 import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
 import { PG } from "../../ed/logic/ed-global";
 import { evalCJS } from "../../ed/logic/ed-sync";
 import { treeRebuild } from "../../ed/logic/tree/build";
+import { w } from "../../../utils/types/general";
 
+const encoder = new TextEncoder();
 export const viLoadSnapshot = async (p: PG) => {
   let api_url = p.site.config.api_url;
 
@@ -12,6 +14,29 @@ export const viLoadSnapshot = async (p: PG) => {
     if (api_url && apiURL.hostname) {
       try {
         await loadApiProxyDef(api_url, true);
+
+        const api = w.prasiApi[api_url];
+        if (api && api.apiTypes && api.prismaTypes) {
+          const zip = JSON.stringify({
+            api: api.apiTypes,
+            prisma: api.prismaTypes,
+          });
+          const hash = hashCode(zip);
+          const res = await p.sync?.code.action({
+            type: "check-typings",
+            site_id: p.site.id,
+            hash,
+          });
+          if (res?.type === "check-typings" && !res.hash) {
+            const body = Buffer.from(compress(encoder.encode(zip)));
+            p.sync?.code.action({
+              type: "push-typings",
+              site_id: p.site.id,
+              body,
+              hash,
+            });
+          }
+        }
       } catch (e) {
         console.warn("Failed to load API:", api_url);
       }
@@ -52,4 +77,12 @@ export const applyEnv = (p: PG, src?: string) => {
       }
     }
   }
+};
+
+const hashCode = function (s: string) {
+  var h = 0,
+    l = s.length,
+    i = 0;
+  if (l > 0) while (i < l) h = ((h << 5) - h + s.charCodeAt(i++)) | 0;
+  return h;
 };
