@@ -4,6 +4,8 @@ import { PG } from "../../ed/logic/ed-global";
 import { evalCJS } from "../../ed/logic/ed-sync";
 import { treeRebuild } from "../../ed/logic/tree/build";
 import { w } from "../../../utils/types/general";
+import { dbProxy } from "../../../base/load/db/db-proxy";
+import { apiProxy } from "../../../base/load/api/api-proxy";
 
 const encoder = new TextEncoder();
 export const viLoadSnapshot = async (p: PG) => {
@@ -69,6 +71,12 @@ export const viLoadSnapshot = async (p: PG) => {
 export const applyEnv = (p: PG, src?: string) => {
   if (src) {
     const w = window as any;
+
+    if (p.site.config.api_url) {
+      w.db = dbProxy(p.site.config.api_url);
+      w.api = apiProxy(p.site.config.api_url);
+    }
+
     const module = evalCJS(src);
     p.global_prop = Object.keys(module);
     if (typeof module === "object") {
