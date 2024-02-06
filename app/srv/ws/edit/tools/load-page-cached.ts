@@ -23,7 +23,7 @@ export const loadCachedPage = async (site_id: string, page_id: string) => {
       edit.lastRefresh = Date.now();
       site_cache[page_id] = edit as any;
     } else {
-      const page = await db.page.findFirst({
+      const page = await _db.page.findFirst({
         where: { id: page_id },
         select: {
           js: true,

@@ -10,7 +10,7 @@ export const _ = {
     const current = session.get(req);
 
     if (!current) {
-      const user = await db.user.findFirst({
+      const user = await _db.user.findFirst({
         where: { OR: [{ username }, { phone: username }] },
         include: {
           org_user: {

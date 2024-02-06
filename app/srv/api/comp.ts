@@ -4,6 +4,6 @@ export const _ = {
   url: "/_web/comp/:id",
   async api(id: string) {
     const { req, res } = apiContext(this);
-    return await db.component.findFirst({ where: { id } });
+    return await _db.component.findFirst({ where: { id } });
   },
 };
