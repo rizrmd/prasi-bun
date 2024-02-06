@@ -59,7 +59,7 @@ export const EdFormSite: FC<{
               try {
                 if (!form.id) {
                   try {
-                    await db.site.create({
+                    await _db.site.create({
                       data: {
                         name: form.name,
                         favicon: "",
@@ -73,7 +73,7 @@ export const EdFormSite: FC<{
                     alert(e);
                   }
                 } else {
-                  await db.site.update({
+                  await _db.site.update({
                     data: {
                       name: form.name,
                       domain: form.domain,
@@ -160,7 +160,7 @@ export const EdFormSite: FC<{
                         "Please type 'yes' (without quote) to confirm deletion: "
                       )?.toLowerCase() === "yes"
                     ) {
-                      await db.site.update({
+                      await _db.site.update({
                         where: {
                           id: site.id,
                         },

@@ -91,14 +91,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
             });
 
             if (save_to === "comp" && comp_id) {
-              db.component.update({
+              _db.component.update({
                 where: { id: comp_id },
                 data: {
                   content_tree: root.toJSON(),
                 },
               });
             } else if (page_id && validate(page_id)) {
-              db.page.update({
+              _db.page.update({
                 where: { id: page_id },
                 data: {
                   content_tree: root.toJSON(),
@@ -128,14 +128,14 @@ export const code_edit: SAction["code"]["edit"] = async function (
               });
 
               if (save_to === "comp" && comp_id) {
-                db.component.update({
+                _db.component.update({
                   where: { id: comp_id },
                   data: {
                     content_tree: root.toJSON(),
                   },
                 });
               } else if (page_id && validate(page_id)) {
-                db.page.update({
+                _db.page.update({
                   where: { id: page_id },
                   data: {
                     content_tree: root.toJSON(),
@@ -189,7 +189,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
                   }
                 }
               });
-              await db.component.update({
+              await _db.component.update({
                 where: { id: comp_id },
                 data: {
                   content_tree: root.toJSON(),

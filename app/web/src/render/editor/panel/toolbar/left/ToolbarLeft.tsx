@@ -21,7 +21,7 @@ export const ToolbarLeft = () => {
           {
             label: "Logout",
             onClick: () => {
-              api.logout().then(() => {
+              _api.logout().then(() => {
                 location.href = "/login";
               });
             },

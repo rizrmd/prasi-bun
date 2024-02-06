@@ -92,7 +92,7 @@ export const CompManager: FC = () => {
     if (p.site.id) {
       local.loading = true;
       local.site_use = (
-        await db.site_use_comp.findMany({
+        await _db.site_use_comp.findMany({
           where: {
             id_site: p.site.id,
           },
@@ -101,7 +101,7 @@ export const CompManager: FC = () => {
           },
         })
       ).map((e) => e.use_id_site);
-      const group = await db.component_group.findMany({
+      const group = await _db.component_group.findMany({
         where: {
           component_site: {
             some: {
@@ -151,7 +151,7 @@ export const CompManager: FC = () => {
       const group_ids = Object.keys(local.group);
 
       if (group_ids.length > 0) {
-        const comps = await db.component.findMany({
+        const comps = await _db.component.findMany({
           where: {
             id_component_group: {
               in: group_ids,
@@ -308,7 +308,7 @@ export const CompManager: FC = () => {
                         });
                         if (totrash.length > 0) {
                           if (!local.trash_id) {
-                            const res = await db.component_group.create({
+                            const res = await _db.component_group.create({
                               data: {
                                 name: "__TRASH__",
                                 component_site: {
@@ -322,7 +322,7 @@ export const CompManager: FC = () => {
                           }
 
                           if (local.trash_id) {
-                            await db.component.updateMany({
+                            await _db.component.updateMany({
                               where: {
                                 id: { in: totrash },
                               },
@@ -378,7 +378,7 @@ export const CompManager: FC = () => {
                       onClick={async () => {
                         local.site_use_loading = true;
                         local.render();
-                        await db.site_use_comp.create({
+                        await _db.site_use_comp.create({
                           data: {
                             id_site: p.site.id,
                             use_id_site: "9e34f31f-4ebd-4630-b61d-597045171ebb",
@@ -409,7 +409,7 @@ export const CompManager: FC = () => {
                         if (p.site.id) {
                           local.site_use_loading = true;
                           local.render();
-                          await db.site_use_comp.delete({
+                          await _db.site_use_comp.delete({
                             where: {
                               id_site_use_id_site: {
                                 id_site: p.site.id,
@@ -482,7 +482,7 @@ export const CompManager: FC = () => {
                               local.renaming.id = "";
                               local.render();
 
-                              db.component_group.update({
+                              _db.component_group.update({
                                 where: {
                                   id: g.info.id,
                                 },
@@ -543,7 +543,7 @@ export const CompManager: FC = () => {
                                 onClick={async () => {
                                   g.shared = false;
 
-                                  db.component_group.update({
+                                  _db.component_group.update({
                                     where: {
                                       id: g.info.id,
                                     },
@@ -563,7 +563,7 @@ export const CompManager: FC = () => {
                                 onClick={async () => {
                                   g.shared = true;
 
-                                  db.component_group.update({
+                                  _db.component_group.update({
                                     where: {
                                       id: g.info.id,
                                     },
@@ -596,7 +596,7 @@ export const CompManager: FC = () => {
                                 const name = prompt(`New Group Name:`);
 
                                 if (name) {
-                                  const res = await db.component_group.create({
+                                  const res = await _db.component_group.create({
                                     data: {
                                       component_site: {
                                         create: {
@@ -629,7 +629,7 @@ export const CompManager: FC = () => {
                                   if (confirm("Are you sure ?")) {
                                     delete local.group[g.info.id];
                                     local.render();
-                                    await db.component_site.delete({
+                                    await _db.component_site.delete({
                                       where: {
                                         id_component_group_id_site: {
                                           id_component_group: g.info.id,
@@ -779,7 +779,7 @@ export const CompManager: FC = () => {
                                       g.comps.splice(idx, 1);
                                       local.render();
 
-                                      db.component.update({
+                                      _db.component.update({
                                         where: {
                                           id: e.id,
                                         },
@@ -823,7 +823,7 @@ export const CompManager: FC = () => {
                   onClick={async (ev) => {
                     if (confirm("Are you sure ?")) {
                       if (!local.trash_id) {
-                        const res = await db.component_group.create({
+                        const res = await _db.component_group.create({
                           data: {
                             name: "__TRASH__",
                             component_site: {
@@ -837,7 +837,7 @@ export const CompManager: FC = () => {
                       }
 
                       if (local.trash_id) {
-                        await db.component.update({
+                        await _db.component.update({
                           where: {
                             id: local.selected_id,
                           },

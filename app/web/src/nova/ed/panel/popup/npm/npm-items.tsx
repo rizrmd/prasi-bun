@@ -34,11 +34,11 @@ export const EdNpmItems = ({
               bundled={bundled}
               remove={async (e) => {
                 if (mode === "site") {
-                  await db.npm_site.delete({
+                  await _db.npm_site.delete({
                     where: { id: BigInt(e.id) },
                   });
                 } else {
-                  await db.npm_page.delete({
+                  await _db.npm_page.delete({
                     where: { id: BigInt(e.id) },
                   });
                 }
@@ -230,14 +230,14 @@ const MainImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,
@@ -315,14 +315,14 @@ const CustomImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,
@@ -396,14 +396,14 @@ const NamedImport: FC<{
   useEffect(() => {
     if (!local.open) {
       if (mode === "site") {
-        db.npm_site.update({
+        _db.npm_site.update({
           where: { id: item.id },
           data: {
             import_as,
           },
         });
       } else {
-        db.npm_page.update({
+        _db.npm_page.update({
           where: { id: item.id },
           data: {
             import_as,

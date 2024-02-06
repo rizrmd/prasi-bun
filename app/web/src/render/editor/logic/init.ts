@@ -127,7 +127,7 @@ export const initEditor = async (p: PG, site_id: string) => {
     }
 
     w.apiurl = p.site.api_url;
-    api.site_dts(p.site.id).then((e: any) => {
+    _api.site_dts(p.site.id).then((e: any) => {
       p.site_dts = e || "";
       p.render();
     });

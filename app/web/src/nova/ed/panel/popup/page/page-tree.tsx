@@ -72,7 +72,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
 
                 if (item.id === "NEW") {
                   if (item.name) {
-                    await db.page_folder.create({
+                    await _db.page_folder.create({
                       data: {
                         name: local.rename_to,
                         id_site: p.site.id,
@@ -84,7 +84,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                     pagePicker.new_parent_id = "";
                   }
                 } else {
-                  await db.page_folder.update({
+                  await _db.page_folder.update({
                     where: { id: item.id },
                     data: { name: local.rename_to },
                   });
@@ -160,7 +160,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                     e.stopPropagation();
                     if (confirm("Clone page ?")) {
                       local.render();
-                      const page = (await db.page.findFirst({
+                      const page = (await _db.page.findFirst({
                         where: {
                           id: node.id as string,
                           is_deleted: false,
@@ -171,7 +171,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                       delete page.id;
                       page.name = `${page.name} [Cloned]`;
                       page.url = `${page.url}-cloned`;
-                      await db.page.create({
+                      await _db.page.create({
                         data: page,
                       });
 
@@ -204,7 +204,7 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                     e.stopPropagation();
                     if (confirm("Deletting cannot be undone. Are you sure ?")) {
                       if (item.type === "folder") {
-                        await db.page.updateMany({
+                        await _db.page.updateMany({
                           where: { id_folder: node.id as string },
                           data: {
                             id_folder:
@@ -213,14 +213,14 @@ export const edPageTreeRender: NodeRender<PageItem> = (
                                 : (node.parent as string),
                           },
                         });
-                        await db.page_folder.update({
+                        await _db.page_folder.update({
                           where: { id: node.id as string },
                           data: {
                             is_deleted: true,
                           },
                         });
                       } else {
-                        await db.page.update({
+                        await _db.page.update({
                           where: { id: node.id as string },
                           data: {
                             is_deleted: true,

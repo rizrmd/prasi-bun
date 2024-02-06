@@ -24,7 +24,7 @@ export const pagePicker = {
 export const reloadPagePicker = async (p: PG) => {
   pagePicker.status = "loading";
 
-  const pages = await db.page.findMany({
+  const pages = await _db.page.findMany({
     where: {
       id_site: p.site.id,
       is_deleted: false,
@@ -39,7 +39,7 @@ export const reloadPagePicker = async (p: PG) => {
     },
   });
 
-  const folders = await db.page_folder.findMany({
+  const folders = await _db.page_folder.findMany({
     where: { id_site: p.site.id, is_deleted: false },
     select: { id: true, name: true, parent_id: true },
   });

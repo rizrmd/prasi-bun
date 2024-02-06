@@ -22,7 +22,7 @@ export const site_update: SAction["site"]["update"] = async function (
       }
     }
 
-    await db.site.update({
+    await _db.site.update({
       where: { id },
       data: updated,
     });

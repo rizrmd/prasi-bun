@@ -6,7 +6,7 @@ const config = { serverurl: "" };
 export const devLoader: Loader = {
   async site(p, where) {
     config.serverurl = serverurl;
-    const site = (await db.site.findFirst({
+    const site = (await _db.site.findFirst({
       where:
         where.type === "siteid" ? { id: where.id } : { domain: where.domain },
       select: {
@@ -24,7 +24,7 @@ export const devLoader: Loader = {
       return null;
     }
 
-    const cgroups = await db.site_use_comp.findMany({
+    const cgroups = await _db.site_use_comp.findMany({
       where: { id_site: site.id },
       select: { use_id_site: true },
     });
@@ -36,7 +36,7 @@ export const devLoader: Loader = {
       }
     }
 
-    const layout = await db.page.findFirst({
+    const layout = await _db.page.findFirst({
       where: {
         id_site: site.id,
         name: { startsWith: "layout:" },
@@ -83,7 +83,7 @@ export const devLoader: Loader = {
     }
 
     const loadPages = async () => {
-      return await db.page.findMany({
+      return await _db.page.findMany({
         where: {
           id_site: cache.site.id,
           is_deleted: false,

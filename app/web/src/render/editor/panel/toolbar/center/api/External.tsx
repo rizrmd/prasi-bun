@@ -48,7 +48,7 @@ export const ExternalAPI = ({
           }
         }}
         onBlur={async () => {
-          await db.site.update({
+          await _db.site.update({
             where: { id: p.site.id },
             data: {
               config: {

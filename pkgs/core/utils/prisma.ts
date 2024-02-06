@@ -15,7 +15,7 @@ export const preparePrisma = async () => {
 		}
 
 		const { PrismaClient } = await import("../../../app/db/db");
-		g.db = new PrismaClient();
+		g._db = new PrismaClient();
 	}
 
 	g.dburl = process.env.DATABASE_URL || "";

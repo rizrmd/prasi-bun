@@ -45,7 +45,7 @@ export const reloadCompPicker = async (p: PG) => {
     comp_ids.push(k);
   }
 
-  const comps = await db.component.findMany({
+  const comps = await _db.component.findMany({
     where: { id_component_group: { in: comp_ids } },
     select: { id: true, id_component_group: true, name: true },
   });
@@ -66,7 +66,7 @@ export const reloadCompPicker = async (p: PG) => {
           if (root) {
             if (root.data?.item.name && comp.name !== root.data?.item.name) {
               comp.name = root.data.item.name;
-              db.component.update({
+              _db.component.update({
                 where: { id: comp.id },
                 data: { name: comp.name },
               });

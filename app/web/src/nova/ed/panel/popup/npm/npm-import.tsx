@@ -27,16 +27,16 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
 
   const reload = async () => {
     if (mode === "page") {
-      local.list = await db.npm_page.findMany({
+      local.list = await _db.npm_page.findMany({
         where: { id_page: p.page.cur.id },
       });
     } else if (mode === "site") {
-      local.list = await db.npm_site.findMany({
+      local.list = await _db.npm_site.findMany({
         where: { id_site: p.site.id },
       });
     }
 
-    const size = await api.npm_size(
+    const size = await _api.npm_size(
       mode,
       mode === "site" ? p.site.id || "" : p.page.cur.id
     );
@@ -100,7 +100,7 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                 local.render();
 
                 if (mode === "page") {
-                  await db.npm_page.create({
+                  await _db.npm_page.create({
                     data: {
                       id_page: p.page.cur.id,
                       module: name,
@@ -108,7 +108,7 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                     },
                   });
                 } else {
-                  await db.npm_site.create({
+                  await _db.npm_site.create({
                     data: {
                       id_site: p.site.id,
                       module: name,
@@ -129,11 +129,11 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                 const [name, version] = e.value.split("-><-");
 
                 if (mode === "page") {
-                  await db.npm_page.create({
+                  await _db.npm_page.create({
                     data: { id_page: p.page.cur.id, module: name, version },
                   });
                 } else {
-                  await db.npm_site.create({
+                  await _db.npm_site.create({
                     data: { id_site: p.site.id, module: name, version },
                   });
                 }
@@ -194,7 +194,7 @@ export const EdNpmImport = ({ mode }: { mode: "page" | "site" }) => {
                     local.bundling = true;
                     local.render();
 
-                    const res = (await api.npm_bundle(
+                    const res = (await _api.npm_bundle(
                       mode,
                       mode === "site"
                         ? p.site.id || ""

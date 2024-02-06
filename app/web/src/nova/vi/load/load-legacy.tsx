@@ -27,7 +27,7 @@ export const viLoadLegacy = async (vi: {
     w.exports = {};
   }
 
-  const site = await db.site.findFirst({
+  const site = await _db.site.findFirst({
     where: { id: vi.site.id },
     include: { component_site: true },
   });

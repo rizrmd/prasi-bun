@@ -4,7 +4,7 @@ export const loadDefaultSite = async (user_id: string) => {
   const conf = user.conf.get(user_id);
   if (conf) {
     if (!conf.site_id) {
-      const site = await db.site.findFirst({
+      const site = await _db.site.findFirst({
         where: {
           id_user: user_id,
           is_deleted: false,
@@ -18,7 +18,7 @@ export const loadDefaultSite = async (user_id: string) => {
     }
 
     if (conf.site_id && !conf.page_id) {
-      const page = await db.page.findFirst({
+      const page = await _db.page.findFirst({
         select: { id: true },
         where: {
           id_site: conf.site_id,

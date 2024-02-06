@@ -7,7 +7,7 @@ export const loadSitePage = async (
   page_id?: string
 ) => {
   if (validate(site_id)) {
-    const site = await db.site.findFirst({
+    const site = await _db.site.findFirst({
       where: { id: site_id },
       select: { id: true },
     });
@@ -18,13 +18,13 @@ export const loadSitePage = async (
 
     let page = null;
     if (validate(page_id || "")) {
-      page = await db.page.findFirst({
+      page = await _db.page.findFirst({
         where: { id: page_id, id_site: site_id, is_deleted: false },
         select: { id: true },
       });
     }
     if (!page) {
-      page = await db.page.findFirst({
+      page = await _db.page.findFirst({
         where: { id_site: site_id, is_deleted: false },
         select: { id: true },
       });

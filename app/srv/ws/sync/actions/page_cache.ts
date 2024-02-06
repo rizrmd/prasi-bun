@@ -21,7 +21,7 @@ export const page_cache: SAction["page"]["cache"] = async function (
     !cache[site_id] ||
     (cache[site_id] && Date.now() - cache[site_id].ts > 5000)
   ) {
-    const pages = await db.page.findMany({
+    const pages = await _db.page.findMany({
       where: {
         id_site: site_id,
         is_deleted: false,
@@ -45,7 +45,7 @@ export const page_cache: SAction["page"]["cache"] = async function (
     for (const url of urls) {
       const found = router.lookup(url);
       if (found && !exclude_page_id.includes(found.id)) {
-        const row = await db.page.findFirst({
+        const row = await _db.page.findFirst({
           where: { id: found.id },
           select: { content_tree: true, url: true },
         });

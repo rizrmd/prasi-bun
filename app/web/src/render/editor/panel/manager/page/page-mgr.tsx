@@ -77,7 +77,7 @@ export const PageManager = () => {
     local.loading = true;
     local.render();
 
-    const folders = await db.page_folder.findMany({
+    const folders = await _db.page_folder.findMany({
       where: {
         id_site: p.site.id,
         is_deleted: false,
@@ -90,7 +90,7 @@ export const PageManager = () => {
         data.folder[f.id] = { ...f };
       }
 
-      data.all = await db.page.findMany({
+      data.all = await _db.page.findMany({
         where: {
           id_site: p.site.id,
           is_deleted: false,
@@ -256,7 +256,7 @@ export const PageManager = () => {
                     opt.dropTargetId === "ROOT" || opt.dropTargetId === "root";
 
                   if (!opt.dragSource?.droppable) {
-                    await db.page.update({
+                    await _db.page.update({
                       where: {
                         id: opt.dragSourceId as string,
                       },
@@ -268,7 +268,7 @@ export const PageManager = () => {
                       select: { id: true },
                     });
                   } else {
-                    await db.page_folder.update({
+                    await _db.page_folder.update({
                       where: {
                         id: opt.dragSourceId as string,
                       },
@@ -364,7 +364,7 @@ export const PageManager = () => {
 
                               local.loading = true;
                               local.render();
-                              await db.page_folder.create({
+                              await _db.page_folder.create({
                                 data: {
                                   id_site: firstPage.id_site,
                                   name: local.newFolder.name,
@@ -386,7 +386,7 @@ export const PageManager = () => {
                             node.text = local.newFolder.name;
                             local.loading = true;
                             local.render();
-                            await db.page_folder.update({
+                            await _db.page_folder.update({
                               data: {
                                 name: local.newFolder.name,
                               },
@@ -502,14 +502,14 @@ export const PageManager = () => {
                                 if (confirm("Clone page ?")) {
                                   local.loading = true;
                                   local.render();
-                                  const page = (await db.page.findFirst({
+                                  const page = (await _db.page.findFirst({
                                     where: { id: node.id as string },
                                   })) as any;
 
                                   delete page.id;
                                   page.name = `${page.name} [Cloned]`;
                                   page.url = `${page.url}-cloned`;
-                                  await db.page.create({
+                                  await _db.page.create({
                                     data: page,
                                   });
 
@@ -542,7 +542,7 @@ export const PageManager = () => {
                                     local.init = false;
                                     delete data.folder[node.id];
                                     local.render();
-                                    db.page_folder.update({
+                                    _db.page_folder.update({
                                       where: { id: node.id as string },
                                       data: {
                                         is_deleted: true,
@@ -551,7 +551,7 @@ export const PageManager = () => {
                                   } else {
                                     local.loading = true;
                                     local.render();
-                                    await db.page.update({
+                                    await _db.page.update({
                                       where: { id: node.id as string },
                                       data: {
                                         is_deleted: true,

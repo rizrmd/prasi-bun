@@ -17,7 +17,7 @@ export const getComp = async (
   if (!validate(comp_id)) return;
 
   if (!eg.edit.comp[comp_id]) {
-    const rawComp = await db.component.findFirst({
+    const rawComp = await _db.component.findFirst({
       where: {
         id: comp_id,
       },

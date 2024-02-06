@@ -157,7 +157,7 @@ export const ToolbarCenter = () => {
                     (!p.site.api_prasi ||
                       (p.site.api_prasi && !p.site.api_prasi.port))
                   ) {
-                    await db.site.update({
+                    await _db.site.update({
                       data: {
                         config: {
                           api_url: p.site.api_url,

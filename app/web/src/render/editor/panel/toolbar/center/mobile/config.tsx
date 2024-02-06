@@ -27,7 +27,7 @@ export const ExportMobileSetting: FC<{
 }> = () => {
   const p = useGlobal(EditorGlobal, "EDITOR");
   const local = useLocal({}, async () => {
-    setting.config = await api.export_mobile(p.site.id, "config");
+    setting.config = await _api.export_mobile(p.site.id, "config");
     local.render();
   });
 
@@ -48,7 +48,7 @@ export const ExportMobileSetting: FC<{
                 if (setting.config?.android && confirm("Remove Android?")) {
                   setting.status = "building-android";
                   local.render();
-                  setting.config = await api.export_mobile(
+                  setting.config = await _api.export_mobile(
                     p.site.id,
                     "remove-android"
                   );
@@ -66,7 +66,7 @@ export const ExportMobileSetting: FC<{
                 onClick={async () => {
                   setting.status = "building-android";
                   local.render();
-                  setting.config = await api.export_mobile(
+                  setting.config = await _api.export_mobile(
                     p.site.id,
                     "build-android"
                   );
@@ -90,7 +90,7 @@ export const ExportMobileSetting: FC<{
                 if (setting.config?.ios && confirm("Remove IOS?")) {
                   setting.status = "building-ios";
                   local.render();
-                  setting.config = await api.export_mobile(
+                  setting.config = await _api.export_mobile(
                     p.site.id,
                     "remove-ios"
                   );
@@ -108,7 +108,7 @@ export const ExportMobileSetting: FC<{
                 onClick={async () => {
                   setting.status = "building-ios";
                   local.render();
-                  setting.config = await api.export_mobile(
+                  setting.config = await _api.export_mobile(
                     p.site.id,
                     "build-ios"
                   );
@@ -169,7 +169,7 @@ export const ExportMobileSetting: FC<{
                   onClick={async () => {
                     setting.status = "saving";
                     local.render();
-                    await api.export_mobile(
+                    await _api.export_mobile(
                       p.site.id,
                       "set-config",
                       setting.config
@@ -178,13 +178,13 @@ export const ExportMobileSetting: FC<{
                     if (setting.config?.android) {
                       setting.status = "building-android";
                       local.render();
-                      await api.export_mobile(p.site.id, "build-android");
+                      await _api.export_mobile(p.site.id, "build-android");
                     }
 
                     if (setting.config?.ios) {
                       setting.status = "building-ios";
                       local.render();
-                      await api.export_mobile(p.site.id, "build-ios");
+                      await _api.export_mobile(p.site.id, "build-ios");
                     }
 
                     setting.status = "ready";
@@ -280,11 +280,11 @@ const Img = (opt: {
           type="file"
           onChange={async (e) => {
             if (e.currentTarget.files) {
-              const res = await api._upload(e.currentTarget.files[0]);
+              const res = await _api._upload(e.currentTarget.files[0]);
               (setting.config as any)[opt.name] = res;
               setting.status = "saving";
               opt.render();
-              await api.export_mobile(
+              await _api.export_mobile(
                 opt.site_id,
                 "set-config",
                 setting.config

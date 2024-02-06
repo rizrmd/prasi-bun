@@ -5,7 +5,7 @@ import { g } from "../../utils/global";
 
 export const prepareAPITypes = async () => {
   const out: string[] = [];
-  for (const [k, v] of Object.entries(g.api)) {
+  for (const [k, v] of Object.entries(g._api)) {
     const name = k.substring(0, k.length - 3).replace(/\W/gi, "_");
 
     let p = {

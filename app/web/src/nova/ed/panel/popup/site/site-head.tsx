@@ -34,7 +34,7 @@ export const EdSiteHead = ({
           onClick={async () => {
             const neworg = prompt("New Organization Name");
             if (neworg) {
-              const res = await db.org.create({
+              const res = await _db.org.create({
                 data: {
                   name: neworg,
                   org_user: {

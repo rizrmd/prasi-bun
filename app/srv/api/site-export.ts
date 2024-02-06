@@ -12,10 +12,10 @@ export const _ = {
   url: "/site-export/:site_id",
   async api(site_id: string) {
     const { req, res } = apiContext(this);
-    const site = (await db.site.findFirst({
+    const site = (await _db.site.findFirst({
       where: { id: site_id },
     })) as any;
-    const pages = await db.page.findMany({
+    const pages = await _db.page.findMany({
       where: {
         id_site: site_id,
         is_deleted: false,
@@ -24,7 +24,7 @@ export const _ = {
     });
 
     if (site) {
-      const layout = await db.page.findFirst({
+      const layout = await _db.page.findFirst({
         where: {
           id_site: site.id,
           name: { startsWith: "layout:" },
@@ -34,7 +34,7 @@ export const _ = {
         select: { content_tree: true, id: true },
       });
 
-      const cgroups = await db.site_use_comp.findMany({
+      const cgroups = await _db.site_use_comp.findMany({
         where: { id_site: site.id },
       });
 
@@ -54,7 +54,7 @@ export const _ = {
       }
     }
 
-    const comps = await db.component.findMany({
+    const comps = await _db.component.findMany({
       where: {
         component_group: {
           component_site: {
@@ -69,11 +69,11 @@ export const _ = {
       site: {} as Record<string, string>,
       pages: {} as Record<string, Record<string, string>>,
     };
-    const page_ids = await db.page.findMany({
+    const page_ids = await _db.page.findMany({
       where: { id_site: site_id, is_deleted: false },
       select: { id: true },
     });
-    const npm_page = await db.npm_page.findMany({
+    const npm_page = await _db.npm_page.findMany({
       where: { id_page: { in: page_ids.map((e) => e.id) } },
     });
 

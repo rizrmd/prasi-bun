@@ -10,7 +10,7 @@ export const CORS_HEADERS = {
 export const serveAPI = {
   init: async () => {
     g.router = createRouter({ strictTrailingSlash: false });
-    for (const route of Object.values(g.api)) {
+    for (const route of Object.values(g._api)) {
       g.router.insert(route.url.replace(/\*/gi, "**"), route);
     }
   },

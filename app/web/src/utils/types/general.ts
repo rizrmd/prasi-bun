@@ -36,8 +36,8 @@ export const w = window as unknown as {
   ts: number;
   serverurl: string;
   apiurl: string;
-  api: any;
-  db: any;
+  _api: any;
+  _db: any;
   offline: boolean;
   debug: {
     on: any;
