@@ -69,16 +69,24 @@ export const fetchViaProxy = async (
       (Array.isArray(data) && data[0] instanceof File)
     ) {
       const target = new URL(url);
+      _headers["content-type"] = "multipart/form-data";
       if (data instanceof File) {
+        const formData = new FormData();
+        formData.append("file", data);
         const res = await fetch(target.pathname, {
-          body: data,
+          body: formData,
           method: "POST",
           headers: _headers,
         });
         return await res.text();
       } else {
+        const formData = new FormData();
+        let idx = 1;
+        for (const file of data) {
+          formData.append("file-" + idx++, file);
+        }
         const res = await fetch(target.pathname, {
-          body: data[0],
+          body: formData,
           method: "POST",
           headers: _headers,
         });
