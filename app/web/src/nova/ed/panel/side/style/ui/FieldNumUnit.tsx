@@ -32,6 +32,7 @@ export const FieldNumUnit: FC<{
     unit: "",
     drag: { clientX: 0, old: 0 },
     dragging: false,
+    timeout: null as any,
   });
 
   const parseVal = useCallback(() => {
@@ -84,7 +85,10 @@ export const FieldNumUnit: FC<{
 
         local.render();
 
-        update(local.val + local.unit);
+        clearTimeout(local.timeout);
+        local.timeout = setTimeout(() => {
+          update(local.val + local.unit);
+        }, 300);
       }
     };
 
