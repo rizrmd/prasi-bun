@@ -1,15 +1,14 @@
 import { get, set } from "idb-keyval";
 import { IContent } from "../../../../utils/types/general";
 import { IItem, MItem } from "../../../../utils/types/item";
+import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
 import { nav } from "../../../vi/render/script/extract-nav";
-import { loadCompSnapshot, loadComponent } from "../comp/load";
+import { loadCompSnapshot } from "../comp/load";
 import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
-import { createId } from "@paralleldrive/cuid2";
-import { FMCompDef } from "../../../../utils/types/meta-fn";
 
 export const treeCacheBuild = async (p: PG, page_id: string) => {
   const page_cache = p.preview.page_cache[page_id];
@@ -30,6 +29,8 @@ export const treeCacheBuild = async (p: PG, page_id: string) => {
       page_cache.root as unknown as IItem,
       {
         async load(comp_ids) {
+          if (!p.sync) return;
+          
           const ids = comp_ids.filter((id) => !p.comp.loaded[id]);
           const comps = await p.sync.comp.load(ids, true);
           let result = Object.entries(comps);

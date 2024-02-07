@@ -77,6 +77,8 @@ if (!g.parcel) {
   await parcelBuild();
 }
 
+await import("./build-deploy");
+
 const { createServer } = await import("./server/create");
 await createServer();
 g.status = "ready";
