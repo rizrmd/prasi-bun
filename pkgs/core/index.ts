@@ -13,7 +13,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { prepareApiRoutes } from "./server/api/api-scan";
 import { writeAsync } from "fs-jetpack";
 import { dir } from "dir";
-import { join } from "path";
 import { watchApiRoutes } from "./server/api/api-watch";
 // import "../docker-prep";
 
@@ -31,13 +30,8 @@ if (!g.Y) {
   await createLogger();
   g._api = {};
   g.mode = process.argv.includes("dev") ? "dev" : "prod";
-  Object.defineProperty(g, "datadir", {
-    get: function () {
-      return join(process.cwd(), g.mode === "prod" ? "../data" : "data");
-    },
-  });
+  g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
   console.log("DataDir", g.datadir);
-  
   g.port = parseInt(process.env.PORT || "4550");
 
   g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
