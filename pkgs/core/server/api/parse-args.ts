@@ -1,5 +1,4 @@
 import { parseFile } from "@swc/core";
-import { readAsync } from "fs-jetpack";
 
 export const parseArgs = async (path: string) => {
   const res = await parseFile(path, { syntax: "typescript" });

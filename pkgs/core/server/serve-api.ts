@@ -33,6 +33,8 @@ export const serveAPI = {
         found = null;
       }
     }
+    console.log(found?.fn.toString());
+
     if (found) {
       const params = { ...found.params };
 
@@ -99,7 +101,7 @@ export const serveAPI = {
 
         return finalResponse;
       }
- 
+
       if (finalResponse) {
         return createResponse(current.res, finalResponse);
       }
