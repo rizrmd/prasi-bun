@@ -13,6 +13,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { prepareApiRoutes } from "./server/api/api-scan";
 import { writeAsync } from "fs-jetpack";
 import { dir } from "dir";
+import { watchApiRoutes } from "./server/api/api-watch";
 // import "../docker-prep";
 
 g.status = "init";
@@ -57,15 +58,19 @@ if (!db) {
       });
   }
 }
+await prepareApiRoutes();
 
 if (!g.apiPrepared) {
   await initSrv();
   await syncActionDefinition();
   g.log.info("WS Action defined");
-  await prepareApiRoutes();
   await prepareAPITypes();
   g.log.info("API Prepared");
   g.apiPrepared = true;
+
+  if (g.mode === "dev") {
+    watchApiRoutes();
+  }
 }
 
 if (!g.parcel) {
