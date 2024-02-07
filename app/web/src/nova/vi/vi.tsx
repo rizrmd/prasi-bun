@@ -20,7 +20,7 @@ export const Vi: FC<{
   api?: any;
   db?: any;
   layout?: VG["layout"];
-  script?: { init_local_effect: Record<string, boolean> };
+  script: { init_local_effect: Record<string, boolean> };
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
   on_status_changed?: (status: VG["status"]) => void;

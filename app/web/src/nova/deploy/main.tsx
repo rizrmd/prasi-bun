@@ -1,8 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { Root } from "./root";
+import { initBaseConfig } from "./base/base";
 
 (async () => {
+  initBaseConfig();
   const div = document.getElementById("root");
   if (div) {
     const root = createRoot(div);
