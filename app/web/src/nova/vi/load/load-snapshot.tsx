@@ -45,6 +45,7 @@ export const viLoadSnapshot = async (p: PG) => {
     }
   } catch (e) {}
 
+  console.log(p.site.code);
   if (p.site.code.snapshot) {
     for (const [name, build] of Object.entries(p.site.code.snapshot)) {
       const doc = new Y.Doc();
@@ -52,7 +53,6 @@ export const viLoadSnapshot = async (p: PG) => {
 
       p.code[name] = { doc: doc as any };
       const code = p.code[name].doc;
-      console.log(code);
       if (code) {
         const src = code.getMap("map").get("files")?.get("index.js");
         console.log(src);

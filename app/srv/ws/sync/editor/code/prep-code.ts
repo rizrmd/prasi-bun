@@ -45,7 +45,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
             snapshot.update({
               id: id_site,
               type: "code",
-              build: snap.build, 
+              build: snap.build,
             });
           }
 
