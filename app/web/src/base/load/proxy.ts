@@ -64,34 +64,39 @@ export const fetchViaProxy = async (
       return raw;
     }
   } else {
-    const res = await fetch(`${w.basehost ? w.basehost : ""}/_proxy`, {
-      method: "POST",
-      body: JSON.stringify([
-        {
-          url,
-          body,
-          headers,
-        },
-      ]),
-      headers: { "content-type": "application/json" },
-    });
+    if (body instanceof File) {
+      const res = await fetch(url, { body, headers: _headers });
+      return await res.text();
+    } else {
+      const res = await fetch(`${w.basehost ? w.basehost : ""}/_proxy`, {
+        method: "POST",
+        body: JSON.stringify([
+          {
+            url,
+            body,
+            headers,
+          },
+        ]),
+        headers: { "content-type": "application/json" },
+      });
 
-    let text = "";
-    try {
-      text = await res.text();
-      return JSON.parse(text);
-    } catch (e) {
-      let formatted_body = null;
+      let text = "";
       try {
-        formatted_body = JSON.stringify(JSON.parse(body), null, 2);
-      } catch (e) {}
+        text = await res.text();
+        return JSON.parse(text);
+      } catch (e) {
+        let formatted_body = null;
+        try {
+          formatted_body = JSON.stringify(JSON.parse(body), null, 2);
+        } catch (e) {}
 
-      console.warn(
-        `\n\n⚡ Failed to JSON.parse fetch result of ${url}:\n\n${JSON.stringify(
-          text
-        )} \n\nwith params:\n${formatted_body}`
-      );
-      return text;
+        console.warn(
+          `\n\n⚡ Failed to JSON.parse fetch result of ${url}:\n\n${JSON.stringify(
+            text
+          )} \n\nwith params:\n${formatted_body}`
+        );
+        return text;
+      }
     }
   }
 };
