@@ -1,8 +1,12 @@
+import { g } from "./utils/global";
+
+g.mode = process.argv.includes("dev") ? "dev" : "prod";
+g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
+
 import { parcelBuild } from "utils/parcel";
 import { prepareAPITypes } from "./server/api/prep-api-ts";
 import { startDevWatcher } from "./utils/dev-watcher";
 import { ensureNotRunning } from "./utils/ensure";
-import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
 import { syncActionDefinition } from "utils/sync-def";
@@ -29,8 +33,6 @@ if (!g.Y) {
 
   await createLogger();
   g._api = {};
-  g.mode = process.argv.includes("dev") ? "dev" : "prod";
-  g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
   console.log("DataDir", g.datadir);
   g.port = parseInt(process.env.PORT || "4550");
 
