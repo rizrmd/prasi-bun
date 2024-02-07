@@ -12,14 +12,14 @@ export const _ = {
     const { req, res, mode: _mode } = apiContext(this);
 
     if (mode === "apk-qr") {
-      const file_apk = Bun.file(dir.path(`${g.datadir}/prasi-wrap.apk`));
+      const file_apk = Bun.file(dir.data(`/prasi-wrap.apk`));
       if (!await file_apk.exists()) {
         return new Response('not found');
       }
       return new Response(file_apk);
     }
 
-    let path = dir.path(`${g.datadir}/npm/${mode}/${id}/${req.params._}`);
+    let path = dir.data(`/npm/${mode}/${id}/${req.params._}`);
 
     const contentType = mime.lookup(path);
     if (contentType) res.setHeader("content-type", contentType);
@@ -53,7 +53,7 @@ export const _ = {
       }
     }
 
-    if (path.length > dir.path(`${g.datadir}/npm/${mode}/${id}`).length) {
+    if (path.length > dir.data(`/npm/${mode}/${id}`).length) {
       const file = await readAsync(path, "buffer");
 
       if (file) {

@@ -11,21 +11,21 @@ export const code = {
     if (path) {
       file_path = path[0] === "/" ? path : `/${path}`;
     }
-    return dir.path(`${g.datadir}/code/${id_site}/${mode}/${type}${file_path}`);
+    return dir.data(`/code/${id_site}/${mode}/${type}${file_path}`);
   },
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
   prep(id_site: string, mode: CodeMode) {
-    if (exists(`${g.datadir}`)) {
+    if (exists(dir.data(""))) {
       Bun.spawn({
         cmd: ["chmod", "-R", "777", "."],
-        cwd: dir.path(`${g.datadir}`),
+        cwd: dir.data(``),
       });
     }
     const promises: Promise<void>[] = [];
     return {
       path(type: "src" | "build", path: string) {
-        return dir.path(
-          `${g.datadir}/code/${id_site}/${mode}/${type}${
+        return dir.data(
+          `/code/${id_site}/${mode}/${type}${
             path[0] === "/" ? path : `/${path}`
           }`
         );

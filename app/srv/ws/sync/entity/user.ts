@@ -25,7 +25,7 @@ export const user = {
     init() {
       this._db = open<UserConf, string>({
         name: "user-conf",
-        path: dir.path(`${g.datadir}/lmdb/user-conf.lmdb`),
+        path: dir.data(`/lmdb/user-conf.lmdb`),
       });
       return this._db;
     },

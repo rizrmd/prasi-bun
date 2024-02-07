@@ -7,7 +7,7 @@ export const _ = {
   async api() {
     const { req } = apiContext(this);
     const rpath = decodeURIComponent(req.params._);
-    const path = dir.path(`${g.datadir}/upload/${rpath}`);
+    const path = dir.data(`/upload/${rpath}`);
 
     try {
       return new Response(Bun.file(path) as any);

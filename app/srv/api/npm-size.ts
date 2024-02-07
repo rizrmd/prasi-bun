@@ -8,7 +8,7 @@ export const _ = {
   async api(mode: "site" | "page", id: string) {
     const { req, res } = apiContext(this);
     try {
-      const s = await stat(dir.path(`${g.datadir}/npm/${mode}/${id}/index.js`));
+      const s = await stat(dir.data(`$/npm/${mode}/${id}/index.js`));
       return s.size.toString();
     } catch (e) {}
     return "-";

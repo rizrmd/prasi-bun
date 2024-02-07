@@ -4,6 +4,7 @@ import { dirname } from "path";
 import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
 import { baseTypings } from "../../web/src/utils/script/types/base";
+import { dir } from "dir";
 
 export const _ = {
   url: "/code/:site_id/:action",
@@ -27,21 +28,21 @@ export const _ = {
         if (typeof json.apiTypes === "string") {
           apiPath = "gen/srv/api/srv";
           await Bun.write(
-            `${g.datadir}/site/code/${site_id}/api-types.d.ts`,
+            dir.data(`/site/code/${site_id}/api-types.d.ts`),
             json.apiTypes
           );
         }
 
         for (const [k, v] of Object.entries(json.prismaTypes)) {
-          await dirAsync(dirname(`${g.datadir}/site/code/${site_id}/${k}`));
+          await dirAsync(dirname(dir.data(`/site/code/${site_id}/${k}`)));
           await Bun.write(
-            `${g.datadir}/site/code/${site_id}/${k}`,
+            dir.data(`/site/code/${site_id}/${k}`),
             JSON.parse(v)
           );
         }
 
         await Bun.write(
-          `${g.datadir}/site/code/${site_id}/global.d.ts`,
+          dir.data(`/site/code/${site_id}/global.d.ts`),
           `\
 import React from "react";
 import {
@@ -79,7 +80,7 @@ declare global {
 
       return new Response("NOT FOUND", { status: 404 });
     }
-    
+
     return "This is code.ts";
   },
 };
