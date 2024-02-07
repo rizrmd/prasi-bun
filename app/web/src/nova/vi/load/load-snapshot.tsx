@@ -14,38 +14,35 @@ export const viLoadSnapshot = async (p: PG) => {
   try {
     const apiURL = new URL(api_url);
     if (api_url && apiURL.hostname) {
-      try {
-        await loadApiProxyDef(api_url, true);
+      await loadApiProxyDef(api_url, true);
 
-        const api = w.prasiApi[api_url];
-        if (api && api.apiTypes && api.prismaTypes) {
-          const zip = JSON.stringify({
-            api: api.apiTypes,
-            prisma: api.prismaTypes,
-          });
-          const hash = hashCode(zip);
-          const res = await p.sync?.code.action({
-            type: "check-typings",
+      const api = w.prasiApi[api_url];
+      if (api && api.apiTypes && api.prismaTypes) {
+        const zip = JSON.stringify({
+          api: api.apiTypes,
+          prisma: api.prismaTypes,
+        });
+        const hash = hashCode(zip);
+        const res = await p.sync?.code.action({
+          type: "check-typings",
+          site_id: p.site.id,
+          hash,
+        });
+        if (res?.type === "check-typings" && !res.hash) {
+          const body = Buffer.from(compress(encoder.encode(zip)));
+          p.sync?.code.action({
+            type: "push-typings",
             site_id: p.site.id,
+            body,
             hash,
           });
-          if (res?.type === "check-typings" && !res.hash) {
-            const body = Buffer.from(compress(encoder.encode(zip)));
-            p.sync?.code.action({
-              type: "push-typings",
-              site_id: p.site.id,
-              body,
-              hash,
-            });
-          }
         }
-      } catch (e) {
-        console.warn("Failed to load API:", api_url);
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn("Failed to load API:", api_url);
+  }
 
-  console.log(p.site.code);
   if (p.site.code.snapshot) {
     for (const [name, build] of Object.entries(p.site.code.snapshot)) {
       const doc = new Y.Doc();
