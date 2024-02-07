@@ -8,6 +8,7 @@ export const _ = {
   async api(mode: "site" | "ssr", id_site: string) {
     const { req, res } = apiContext(this);
 
+    console.log(code.path(id_site, mode, "build", req.params["*"]));
     const file = Bun.file(code.path(id_site, mode, "build", req.params["*"]));
     if (await file.exists()) {
       return new Response(file as any);
