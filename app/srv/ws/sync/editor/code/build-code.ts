@@ -52,7 +52,7 @@ export const codeBuild = async (id_site: any, mode: CodeMode) => {
               if (cdoc) {
                 const doc = cdoc.build[mode];
                 const build_dir = code.path(id_site, mode, "build");
-
+                console.log("done building", build_dir);
                 if (doc) {
                   codeApplyChanges(build_dir, doc);
                 }
