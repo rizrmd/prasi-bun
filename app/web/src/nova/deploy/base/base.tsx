@@ -30,7 +30,7 @@ export const base = {
     api: any;
     db: any;
   },
-  init_local_effect: {} as any, 
+  init_local_effect: {} as any,
   mode: "" as "desktop" | "mobile",
   route: {
     status: "init" as "init" | "loading" | "ready",
@@ -39,6 +39,11 @@ export const base = {
   comp: {
     list: {} as Record<string, IItem>,
     pending: new Set<string>(),
+  },
+  layout: {
+    id: "",
+    root: null as null | IRoot,
+    meta: null as null | Record<string, IMeta>,
   },
   page: {
     id: "",

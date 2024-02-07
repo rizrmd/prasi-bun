@@ -41,6 +41,12 @@ const scanSingle = (item: IItem | ISection) => {
       if (!comp.list[comp_id] && !comp.pending.has(comp_id)) {
         comp.pending.add(comp_id);
       }
+
+      for (const prop of Object.values(item.component?.props || {})) {
+        if (prop.content && prop.meta?.type === "content-element") {
+          scanSingle(prop.content);
+        }
+      }
     }
   }
 

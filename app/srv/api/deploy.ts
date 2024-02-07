@@ -62,6 +62,25 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
             },
           });
 
+          const layouts = await _db.page.findMany({
+            where: {
+              name: { startsWith: "layout:" },
+              is_deleted: false,
+            },
+            select: {
+              id: true,
+              name: true,
+              is_default_layout: true,
+              content_tree: true,
+            },
+          });
+
+          let layout = null as any;
+          for (const l of layouts) {
+            if (!layout) layout = l;
+            if (l.is_default_layout) layout = l;
+          }
+
           let api_url = "";
           if (site && site.config && (site.config as any).api_url) {
             api_url = (site.config as any).api_url;
@@ -76,7 +95,13 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
             select: { url: true, id: true },
           });
           return gzipAsync(
-            JSON.stringify({ site: { ...site, api_url }, urls }) as any
+            JSON.stringify({
+              site: { ...site, api_url },
+              urls,
+              layout: layout
+                ? { id: layout.id, root: layout.content_tree }
+                : undefined,
+            }) as any
           );
         }
         case "page": {
