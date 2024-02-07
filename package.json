@@ -9,7 +9,7 @@
     "build-site": "bun run --silent ./pkgs/core/build-site.ts",
     "db-pull": "bun run ./pkgs/core/db-pull.ts",
     "parcel": "bun clean && bun run ./pkgs/core/parcel.ts",
-    "prod": "bun run --silent ./pkgs/core/index.ts",
+    "prod": "bun run --silent ./pkgs/core/index.ts prod",
     "local-prod": "bun run build && bun run db-pull && bun run ./pkgs/core/index.ts",
     "pull": "cd app/db && bun prisma db pull && bun prisma generate",
     "pkgs-upgrade": "bun run --silent ./pkgs/core/upgrade.ts",
