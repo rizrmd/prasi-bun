@@ -68,15 +68,16 @@ export const fetchViaProxy = async (
       data instanceof File ||
       (Array.isArray(data) && data[0] instanceof File)
     ) {
+      const target = new URL(url);
       if (data instanceof File) {
-        const res = await fetch(url, {
+        const res = await fetch(target.pathname, {
           body: data,
           method: "POST",
           headers: _headers,
         });
         return await res.text();
       } else {
-        const res = await fetch(url, {
+        const res = await fetch(target.pathname, {
           body: data[0],
           method: "POST",
           headers: _headers,
