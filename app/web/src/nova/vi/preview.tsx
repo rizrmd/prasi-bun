@@ -12,10 +12,11 @@ import {
   savePageMetaCache,
 } from "../ed/logic/ed-route";
 import { loadSite } from "../ed/logic/ed-site";
-import { treeCacheBuild } from "../ed/logic/tree/build";
+import { treeCacheBuild, treeRebuild } from "../ed/logic/tree/build";
 import { nav } from "./render/script/extract-nav";
 import { Vi } from "./vi";
 import parseUA from "ua-parser-js";
+import { DeadEnd } from "../../utils/ui/deadend";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
@@ -66,6 +67,18 @@ export const ViPreview = (arg: { pathname: string }) => {
   viRoute(p);
 
   if (p.status !== "ready" && p.status !== "reload") {
+    if (p.status === "page-not-found") {
+      return (
+        <DeadEnd
+          back={() => {
+            history.back();
+          }}
+        >
+          Page Not Found
+        </DeadEnd>
+      );
+    }
+
     return <Loading note={p.status + "-page"} />;
   }
 

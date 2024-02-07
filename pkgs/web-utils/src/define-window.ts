@@ -76,7 +76,7 @@ export const defineWindow = async (awaitServerUrl = true) => {
       if (!_href) return null;
     }
 
-    history.pushState({}, "", _href);
+    history.pushState({ prevUrl: window.location.href }, "", _href);
     w.pathname = href;
 
     if (w.prasiContext && w.prasiContext.render) {
