@@ -21,9 +21,14 @@ export const Input: FC<
     delete prop.onChange;
   }
 
+  let value = form[name];
+  if (value instanceof URL) {
+    value = value.toString();
+  }
+
   return (
     <input
-      value={form[name] || ""}
+      value={value || ""}
       spellCheck={false}
       onInput={(e) => {
         form[name] = e.currentTarget.value;
