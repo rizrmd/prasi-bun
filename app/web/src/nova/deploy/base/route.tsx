@@ -1,12 +1,11 @@
 import { createRouter } from "radix3";
-import { base } from "./base";
-import { decompressBlob } from "./util";
-import { IMeta } from "../../vi/utils/types";
-import { IRoot } from "../../../utils/types/root";
-import { genMeta } from "../../vi/meta/meta";
-import { IItem } from "../../../utils/types/item";
 import { apiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
+import { IRoot } from "../../../utils/types/root";
+import { genMeta } from "../../vi/meta/meta";
+import { IMeta } from "../../vi/utils/types";
+import { base } from "./base";
+import { decompressBlob } from "./util";
 
 export const initBaseRoute = async () => {
   const raw = await (await fetch(base.url`_prasi/route`)).blob();
