@@ -48,6 +48,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
               build: snap.build,
             });
           }
+          const build_dir = code.path(id_site, mode, "build");
 
           const sv_local = await gzipAsync(bin);
           user.active.findAll({ site_id: id_site }).map((e) => {
@@ -84,6 +85,11 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
     });
 
     if (snap.type === "code") {
+      snapshot.update({
+        id: id_site,
+        type: "code",
+        build,
+      });
       return snap;
     }
   }
