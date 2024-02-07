@@ -17,7 +17,7 @@ export const FieldNumUnit: FC<{
   icon,
   value,
   label,
-  update,
+  update: _update,
   unit,
   hideUnit,
   width,
@@ -34,6 +34,16 @@ export const FieldNumUnit: FC<{
     dragging: false,
     timeout: null as any,
   });
+
+  const update: typeof _update = useCallback(
+    (...arg) => {
+      clearTimeout(local.timeout);
+      local.timeout = setTimeout(() => {
+        _update(...arg);
+      }, 100);
+    },
+    [_update]
+  );
 
   const parseVal = useCallback(() => {
     let val = "";
@@ -83,12 +93,10 @@ export const FieldNumUnit: FC<{
           local.val = Math.max(0, local.val);
         }
 
+        local.val_str = local.val + "";
         local.render();
 
-        clearTimeout(local.timeout);
-        local.timeout = setTimeout(() => {
-          update(local.val + local.unit);
-        }, 300);
+        update(local.val + local.unit);
       }
     };
 
