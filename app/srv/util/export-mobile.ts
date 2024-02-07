@@ -4,7 +4,7 @@ import { writeAsync, dirAsync } from "fs-jetpack";
 import { ExportMobileConfig } from "../../web/src/render/editor/panel/toolbar/center/mobile/config";
 
 const mpath = (site_id: string, path?: string) =>
-  dir.path(`${g.datadir}/mobile/${site_id}/${path || ""}`);
+  dir.data(`/mobile/${site_id}/${path || ""}`);
 
 export const exmobile = {
   config: {

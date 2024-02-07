@@ -2,7 +2,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { dirAsync } from "fs-jetpack";
 import lmdb, { RootDatabase, open } from "lmdb";
 import { dirname, join } from "path";
-import { g } from "./global";
 import { dir } from "./dir";
 
 const cuid = createId;
@@ -14,7 +13,7 @@ export const createCache = <T>() => ({
   lmdb: null as unknown as RootDatabase<SessionEntry<T>>,
   cookieKey: "",
   async init(arg: { cookieKey: string; dbname?: string }) {
-    const dbpath = dir.path(join(g.datadir, (arg.dbname || "session") + ".lmdb"));
+    const dbpath = dir.data(join(arg.dbname || "session") + ".lmdb");
     await dirAsync(dirname(dbpath));
     self(this).lmdb = open({
       path: dbpath,

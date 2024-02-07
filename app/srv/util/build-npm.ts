@@ -107,26 +107,26 @@ export const buildNpm = async ({
 ${imports}
 ${exports}
 `.trim();
-  await dirAsync(dir.path(`${g.datadir}/npm/${mode}/${id}`));
-  await writeAsync(dir.path(`${g.datadir}/npm/${mode}/${id}/input.js`), src);
+  await dirAsync(dir.data(`/npm/${mode}/${id}`));
+  await writeAsync(dir.data(`/npm/${mode}/${id}/input.js`), src);
   packages["react"] = "18.2.0";
   packages["react-dom"] = "18.2.0";
-  await writeAsync(dir.path(`${g.datadir}/npm/${mode}/${id}/package.json`), {
+  await writeAsync(dir.data(`/npm/${mode}/${id}/package.json`), {
     dependencies: packages,
   });
   await writeAsync(
-    dir.path(`${g.datadir}/npm/${mode}/${id}/pnpm-workspace.yaml`),
+    dir.data(`/npm/${mode}/${id}/pnpm-workspace.yaml`),
     `\
 packages:
 - ./*`
   );
   try {
     await $({
-      cwd: dir.path(`${g.datadir}/npm/${mode}/${id}`),
+      cwd: dir.data(`/npm/${mode}/${id}`),
     })`pnpm i`;
 
     await build({
-      absWorkingDir: dir.path(`${g.datadir}/npm/${mode}/${id}`),
+      absWorkingDir: dir.data(`/npm/${mode}/${id}`),
       entryPoints: ["input.js"],
       bundle: true,
       outfile: "index.js",
@@ -153,7 +153,7 @@ packages:
   }
 
   try {
-    const s = await stat(dir.path(`${g.datadir}/npm/${mode}/${id}/index.js`));
+    const s = await stat(dir.data(`/npm/${mode}/${id}/index.js`));
 
     if (mode === "page") {
       delete glb.npm.page[id];

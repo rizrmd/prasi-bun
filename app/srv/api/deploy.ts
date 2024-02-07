@@ -111,7 +111,7 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
     } else if (pathname === "index.html" || pathname === "_") {
       return index_html;
     } else {
-      const res = dir.path(`${g.datadir}/deploy/${pathname}`);
+      const res = dir.data(`/deploy/${pathname}`);
       const file = Bun.file(res);
       if (!(await file.exists())) {
         return index_html;

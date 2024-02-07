@@ -69,7 +69,7 @@ export const snapshot = {
   init() {
     this._db = open<DocSnapshot, string>({
       name: "doc-snapshot",
-      path: dir.path(`${g.datadir}/lmdb/doc-snapshot.lmdb`),
+      path: dir.data(`/lmdb/doc-snapshot.lmdb`),
       compression: true,
     });
     return this._db;

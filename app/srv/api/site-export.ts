@@ -77,7 +77,7 @@ export const _ = {
       where: { id_page: { in: page_ids.map((e) => e.id) } },
     });
 
-    if (!exists(dir.path(`${g.datadir}/npm/site/${site_id}`))) {
+    if (!exists(dir.data(`/npm/site/${site_id}`))) {
       await buildNpm({ id: site_id, mode: "site" });
     }
     const npm_page_ids = {} as Record<string, any[]>;
@@ -89,19 +89,19 @@ export const _ = {
     }
 
     for (const [k, v] of Object.entries(npm_page_ids)) {
-      if (!exists(dir.path(`${g.datadir}/npm/page/${k}`))) {
+      if (!exists(dir.data(`/npm/page/${k}`))) {
         await buildNpm({ id: k, mode: "page", _items: v });
       }
     }
 
     npm.site = readDirectoryRecursively(
-      dir.path(`${g.datadir}/npm/site/${site_id}`)
+      dir.data(`/npm/site/${site_id}`)
     );
 
     for (const page of pages) {
-      if (exists(dir.path(`${g.datadir}/npm/page/${page.id}`))) {
+      if (exists(dir.data(`/npm/page/${page.id}`))) {
         npm.pages[page.id] = readDirectoryRecursively(
-          dir.path(`${g.datadir}/npm/page/${page.id}`)
+          dir.data(`/npm/page/${page.id}`)
         );
       }
     }
