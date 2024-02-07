@@ -95,6 +95,7 @@ const codeLoad = (id: string, path: string) => {
 
   const files = new Y.Map();
 
+  console.log("loading code", path);
   const dirs = readDirectoryRecursively(path);
   for (const [k, v] of Object.entries(dirs)) {
     files.set(k, v);
