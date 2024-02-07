@@ -52,7 +52,6 @@ export const viLoadSnapshot = async (p: PG) => {
       const code = p.code[name].doc;
       if (code) {
         const src = code.getMap("map").get("files")?.get("index.js");
-        console.log(src);
         applyEnv(p, src);
         treeRebuild(p);
         p.render();
