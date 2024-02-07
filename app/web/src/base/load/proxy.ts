@@ -64,9 +64,17 @@ export const fetchViaProxy = async (
       return raw;
     }
   } else {
-    if (body instanceof File) {
-      const res = await fetch(url, { body, headers: _headers });
-      return await res.text();
+    if (
+      data instanceof File ||
+      (Array.isArray(data) && data[0] instanceof File)
+    ) {
+      if (data instanceof File) {
+        const res = await fetch(url, { body: data, headers: _headers });
+        return await res.text();
+      } else {
+        const res = await fetch(url, { body: data[0], headers: _headers });
+        return await res.text();
+      }
     } else {
       const res = await fetch(`${w.basehost ? w.basehost : ""}/_proxy`, {
         method: "POST",
