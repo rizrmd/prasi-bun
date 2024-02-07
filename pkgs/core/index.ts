@@ -1,12 +1,8 @@
-import { g } from "./utils/global";
-
-g.mode = process.argv.includes("dev") ? "dev" : "prod";
-g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
-
 import { parcelBuild } from "utils/parcel";
 import { prepareAPITypes } from "./server/api/prep-api-ts";
 import { startDevWatcher } from "./utils/dev-watcher";
 import { ensureNotRunning } from "./utils/ensure";
+import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
 import { syncActionDefinition } from "utils/sync-def";
@@ -17,6 +13,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { prepareApiRoutes } from "./server/api/api-scan";
 import { writeAsync } from "fs-jetpack";
 import { dir } from "dir";
+import { join } from "path";
 import { watchApiRoutes } from "./server/api/api-watch";
 // import "../docker-prep";
 
@@ -33,7 +30,14 @@ if (!g.Y) {
 
   await createLogger();
   g._api = {};
+  g.mode = process.argv.includes("dev") ? "dev" : "prod";
+  Object.defineProperty(g, "datadir", {
+    get: function () {
+      return join(process.cwd(), g.mode === "prod" ? "../data" : "data");
+    },
+  });
   console.log("DataDir", g.datadir);
+  
   g.port = parseInt(process.env.PORT || "4550");
 
   g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
