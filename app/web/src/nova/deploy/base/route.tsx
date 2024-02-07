@@ -17,9 +17,18 @@ export const initBaseRoute = async () => {
         id: string;
         url: string;
       }[];
+      layout: any;
     };
 
     if (res && res.site && res.urls) {
+      if (res.layout) {
+        base.layout.root = res.layout.root;
+        base.layout.meta = {};
+        if (base.layout.root) {
+          rebuildMeta(base.layout.meta, base.layout.root);
+        }
+      }
+
       base.site = res.site;
       base.site.code = { mode: "new" };
       await injectSiteScript();
@@ -31,7 +40,6 @@ export const initBaseRoute = async () => {
       w.serverurl = base.site.api_url;
       w.db = base.site.db;
       w.api = base.site.api;
-
 
       for (const item of res.urls) {
         router.insert(item.url, item);

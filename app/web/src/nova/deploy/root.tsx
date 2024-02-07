@@ -121,6 +121,17 @@ export const Root = () => {
           site_id={base.site.id}
           db={base.site.db}
           api={base.site.api}
+          layout={
+            base.layout.id && base.layout.root && base.layout.meta
+              ? {
+                  id: base.layout.id,
+                  meta: base.layout.meta,
+                  entry: Object.values(base.layout.root.childs)
+                    .filter((e) => e)
+                    .map((e) => e.id),
+                }
+              : undefined
+          }
           script={{ init_local_effect: base.init_local_effect }}
         />
       </div>
