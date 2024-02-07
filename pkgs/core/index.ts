@@ -31,6 +31,7 @@ if (!g.Y) {
   g._api = {};
   g.mode = process.argv.includes("dev") ? "dev" : "prod";
   g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
+  console.log("DataDir", g.datadir);
   g.port = parseInt(process.env.PORT || "4550");
 
   g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
