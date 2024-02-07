@@ -30,9 +30,7 @@ if (!g.Y) {
   await createLogger();
   g._api = {};
   g.mode = process.argv.includes("dev") ? "dev" : "prod";
-  g.datadir = dir.path(g.mode == "prod" ? "../data" : "data");
-  console.log(`DataDir: ${g.datadir}`);
-
+  g.datadir = dir.path(g.mode === "prod" ? "../data" : "data", false);
   g.port = parseInt(process.env.PORT || "4550");
 
   g.log.info(g.mode === "dev" ? "DEVELOPMENT" : "PRODUCTION");
