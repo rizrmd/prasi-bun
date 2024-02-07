@@ -22,6 +22,7 @@ export const initBaseRoute = async () => {
 
     if (res && res.site && res.urls) {
       if (res.layout) {
+        base.layout.id = res.layout.id;
         base.layout.root = res.layout.root;
         base.layout.meta = {};
         if (base.layout.root) {
