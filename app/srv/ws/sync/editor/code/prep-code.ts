@@ -48,8 +48,6 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
               build: snap.build,
             });
           }
-          const build_dir = code.path(id_site, mode, "build");
-
           const sv_local = await gzipAsync(bin);
           user.active.findAll({ site_id: id_site }).map((e) => {
             const ws = conns.get(e.client_id)?.ws;
@@ -100,6 +98,8 @@ const codeLoad = (id: string, path: string) => {
   const map = doc.getMap("map");
 
   const files = new Y.Map();
+
+  console.log(`loading code`, path);
 
   const dirs = readDirectoryRecursively(path);
   for (const [k, v] of Object.entries(dirs)) {
