@@ -50,6 +50,16 @@ export const reloadPagePicker = async (p: PG) => {
   tree.push(pagePickerRootItem);
 
   for (const page of pages) {
+    if (p.page.list[page.id]) {
+      p.page.list[page.id].page.name = page.name;
+      p.page.list[page.id].page.name = page.url;
+    }
+
+    if (p.page.cur.id === page.id) {
+      p.page.cur.name = page.name;
+      p.page.cur.url = page.url;
+    }
+
     tree.push({
       id: page.id,
       parent: page.id_folder || "root",
