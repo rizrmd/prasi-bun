@@ -12,7 +12,7 @@ export const viEvalProps = (
     meta: VG["meta"];
     site: { db: any; api: any };
     page: VG["page"];
-    on_nav_loaded?: VG["on_nav_loaded"];
+    on_nav_loaded?: VG["on_preload"];
   },
   meta: IMeta,
   is_layout: boolean,

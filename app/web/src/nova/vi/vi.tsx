@@ -24,7 +24,7 @@ export const Vi: FC<{
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
   on_status_changed?: (status: VG["status"]) => void;
-  on_nav_loaded?: (arg: { urls: string[] }) => Promise<void>;
+  on_preload?: (arg: { urls: string[] }) => Promise<void>;
 }> = ({
   meta,
   entry,
@@ -38,13 +38,13 @@ export const Vi: FC<{
   page_id,
   render_stat: rs,
   on_status_changed,
-  on_nav_loaded,
+  on_preload,
   layout,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
   vi.mode = mode;
   vi.entry = entry;
-  vi.on_nav_loaded = on_nav_loaded;
+  vi.on_preload = on_preload;
 
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
@@ -56,8 +56,8 @@ export const Vi: FC<{
     }
     clearTimeout(nav.timeout);
     nav.timeout = setTimeout(() => {
-      if (vi.on_nav_loaded) {
-        vi.on_nav_loaded({
+      if (vi.on_preload) {
+        vi.on_preload({
           urls: Array.from(vi.page.navs[page_id]),
         });
       }
@@ -88,12 +88,12 @@ export const Vi: FC<{
     viLoad(vi, { api_url, site_id });
   }
 
-  if (on_nav_loaded) {
+  if (on_preload) {
     useEffect(() => {
       setTimeout(() => {
         const nav = vi.page.navs[vi.page.cur.id];
         if (nav) {
-          on_nav_loaded({
+          on_preload({
             urls: Array.from(nav),
           });
         }

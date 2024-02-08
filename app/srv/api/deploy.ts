@@ -118,6 +118,30 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
           }
           return null;
         }
+        case "pages": {
+          const page_ids = req.params.ids as string[];
+          if (page_ids) {
+            const ids = page_ids.filter((id) => validate(id));
+            const pages = await _db.page.findMany({
+              where: { id: { in: ids } },
+              select: { id: true, content_tree: true, url: true },
+            });
+            if (pages) {
+              console.log(pages.map((e) => e.id));
+
+              return gzipAsync(
+                JSON.stringify(
+                  pages.map((e) => ({
+                    id: e.id,
+                    url: e.url,
+                    root: e.content_tree,
+                  }))
+                ) as any
+              );
+            }
+          }
+          break;
+        }
         case "comp": {
           const ids = req.params.ids as string[];
           const result = {} as Record<string, any>;

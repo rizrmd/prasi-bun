@@ -36,7 +36,7 @@ export const ViGlobal = {
     cur: { id: "" },
     navs: {} as Record<string, Set<string>>,
   },
-  on_nav_loaded: undefined as
+  on_preload: undefined as
     | undefined
     | ((arg: { urls: string[] }) => Promise<void>),
 };
