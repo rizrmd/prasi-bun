@@ -127,8 +127,6 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
               select: { id: true, content_tree: true, url: true },
             });
             if (pages) {
-              console.log(pages.map((e) => e.id));
-
               return gzipAsync(
                 JSON.stringify(
                   pages.map((e) => ({
