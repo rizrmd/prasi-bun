@@ -16,7 +16,7 @@ const onEndPlugin: Plugin = {
   },
 };
 
-console.log("Building deploy");
+console.log("Building site deploy");
 const ctx = await context({
   bundle: true,
   absWorkingDir: dir.path(""),

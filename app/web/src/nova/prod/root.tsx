@@ -30,7 +30,7 @@ export const Root = () => {
 
         const site_script = evalCJS(
           await (
-            await fetch(`/deploy/${base.site.id}/_prasi/code/index.js`)
+            await fetch(`/prod/${base.site.id}/_prasi/code/index.js`)
           ).text()
         );
         if (site_script) {

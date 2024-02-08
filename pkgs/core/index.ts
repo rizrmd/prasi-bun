@@ -76,7 +76,7 @@ if (!g.parcel) {
   await parcelBuild();
 }
 
-await import("./build-deploy");
+await import("./build-prod");
 
 const { createServer } = await import("./server/create");
 await createServer();

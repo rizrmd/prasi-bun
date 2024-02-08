@@ -24,11 +24,11 @@ import { w } from "./w";
           location.hostname === "10.0.2.2" // android localhost
         ) {
           if (
-            location.pathname.startsWith("/deploy") &&
-            !_href.startsWith("/deploy")
+            location.pathname.startsWith("/prod") &&
+            !_href.startsWith("/prod")
           ) {
             const patharr = location.pathname.split("/");
-            _href = `/deploy/${patharr[2]}${_href}`;
+            _href = `/prod/${patharr[2]}${_href}`;
           }
         }
       }

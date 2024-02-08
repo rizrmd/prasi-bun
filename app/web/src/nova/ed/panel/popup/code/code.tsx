@@ -128,7 +128,7 @@ const CodeBody = () => {
     <div className="relative w-full h-full flex flex-col">
       <div className="border-b flex justify-between h-[40px] items-stretch">
         <div className="flex items-stretch">
-          <Popover
+          {/* <Popover
             placement="bottom"
             offset={0}
             arrow={false}
@@ -161,7 +161,7 @@ const CodeBody = () => {
                 __html: iconChevronDown,
               }}
             ></div>
-          </Popover>
+          </Popover> */}
 
           {/* <Tooltip
             content="STDOUT Log"
