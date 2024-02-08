@@ -5,7 +5,7 @@ import { code } from "../ws/sync/editor/code/util-code";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 
 export const _ = {
-  url: "/deploy/:site_id/**",
+  url: "/prod/:site_id/**",
   async api() {
     const { req, res } = apiContext(this);
 
@@ -25,9 +25,9 @@ export const _ = {
 <body class="flex-col flex-1 w-full min-h-screen flex opacity-0">
 <div id="root"></div>
 <script>
-window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
+window._prasi={basepath: "/prod/${site_id}",site_id:"${site_id}"}
 </script>
-<script src="/deploy/${site_id}/main.js" type="module"></script>
+<script src="/prod/${site_id}/main.js" type="module"></script>
 </body> 
 </html>`,
       { headers: { "content-type": "text/html" } }
@@ -158,7 +158,7 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
     } else if (pathname === "index.html" || pathname === "_") {
       return index_html;
     } else {
-      const res = dir.data(`/deploy/${pathname}`);
+      const res = dir.data(`/prod/${pathname}`);
       const file = Bun.file(res);
       if (!(await file.exists())) {
         return index_html;

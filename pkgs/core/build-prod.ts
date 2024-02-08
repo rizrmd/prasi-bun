@@ -1,12 +1,11 @@
 import { dir } from "dir";
 import { context } from "esbuild";
-import { g } from "./utils/global";
 
 const ctx = await context({
   bundle: true,
   absWorkingDir: dir.path(""),
-  entryPoints: [dir.path("app/web/src/nova/deploy/main.tsx")],
-  outdir: dir.data(`/deploy`),
+  entryPoints: [dir.path("app/web/src/nova/prod/main.tsx")],
+  outdir: dir.data(`/prod`),
   splitting: true,
   format: "esm",
   jsx: "transform",
