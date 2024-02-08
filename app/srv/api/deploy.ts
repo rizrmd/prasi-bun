@@ -66,6 +66,7 @@ window._prasi={basepath: "/deploy/${site_id}",site_id:"${site_id}"}
             where: {
               name: { startsWith: "layout:" },
               is_deleted: false,
+              id_site: site_id,
             },
             select: {
               id: true,
