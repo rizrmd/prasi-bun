@@ -135,7 +135,7 @@ export const ViPreview = (arg: { pathname: string }) => {
           }
           render_stat="disabled"
           script={{ init_local_effect: p.script.init_local_effect }}
-          on_nav_loaded={async ({ urls }) => {
+          on_preload={async ({ urls }) => {
             const load_urls: string[] = [];
             if (p.preview.url_cache) {
               for (const url of urls) {

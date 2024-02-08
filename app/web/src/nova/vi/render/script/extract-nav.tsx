@@ -5,7 +5,7 @@ const store = createStore(`prasi-cache`, `prasi-cache-store`);
 export const nav = { timeout: null as any, store };
 
 export const extractNavigate = (
-  vi: { page: VG["page"]; on_nav_loaded?: VG["on_nav_loaded"] },
+  vi: { page: VG["page"]; on_nav_loaded?: VG["on_preload"] },
   str: string
 ) => {
   const found_nav = [

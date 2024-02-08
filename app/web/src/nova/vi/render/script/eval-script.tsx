@@ -20,7 +20,7 @@ export const viEvalScript = (
     meta: VG["meta"];
     visit?: VG["visit"];
     script?: { init_local_effect: any };
-    on_nav_loaded?: VG["on_nav_loaded"];
+    on_nav_loaded?: VG["on_preload"];
   },
   meta: IMeta,
   is_layout: boolean,

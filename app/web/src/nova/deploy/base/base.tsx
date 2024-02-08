@@ -45,6 +45,9 @@ export const base = {
     root: null as null | IRoot,
     meta: null as null | Record<string, IMeta>,
   },
+  cache: {
+    urls: new Set<string>(),
+  },
   page: {
     id: "",
     url: "",

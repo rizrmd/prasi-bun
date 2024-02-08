@@ -1,15 +1,15 @@
 import { FC, useState } from "react";
+import { GlobalContext } from "web-utils";
 import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
 import { evalCJS } from "../ed/logic/ed-sync";
 import { Vi } from "../vi/vi";
 import { base } from "./base/base";
 import { scanComponent } from "./base/component";
-import { loadPage } from "./base/page";
+import { loadPage, loadUrls } from "./base/page";
 import { detectResponsiveMode } from "./base/responsive";
 import { initBaseRoute, rebuildMeta } from "./base/route";
 import { w } from "./w";
-import { GlobalContext } from "web-utils";
 
 export const Root = () => {
   // #region context
@@ -139,6 +139,32 @@ export const Root = () => {
                 : undefined
             }
             script={{ init_local_effect: base.init_local_effect }}
+            on_preload={async ({ urls }) => {
+              const load_urls: string[] = [];
+              if (base.cache.urls) {
+                for (const url of urls) {
+                  if (!base.cache.urls.has(url)) {
+                    load_urls.push(url);
+                    base.cache.urls.add(url);
+                  }
+                }
+              }
+
+              if (load_urls.length > 0) {
+                const pages = await loadUrls(load_urls);
+                for (const page of pages) {
+                  const p = {
+                    id: page.id,
+                    url: page.url,
+                    root: page.root,
+                    meta: {},
+                  };
+                  await scanComponent(page.root.childs);
+                  rebuildMeta(p.meta, page.root);
+                  base.page.cache[p.id] = p;
+                }
+              }
+            }}
           />
         </div>
       </div>
