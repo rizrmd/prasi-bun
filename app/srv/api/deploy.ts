@@ -1,9 +1,8 @@
 import { dir } from "dir";
 import { apiContext } from "service-srv";
-import { g } from "utils/global";
 import { validate } from "uuid";
-import { gzipAsync } from "../ws/sync/entity/zlib";
 import { code } from "../ws/sync/editor/code/util-code";
+import { gzipAsync } from "../ws/sync/entity/zlib";
 
 export const _ = {
   url: "/deploy/:site_id/**",
