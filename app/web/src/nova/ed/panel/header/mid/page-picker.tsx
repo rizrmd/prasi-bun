@@ -5,10 +5,11 @@ import { TopBtn } from "../top-btn";
 export const EdPagePicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
-  if (p.page.cur.name !== p.page.list[p.page.cur.id].page.name) {
-    p.page.cur.name = p.page.list[p.page.cur.id].page.name;
+  if (p.page.list[p.page.cur.id]) {
+    if (p.page.cur.name !== p.page.list[p.page.cur.id].page.name) {
+      p.page.cur.name = p.page.list[p.page.cur.id].page.name;
+    }
   }
-
   return (
     <TopBtn
       onClick={(e) => {
