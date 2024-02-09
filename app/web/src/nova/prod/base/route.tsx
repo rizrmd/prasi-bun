@@ -6,19 +6,39 @@ import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { decompressBlob } from "./util";
+import { prodCache } from "./cache";
+import { get, set } from "idb-keyval";
+
+const getRoute = () => {
+  return new Promise<{
+    site: any;
+    urls: {
+      id: string;
+      url: string;
+    }[];
+    layout: any;
+  }>(async (done) => {
+    let is_done = false;
+    const route_cache = await get("route", prodCache);
+    if (route_cache) {
+      done(route_cache);
+      is_done = true;
+    }
+
+    let raw = await (await fetch(base.url`_prasi/route`)).blob();
+    const res = JSON.parse(await (await decompressBlob(raw)).text());
+
+    await set("route", res, prodCache);
+    if (!is_done) {
+      done(res);
+    }
+  });
+};
 
 export const initBaseRoute = async () => {
-  const raw = await (await fetch(base.url`_prasi/route`)).blob();
   const router = createRouter<{ id: string; url: string }>();
   try {
-    const res = JSON.parse(await (await decompressBlob(raw)).text()) as {
-      site: any;
-      urls: {
-        id: string;
-        url: string;
-      }[];
-      layout: any;
-    };
+    const res = await getRoute();
 
     if (res && res.site && res.urls) {
       if (res.layout) {
