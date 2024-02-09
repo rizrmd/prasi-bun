@@ -15,8 +15,6 @@ export const scanComponent = async (items: IContent[]) => {
     }
   }
 
-  console.log(comp.pending);
-
   if (comp.pending.size > 0) {
     let all_found = true;
     const founds: any = [];
