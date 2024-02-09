@@ -43,16 +43,17 @@ export const loadPages = (page_ids: string[]) => {
   >(async (done) => {
     const result: any = {};
     const ids = [...new Set(page_ids)];
-    let is_complete = true;
+    let is_done = true;
     for (const id of ids) {
       const page = await get(`page-${id}`, prodCache);
       if (page) {
         result[id] = page;
       } else {
-        is_complete = false;
+        is_done = false;
+        break;
       }
     }
-    if (is_complete) {
+    if (is_done) {
       done(result);
     }
 
@@ -72,7 +73,7 @@ export const loadPages = (page_ids: string[]) => {
       set(`page-${k}`, v, prodCache);
     }
 
-    if (!is_complete) {
+    if (!is_done) {
       done(res);
     }
   });
