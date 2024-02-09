@@ -15,12 +15,12 @@ type SingleRoute = {
 
 export const g = global as unknown as {
   status: "init" | "ready";
-  _server: any;
   server_hook?: (arg: {
     url: URL;
     req: Request;
     server: Server;
     handle: (req: Request) => Promise<Response | undefined>;
+    wsHandler: Record<string, WebSocketHandler<WSData>>;
   }) => Promise<Response | undefined>;
   ws_hook?: WebSocketHandler<WSData>;
   _db: PrismaClient;
