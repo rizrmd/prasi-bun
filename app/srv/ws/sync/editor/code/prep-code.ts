@@ -33,7 +33,9 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
   if (dcode) {
     if (!dcode.build[mode]) {
       const build_dir = code.path(id_site, mode, "build");
+
       await codeBuild(id_site);
+
       dcode.build[mode] = codeLoad(id_site, build_dir);
       const doc = dcode.build[mode] as Doc;
       if (doc) {
@@ -49,6 +51,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
             });
           }
           const sv_local = await gzipAsync(bin);
+
           user.active.findAll({ site_id: id_site }).map((e) => {
             const ws = conns.get(e.client_id)?.ws;
             if (ws) {

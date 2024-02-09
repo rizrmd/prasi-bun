@@ -6,17 +6,6 @@ import { dirname } from "path";
 
 export type CodeMode = "site" | "server";
 
-type PrasiServer = {
-  ws?: WebSocketHandler<{ url: string }>;
-  http: (arg: {
-    url: URL;
-    req: Request;
-    server: Server;
-    handle: (req: Request) => Promise<undefined | Response>;
-  }) => Promise<Response>;
-};
-export const server = {} as Record<string, null | PrasiServer>;
-
 export const code = {
   path(id_site: string, mode: CodeMode, type: "src" | "build", path?: string) {
     let file_path = "";
@@ -24,9 +13,6 @@ export const code = {
       file_path = path[0] === "/" ? path : `/${path}`;
     }
     return dir.data(`/code/${id_site}/${mode}/${type}${file_path}`);
-  },
-  package_deps: (path: string) => {
-    const file = Bun.file(path);
   },
   server: {} as Record<string, {}>,
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,

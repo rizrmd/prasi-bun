@@ -5,7 +5,8 @@ import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { DCode } from "../../../../../web/src/utils/types/root";
 import { readDirectoryRecursively } from "../../../../api/site-export";
 import { docs } from "../../entity/docs";
-import { code, server } from "./util-code";
+import { code } from "./util-code";
+import { server } from "./server-main";
 
 export const codeBuild = async (id_site: any) => {
   const src_path = code.path(id_site, "site", "src");
@@ -47,6 +48,7 @@ export const server: {
     const build_path = code.path(id_site, "server", "build");
     await removeAsync(build_path);
     await dirAsync(build_path);
+
     const build_file = `${build_path}/index.js`;
     await writeAsync(build_file, "");
 
@@ -60,6 +62,21 @@ export const server: {
       format: "cjs",
       logLevel: "silent",
       sourcemap: true,
+      banner: {
+        js: `\
+const _fs = require('node:fs/promises');
+const console =
+typeof global.server_hook === "function"
+  ? { ...global.console }
+  : global.console;
+if (typeof global.server_hook === "function") {
+  const log = global.console.log;
+  console.log = function (...arg) {
+    const out = "${code.path(id_site, "site", "src", "server.log")}";
+    _fs.appendFile(out, arg.join(" ") + "\\n");
+  }.bind(console);
+}`,
+      },
       plugins: [
         style(),
         globalExternals({
@@ -75,20 +92,14 @@ export const server: {
         {
           name: "prasi",
           setup(setup) {
-            setup.onEnd(async (res) => {
-              const server_src_path = code.path(id_site, "server", "build", "index.js");
-              server[id_site] = null;
-              if (await existsAsync(server_src_path)) {
-                const svr = require(server_src_path);
-                if (svr && svr.server) {
-                  server[id_site] = svr.server;
-                }
-              }
+            setup.onEnd((res) => {
+              server.init(id_site);
             });
           },
         },
       ],
     });
+
     const esbuild = code.esbuild[id_site].server;
     esbuild?.watch();
   }
@@ -147,8 +158,10 @@ export const server: {
     const esbuild = code.esbuild[id_site].site;
     esbuild?.watch();
   }
-  for (const mode of ["site", "server"]) {
-    const esbuild = code.esbuild[id_site][mode as "site" | "server"];
+  for (const _mode of ["site", "server"]) {
+    const mode = _mode as "site" | "server";
+
+    const esbuild = code.esbuild[id_site][mode];
     if (esbuild) {
       try {
         await esbuild.rebuild();
@@ -157,7 +170,7 @@ export const server: {
       }
     }
 
-    const build_file = code.path(id_site, "site", "build", "index.js");
+    const build_file = code.path(id_site, mode, "build", "index.js");
     const out = Bun.file(build_file);
     const src = (await out.text()).replace(
       "//# sourceMappingURL=index.js.map",
