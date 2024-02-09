@@ -2,9 +2,8 @@ import { dir } from "dir";
 import { BuildContext } from "esbuild";
 import { dirAsync, exists, existsAsync, writeAsync } from "fs-jetpack";
 import { dirname } from "path";
-import { g } from "utils/global";
 
-export type CodeMode = "site" | "ssr";
+export type CodeMode = "site" | "server";
 export const code = {
   path(id_site: string, mode: CodeMode, type: "src" | "build", path?: string) {
     let file_path = "";
@@ -12,6 +11,9 @@ export const code = {
       file_path = path[0] === "/" ? path : `/${path}`;
     }
     return dir.data(`/code/${id_site}/${mode}/${type}${file_path}`);
+  },
+  package_deps: (path: string) => {
+    const file = Bun.file(path);
   },
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
   prep(id_site: string, mode: CodeMode) {
@@ -25,9 +27,7 @@ export const code = {
     return {
       path(type: "src" | "build", path: string) {
         return dir.data(
-          `/code/${id_site}/${mode}/${type}${
-            path[0] === "/" ? path : `/${path}`
-          }`
+          `/code/${id_site}/site/${type}${path[0] === "/" ? path : `/${path}`}`
         );
       },
       new_file(path: string, content: string) {
