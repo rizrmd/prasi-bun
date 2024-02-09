@@ -5,7 +5,7 @@ import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { DCode } from "../../../../../web/src/utils/types/root";
 import { readDirectoryRecursively } from "../../../../api/site-export";
 import { docs } from "../../entity/docs";
-import { CodeMode, code } from "./util-code";
+import { code, server } from "./util-code";
 
 export const codeBuild = async (id_site: any) => {
   const src_path = code.path(id_site, "site", "src");
@@ -17,7 +17,26 @@ export const codeBuild = async (id_site: any) => {
   if (!code.esbuild[id_site].server) {
     const server_main = code.path(id_site, "site", "src", "server.ts");
     if (!(await existsAsync(server_main))) {
-      await writeAsync(server_main, "");
+      await writeAsync(
+        server_main,
+        `\
+import { Server, WebSocketHandler } from "bun";
+
+export const server: {
+  ws?: WebSocketHandler<{ url: string }>;
+  http: (arg: {
+    url: URL;
+    req: Request;
+    server: Server;
+    handle: (req: Request) => Promise<Response>;
+  }) => Promise<Response>;
+} = {
+  async http({ req, handle, url, server }) {
+    return await handle(req);
+  },
+};
+`
+      );
       const bun_types = Bun.spawn({
         cmd: ["npm", "i", "-D", "@types/bun"],
         cwd: code.path(id_site, "site", "src"),
@@ -53,6 +72,21 @@ export const codeBuild = async (id_site: any) => {
             type: "cjs",
           },
         }),
+        {
+          name: "prasi",
+          setup(setup) {
+            setup.onEnd(async (res) => {
+              const server_src_path = code.path(id_site, "server", "build", "index.js");
+              server[id_site] = null;
+              if (await existsAsync(server_src_path)) {
+                const svr = require(server_src_path);
+                if (svr && svr.server) {
+                  server[id_site] = svr.server;
+                }
+              }
+            });
+          },
+        },
       ],
     });
     const esbuild = code.esbuild[id_site].server;

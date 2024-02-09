@@ -104,7 +104,7 @@ export const code_action: SAction["code"]["action"] = async function (
       );
       await Bun.write(
         Bun.file(path.join(dir, "global.d.ts")),
-        `
+        `\
 import prisma from "./prisma";
 import type * as SRVAPI from "gen/srv/api/srv";
 

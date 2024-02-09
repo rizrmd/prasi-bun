@@ -1,22 +1,22 @@
+import { createId } from "@paralleldrive/cuid2";
+import { dir } from "dir";
+import { writeAsync } from "fs-jetpack";
 import { parcelBuild } from "utils/parcel";
+import { syncActionDefinition } from "utils/sync-def";
+import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
+import { user } from "../../app/srv/ws/sync/entity/user";
+import { prepareApiRoutes } from "./server/api/api-scan";
+import { watchApiRoutes } from "./server/api/api-watch";
 import { prepareAPITypes } from "./server/api/prep-api-ts";
 import { startDevWatcher } from "./utils/dev-watcher";
 import { ensureNotRunning } from "./utils/ensure";
 import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
-import { syncActionDefinition } from "utils/sync-def";
-import { user } from "../../app/srv/ws/sync/entity/user";
-import { snapshot } from "../../app/srv/ws/sync/entity/snapshot";
-import { initSrv } from "../../app/srv/init";
-import { createId } from "@paralleldrive/cuid2";
-import { prepareApiRoutes } from "./server/api/api-scan";
-import { writeAsync } from "fs-jetpack";
-import { dir } from "dir";
-import { watchApiRoutes } from "./server/api/api-watch";
 // import "../docker-prep";
 
 g.status = "init";
+
 
 await writeAsync(
   dir.path("app/web/timestamp.ts"),
@@ -57,10 +57,10 @@ if (!db) {
       });
   }
 }
+await import("../../app/srv/init");
 await prepareApiRoutes();
 
 if (!g.apiPrepared) {
-  await initSrv();
   await syncActionDefinition();
   g.log.info("WS Action defined");
   await prepareAPITypes();

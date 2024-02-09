@@ -1,9 +1,22 @@
+import { Server, WebSocketHandler } from "bun";
 import { dir } from "dir";
 import { BuildContext } from "esbuild";
 import { dirAsync, exists, existsAsync, writeAsync } from "fs-jetpack";
 import { dirname } from "path";
 
 export type CodeMode = "site" | "server";
+
+type PrasiServer = {
+  ws?: WebSocketHandler<{ url: string }>;
+  http: (arg: {
+    url: URL;
+    req: Request;
+    server: Server;
+    handle: (req: Request) => Promise<undefined | Response>;
+  }) => Promise<Response>;
+};
+export const server = {} as Record<string, null | PrasiServer>;
+
 export const code = {
   path(id_site: string, mode: CodeMode, type: "src" | "build", path?: string) {
     let file_path = "";
@@ -15,6 +28,7 @@ export const code = {
   package_deps: (path: string) => {
     const file = Bun.file(path);
   },
+  server: {} as Record<string, {}>,
   esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
   prep(id_site: string, mode: CodeMode) {
     if (exists(dir.data(""))) {
