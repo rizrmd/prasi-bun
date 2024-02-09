@@ -105,8 +105,10 @@ export const code_action: SAction["code"]["action"] = async function (
       await Bun.write(
         Bun.file(path.join(dir, "global.d.ts")),
         `\
-import prisma from "./prisma";
 import type * as SRVAPI from "gen/srv/api/srv";
+
+import { Server, WebSocketHandler } from "bun";
+import prisma from "./prisma";
 
 declare global {
   const db: prisma.PrismaClient;
@@ -114,8 +116,18 @@ declare global {
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
   const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] };
+
+  type PrasiServer = {
+    ws?: WebSocketHandler<{ url: string }>;
+    http: (arg: {
+      url: URL;
+      req: Request;
+      server: Server;
+      handle: (req: Request) => Promise<Response>;
+    }) => Promise<Response>;
+  };
 }
-      `
+`
       );
 
       Bun.spawn({

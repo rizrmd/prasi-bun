@@ -109,10 +109,16 @@ window._prasi={basepath: "/prod/${site_id}",site_id:"${site_id}"}
           if (validate(page_id)) {
             const page = await _db.page.findFirst({
               where: { id: page_id },
-              select: { content_tree: true },
+              select: { content_tree: true, url: true },
             });
             if (page) {
-              return gzipAsync(JSON.stringify(page.content_tree) as any);
+              return gzipAsync(
+                JSON.stringify({
+                  id: page_id,
+                  root: page.content_tree,
+                  url: page.url,
+                }) as any
+              );
             }
           }
           return null;

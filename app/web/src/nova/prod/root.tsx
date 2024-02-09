@@ -61,7 +61,7 @@ export const Root = () => {
 
   if (!cache) {
     loadPage(page.id)
-      .then(async (root) => {
+      .then(async ({ root }) => {
         const p = {
           id: page.id,
           url: page.url,

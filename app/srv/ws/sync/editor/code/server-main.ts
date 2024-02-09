@@ -27,7 +27,6 @@ const serverMain = () => ({
   init(site_id: string) {
     clearTimeout(this.init_timeout);
     this.init_timeout = setTimeout(() => {
-      console.log("initing", site_id);
       try {
         const server_src_path = code.path(
           site_id,
