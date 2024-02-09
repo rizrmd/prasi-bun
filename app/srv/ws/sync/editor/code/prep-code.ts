@@ -33,7 +33,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
   if (dcode) {
     if (!dcode.build[mode]) {
       const build_dir = code.path(id_site, mode, "build");
-      await codeBuild(id_site, mode);
+      await codeBuild(id_site);
       dcode.build[mode] = codeLoad(id_site, build_dir);
       const doc = dcode.build[mode] as Doc;
       if (doc) {

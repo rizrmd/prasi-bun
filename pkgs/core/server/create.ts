@@ -29,29 +29,37 @@ export const createServer = async () => {
     async fetch(req, server) {
       const url = new URL(req.url);
 
-      if (wsHandler[url.pathname]) {
-        if (
-          server.upgrade(req, {
-            data: {
-              url: new URL(req.url),
-            },
-          })
-        ) {
-          return;
+      const handle = async (req: Request) => {
+        if (wsHandler[url.pathname]) {
+          if (
+            server.upgrade(req, {
+              data: {
+                url: new URL(req.url),
+              },
+            })
+          ) {
+            return;
+          }
+          return new Response("Upgrade failed :(", { status: 500 });
         }
-        return new Response("Upgrade failed :(", { status: 500 });
-      }
 
-      if (serveStatic.exists(url)) {
+        if (serveStatic.exists(url)) {
+          return serveStatic.serve(url);
+        }
+
+        const api_response = await serveAPI.serve(url, req);
+        if (api_response) {
+          return api_response;
+        }
+
         return serveStatic.serve(url);
-      }
+      };
 
-      const api_response = await serveAPI.serve(url, req);
-      if (api_response) {
-        return api_response;
+      if (g.server_hook) {
+        return await g.server_hook({ url, req, server, handle });
+      } else {
+        return await handle(req);
       }
-
-      return serveStatic.serve(url);
     },
   });
 
