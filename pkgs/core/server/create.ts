@@ -28,7 +28,6 @@ export const createServer = async () => {
     websocket: await serveWS(wsHandler),
     async fetch(req, server) {
       const url = new URL(req.url);
-
       const handle = async (req: Request) => {
         if (wsHandler[url.pathname]) {
           if (
@@ -56,7 +55,7 @@ export const createServer = async () => {
       };
 
       if (g.server_hook) {
-        return await g.server_hook({ url, req, server, handle });
+        return await g.server_hook({ url, req, server, handle, wsHandler });
       } else {
         return await handle(req);
       }

@@ -93,6 +93,7 @@ if (typeof global.server_hook === "function") {
           name: "prasi",
           setup(setup) {
             setup.onEnd((res) => {
+              console.log("en bul");
               server.init(id_site);
             });
           },
