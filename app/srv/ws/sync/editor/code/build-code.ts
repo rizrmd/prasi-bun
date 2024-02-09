@@ -21,17 +21,9 @@ export const codeBuild = async (id_site: any) => {
       await writeAsync(
         server_main,
         `\
-import { Server, WebSocketHandler } from "bun";
+import type {} from "./typings/global";
 
-export const server: {
-  ws?: WebSocketHandler<{ url: string }>;
-  http: (arg: {
-    url: URL;
-    req: Request;
-    server: Server;
-    handle: (req: Request) => Promise<Response>;
-  }) => Promise<Response>;
-} = {
+export const server: PrasiServer = {
   async http({ req, handle, url, server }) {
     return await handle(req);
   },
@@ -93,7 +85,6 @@ if (typeof global.server_hook === "function") {
           name: "prasi",
           setup(setup) {
             setup.onEnd((res) => {
-              console.log("en bul");
               server.init(id_site);
             });
           },
