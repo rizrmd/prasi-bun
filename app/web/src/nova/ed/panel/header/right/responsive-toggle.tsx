@@ -11,13 +11,14 @@ export const ResponsiveToggle = () => {
   const activeModeClassName = "border-b-2 border-blue-500";
 
   const render = () => {
-    const code = p.code["site"].doc;
+    const code = p.code["site"]?.doc;
     if (code) {
       const src = code.getMap("map").get("files")?.get("index.js");
       applyEnv(p, src);
-      treeRebuild(p);
-      p.render();
     }
+
+    treeRebuild(p);
+    p.render();
   };
 
   const box = {
