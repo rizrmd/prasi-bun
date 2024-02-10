@@ -3,9 +3,8 @@ import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { dir } from "dir";
 import fs from "fs";
 import { exists } from "fs-jetpack";
-import { gzipSync } from "zlib";
 import path from "path";
-import { g } from "utils/global";
+import { gzipSync } from "zlib";
 import { buildNpm } from "../util/build-npm";
 
 export const _ = {
