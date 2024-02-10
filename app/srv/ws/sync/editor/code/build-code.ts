@@ -24,7 +24,7 @@ export const codeBuild = async (id_site: any) => {
 import type {} from "./typings/global";
 
 export const server: PrasiServer = {
-  async http({ req, handle, url, server }) {
+  async http({ req, handle, mode, url, index, server }) {
     return await handle(req);
   },
 };

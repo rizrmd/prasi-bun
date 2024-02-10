@@ -103,7 +103,7 @@ export const EdApiServer = forwardRef<
       server.status = "saving";
       p.render();
       p.site.config.api_url = trim(local.api_url, "/");
-      await p.sync.site.update(p.site.id, {
+      await p.sync?.site.update(p.site.id, {
         config: { api_url: local.api_url },
       });
     }
@@ -254,7 +254,6 @@ export const EdApiServer = forwardRef<
       )}
       {local.deployable && (
         <>
-          <EdApiDomain domains={local.domains} />
           <EdApiDeploy deploy={local.deploy} />
         </>
       )}

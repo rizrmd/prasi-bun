@@ -123,7 +123,9 @@ declare global {
       url: URL;
       req: Request;
       server: Server;
+      mode: "dev" | "prod";
       handle: (req: Request) => Promise<Response>;
+      index: { head: string[]; body: string[]; render: () => string };
     }) => Promise<Response>;
   };
 }

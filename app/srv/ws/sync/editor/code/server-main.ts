@@ -6,6 +6,7 @@ import { waitUntil } from "web-utils";
 import { code } from "./util-code";
 import { WSData } from "../../../../../../pkgs/core/server/create";
 import { codeBuild } from "./build-code";
+import { prodIndex } from "../../../../util/prod-index";
 
 const serverMain = () => ({
   handler: {} as Record<string, PrasiServer>,
@@ -85,7 +86,11 @@ const serverMain = () => ({
           return new Response("Upgrade failed :(", { status: 500 });
         }
 
-        return await handler.http(arg);
+        return await handler.http({
+          ...arg,
+          mode: "dev",
+          index: prodIndex(site_id),
+        });
       } catch (e: any) {
         _fs.appendFile(
           code.path(site_id, "site", "src", "server.log"),
@@ -103,6 +108,8 @@ type PrasiServer = {
     req: Request;
     server: Server;
     handle: (req: Request) => Promise<undefined | Response>;
+    mode: "dev" | "prod";
+    index: { head: string[]; body: string[]; render: () => string };
   }) => Promise<Response>;
 };
 
