@@ -1,6 +1,6 @@
 import { gzip, gunzip } from "zlib";
 
-export const gzipAsync = (bin: Uint8Array) => {
+export const gzipAsync = (bin: Uint8Array | string) => {
   return new Promise<Buffer>((resolve, reject) => {
     gzip(bin, (err, res) => {
       if (err) {
