@@ -3,6 +3,7 @@ import { apiContext } from "service-srv";
 import { validate } from "uuid";
 import { code } from "../ws/sync/editor/code/util-code";
 import { gzipAsync } from "../ws/sync/entity/zlib";
+import { prodIndex } from "../util/prod-index";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -12,26 +13,9 @@ export const _ = {
     const pathname: string = req.params["*"] || "";
     const site_id = req.params.site_id as string;
 
-    const index_html = new Response(
-      `\
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
-<title></title>
-<link rel="stylesheet" href="https://prasi.app/index.css">
-</head>
-<body class="flex-col flex-1 w-full min-h-screen flex opacity-0">
-<div id="root"></div>
-<script>
-window._prasi={basepath: "/prod/${site_id}",site_id:"${site_id}"}
-</script>
-<script src="/prod/${site_id}/main.js" type="module"></script>
-</body> 
-</html>`,
-      { headers: { "content-type": "text/html" } }
-    );
+    const index_html = new Response(prodIndex(site_id).render(), {
+      headers: { "content-type": "text/html" },
+    });
 
     if (!validate(site_id))
       return new Response("site not found", { status: 403 });
