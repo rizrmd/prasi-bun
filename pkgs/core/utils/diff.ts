@@ -100,10 +100,6 @@ export class Diff<T> {
 
   async applyPatch(_patch: Uint8Array) {
     const patch = packr.unpack(_patch) as PATCH_RESULT;
-    console.log(
-      patch.mode,
-      patch.mode === "new" ? patch.data.length : patch.diff.length
-    );
     if (patch.mode === "new") {
       this.ts = patch.ts;
       if (patch.data) this._data = patch.data;
