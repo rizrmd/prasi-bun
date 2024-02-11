@@ -2,8 +2,8 @@ import { applyPatch, calcPatch } from "./diff-internal";
 import { Packr } from "msgpackr";
 import { gunzip, gzip } from "zlib";
 
-const MAX_HISTORY = 10; // max history item
-const DIFF_TIMEOUT = 50; // in ms
+const MAX_HISTORY = 25; // max history item
+const MAX_DIFF_TIMEOUT = 50; // in ms
 
 const packr = new Packr({});
 
@@ -74,12 +74,12 @@ export class Diff<T> {
                 return old_data[key1] === this._data[key2];
               },
               () => {
-                return performance.now() - now > DIFF_TIMEOUT;
+                return performance.now() - now > MAX_DIFF_TIMEOUT;
               }
             ),
           ];
 
-          if (performance.now() - now <= DIFF_TIMEOUT) {
+          if (performance.now() - now <= MAX_DIFF_TIMEOUT) {
             done(
               new Uint8Array(
                 packr.pack({ diff: result_diff, mode: "patch", ts: this.ts })
@@ -113,7 +113,7 @@ export class Diff<T> {
           }
         } else {
           num_array.push(num);
-        }
+        } 
       }
       this._data = num_array;
     }
