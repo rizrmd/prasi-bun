@@ -1,11 +1,12 @@
 import { compress, decompress } from "wasm-gzip";
+import { apiProxy } from "../../../base/load/api/api-proxy";
 import { loadApiProxyDef } from "../../../base/load/api/api-proxy-def";
+import { dbProxy } from "../../../base/load/db/db-proxy";
+import { w } from "../../../utils/types/general";
 import { PG } from "../../ed/logic/ed-global";
 import { evalCJS } from "../../ed/logic/ed-sync";
 import { treeRebuild } from "../../ed/logic/tree/build";
-import { w } from "../../../utils/types/general";
-import { dbProxy } from "../../../base/load/db/db-proxy";
-import { apiProxy } from "../../../base/load/api/api-proxy";
+import { simpleHash } from "../utils/simple-hash";
 
 const encoder = new TextEncoder();
 export const viLoadSnapshot = async (p: PG) => {
@@ -22,7 +23,8 @@ export const viLoadSnapshot = async (p: PG) => {
           api: api.apiTypes,
           prisma: api.prismaTypes,
         });
-        const hash = hashCode(zip);
+
+        const hash = simpleHash(zip);
         const res = await p.sync?.code.action({
           type: "check-typings",
           site_id: p.site.id,
@@ -83,12 +85,4 @@ export const applyEnv = (p: PG, src?: string) => {
       }
     }
   }
-};
-
-const hashCode = function (s: string) {
-  var h = 0,
-    l = s.length,
-    i = 0;
-  if (l > 0) while (i < l) h = ((h << 5) - h + s.charCodeAt(i++)) | 0;
-  return h;
 };
