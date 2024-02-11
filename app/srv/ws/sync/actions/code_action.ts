@@ -120,7 +120,7 @@ declare global {
   type PrasiServer = {
     ws?: WebSocketHandler<{ url: string }>;
     http: (arg: {
-      url: URL;
+      url: { raw: URL; pathname: string };
       req: Request;
       server: Server;
       mode: "dev" | "prod";

@@ -86,8 +86,14 @@ const serverMain = () => ({
           return new Response("Upgrade failed :(", { status: 500 });
         }
 
+        const pathname = `/${arg.url.pathname.split("/").slice(3).join("/")}`;
+
         return await handler.http({
           ...arg,
+          url: {
+            pathname,
+            raw: arg.url,
+          },
           mode: "dev",
           index: prodIndex(site_id),
         });
@@ -104,7 +110,7 @@ const serverMain = () => ({
 type PrasiServer = {
   ws?: WebSocketHandler<{ url: string }>;
   http: (arg: {
-    url: URL;
+    url: { raw: URL; pathname: string };
     req: Request;
     server: Server;
     handle: (req: Request) => Promise<undefined | Response>;
