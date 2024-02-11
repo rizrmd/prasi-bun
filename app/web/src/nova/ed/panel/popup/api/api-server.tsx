@@ -57,7 +57,8 @@ export const EdApiServer = forwardRef<
       try {
         if (dev) {
           const vdev = JSON.parse(localStorage.getItem("prasi-dev") || "{}");
-          if (vdev) {
+
+          if (vdev && Object.keys(vdev).length > 0) {
             dev.url = vdev.url;
             dev.enabled = vdev.enabled;
           }
@@ -167,7 +168,9 @@ export const EdApiServer = forwardRef<
                 local.api_url.startsWith("http://") ||
                 local.api_url.startsWith("https://")
               ) {
-                local.api_url = trim(local.api_url, "/");
+                if (local.api_url.length > 8) {
+                  local.api_url = trim(local.api_url, "/");
+                }
               }
               local.render();
             }}

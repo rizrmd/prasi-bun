@@ -8,7 +8,7 @@ glb.ws_hook = {
     server.ws("ping", ws, data);
   },
   pong(ws, data) {
-    server.ws("pong", ws, data);
+    server.ws("pong", ws, data); 
   },
   drain(ws) {
     server.ws("drain", ws);

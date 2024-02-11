@@ -52,34 +52,45 @@ export const apiProxy = (api_url: string) => {
                       );
                       return;
                     }
-                  }
 
-                  let actionUrl = api_ref.apiEntry[actionName].url;
-                  const actionParams = api_ref.apiEntry[actionName].args;
-                  if (actionUrl && actionParams) {
-                    if (rest.length > 0 && actionParams.length > 0) {
-                      for (const [idx, p] of Object.entries(rest)) {
-                        const paramName = actionParams[parseInt(idx)];
-                        if (actionParams && actionParams.includes(paramName)) {
+                    let actionUrl = api_ref.apiEntry[actionName].url;
+                    const actionParams = api_ref.apiEntry[actionName].args;
+                    if (actionUrl && actionParams) {
+                      if (rest.length > 0 && actionParams.length > 0) {
+                        for (const [idx, p] of Object.entries(rest)) {
+                          const paramName = actionParams[parseInt(idx)];
                           if (
-                            !!p &&
-                            typeof p !== "string" &&
-                            typeof p !== "number"
+                            actionParams &&
+                            actionParams.includes(paramName)
                           ) {
-                            continue;
+                            if (
+                              !!p &&
+                              typeof p !== "string" &&
+                              typeof p !== "number"
+                            ) {
+                              continue;
+                            }
                           }
+                          actionUrl = actionUrl.replace(
+                            `:${paramName}?`,
+                            p + ""
+                          );
+                          actionUrl = actionUrl.replace(
+                            `:${paramName}`,
+                            p + ""
+                          );
                         }
-                        actionUrl = actionUrl.replace(`:${paramName}?`, p + "");
-                        actionUrl = actionUrl.replace(`:${paramName}`, p + "");
                       }
+
+                      const url = `${base_url}${actionUrl}`;
+
+                      const result = await fetchSendApi(url, rest);
+                      resolve(result);
+                    } else {
+                      console.error(`API Not Found: ${actionName.toString()}`);
                     }
-
-                    const url = `${base_url}${actionUrl}`;
-
-                    const result = await fetchSendApi(url, rest);
-                    resolve(result);
                   } else {
-                    console.error(`API Not Found: ${actionName.toString()}`);
+                    reject("Failed to load API: " + base_url);
                   }
                 } catch (e) {
                   reject(e);

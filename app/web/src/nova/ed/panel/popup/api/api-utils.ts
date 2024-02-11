@@ -48,12 +48,14 @@ export const apiUrl = function (p: PG): string {
 
 export const checkAPI = async (p: PG) => {
   const url = apiUrl(p);
+
   if (!url) return "offline";
 
   try {
     if (!apiRef[url]) apiRef[url] = apiProxy(url) as any;
 
     const capi = apiRef[url];
+
     if (!capi) {
       console.error(`Cannot initialize API for ${url}.`, w.prasiApi[url]);
     } else {
@@ -61,6 +63,7 @@ export const checkAPI = async (p: PG) => {
         type: "check",
         id_site: p.site.id,
       });
+
       if (!res) {
         return { deployable: false, db: "", hasDB: false, domains: [] };
       } else {
