@@ -201,15 +201,6 @@ export const edInitSync = (p: PG) => {
           };
         },
         async editor_start(e) {
-          if (p.ui.syncing) {
-            await reloadPage(p, params.page_id, "editor-start");
-            if (p.page.doc) {
-              p.page.doc.transact(() => {
-                p.page.doc?.getMap("map").set("ts", Date.now());
-              }, `sync`);
-            }
-          }
-
           if (params.site_id !== e.site_id || params.page_id !== e.page_id) {
             if (!p.page.cur.id) {
               p.site.id = e.site_id;
