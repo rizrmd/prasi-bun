@@ -1,12 +1,13 @@
-import { applyPatch, calcPatch } from "fast-myers-diff";
+import { applyPatch, calcPatch } from "./diff-internal";
 import { Packr } from "msgpackr";
 import { gunzip, gzip } from "zlib";
 
-const MAX_HISTORY = 10;
+const MAX_HISTORY = 10; // max history item
+const DIFF_TIMEOUT = 50; // in ms
 
 const packr = new Packr({});
 
-type PATCH_RESULT<T> =
+type PATCH_RESULT =
   | {
       mode: "new";
       ts: string;
@@ -22,7 +23,7 @@ export class Diff<T> {
   ts = "";
   mode: "client" | "server" = "server";
 
-  private _data: number[] = [];
+  _data: number[] = [];
   private _history = {} as Record<string, number[]>;
 
   constructor() {}
@@ -58,20 +59,51 @@ export class Diff<T> {
     }
   }
 
-  getPatch(ts: "new" | string): PATCH_RESULT<T> {
-    if (ts !== "new") {
-      const old_data = this._history[ts];
+  getPatch(ts: "new" | string) {
+    return new Promise<Uint8Array>((done) => {
+      if (ts !== "new") {
+        const old_data = this._history[ts];
 
-      if (old_data) {
-        const result_diff = [...calcPatch(old_data, this._data)];
-        return { diff: result_diff, mode: "patch", ts: this.ts };
+        if (old_data) {
+          const now = performance.now();
+          const result_diff = [
+            ...calcPatch(
+              old_data,
+              this._data,
+              (key1, key2) => {
+                return old_data[key1] === this._data[key2];
+              },
+              () => {
+                return performance.now() - now > DIFF_TIMEOUT;
+              }
+            ),
+          ];
+
+          if (performance.now() - now <= DIFF_TIMEOUT) {
+            done(
+              new Uint8Array(
+                packr.pack({ diff: result_diff, mode: "patch", ts: this.ts })
+              )
+            );
+            return;
+          }
+        }
       }
-    }
 
-    return { data: this._data, mode: "new", ts: this.ts };
+      done(
+        new Uint8Array(
+          packr.pack({ data: this._data, mode: "new", ts: this.ts })
+        )
+      );
+    });
   }
 
-  async applyPatch(patch: PATCH_RESULT<T>) {
+  async applyPatch(_patch: Uint8Array) {
+    const patch = packr.unpack(_patch) as PATCH_RESULT;
+    console.log(
+      patch.mode,
+      patch.mode === "new" ? patch.data.length : patch.diff.length
+    );
     if (patch.mode === "new") {
       this.ts = patch.ts;
       if (patch.data) this._data = patch.data;
@@ -97,14 +129,10 @@ export class Diff<T> {
     return diff;
   }
 
-  static async client<T>(patch: PATCH_RESULT<T>) {
+  static async client<T>(patch: Uint8Array) {
     const diff = new Diff<T>();
     diff.mode = "client";
-
-    if (patch.mode === "new") {
-      diff.ts = patch.ts;
-      if (patch.data) diff._data = patch.data;
-    }
+    diff.applyPatch(patch);
     return diff;
   }
 }
