@@ -7,7 +7,6 @@ export const EdPageHistoryList = () => {
   const local = useLocal(
     { loading: true, list: [] as Awaited<ReturnType<typeof queryList>> },
     async () => {
-      console.log("query list");
       local.list = await queryList(p.page.cur.id);
       local.loading = false;
       local.render();
