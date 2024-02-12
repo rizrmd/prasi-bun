@@ -22,7 +22,6 @@ export const EdTreeSearch = () => {
 
   return (
     <div
-      className="flex flex-col items-stretch border-b"
       onMouseOver={() => {
         if (local.focus) {
           local.hover = true;

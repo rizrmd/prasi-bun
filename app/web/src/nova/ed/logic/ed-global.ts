@@ -168,6 +168,10 @@ export const EDGlobal = {
     init_local_effect: {} as Record<string, boolean>,
   },
   page: {
+    history: {
+      id: "",
+      show: false
+    },
     root_id: "root",
     cur: EmptyPage,
     doc: null as null | DPage,
