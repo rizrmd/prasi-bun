@@ -7,11 +7,17 @@ import { EdApi } from "./panel/header/left/api";
 import { EdSiteJS } from "./panel/header/left/js";
 import { EdSitePicker } from "./panel/header/left/site-picker";
 import { EdTreeBody } from "./panel/tree/body";
+import { EdPageHistoryBtn } from "./panel/tree/history-btn";
+import { EdPageHistoryList } from "./panel/tree/history-list";
 import { EdTreeSearch } from "./panel/tree/search";
+import { treeRebuild } from "./logic/tree/build";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({ tree: null as any, timeout: null as any });
+  const local = useLocal({
+    tree: null as any,
+    timeout: null as any,
+  });
 
   if (!local.tree) {
     clearTimeout(local.timeout);
@@ -40,27 +46,46 @@ export const EdLeft = () => {
           </div>
         </div>
 
-        <EdTreeSearch />
+        <div className="flex flex-row items-stretch border-b">
+          <EdPageHistoryBtn
+            show={p.page.history.show}
+            onShow={async (show) => {
+              p.page.history.id = "";
+              p.page.history.show = show;
+              if (!show) {
+                await treeRebuild(p);
+              }
+
+              p.render();
+              local.render();
+            }}
+          />
+          {!p.page.history.show && <EdTreeSearch />}
+        </div>
         <div
           className="tree-body flex relative flex-1 overflow-y-auto overflow-x-hidden"
           ref={(ref) => {
             if (ref) local.tree = ref;
           }}
         >
-          <div className="absolute inset-0 flex flex-col">
-            {local.tree && (
-              <DndProvider
-                backend={HTML5Backend}
-                options={getBackendOptions({
-                  html5: {
-                    rootElement: local.tree,
-                  },
-                })}
-              >
-                <EdTreeBody />
-              </DndProvider>
-            )}
-          </div>
+          {p.page.history.show ? (
+            <EdPageHistoryList />
+          ) : (
+            <div className="absolute inset-0 flex flex-col">
+              {local.tree && (
+                <DndProvider
+                  backend={HTML5Backend}
+                  options={getBackendOptions({
+                    html5: {
+                      rootElement: local.tree,
+                    },
+                  })}
+                >
+                  <EdTreeBody />
+                </DndProvider>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

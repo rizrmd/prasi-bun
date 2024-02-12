@@ -2,6 +2,8 @@ import { getCompMeta } from "../comp/comp-meta";
 import { IMeta, PG, active } from "../ed-global";
 
 export const isMetaActive = (p: PG, meta: IMeta) => {
+  if (!meta.item) return false;
+  
   let is_active: boolean = active.item_id === meta.item.id;
   if (active.comp_id) {
     if (meta.parent?.comp_id === active.comp_id) {

@@ -107,7 +107,7 @@ export const EdMain = () => {
   return null;
 };
 
-const mainStyle = (p: PG, meta?: IMeta) => {
+export const mainStyle = (p: PG, meta?: IMeta) => {
   let is_active = meta ? isMetaActive(p, meta) : false;
 
   const scale = parseInt(p.ui.zoom.replace("%", "")) / 100;

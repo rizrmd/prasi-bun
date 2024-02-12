@@ -3,6 +3,9 @@ import { SAction } from "../actions";
 import { docs } from "../entity/docs";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
+import { gzipAsync } from "utils/diff";
+
+const history = {} as Record<string, string>;
 
 export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
   this: SyncConnection,
@@ -25,6 +28,32 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
     if (root) {
       if (mode === "page") {
         if (validate(id) && id) {
+          let mode = "create" as "create" | "update";
+          const cur = Math.round(Date.now() / 5000) + "";
+          if (history[id] && history[id] === cur) {
+            mode = "update";
+          }
+          history[id] = cur;
+          if (mode === "create") {
+            await _db.page_history.create({
+              data: {
+                id_page: id,
+                content_tree: await gzipAsync(JSON.stringify(root.toJSON())),
+                ts: history[id],
+              },
+            });
+          } else {
+            await _db.page_history.updateMany({
+              data: {
+                content_tree: await gzipAsync(JSON.stringify(root.toJSON())),
+              },
+              where: {
+                id_page: id,
+                ts: history[id],
+              },
+            });
+          }
+
           await _db.page.update({
             where: { id },
             data: {

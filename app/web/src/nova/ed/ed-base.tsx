@@ -16,6 +16,7 @@ import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
+import { EdPageHistoryMain } from "./panel/main/main-history";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -51,22 +52,27 @@ export const EdBase = () => {
         )}
         <div className="flex flex-1 flex-col items-stretch">
           <EdMid />
-          <div
-            className={cx(
-              "flex flex-1 items-stretch",
-              p.mode === "mobile" ? mobileCSS : "bg-white"
-            )}
-          >
-            {p.status !== "ready" ? (
-              <Loading note={`page-${p.status}`} />
-            ) : (
-              <>
-                <EdMain />
-                <EdPane type="right" min_size={240} />
-                <EdRight />
-              </>
-            )}
-          </div>
+
+          {p.page.history.id ? (
+            <EdPageHistoryMain  />
+          ) : (
+            <div
+              className={cx(
+                "flex flex-1 items-stretch",
+                p.mode === "mobile" ? mobileCSS : "bg-white"
+              )}
+            >
+              {p.status !== "ready" ? (
+                <Loading note={`page-${p.status}`} />
+              ) : (
+                <>
+                  <EdMain />
+                  <EdPane type="right" min_size={240} />
+                  <EdRight />
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <>
