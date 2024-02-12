@@ -39,7 +39,7 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
         if (e) {
           const zip = new Uint8Array((e.content_tree as any).data);
           const root = JSON.parse(decoder.decode(decompress(zip))) as IRoot;
-          local.root = root;
+          local.root = JSON.parse(JSON.stringify(root));
           await initLoadComp(
             {
               comps: p.comp.loaded,
@@ -99,11 +99,9 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
               p.page.history.show = false;
 
               p.page.doc?.transact(() => {
-                const root = p.page.doc?.getMap("map").get("root");
-
-                if (root) {
-                  syncronize(root as any, local.root);
-                }
+                const map = new Y.Map();
+                syncronize(map, local.root);
+                p.page.doc?.getMap("map").set("root", map as any);
               });
 
               await treeRebuild(p);
