@@ -94,7 +94,7 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
         <div
           className="border px-2 cursor-pointer hover:bg-blue-200 border border-blue-700 hover:bg-blue-700 hover:text-white transition-all "
           onClick={async () => {
-            if (confirm("Are you sure ?")) {
+            if (confirm("Are you sure ?") && local.root) {
               p.page.history.id = "";
               p.page.history.show = false;
 
@@ -106,6 +106,7 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
                 }
               });
 
+              await treeRebuild(p);
               p.render();
             }
           }}
