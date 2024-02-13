@@ -4,16 +4,17 @@ import {
   TreeMethods,
   getBackendOptions,
 } from "@minoru/react-dnd-treeview";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { useEffect } from "react";
-import { deepClone, useGlobal, useLocal } from "web-utils";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { useGlobal, useLocal } from "web-utils";
+import { fuzzy } from "../../../../../utils/ui/fuzzy";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal, active } from "../../../logic/ed-global";
+import { EdCompPreview } from "./comp-preview";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { CompItem, edPageTreeRender } from "./comp-tree";
-import { EdCompPreview } from "./comp-preview";
-import { fuzzy } from "../../../../../utils/ui/fuzzy";
+import { EdCompImport } from "./comp-import";
 
 export const EdPopComp = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -62,6 +63,7 @@ export const EdPopComp = () => {
         }}
         fade={false}
       >
+        {p.ui.popup.comp.import && <EdCompImport />}
         <div
           id="comp-picker"
           ref={(ref) => {
@@ -101,7 +103,16 @@ export const EdPopComp = () => {
                         );
                       })}
                     </div>
-                    <div className="flex flex-1 mr-1">
+                    <div className="flex flex-1 mr-1 justify-end items-stretch">
+                      <div
+                        className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => {
+                          p.ui.popup.comp.import = true;
+                          p.render();
+                        }}
+                      >
+                        Import Components
+                      </div>
                       <input
                         type="search"
                         placeholder="Search"
