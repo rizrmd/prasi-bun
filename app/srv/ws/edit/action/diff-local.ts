@@ -1,4 +1,6 @@
+import { gzipAsync } from "../../sync/entity/zlib";
 import { eg } from "../edit-global";
+const history = {} as Record<string, string>;
 
 export const diffLocal = (ws: any, msg: any) => {
   return new Promise<void>((resolve) => {
@@ -31,6 +33,37 @@ export const diffLocal = (ws: any, msg: any) => {
           if (msg.id) {
             const page = eg.edit.page[msg.id].doc.getMap("map").toJSON();
             try {
+              const id = msg.id;
+              let mode = "create" as "create" | "update";
+              const cur = Math.round(Date.now() / 5000) + "";
+              if (history[id] && history[id] === cur) {
+                mode = "update";
+              }
+              history[id] = cur;
+              if (mode === "create") {
+                await _db.page_history.create({
+                  data: {
+                    id_page: id,
+                    content_tree: await gzipAsync(
+                      JSON.stringify(page.content_tree)
+                    ),
+                    ts: history[id],
+                  },
+                });
+              } else {
+                await _db.page_history.updateMany({
+                  data: {
+                    content_tree: await gzipAsync(
+                      JSON.stringify(page.content_tree)
+                    ),
+                  },
+                  where: {
+                    id_page: id,
+                    ts: history[id],
+                  },
+                });
+              }
+
               await _db.page.update({
                 where: { id: page.id },
                 data: {
