@@ -61,6 +61,9 @@ const console =
 typeof global.server_hook === "function"
   ? { ...global.console }
   : global.console;
+
+const db = {};
+const api = {};
 if (typeof global.server_hook === "function") {
   const log = global.console.log;
   console.log = function (...arg) {
