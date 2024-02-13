@@ -18,6 +18,7 @@ export const compPicker = {
 
 export const reloadCompPicker = async (p: PG) => {
   compPicker.status = "loading";
+  if (!p.sync) return;
 
   compPicker.site_id = p.site.id;
   p.comp.group[p.site.id] = await p.sync.comp.group(p.site.id);

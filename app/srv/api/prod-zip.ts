@@ -13,8 +13,26 @@ export const _ = {
 
     if (validate(site_id)) {
       const result = {
+        layouts: await _db.page.findMany({
+          where: {
+            id_site: site_id,
+            is_deleted: false,
+            name: { startsWith: "layout:" },
+          },
+          select: {
+            id: true,
+            name: true,
+            url: true,
+            content_tree: true,
+            is_default_layout: true,
+          },
+        }),
         pages: await _db.page.findMany({
-          where: { id_site: site_id, is_deleted: false },
+          where: {
+            id_site: site_id,
+            is_deleted: false,
+            name: { not: { startsWith: "layout:" } },
+          },
           select: { id: true, name: true, url: true, content_tree: true },
         }),
         comps: await _db.component.findMany({
