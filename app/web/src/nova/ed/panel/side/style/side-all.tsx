@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useGlobal } from "web-utils";
+import { IItem } from "../../../../../utils/types/item";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { PanelAdv } from "./panel/advanced";
 import { PanelAutoLayout } from "./panel/auto-layout";
@@ -11,8 +12,6 @@ import { PanelLink } from "./panel/link";
 import { PanelPadding } from "./panel/padding";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
-import { treeRebuild } from "../../../logic/tree/build";
-import { IItem } from "../../../../../utils/types/item";
 
 export const EdStyleAll = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
