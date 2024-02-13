@@ -69,9 +69,9 @@ export const EdCompPicker = () => {
     p.render();
   };
 
-  useEffect(() => {
-    activatePopup();
-  }, []);
+  // useEffect(() => {
+  //   activatePopup();
+  // }, []);
 
   return (
     <TopBtn

@@ -273,7 +273,7 @@ export const EDGlobal = {
       comp: {
         preview_id: "",
         open: null as null | ((comp_id: string) => void | Promise<void>),
-        import: true
+        import: false
       },
       comp_group: null as null | {
         mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;
