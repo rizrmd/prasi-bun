@@ -6,7 +6,7 @@ import { validate } from "uuid";
 export const EdCompImport = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
-    site_id: "d3899ed7-a6fd-4e41-935e-ff5f96cd41d0",
+    site_id: "",
     groups: [] as {
       name: string;
       id: string;
@@ -79,7 +79,7 @@ export const EdCompImport = () => {
       >
         <div className="min-h-[400px] flex flex-col items-stretch p-3">
           <div className="flex justify-between items-center">
-            <div>Site ID:</div>
+            <div>Import from Site ID:</div>
             <div className="space-x-1 flex">
               <div
                 className="bg-white text-sm border px-2 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"

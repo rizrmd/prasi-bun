@@ -51,7 +51,7 @@ export const MobileQRButton = () => {
             "flex flex-col w-[400px] items-stretch bg-white -mx-[8px] -my-[3px] text-[14px]"
           )}
         >
-          <div className="min-h-[80vh] flex flex-col items-center p-3">
+          <div className="min-h-[400px] flex flex-col items-center p-3">
             <QrSvg
               value={JSON.stringify({
                 site: { name: p.site.name, id: p.site.id },
