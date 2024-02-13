@@ -12,6 +12,7 @@ import { PanelPadding } from "./panel/padding";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
 import { treeRebuild } from "../../../logic/tree/build";
+import { IItem } from "../../../../../utils/types/item";
 
 export const EdStyleAll = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -23,7 +24,7 @@ export const EdStyleAll = () => {
   const item = meta.item;
 
   const update = useCallback(
-    (key: any, value: any) => {
+    async (key: any, value: any) => {
       if (meta) {
         let mitem = meta.mitem;
 
@@ -61,6 +62,10 @@ export const EdStyleAll = () => {
               }
             }
           });
+
+          meta.item = mitem.toJSON() as IItem;
+
+          p.render();
         }
       }
     },
