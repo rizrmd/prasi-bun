@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 import { validate } from "uuid";
+import { dir } from "dir";
 
 export const _ = {
   url: "/prod-zip/:site_id",
@@ -30,6 +31,7 @@ export const _ = {
             code.path(site_id, "server", "build")
           ),
           site: readDirectoryRecursively(code.path(site_id, "site", "build")),
+          core: readDirectoryRecursively(dir.data(`prod`)),
         },
       };
 
