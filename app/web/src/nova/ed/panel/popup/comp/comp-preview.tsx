@@ -46,6 +46,8 @@ export const EdCompPreview = () => {
 
   const isTrashed = !!compPicker.trash.find((e) => e.id === comp_id);
 
+  if (!p.ui.popup.comp.preview_id) return null;
+
   return (
     <div className="flex flex-1 flex-col items-stretch overflow-auto border-l">
       {comp_id && item && (

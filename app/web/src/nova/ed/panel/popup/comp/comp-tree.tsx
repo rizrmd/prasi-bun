@@ -45,7 +45,11 @@ export const edPageTreeRender: NodeRender<CompItem> = (
         if (item.type === "folder") {
           onToggle();
         } else {
-          p.ui.popup.comp.preview_id = item.id;
+          if (p.ui.popup.comp.preview_id !== item.id) {
+            p.ui.popup.comp.preview_id = item.id;
+          } else {
+            p.ui.popup.comp.preview_id = "";
+          }
           p.render();
         }
       }}

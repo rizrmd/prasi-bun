@@ -55,11 +55,6 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   if (!snap && !ydoc) {
     const comp = await _db.component.findFirst({ where: { id: comp_id } });
     if (comp) {
-      const item = comp.content_tree as IItem;
-      if (item && item.component?.id !== comp.id) {
-        item.component = { id: comp.id, props: {} };
-      }
-
       const doc = new Y.Doc();
       let root = doc.getMap("map");
       syncronize(root, { id: comp_id, root: comp.content_tree });
