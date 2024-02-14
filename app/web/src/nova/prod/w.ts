@@ -5,4 +5,5 @@ export const w = window as unknown as {
   };
   params: any;
   navigateOverride: (href: string) => void;
+  _prasi: { basepath: string };
 };

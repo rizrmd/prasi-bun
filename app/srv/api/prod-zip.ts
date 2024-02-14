@@ -5,6 +5,7 @@ import path from "path";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 import { validate } from "uuid";
 import { dir } from "dir";
+import { existsAsync, readAsync } from "fs-jetpack";
 
 export const _ = {
   url: "/prod-zip/:site_id",
@@ -43,15 +44,29 @@ export const _ = {
           },
           select: { id: true, content_tree: true },
         }),
-        site: await _db.component.findFirst({ where: { id: site_id } }),
+        site: await _db.site.findFirst({
+          where: { id: site_id },
+          select: {
+            id: true,
+            name: true,
+            config: true,
+            responsive: true,
+            domain: true,
+          },
+        }),
         code: {
           server: readDirectoryRecursively(
             code.path(site_id, "server", "build")
           ),
           site: readDirectoryRecursively(code.path(site_id, "site", "build")),
-          core: readDirectoryRecursively(dir.data(`prod`)),
+          core: readDirectoryRecursively(dir.path(`/app/srv/prod`)),
         },
       };
+
+      if (await existsAsync(dir.path("/app/static/index.css"))) {
+        result.code.site["index.css"] =
+          (await readAsync(dir.path("/app/static/index.css"))) || "";
+      }
 
       return await gzipAsync(JSON.stringify(result));
     }

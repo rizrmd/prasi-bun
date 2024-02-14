@@ -148,7 +148,7 @@ export const _ = {
     } else if (pathname === "index.html" || pathname === "_") {
       return index_html;
     } else {
-      const res = dir.data(`/prod/${pathname}`);
+      const res = dir.path(`/app/srv/prod/${pathname}`);
       const file = Bun.file(res);
       if (!(await file.exists())) {
         return index_html;

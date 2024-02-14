@@ -26,7 +26,9 @@ const getRoute = () => {
     }
 
     let raw = await (await fetch(base.url`_prasi/route`)).blob();
-    const res = JSON.parse(await (await decompressBlob(raw)).text());
+    const dc = decompressBlob(raw);
+    const unziped = await dc;
+    const res = JSON.parse(await unziped.text());
 
     await set("route", res, prodCache);
     if (!is_done) {
