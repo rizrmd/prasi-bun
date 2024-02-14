@@ -9,7 +9,7 @@ export const EdPopCompGroup = () => {
 
   useEffect(() => {
     (async () => {
-      if (p.ui.popup.comp_group) {
+      if (p.ui.popup.comp_group && p.sync) {
         if (!p.comp.group[p.site.id]) {
           p.comp.group[p.site.id] = await p.sync.comp.group(p.site.id);
         }
