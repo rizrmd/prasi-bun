@@ -23,7 +23,9 @@ export const base = {
     }
   },
   get pathname() {
-    return location.pathname.substring(base.root.pathname.length);
+    const res = location.pathname.substring(base.root.pathname.length);
+    if (!res.startsWith("/")) return `/${res}`;
+    return res;
   },
   site: { id: w._prasi?.site_id } as {
     id: string;
