@@ -61,7 +61,7 @@ export const _ = {
 
     for (const comp of comps) {
       if (comp.component_group && comp_groups[comp.component_group.name]) {
-        await _db.component.create({
+        const res = await _db.component.create({
           data: {
             name: comp.name,
             content_tree: comp.content_tree as any,
@@ -69,7 +69,16 @@ export const _ = {
               connect: { id: comp_groups[comp.component_group.name] },
             },
           },
+          select: { id: true },
         });
+
+        if (res) {
+          (comp.content_tree as any).component.id = res.id;
+          await _db.component.update({
+            where: { id: res.id },
+            data: { content_tree: comp.content_tree as any },
+          });
+        }
       }
     }
 
