@@ -17,7 +17,6 @@ import { preparePrisma } from "./utils/prisma";
 
 g.status = "init";
 
-
 await writeAsync(
   dir.path("app/web/timestamp.ts"),
   `export const version = "${createId().substring(0, 7)}";`
@@ -75,8 +74,6 @@ if (!g.apiPrepared) {
 if (!g.parcel) {
   await parcelBuild();
 }
-
-await import("./build-prod");
 
 const { createServer } = await import("./server/create");
 await createServer();

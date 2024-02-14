@@ -5,7 +5,7 @@ const ctx = await context({
   bundle: true,
   absWorkingDir: dir.path(""),
   entryPoints: [dir.path("app/web/src/nova/prod/main.tsx")],
-  outdir: dir.data(`/prod`),
+  outdir: dir.path(`/app/srv/prod`),
   splitting: true,
   format: "esm",
   jsx: "transform",

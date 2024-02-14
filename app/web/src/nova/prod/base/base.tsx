@@ -12,8 +12,15 @@ export const base = {
     const pathname = arg
       .map((e) => (Array.isArray(e) ? e.join("") : e))
       .join("");
-    if (pathname.startsWith("/")) return this.root + pathname;
-    else return this.root.toString() + "/" + pathname;
+
+    let base_url = this.root.toString();
+    if (base_url.endsWith("/"))
+      base_url = base_url.substring(0, base_url.length - 1);
+
+    if (pathname.startsWith("/")) return base_url + pathname;
+    else {
+      return base_url + "/" + pathname;
+    }
   },
   get pathname() {
     return location.pathname.substring(base.root.pathname.length);

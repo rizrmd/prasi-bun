@@ -16,7 +16,10 @@ export const apiProxy = (api_url: string) => {
     let base_url = `${base.protocol}//${base.host}`;
     if (!w.prasiApi[base_url]) {
       if (!apiProxyLoaded[base_url]) {
-        apiProxyLoaded[base_url] = loadApiProxyDef(base_url, true);
+        apiProxyLoaded[base_url] = loadApiProxyDef(
+          base_url,
+          location.hostname.includes("prasi")
+        );
       }
     }
 
