@@ -22,6 +22,7 @@ export const EdPopSite = () => {
   );
 
   const reload = async () => {
+    if (!p.sync) return;
     local.status = "loading";
     local.render();
 

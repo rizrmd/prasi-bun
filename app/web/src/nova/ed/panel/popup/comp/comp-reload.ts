@@ -50,6 +50,7 @@ export const reloadCompPicker = async (p: PG) => {
     where: { id_component_group: { in: comp_ids } },
     select: { id: true, id_component_group: true, name: true },
   });
+  console.log(comps);
 
   for (const comp of Object.values(comps)) {
     if (comp.id_component_group) {

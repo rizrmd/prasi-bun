@@ -44,7 +44,7 @@ export const comp_group: SAction["comp"]["group"] = async function (
         },
       },
     });
-    
+
     groups = await _db.component_group.findMany({
       where: {
         component_site: {
