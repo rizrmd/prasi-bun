@@ -34,8 +34,6 @@ if (!g.dockerPrepared) {
     },
   };
 
-  await import("./core/build-prod");
-
   if (!(await existsAsync(dir.path("_tmp_docker")))) {
     for (const file of Object.keys(dir.read(dir.path``))) {
       if (

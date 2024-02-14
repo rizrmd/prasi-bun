@@ -71,6 +71,8 @@ if (!g.apiPrepared) {
   }
 }
 
+if (g.mode === "dev") await import("./build-core");
+
 if (!g.parcel) {
   await parcelBuild();
 }

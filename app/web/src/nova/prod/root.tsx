@@ -55,7 +55,7 @@ export const Root = () => {
   const page = router.lookup(base.pathname);
   if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
 
-  w.params = page.params;
+  w.params = page.params || {}; 
 
   base.page.id = page.id;
   base.page.url = page.url;

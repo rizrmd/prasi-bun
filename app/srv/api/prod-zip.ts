@@ -59,7 +59,7 @@ export const _ = {
             code.path(site_id, "server", "build")
           ),
           site: readDirectoryRecursively(code.path(site_id, "site", "build")),
-          core: readDirectoryRecursively(dir.path(`/app/srv/prod`)),
+          core: readDirectoryRecursively(dir.path(`/app/srv/core`)),
         },
       };
 
