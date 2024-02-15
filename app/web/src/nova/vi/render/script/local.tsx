@@ -67,7 +67,7 @@ export const createViLocal = (
       }
 
       return () => {};
-    }, []);
+    }, [location.pathname]);
 
     return modifyChild(children, {
       ...meta.script?.scope,
