@@ -1,3 +1,4 @@
+import { get, set } from "idb-keyval";
 import { createRouter } from "radix3";
 import { apiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
@@ -5,9 +6,7 @@ import { IRoot } from "../../../utils/types/root";
 import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
-import { decompressBlob } from "./util";
 import { prodCache } from "./cache";
-import { get, set } from "idb-keyval";
 
 const getRoute = () => {
   return new Promise<{
@@ -25,11 +24,7 @@ const getRoute = () => {
       is_done = true;
     }
 
-    let raw = await (await fetch(base.url`_prasi/route`)).blob();
-    const dc = decompressBlob(raw);
-    const unziped = await dc;
-    const res = JSON.parse(await unziped.text());
-
+    let res = await (await fetch(base.url`_prasi/route`)).json();
     await set("route", res, prodCache);
     if (!is_done) {
       done(res);

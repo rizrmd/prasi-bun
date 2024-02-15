@@ -3,7 +3,6 @@ import { IContent } from "../../../utils/types/general";
 import { IItem } from "../../../utils/types/item";
 import { ISection } from "../../../utils/types/section";
 import { base } from "./base";
-import { decompressBlob } from "./util";
 import { prodCache } from "./cache";
 
 export const scanComponent = async (items: IContent[]) => {
@@ -38,15 +37,12 @@ export const scanComponent = async (items: IContent[]) => {
 
   if (comp.pending.size > 0) {
     try {
-      const raw = await (
+      const res = (await (
         await fetch(base.url`_prasi/comp`, {
           method: "POST",
           body: JSON.stringify({ ids: [...comp.pending] }),
         })
-      ).blob();
-      const res = JSON.parse(
-        await (await decompressBlob(raw)).text()
-      ) as Record<string, IItem>;
+      ).json()) as Record<string, IItem>;
       for (const [id, item] of Object.entries(res)) {
         comp.pending.delete(id);
         comp.list[id] = item;

@@ -1,6 +1,5 @@
 import { base } from "./base";
 import { IRoot } from "../../../utils/types/root";
-import { decompressBlob } from "./util";
 import { prodCache } from "./cache";
 import { get, set } from "idb-keyval";
 
@@ -17,8 +16,9 @@ export const loadPage = (page_id: string) => {
       returned = true;
     }
 
-    const raw = await (await fetch(base.url`_prasi/page/${page_id}`)).blob();
-    const res = JSON.parse(await (await decompressBlob(raw)).text()) as {
+    const res = (await (
+      await fetch(base.url`_prasi/page/${page_id}`)
+    ).json()) as {
       id: string;
       url: string;
       root: IRoot;
@@ -57,13 +57,12 @@ export const loadPages = (page_ids: string[]) => {
       done(result);
     }
 
-    const raw = await (
+    const res = (await (
       await fetch(base.url`_prasi/pages`, {
         method: "POST",
         body: JSON.stringify({ ids }),
       })
-    ).blob();
-    const res = JSON.parse(await (await decompressBlob(raw)).text()) as {
+    ).json()) as {
       id: string;
       url: string;
       root: IRoot;

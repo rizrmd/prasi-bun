@@ -1,9 +1,9 @@
 import { dir } from "dir";
 import { apiContext } from "service-srv";
 import { validate } from "uuid";
+import { prodIndex } from "../util/prod-index";
 import { code } from "../ws/sync/editor/code/util-code";
 import { gzipAsync } from "../ws/sync/entity/zlib";
-import { prodIndex } from "../util/prod-index";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -78,7 +78,9 @@ export const _ = {
             },
             select: { url: true, id: true },
           });
-          return gzipAsync(
+
+          return await responseCompressed(
+            req,
             JSON.stringify({
               site: { ...site, api_url },
               urls,
@@ -96,7 +98,8 @@ export const _ = {
               select: { content_tree: true, url: true },
             });
             if (page) {
-              return gzipAsync(
+              return await responseCompressed(
+                req,
                 JSON.stringify({
                   id: page_id,
                   root: page.content_tree,
@@ -116,7 +119,8 @@ export const _ = {
               select: { id: true, content_tree: true, url: true },
             });
             if (pages) {
-              return gzipAsync(
+              return await responseCompressed(
+                req,
                 JSON.stringify(
                   pages.map((e) => ({
                     id: e.id,
@@ -141,7 +145,7 @@ export const _ = {
               result[comp.id] = comp.content_tree;
             }
           }
-          return gzipAsync(JSON.stringify(result) as any);
+          return await responseCompressed(req, JSON.stringify(result) as any);
         }
       }
       return new Response("action " + action + ": not found");
@@ -156,4 +160,14 @@ export const _ = {
       return new Response(file);
     }
   },
+};
+
+const responseCompressed = async (req: Request, body: string) => {
+  if (req.headers.get("accept-encoding")?.includes("gz")) {
+    return new Response(await gzipAsync(body), {
+      headers: { "content-encoding": "gzip" },
+    });
+  }
+
+  return new Response(body);
 };
