@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { GlobalContext } from "web-utils";
+import { GlobalContext, useLocal } from "web-utils";
 import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
 import { evalCJS } from "../ed/logic/ed-sync";
@@ -13,6 +13,7 @@ import { w } from "./w";
 
 export const Root = () => {
   // #region context
+  const local = useLocal({ page_id: "" });
   const [_, set] = useState({});
   const render = () => set({});
   w.prasiContext.render = render;
@@ -55,7 +56,11 @@ export const Root = () => {
   const page = router.lookup(base.pathname);
   if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
 
-  w.params = page.params || {}; 
+  if (page.id !== local.page_id) {
+    base.init_local_effect = {};
+  }
+
+  w.params = page.params || {};
 
   base.page.id = page.id;
   base.page.url = page.url;

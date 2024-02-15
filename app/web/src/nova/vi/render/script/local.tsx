@@ -52,6 +52,7 @@ export const createViLocal = (
           }
         }
       }
+
       let should_run = !init_local_effect[id];
       if (should_run) {
         if (typeof init_local_effect === "object") {
