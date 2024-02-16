@@ -33,6 +33,35 @@ export const nodeOnDrop: (
 
       if (to) {
         if (to.get("component")?.get("id")) {
+          if (!toMeta.item.component?.id) {
+            to.doc?.transact(() => {
+              if (toMeta?.mitem && from && typeof relativeIndex === "number") {
+                const toChilds = toMeta.mitem.get("childs");
+                if (toChilds) {
+                  const map = new Y.Map();
+                  syncronize(map, fillID(from.toJSON() as any));
+                  toChilds.insert(relativeIndex, [map]);
+                }
+
+                if (!fromMeta?.jsx_prop?.is_root) {
+                  from.parent.forEach((e, idx) => {
+                    if (
+                      from &&
+                      !!e &&
+                      !!e.get &&
+                      e.get("id") === from.get("id")
+                    ) {
+                      from.parent.delete(idx);
+                    }
+                  });
+                }
+              }
+            });
+
+            treeRebuild(p);
+            p.render();
+          }
+
           return null;
         }
 
