@@ -128,7 +128,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
             if (document.activeElement?.tagName === "INPUT") {
               return;
             }
-            const el_active = document.querySelector(".el-active") as any;
+            const el_active = document.querySelector(`.s-${item.id}`) as any;
 
             if (el_active) {
               setEndOfContenteditable(el_active);
@@ -164,7 +164,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
       )}
       <EdTreeIndent node={node} prm={prm} />
       <EdTreeName node={node} prm={prm} />
-      <EdTreeAction node={node} prm={prm} />
+      {node.data?.mitem && <EdTreeAction node={node} prm={prm} />}
     </div>
   );
 };

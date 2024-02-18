@@ -60,6 +60,43 @@ export const nodeOnDrop: (
 
             treeRebuild(p);
             p.render();
+          } else {
+            const child_id = toMeta.item.component?.props.child.content?.id;
+            if (child_id) {
+              const child_meta = getMetaById(p, child_id);
+              if (child_meta) {
+                to.doc?.transact(() => {
+                  if (
+                    child_meta.mitem &&
+                    from &&
+                    typeof relativeIndex === "number"
+                  ) {
+                    const toChilds = child_meta.mitem.get("childs");
+                    if (toChilds) {
+                      const map = new Y.Map();
+                      syncronize(map, fillID(from.toJSON() as any));
+                      toChilds.insert(relativeIndex, [map]);
+                    }
+
+                    if (!fromMeta?.jsx_prop?.is_root) {
+                      from.parent.forEach((e, idx) => {
+                        if (
+                          from &&
+                          !!e &&
+                          !!e.get &&
+                          e.get("id") === from.get("id")
+                        ) {
+                          from.parent.delete(idx);
+                        }
+                      });
+                    }
+                  }
+                });
+
+                treeRebuild(p);
+                p.render();
+              }
+            }
           }
 
           return null;

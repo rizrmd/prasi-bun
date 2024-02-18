@@ -45,21 +45,40 @@ export const pushTreeNode = (
         data: meta,
       });
     } else {
-      if (meta.jsx_prop?.is_root) {
-        tree.push({
-          id: meta.item.id,
-          parent: meta.parent?.instance_id || "root",
-          text: meta.jsx_prop.name,
-          data: meta,
-        });
-      } else {
-        if (meta.parent.id !== meta.parent.instance_id) {
-          tree.push({
-            id: meta.item.id,
-            parent: meta.parent?.id || "root",
-            text: meta.item.name,
-            data: meta,
-          });
+      if (meta.jsx_prop) {
+        if (meta.jsx_prop.is_root) {
+          if (meta.jsx_prop.name !== "child") {
+            tree.push({
+              id: meta.item.id,
+              parent: meta.parent?.instance_id || "root",
+              text: meta.jsx_prop.name,
+              data: meta,
+            });
+          }
+        } else {
+          if (meta.jsx_prop.name === "child" && meta.parent.instance_id) {
+            const comp_meta = metas[meta.parent.instance_id] as IMeta;
+            const child_id = comp_meta.item.component?.props.child.content?.id;
+            if (child_id && comp_meta.mitem) {
+              const child_meta = metas[child_id];
+              if (child_meta.item.childs.find((e) => meta.item.id === e.id)) {
+                tree.push({
+                  id: meta.item.id,
+                  parent: meta.parent?.instance_id || "root",
+                  text: meta.item.name,
+                  data: meta,
+                });
+              }
+            }
+          }
+          if (meta.parent.id !== meta.parent.instance_id) {
+            tree.push({
+              id: meta.item.id,
+              parent: meta.parent?.id || "root",
+              text: meta.item.name,
+              data: meta,
+            });
+          }
         }
       }
     }

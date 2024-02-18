@@ -2,6 +2,7 @@ import { TypedMap } from "yjs-types";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta, PG } from "../ed-global";
+import { createId } from "@paralleldrive/cuid2";
 
 export const assignMitem = (arg: {
   m: IMeta;
@@ -44,6 +45,22 @@ export const assignMitem = (arg: {
             const mprop = mprops.get(m.jsx_prop.name);
             if (mprop) {
               const mcontent = mprop.get("content");
+
+              if (!mcontent) {
+                const map = new Y.Map();
+                syncronize(map, {
+                  id: createId(),
+                  name: m.jsx_prop.name,
+                  type: "item",
+                  dim: { w: "full", h: "full" },
+                  childs: [],
+                  adv: {
+                    css: "",
+                  },
+                });
+                mprop.set("content", map as any);
+              }
+
               if (mcontent) {
                 m.mitem = mcontent;
               }

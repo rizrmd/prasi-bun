@@ -45,7 +45,7 @@ export const Root = () => {
         render();
       });
     }
-    return <Loading note="Loading router" />;
+    return <Loading />;
   }
   // #endregion
 

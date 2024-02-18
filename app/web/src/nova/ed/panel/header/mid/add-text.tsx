@@ -106,7 +106,15 @@ export const EdAddText = () => {
                 active.item_id = map.get("id") || "";
 
                 p.render();
-                focus();
+                setTimeout(() => {
+                  if (document.activeElement?.tagName === "INPUT") {
+                    return;
+                  }
+                  const el_active = document.querySelector(
+                    `.s-${active.item_id}`
+                  ) as any;
+                  if (el_active) el_active.focus();
+                }, 100);
               }
             }
           }
@@ -130,14 +138,4 @@ export const EdAddText = () => {
       </svg>
     </TopBtn>
   );
-};
-
-const focus = () => {
-  setTimeout(() => {
-    if (document.activeElement?.tagName === "INPUT") {
-      return;
-    }
-    const el_active = document.querySelector(".el-active") as any;
-    if (el_active) el_active.focus();
-  }, 100);
 };
