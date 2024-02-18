@@ -60,8 +60,10 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 loader: "tsx",
               });
             }
+            let adv = mitem.get("adv");
+            const jscript = parseJs(adv?.get("js")) || false;
+
             doc?.transact(() => {
-              let adv = mitem.get("adv");
               if (!adv) {
                 mitem.set("adv", new Y.Map() as any);
                 adv = mitem.get("adv");
@@ -80,15 +82,16 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 }
 
                 if (mode === "js") {
-                  const res = parseJs(adv.get("js")) || false;
-                  if (res) {
-                    mitem.set("script", res);
+                  if (jscript) {
+                    mitem.set("script", jscript);
                   } else {
                     mitem.delete("script");
                   }
                 }
+
+                console.log("once");
               }
-            });
+            }, "code");
 
             if (save_to === "comp" && comp_id) {
               await _db.component.update({

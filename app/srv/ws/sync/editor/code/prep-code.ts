@@ -52,15 +52,19 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
           }
           const sv_local = await gzipAsync(bin);
 
-          user.active.findAll({ site_id: id_site }).map((e) => {
-            const ws = conns.get(e.client_id)?.ws;
-            if (ws) {
+          const client_ids = new Set<string>();
+          user.active.findAll({ site_id: id_site }).forEach((e) => {
+            client_ids.add(e.client_id);
+          });
+
+          client_ids.forEach((client_id) => {
+            const ws = conns.get(client_id)?.ws;
+            if (ws)
               sendWS(ws, {
                 type: SyncType.Event,
                 event: "remote_svlocal",
                 data: { type: "code", sv_local, id: id_site },
               });
-            }
           });
         });
       }

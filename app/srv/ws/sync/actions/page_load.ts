@@ -35,19 +35,23 @@ export const page_load: SAction["page"]["load"] = async function (
     snapshot.set("page", id, "id_doc", um.doc.clientID);
 
     doc.on("update", async (update: Uint8Array, origin: any) => {
+      console.log(origin);
       const bin = Y.encodeStateAsUpdate(doc);
       snapshot.set("page", id, "bin", bin);
 
       const sv_local = await gzipAsync(update);
 
-      const users = user.active.findAll({ page_id: id });
-      users.map((e) => {
+      const client_ids = new Set<string>();
+      user.active.findAll({ page_id: id }).forEach((e) => {
+        client_ids.add(e.client_id);
+      });
+
+      client_ids.forEach((client_id) => {
         if (origin !== um) {
-          if (e.client_id === origin) return;
+          if (client_id === origin) return;
         }
 
-        const ws = conns.get(e.client_id)?.ws;
-
+        const ws = conns.get(client_id)?.ws;
         if (ws)
           sendWS(ws, {
             type: SyncType.Event,
