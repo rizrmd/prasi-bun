@@ -93,10 +93,10 @@ if (typeof global.server_hook === "function") {
             while (ancestors.length > 0 && ancestors.at(-1) !== this) {
               ancestors.pop();
             }
-            if (ancestors.includes(value)) {
+            if (ancestors.includes(val)) {
               return "[circular]";
             }
-            ancestors.push(value);
+            ancestors.push(val);
 
             if (val.constructor && val.constructor.name){
               return '[class] ' + val.constructor.name;
