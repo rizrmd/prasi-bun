@@ -460,8 +460,8 @@ declare global {
           applyChanges();
           p.ui.popup.script.on_close = () => {};
         };
-        clearTimeout(scriptEdit.timeout);
-        scriptEdit.timeout = setTimeout(applyChanges, 1000);
+        // clearTimeout(scriptEdit.timeout);
+        // scriptEdit.timeout = setTimeout(applyChanges, 1000);
       }}
       onMount={async (editor, monaco) => {
         local.monaco = monaco;
