@@ -28,22 +28,25 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
 
       const sv_local = await gzipAsync(update);
 
-      const all = user.active.findAll({ comp_id: comp_id });
+      user.active.findAll({ comp_id: comp_id });
 
-      all.map((e) => {
+      const client_ids = new Set<string>();
+      user.active.findAll({ comp_id: comp_id }).forEach((e) => {
+        client_ids.add(e.client_id);
+      });
+
+      client_ids.forEach((client_id) => {
         if (origin !== um) {
-          if (e.client_id === origin) return;
+          if (client_id === origin) return;
         }
 
-        const ws = conns.get(e.client_id)?.ws;
-
-        if (ws) {
+        const ws = conns.get(client_id)?.ws;
+        if (ws)
           sendWS(ws, {
             type: SyncType.Event,
             event: "remote_svlocal",
             data: { type: "comp", sv_local, id: comp_id },
           });
-        }
       });
     });
   };
