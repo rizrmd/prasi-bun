@@ -17,6 +17,7 @@ import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { EdPageHistoryMain } from "./panel/main/main-history";
+import { jscript } from "../../utils/script/jscript";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -40,6 +41,8 @@ export const EdBase = () => {
     );
   }
 
+  const Editor = jscript.editor;
+
   return (
     <div className={cx("flex flex-col flex-1", style)}>
       <div className="flex justify-between"></div>
@@ -54,7 +57,7 @@ export const EdBase = () => {
           <EdMid />
 
           {p.page.history.id ? (
-            <EdPageHistoryMain  />
+            <EdPageHistoryMain />
           ) : (
             <div
               className={cx(
@@ -84,6 +87,20 @@ export const EdBase = () => {
         <EdPopCompGroup />
         <EdPopComp />
       </>
+      {Editor && !jscript.editorLoaded && (
+        <div
+          className={css`
+            display: none;
+          `}
+        >
+          <Editor
+            onMount={() => {
+              jscript.editorLoaded = true;
+              p.render();
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
