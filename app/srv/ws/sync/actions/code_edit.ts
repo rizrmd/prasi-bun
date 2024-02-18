@@ -88,8 +88,6 @@ export const code_edit: SAction["code"]["edit"] = async function (
                     mitem.delete("script");
                   }
                 }
-
-                console.log("once");
               }
             }, "code");
 
