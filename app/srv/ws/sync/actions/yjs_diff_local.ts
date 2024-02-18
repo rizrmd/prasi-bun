@@ -42,6 +42,28 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
                 ts: history[id],
               },
             });
+
+            const res = await _db.page_history.findMany({
+              where: {
+                id_page: id,
+              },
+              select: {
+                id: true,
+                ts: true,
+              },
+              orderBy: {
+                ts: "desc",
+              },
+            });
+            const ids = [];
+            for (let i = 0; i < res.length; i++) {
+              if (i > 25) {
+                ids.push(res[i].id);
+              }
+            }
+            await _db.page_history.deleteMany({
+              where: { id: { in: ids } },
+            });
           } else {
             await _db.page_history.updateMany({
               data: {
