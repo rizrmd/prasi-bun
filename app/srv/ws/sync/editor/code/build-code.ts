@@ -98,7 +98,7 @@ if (typeof global.server_hook === "function") {
             }
             ancestors.push(val);
 
-            if (val.constructor && val.constructor.name){
+            if (val.constructor && val.constructor.name !== "Object"){
               return '[class] ' + val.constructor.name;
             }
           }
