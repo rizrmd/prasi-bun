@@ -38,6 +38,16 @@ export const EdAddItem = () => {
           },
         } as IItem;
 
+        if (meta.item.component?.id && meta.item.component.props.child) {
+          const child_id = meta.item.component.props.child.content?.id;
+          if (child_id) {
+            const child_meta = getMetaById(p, child_id);
+            if (child_meta) {
+              meta = child_meta;
+            }
+          }
+        }
+
         let mitem = meta.mitem;
         if (mitem) {
           const item = meta.item as IContent;

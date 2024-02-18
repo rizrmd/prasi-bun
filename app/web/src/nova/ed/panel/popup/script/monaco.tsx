@@ -9,7 +9,7 @@ import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
 import { Loading } from "../../../../../utils/ui/loading";
-import { getActiveMeta } from "../../../logic/active/get-meta";
+import { getActiveMeta, getMetaById } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
 import { declareScope } from "./scope/scope";
@@ -169,7 +169,6 @@ declare global {
 }
 `
                       );
-
                     }
 
                     const nmodel = monaco.editor.createModel(
@@ -398,7 +397,7 @@ declare global {
         clearTimeout(scriptEdit.timeout);
         const applyChanges = async () => {
           if (!p.sync) return;
-          
+
           const value = local.value;
           const meta = getActiveMeta(p);
           const mode = p.ui.popup.script.mode;

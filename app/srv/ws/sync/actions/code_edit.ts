@@ -48,7 +48,6 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
     if (root) {
       const mitem = findId(root, item_id);
-
       if (mitem) {
         if (arg.type === "adv") {
           const mode = arg.mode;
@@ -228,15 +227,14 @@ const findId = (mitem: MContent | MRoot, id: string) => {
 
   if (!found) {
     const mprops = m.get("component")?.get("props");
+
     if (mprops) {
       mprops.forEach((mprop) => {
-        if (mprop.get("meta")?.get("type") === "content-element") {
-          const mcontent = mprop.get("content");
-          if (mcontent) {
-            const f = findId(mcontent, id);
-            if (f) {
-              found = f;
-            }
+        const mcontent = mprop.get("content");
+        if (mcontent) {
+          const f = findId(mcontent, id);
+          if (f) {
+            found = f;
           }
         }
       });
