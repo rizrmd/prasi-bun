@@ -35,7 +35,6 @@ export const page_load: SAction["page"]["load"] = async function (
     snapshot.set("page", id, "id_doc", um.doc.clientID);
 
     doc.on("update", async (update: Uint8Array, origin: any) => {
-      console.log(origin);
       const bin = Y.encodeStateAsUpdate(doc);
       snapshot.set("page", id, "bin", bin);
 
