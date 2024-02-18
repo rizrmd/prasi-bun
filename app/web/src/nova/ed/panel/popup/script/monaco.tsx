@@ -394,7 +394,6 @@ declare global {
           local.value = value || "";
         }
         local.render();
-        clearTimeout(scriptEdit.timeout);
         const applyChanges = async () => {
           if (!p.sync) return;
 
@@ -461,7 +460,8 @@ declare global {
           applyChanges();
           p.ui.popup.script.on_close = () => {};
         };
-        scriptEdit.timeout = setTimeout(applyChanges, 1000);
+        clearTimeout(scriptEdit.timeout);
+        // scriptEdit.timeout = setTimeout(applyChanges, 5000);
       }}
       onMount={async (editor, monaco) => {
         local.monaco = monaco;
