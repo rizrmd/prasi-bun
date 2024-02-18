@@ -75,15 +75,24 @@ const injectSiteScript = () => {
     script.onload = async () => {
       done();
     };
-    const url = base.site.api_url;
-
-    if (!localStorage.getItem("api-ts-" + url)) {
-      localStorage.setItem("api-ts-" + url, Date.now().toString());
+    let base_url = base.site.api_url;
+    try {
+      new URL(base_url);
+    } catch (e) {
+      if (location.hostname === "localhost") {
+        base_url = `http://localhost:4550`;
+      } else {
+        base_url = `https://prasi.avolut.com`;
+      }
     }
 
-    const ts = localStorage.getItem("api-ts-" + url);
+    if (!localStorage.getItem("api-ts-" + base_url)) {
+      localStorage.setItem("api-ts-" + base_url, Date.now().toString());
+    }
 
-    script.src = `${url}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
+    const ts = localStorage.getItem("api-ts-" + base_url);
+
+    script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
 
     if (!document.querySelector(`script[src="${script.src}"]`)) {
       d.body.appendChild(script);

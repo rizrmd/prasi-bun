@@ -57,6 +57,10 @@ export type IMeta = {
     name: string;
     comp_id: string;
     is_root: boolean;
+    child?: {
+      prop_id: string;
+      comp_id: string;
+    };
   };
   script?: {
     scope?: any;

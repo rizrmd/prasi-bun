@@ -59,6 +59,7 @@ export const EdAddItem = () => {
 
           if (mitem) {
             const childs = mitem.get("childs");
+
             if (childs) {
               const map = new Y.Map() as MContent;
               syncronize(map as any, fillID(json));

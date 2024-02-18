@@ -30,7 +30,7 @@ export const viEvalProps = (
       api: vi.site.api,
       ...viScriptArg(vi),
       ...passprop,
-      params
+      params,
     };
 
     meta.item.script.props = {};
@@ -41,7 +41,7 @@ export const viEvalProps = (
           if (prop.meta?.type === "content-element") {
             let val = {
               _jsx: true,
-              fn: (arg: { passprop: any; meta: IMeta }) => {
+              fn: (arg: { passprop: any; meta: IMeta; prop_name: string }) => {
                 const id = prop.content?.id;
                 if (id) {
                   const m = is_layout ? vi.layout?.meta[id] : vi.meta[id];
@@ -83,6 +83,7 @@ export const viEvalProps = (
                       }
                     }
                   }
+
                   return (
                     <ViRender
                       meta={m}
@@ -94,7 +95,7 @@ export const viEvalProps = (
                 return null;
               },
             };
-            
+
             arg[name] = val;
 
             if (passprop) {

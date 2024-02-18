@@ -1,7 +1,5 @@
 import { IContent } from "../../../../utils/types/general";
-import {
-  setSelectionOffset
-} from "../../../../utils/ui/selection";
+import { setSelectionOffset } from "../../../../utils/ui/selection";
 import { VG } from "../../../vi/render/global";
 import { activateMeta } from "../../logic/active/activate-meta";
 import { isMetaActive } from "../../logic/active/is-meta.active";
@@ -74,9 +72,6 @@ export const mainPerItemVisit = (
         }
       }
     };
-    if (parts.props.className && !parts.props.className.includes("el-active")) {
-      parts.props.className += " el-active";
-    }
 
     prop.onInput = (e) => {
       e.stopPropagation();
