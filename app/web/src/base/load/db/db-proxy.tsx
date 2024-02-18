@@ -2,6 +2,7 @@ import hash_sum from "hash-sum";
 import { fetchViaProxy } from "../proxy";
 
 export const dbProxy = (dburl: string) => {
+  const name = "";
   return new Proxy(
     {},
     {
@@ -50,12 +51,12 @@ export const dbProxy = (dburl: string) => {
           {},
           {
             get(_, action: string) {
-              return (...params: any[]) => {
+              return async (...params: any[]) => {
                 if (table === "query") {
                   table = action;
                   action = "query";
                 }
-                return fetchSendDb(
+                return await fetchSendDb(
                   {
                     name,
                     action,

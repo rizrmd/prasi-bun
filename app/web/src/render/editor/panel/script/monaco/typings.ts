@@ -116,7 +116,6 @@ declare global {;
   
   ${baseTypings}
 
-  const moko: {nama: string};
   ${propText.join("\n")}
 
   ${iftext(

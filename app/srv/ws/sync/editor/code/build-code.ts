@@ -23,11 +23,13 @@ export const codeBuild = async (id_site: any) => {
         `\
 import type {} from "./typings/global";
 
-export const server: PrasiServer = {
+export const server = createServer({
   async http({ req, handle, mode, url, index, server }) {
     return await handle(req);
   },
-};
+  db,
+  api
+});
 `
       );
       const bun_types = Bun.spawn({
@@ -62,14 +64,53 @@ typeof global.server_hook === "function"
   ? { ...global.console }
   : global.console;
 
-const db = {};
-const api = {};
+let db = new Proxy({}, {
+  get(_, key) {
+    if (key === '___site_id') {
+      return (site_id) => { _.site_id = site_id } 
+    }
+    if (_.site_id) {
+      const runtime = global.server_runtime[_.site_id];
+      if (runtime && runtime.db) {
+        return runtime.db[key];
+      }
+    }
+  }
+});
+let api = {};
 if (typeof global.server_hook === "function") {
   const log = global.console.log;
   console.log = function (...arg) {
     const out = "${code.path(id_site, "site", "src", "server.log")}";
-    _fs.appendFile(out, arg.join(" ") + "\\n");
+    _fs.appendFile(out, arg.map((e)=>{
+      const ancestors = [];
+      if (typeof e === 'object') return JSON.stringify(e, (key, val) => {
+        if (val) {
+          if (typeof val === 'function') {
+            return '[function]'; 
+          }
+          if (typeof val === 'object') {
+            while (ancestors.length > 0 && ancestors.at(-1) !== this) {
+              ancestors.pop();
+            }
+            if (ancestors.includes(value)) {
+              return "[circular]";
+            }
+            ancestors.push(value);
+
+            if (val.constructor && val.constructor.name){
+              return '[class] ' + val.constructor.name;
+            }
+          }
+        }
+        return val;
+      }, 2);
+      return e;
+    }).join(" ") + "\\n");
   }.bind(console);
+} else {
+  db = global.db;
+  api = global.api;
 }`,
       },
       plugins: [

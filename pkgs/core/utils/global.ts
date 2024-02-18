@@ -5,6 +5,11 @@ import { syncronize } from "y-pojo";
 import type * as Y from "yjs";
 import { PrismaClient } from "../../../app/db/db";
 import { WSData } from "../server/create";
+import {
+  ApiProxy,
+  apiProxy,
+} from "../../../app/web/src/base/load/api/api-proxy";
+import { dbProxy } from "../../../app/web/src/base/load/db/db-proxy";
 
 type SingleRoute = {
   url: string;
@@ -22,6 +27,16 @@ export const g = global as unknown as {
     handle: (req: Request) => Promise<Response | undefined>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
   }) => Promise<Response | undefined>;
+  server_runtime: Record<
+    string,
+    {
+      api: ReturnType<typeof apiProxy>;
+      db: ReturnType<typeof dbProxy>;
+    }
+  >;
+  createServer: (
+    arg: PrasiServer & { api: any; db: any }
+  ) => (site_id: string) => Promise<PrasiServer & { api: any; db: any }>;
   ws_hook?: WebSocketHandler<WSData>;
   _db: PrismaClient;
   dburl: string;

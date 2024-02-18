@@ -128,6 +128,8 @@ declare global {
       index: { head: string[]; body: string[]; render: () => string };
     }) => Promise<Response>;
   };
+  
+  function createServer(arg: PrasiServer): PrasiServer;
 }
 `
       );
