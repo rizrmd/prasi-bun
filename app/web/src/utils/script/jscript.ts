@@ -18,6 +18,7 @@ export const initJS = async () => {
 export const jscript = {
   reload: (p: PG) => {},
   editor: null as typeof MonacoEditor | null,
+  editorLoaded: false,
   build: null as null | FBuild,
   pending: null as null | Promise<void>,
   events: {
