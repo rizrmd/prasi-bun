@@ -129,7 +129,7 @@ declare global {
     }) => Promise<Response>;
   };
   
-  function createServer(arg: PrasiServer): PrasiServer;
+  function createServer(arg: PrasiServer & { api: any; db: any }): PrasiServer;
 }
 `
       );
