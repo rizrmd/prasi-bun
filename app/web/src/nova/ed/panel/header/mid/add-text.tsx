@@ -28,6 +28,16 @@ export const EdAddText = () => {
         }
         if (!meta) return null;
 
+        if (meta.item.component?.id && meta.item.component.props.child) {
+          const child_id = meta.item.component.props.child.content?.id;
+          if (child_id) {
+            const child_meta = getMetaById(p, child_id);
+            if (child_meta) {
+              meta = child_meta;
+            }
+          }
+        }
+
         meta.mitem?.doc?.transact(() => {
           if (!meta) return null;
 
@@ -45,6 +55,7 @@ export const EdAddText = () => {
           } as IText;
 
           let mitem = meta.mitem as MContent;
+
           if (mitem) {
             const item = meta.item as IContent;
 

@@ -24,13 +24,18 @@ export const EdTreeName = ({
   const item = node.data?.item;
 
   if (!item) return <></>;
-  const is_jsx_prop = !!node.data?.jsx_prop?.is_root;
+  let is_jsx_prop = !!node.data?.jsx_prop?.is_root;
 
   const isRenaming = p.ui.tree.rename_id === item.id;
   let name = item.name;
   if (item.component?.id && p.comp.loaded[item.component.id]) {
     name = p.comp.loaded[item.component.id].name;
+
+    if (item.component.props.child) {
+      is_jsx_prop = true;
+    }
   }
+
   return (
     <div className="text-[14px] relative flex flex-col justify-center cursor-pointer flex-1">
       {/* <div className="text-[10px]">{item.id}</div> */}
@@ -144,7 +149,7 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
           P
         </Tooltip>
         <div className="flex-1">{name}</div>
-        {meta && meta.mitem && <GenerateJSX mitem={meta.mitem} />}
+        {meta && meta.mitem && <GenerateJSX meta={meta} />}
         {meta && !meta.mitem && (
           <Tooltip
             delay={0}
@@ -185,28 +190,54 @@ Please put {${name}} somewhere inside component JS.`}</div>
   return <div>{name}</div>;
 };
 
-const GenerateJSX: FC<{ mitem: MItem }> = ({ mitem }) => {
+const GenerateJSX: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   return (
     <Tooltip
       content="Generate JSX"
       onClick={() => {
-        const genJSX = findDefaultJSX(p, mitem);
-        const ijson = mitem.toJSON() as IItem;
-        mitem.doc?.transact(() => {
-          syncronize(mitem as any, {
-            type: "item",
-            dim: { w: "full", h: "full" },
-            childs: [],
-            ...(genJSX as any),
-            name: ijson.name,
-            id: ijson.id,
-            hidden: false,
-            originalId: ijson.originalId,
+        let mitem = undefined as undefined | MItem;
+        let is_child = false;
+        if (meta.item.component?.id) {
+          mitem = meta.mitem
+            ?.get("component")
+            ?.get("props")
+            ?.get("child")
+            ?.get("content");
+          is_child = true;
+        } else {
+          mitem = meta.mitem;
+        }
+
+        if (mitem) {
+          const genJSX = findDefaultJSX(p, mitem);
+          const ijson = mitem.toJSON() as IItem;
+
+          mitem.doc?.transact(() => {
+            syncronize(mitem as any, {
+              type: "item",
+              dim: { w: "full", h: "full" },
+              childs: [],
+              ...(genJSX as any),
+              name: ijson.name,
+              id: ijson.id,
+              hidden: false,
+              originalId: ijson.originalId,
+              ...(is_child
+                ? {
+                    adv: {
+                      css: "",
+                      js: "<>{children}</>",
+                      jsBuilt:
+                        "render(/* @__PURE__ */ React.createElement(React.Fragment, null, children));\n",
+                    },
+                  }
+                : {}),
+            });
           });
-        });
-        treeRebuild(p);
-        p.render();
+          treeRebuild(p);
+          p.render();
+        }
       }}
     >
       <div
