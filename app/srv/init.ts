@@ -8,7 +8,7 @@ glb.ws_hook = {
     server.ws("ping", ws, data);
   },
   pong(ws, data) {
-    server.ws("pong", ws, data); 
+    server.ws("pong", ws, data);
   },
   drain(ws) {
     server.ws("drain", ws);
@@ -31,7 +31,12 @@ glb.server_hook = async (arg) => {
     const site_id = arr[2];
 
     if (arr.length >= 3 && validate(site_id)) {
-      return await server.http(site_id, arg);
+      const res = await server.http(site_id, arg);
+      if (res instanceof Response) {
+        return res;
+      } else {
+        return new Response("403: Please see server.log", { status: 403 });
+      }
     }
   }
 

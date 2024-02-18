@@ -8,6 +8,8 @@ import { WSData } from "../../../../../../pkgs/core/server/create";
 import { codeBuild } from "./build-code";
 import { prodIndex } from "../../../../util/prod-index";
 
+import "./server-create";
+
 const serverMain = () => ({
   handler: {} as Record<string, PrasiServer>,
   init_timeout: null as any,
@@ -27,7 +29,7 @@ const serverMain = () => ({
   },
   init(site_id: string) {
     clearTimeout(this.init_timeout);
-    this.init_timeout = setTimeout(() => {
+    this.init_timeout = setTimeout(async () => {
       try {
         const server_src_path = code.path(
           site_id,
@@ -38,7 +40,13 @@ const serverMain = () => ({
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
         if (svr && svr.server) {
-          this.handler[site_id] = svr.server;
+          if (typeof svr.server === "function") {
+            this.handler[site_id] = await svr.server(site_id);
+          } else {
+            this.handler[site_id] = svr.server;
+          }
+
+          this.handler[site_id].site_id = site_id;
         }
 
         Bun.write(
@@ -46,7 +54,7 @@ const serverMain = () => ({
           ""
         );
       } catch (e) {
-        console.log(`Failed to init server ${site_id}`);
+        console.log(`Failed to init server ${site_id}`, e);
       }
     }, 100);
   },
@@ -67,6 +75,8 @@ const serverMain = () => ({
     }
     const handler = this.handler[site_id];
     if (handler) {
+      if (!handler.site_id) handler.site_id = site_id;
+
       try {
         if (
           handler.ws &&
@@ -108,6 +118,7 @@ const serverMain = () => ({
 });
 
 type PrasiServer = {
+  site_id?: string;
   ws?: WebSocketHandler<{ url: string }>;
   http: (arg: {
     url: { raw: URL; pathname: string };
