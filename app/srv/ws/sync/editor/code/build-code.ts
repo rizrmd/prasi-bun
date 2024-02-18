@@ -84,7 +84,7 @@ if (typeof global.server_hook === "function") {
     const out = "${code.path(id_site, "site", "src", "server.log")}";
     _fs.appendFile(out, arg.map((e)=>{
       const ancestors = [];
-      if (typeof e === 'object') return JSON.stringify(e, (key, val) => {
+      if (typeof e === 'object') return JSON.stringify(e, function (key, val) {
         if (val) {
           if (typeof val === 'function') {
             return '[function]'; 
