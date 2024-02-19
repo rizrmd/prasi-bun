@@ -20,12 +20,41 @@ export const EdStyleAll = () => {
     ? p.comp.list[active.comp_id].meta[active.item_id]
     : p.page.meta[active.item_id];
 
-  const item = meta.item;
+  let item = meta.item;
+  let is_inherit = false;
+  if (item.component?.id) {
+    const comp = p.comp.list[item.component.id].doc
+      .getMap("map")
+      .get("root")
+      ?.toJSON() as IItem;
+
+    if (comp.component?.useStyle) {
+      is_inherit = true;
+
+      if (meta.item.component) {
+        if (!meta.item.component.style) {
+          meta.item.component.style = {} as any;
+        }
+
+        if (meta.item.component.style) {
+          item = meta.item.component.style;
+        }
+      }
+    }
+  }
 
   const update = useCallback(
     async (key: any, value: any) => {
       if (meta) {
         let mitem = meta.mitem;
+
+        if (is_inherit) {
+          if (!meta.mitem?.get("component")?.get("style")) {
+            meta.mitem?.get("component")?.set("style", new Y.Map() as any);
+          }
+
+          mitem = meta.mitem?.get("component")?.get("style") as any;
+        }
 
         if (mitem) {
           active.should_render_main = true;
@@ -62,55 +91,70 @@ export const EdStyleAll = () => {
             }
           });
 
-          meta.item = mitem.toJSON() as IItem;
-
+          const json = mitem.toJSON() as IItem;
+          if (is_inherit) {
+            if (meta.item.component) {
+              meta.item.component.style = json;
+            }
+          } else {
+            meta.item = json;
+          }
           p.render();
         }
       }
     },
-    [meta]
+    [meta, is_inherit]
   );
 
   if (!meta) {
     return null;
   }
 
-  return (
-    <div className="flex h-full flex-1 relative overflow-auto">
-      <div className="absolute inset-0 flex items-stretch flex-col pt-1">
-        <SideBox>
-          <PanelAutoLayout mode={p.mode} value={item} update={update} />
-          <PanelPadding
-            id={active.item_id}
-            value={item}
-            mode={p.mode}
-            update={update}
-          />
-          <PanelDimension
-            value={item}
-            mode={p.mode}
-            id={active.item_id}
-            update={update}
-          />
-        </SideBox>
-        <SideLabel>BACKGROUND</SideLabel>
-        <SideBox>
-          <PanelBackground value={item} mode={p.mode} update={update} />
-        </SideBox>
-        <SideLabel>FONT</SideLabel>
-        <SideBox>
-          <PanelFont value={item} mode={p.mode} update={update} />
-        </SideBox>
-        <SideLabel>BORDER</SideLabel>
-        <SideBox>
-          <PanelBorder value={item} mode={p.mode} update={update} />
-        </SideBox>
-        <SideLabel>ADVANCED</SideLabel>
-        <SideBox>
-          <PanelLink value={item} mode={p.mode} update={update} />
-          <PanelAdv value={item} mode={p.mode} update={update} />
-        </SideBox>
-      </div>
-    </div>
+  const childs = (
+    <>
+      <SideBox>
+        <PanelAutoLayout mode={p.mode} value={item} update={update} />
+        <PanelPadding
+          id={active.item_id}
+          value={item}
+          mode={p.mode}
+          update={update}
+        />
+        <PanelDimension
+          value={item}
+          mode={p.mode}
+          id={active.item_id}
+          update={update}
+        />
+      </SideBox>
+      <SideLabel>BACKGROUND</SideLabel>
+      <SideBox>
+        <PanelBackground value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>FONT</SideLabel>
+      <SideBox>
+        <PanelFont value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>BORDER</SideLabel>
+      <SideBox>
+        <PanelBorder value={item} mode={p.mode} update={update} />
+      </SideBox>
+      <SideLabel>ADVANCED</SideLabel>
+      <SideBox>
+        <PanelLink value={item} mode={p.mode} update={update} />
+        <PanelAdv value={item} mode={p.mode} update={update} />
+      </SideBox>
+    </>
   );
+
+  if (!is_inherit)
+    return (
+      <div className="flex h-full flex-1 relative overflow-auto">
+        <div className="absolute inset-0 flex items-stretch flex-col pt-1">
+          {childs}
+        </div>
+      </div>
+    );
+
+  return childs;
 };

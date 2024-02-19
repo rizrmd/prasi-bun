@@ -1,15 +1,14 @@
 import { FC, ReactNode, Suspense, useEffect } from "react";
-import { useLocal } from "web-utils";
+import { w } from "../../../../utils/types/general";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
 import { VG } from "../global";
 import { viParts } from "../parts";
 import { viScriptArg } from "./arg";
 import { updatePropScope } from "./eval-prop";
+import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import { extractNavigate } from "./extract-nav";
-import { w } from "../../../../utils/types/general";
 
 export const viEvalScript = (
   vi: {

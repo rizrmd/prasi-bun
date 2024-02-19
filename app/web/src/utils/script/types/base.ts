@@ -29,6 +29,10 @@ export const baseTypings = `
     onPointerDown?: () => void;
     onPointerMove?: () => void;
     onPointerLeave?: () => void;
+    inherit?: {
+      style: any, 
+      className: string
+    }
   };
   const children: RNode;
 

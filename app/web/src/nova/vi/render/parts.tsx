@@ -1,9 +1,8 @@
-import { FC } from "react";
 import { produceCSS } from "../../../utils/css/gen";
 import { IContent } from "../../../utils/types/general";
+import { IItem } from "../../../utils/types/item";
 import { IMeta } from "../../ed/logic/ed-global";
 import { ViRender } from "./render";
-import { VG } from "./global";
 
 export type ViParts = {
   mode: "mobile" | "desktop";
@@ -32,10 +31,19 @@ export const viParts = (
 ) => {
   const item = meta.item;
 
-  const props: PROPS = {
+  let inherit = undefined;
+  if (item.component?.style) {
+    inherit = {
+      style: item.component.style,
+      className: produceCSS(item.component.style, { mode: vi.mode }),
+    };
+  }
+
+  const props: PROPS & { inherit?: { style: IItem; className: string } } = {
     className: produceCSS(item, {
       mode: vi.mode,
     }),
+    inherit,
   };
 
   let text_props: PROPS = {};
