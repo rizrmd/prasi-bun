@@ -1,5 +1,5 @@
 import { NodeRender } from "@minoru/react-dnd-treeview";
-import { useGlobal, useLocal } from "web-utils";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { IContent } from "../../../../../utils/types/general";
 import { Loading } from "../../../../../utils/ui/loading";
 import { getMetaById } from "../../../logic/active/get-meta";
@@ -244,7 +244,7 @@ function bytesToHumanFileSize(bytes: number): string {
 }
 
 const hydrateItem = (p: PG, item: IItem) => {
-  const result = structuredClone(item);
+  const result = deepClone(item);
 
   if (result.childs) {
     for (const [k, child] of Object.entries(result.childs)) {
