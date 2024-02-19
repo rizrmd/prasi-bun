@@ -118,7 +118,7 @@ export const mainStyle = (p: PG, meta?: IMeta) => {
   }
 
   return cx(
-    "absolute flex main-editor-content",
+    "absolute flex main-editor-content overflow-auto",
     css`
       contain: content;
     `,
