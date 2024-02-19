@@ -21,6 +21,8 @@ export type FNComponent = {
   id: string;
   props: Record<string, FNCompDef>;
   instances?: Record<string, Record<string, string>>;
+  useStyle?: boolean;
+  style?: IItem;
 };
 
 export type FNCompDef = {

@@ -9,14 +9,33 @@ import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
+import { EdStyleAll } from "./style/side-all";
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({
-    rightClickEvent: null as any,
-    pick: { mprop: null as any, name: "" },
-    showJSX: false,
-  });
+  const local = useLocal(
+    {
+      rightClickEvent: null as any,
+      pick: { mprop: null as any, name: "" },
+      showJSX: false,
+      expand: {
+        prop: false,
+        style: false,
+      },
+    },
+    () => {
+      local.expand.prop = true;
+      if (localStorage.getItem("prop-instance-show-prop") === "false") {
+        local.expand.prop = false;
+      }
+
+      local.expand.style = true;
+      if (localStorage.getItem("prop-instance-show-style") === "false") {
+        local.expand.style = false;
+      }
+      local.render();
+    }
+  );
 
   let _meta = meta;
   if (active.comp_id) {
@@ -93,11 +112,31 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     });
   }
 
+  const expandable = item.component?.useStyle;
+  const show_prop = !expandable || (expandable && local.expand.prop);
+  const show_style = !expandable || (expandable && local.expand.style);
+
   return (
     <div className="flex flex-1 flex-col text-[12px]">
-      <div className="flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none">
+      <div
+        className={cx(
+          "flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none",
+          expandable && "cursor-pointer hover:bg-blue-100"
+        )}
+        onClick={() => {
+          if (expandable) {
+            local.expand.prop = !local.expand.prop;
+            localStorage.setItem(
+              "prop-instance-show-prop",
+              JSON.stringify(local.expand.prop)
+            );
+            local.render();
+          }
+        }}
+      >
+        {expandable && <>{!local.expand.prop ? <TriRight /> : <TriDown />}</>}
         <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
-          {_meta.item.name}
+          {expandable ? _meta.item.name : `Props`}
         </div>
         {p.ui.comp_editable && (
           <div
@@ -159,75 +198,110 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               />
             </Menu>
           )}
-          {filtered.length === 0 && (
-            <div className="flex absolute inset-0 items-center justify-center">
-              No Prop Available
-            </div>
+          {show_prop && (
+            <>
+              {filtered.length === 0 && (
+                <div className="flex absolute inset-0 items-center justify-center">
+                  No Prop Available
+                </div>
+              )}
+              {filtered.map(({ name, mprop, cprop }) => {
+                const type = cprop.meta?.type || "text";
+                let hasCode = false;
+
+                const value = mprop.get("value") || "";
+                if (
+                  !!value &&
+                  (![`"`, "'", "`"].includes(value[0]) ||
+                    ![`"`, "'", "`"].includes(value[value.length - 1]))
+                ) {
+                  hasCode = true;
+                }
+                if (value.length > 100) {
+                  hasCode = true;
+                }
+                const labelClick = (e: MouseEvent<HTMLDivElement>) => {
+                  e.preventDefault();
+                  local.pick = { mprop, name };
+                  local.rightClickEvent = e;
+                  local.render();
+                };
+
+                return (
+                  <div
+                    key={name}
+                    className="border-b text-[13px] relative hover:bg-orange-100 cursor-default"
+                    onContextMenu={labelClick}
+                  >
+                    {hasCode ? (
+                      <>
+                        <EdPropInstanceCode
+                          mprop={mprop}
+                          name={name}
+                          labelClick={labelClick}
+                          onEditCode={createEditScript(p, "value", mprop, name)}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {type === "text" && (
+                          <EdPropInstanceText
+                            mprop={mprop}
+                            name={name}
+                            labelClick={labelClick}
+                          />
+                        )}
+                        {type === "option" && (
+                          <EdPropInstanceOptions
+                            mprop={mprop}
+                            cprop={cprop}
+                            name={name}
+                            labelClick={labelClick}
+                          />
+                        )}
+                        {type === "content-element" && (
+                          <div className="min-h-[28px] px-1 flex items-center">
+                            {name}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </>
           )}
-          {filtered.map(({ name, mprop, cprop }) => {
-            const type = cprop.meta?.type || "text";
-            let hasCode = false;
 
-            const value = mprop.get("value") || "";
-            if (
-              !!value &&
-              (![`"`, "'", "`"].includes(value[0]) ||
-                ![`"`, "'", "`"].includes(value[value.length - 1]))
-            ) {
-              hasCode = true;
-            }
-            if (value.length > 100) {
-              hasCode = true;
-            }
-            const labelClick = (e: MouseEvent<HTMLDivElement>) => {
-              e.preventDefault();
-              local.pick = { mprop, name };
-              local.rightClickEvent = e;
-              local.render();
-            };
-
-            return (
+          {item.component?.useStyle && (
+            <>
               <div
-                key={name}
-                className="border-b text-[13px] relative hover:bg-orange-100 cursor-default"
-                onContextMenu={labelClick}
-              >
-                {hasCode ? (
-                  <>
-                    <EdPropInstanceCode
-                      mprop={mprop}
-                      name={name}
-                      labelClick={labelClick}
-                      onEditCode={createEditScript(p, "value", mprop, name)}
-                    />
-                  </>
-                ) : (
-                  <>
-                    {type === "text" && (
-                      <EdPropInstanceText
-                        mprop={mprop}
-                        name={name}
-                        labelClick={labelClick}
-                      />
-                    )}
-                    {type === "option" && (
-                      <EdPropInstanceOptions
-                        mprop={mprop}
-                        cprop={cprop}
-                        name={name}
-                        labelClick={labelClick}
-                      />
-                    )}
-                    {type === "content-element" && (
-                      <div className="min-h-[28px] px-1 flex items-center">
-                        {name}
-                      </div>
-                    )}
-                  </>
+                className={cx(
+                  "flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none",
+                  expandable && "cursor-pointer hover:bg-blue-100"
                 )}
+                onClick={() => {
+                  if (expandable) {
+                    local.expand.style = !local.expand.style;
+                    localStorage.setItem(
+                      "prop-instance-show-style",
+                      JSON.stringify(local.expand.style)
+                    );
+                    local.render();
+                  }
+                }}
+              >
+                {expandable && (
+                  <>{!local.expand.style ? <TriRight /> : <TriDown />}</>
+                )}
+
+                <div className="flex-1 overflow-hidden mr-2 text-ellipsis whitespace-nowrap">
+                  Component Style
+                </div>
               </div>
-            );
-          })}
+
+              {show_style && <EdStyleAll />}
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -239,3 +313,27 @@ const getCompMeta = (p: PG, imeta: IMeta) => {
 
   return imeta;
 };
+
+const TriRight = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 15 15"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M6 11L6 4L10.5 7.5L6 11Z" fill="currentColor"></path>
+  </svg>
+);
+
+const TriDown = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 15 15"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M4 6H11L7.5 10.5L4 6Z" fill="currentColor"></path>
+  </svg>
+);

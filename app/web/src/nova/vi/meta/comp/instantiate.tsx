@@ -30,6 +30,7 @@ export const instantiate = (arg: {
       }
     }
     newitem.component.instances = item.component?.instances;
+    newitem.component.style = item.component?.style;
   }
 
   for (const key of Object.keys(item)) {
