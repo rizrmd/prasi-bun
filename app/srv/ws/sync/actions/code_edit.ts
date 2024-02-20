@@ -11,7 +11,7 @@ import { SyncConnection } from "../type";
 import { parseJs } from "../editor/parser/parse-js";
 import { snapshot } from "../entity/snapshot";
 import { validate } from "uuid";
-import { gzipAsync } from "utils/diff";
+import { gzipAsync } from "utils/diff/diff";
 const decoder = new TextDecoder();
 
 const timeout = {

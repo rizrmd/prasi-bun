@@ -170,7 +170,7 @@ export const EDGlobal = {
   page: {
     history: {
       id: "",
-      show: false
+      show: false,
     },
     root_id: "root",
     cur: EmptyPage,
@@ -231,6 +231,7 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
+      file: { enabled: false },
       code: {
         init: false,
         open: false,
@@ -273,7 +274,7 @@ export const EDGlobal = {
       comp: {
         preview_id: "",
         open: null as null | ((comp_id: string) => void | Promise<void>),
-        import: false
+        import: false,
       },
       comp_group: null as null | {
         mouse_event: React.MouseEvent<HTMLElement, MouseEvent>;

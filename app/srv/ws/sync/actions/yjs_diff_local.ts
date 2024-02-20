@@ -3,7 +3,7 @@ import { SAction } from "../actions";
 import { docs } from "../entity/docs";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
-import { gzipAsync } from "utils/diff";
+import { gzipAsync } from "utils/diff/diff";
 
 const history = {} as Record<string, string>;
 
