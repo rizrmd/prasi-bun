@@ -18,6 +18,7 @@ import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { EdPageHistoryMain } from "./panel/main/main-history";
 import { jscript } from "../../utils/script/jscript";
+import { useEffect } from "react";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

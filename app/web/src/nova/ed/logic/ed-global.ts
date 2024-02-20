@@ -231,7 +231,7 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
-      file: { enabled: false },
+      file: { enabled: false, open: true },
       code: {
         init: false,
         open: false,

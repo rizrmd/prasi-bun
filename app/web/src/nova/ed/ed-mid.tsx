@@ -10,6 +10,7 @@ import { useGlobal } from "web-utils";
 import { ResponsiveToggle } from "./panel/header/right/responsive-toggle";
 import { EdCompEditable } from "./panel/header/mid/comp-editable";
 import { MobileQRButton } from "./panel/side/style/tools/mobile-qr";
+import { EdFileBrowser } from "./panel/file/file-browser";
 
 export const EdMid: FC<{}> = () => {
   const p = useGlobal(EDGlobal, "EDITORF");
@@ -37,6 +38,7 @@ export const EdMid: FC<{}> = () => {
           </div>
         </div>
         <div className="flex items-stretch flex-1 justify-end">
+          <EdFileBrowser />
           {p.site.responsive !== "desktop-only" && <MobileQRButton />}
           <label className=" text-slate-400 flex items-center pr-1">
             <div className=" px-1"> Zoom</div>
