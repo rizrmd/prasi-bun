@@ -15,6 +15,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@paralleldrive/cuid2": "2.2.2",
     "react-contenteditable": "^3.3.7",
+    "react-dropzone": "14.2.3",
     "@parcel/packager-wasm": "^2.10.3",
     "@parcel/service-worker": "^2.10.3",
     "recast": "^0.23.4",

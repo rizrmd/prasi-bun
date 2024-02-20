@@ -29,7 +29,6 @@ export const Root: FC<{}> = ({}) => {
   prasiContext.render = local.render;
 
   const Provider = GlobalContext.Provider as FC<{ value: any; children: any }>;
-
   const found = local.router.lookup(location.pathname);
 
   if (found) {

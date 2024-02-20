@@ -46,11 +46,19 @@ export const apiProxy = (api_url: string) => {
                   }
 
                   if (api_ref) {
+                    if (actionName === "_raw") {
+                      const url = `${base_url}${rest.join("")}`;
+
+                      const result = await fetchSendApi(url, rest);
+                      resolve(result);
+                      return;
+                    }
+
                     if (!api_ref.apiEntry) api_ref.apiEntry = {};
                     if (api_ref.apiEntry && !api_ref.apiEntry[actionName]) {
                       reject(
                         `API ${actionName.toString()} not found, existing API: \n   - ${Object.keys(
-                          api_ref || {}
+                          api_ref.apiEntry || {}
                         ).join("\n   - ")}`
                       );
                       return;
