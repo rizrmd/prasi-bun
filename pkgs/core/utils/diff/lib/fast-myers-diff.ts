@@ -250,9 +250,13 @@ export function diff_core(
 ): IterableIterator<Vec4> {
   const Z = (Math.min(N, M) + 1) * 2;
   const L = N + M;
-  const b = new (L < 256 ? Uint8Array : L < 65536 ? Uint16Array : Uint32Array)(
-    2 * Z
-  );
+
+  let constructor: any = Float64Array;
+  if (L < 256) constructor = Uint8Array;
+  else if (L < 65536) constructor = Uint16Array;
+  else if (L < 4294967297) constructor = Uint32Array;
+
+  const b = new constructor(2 * Z);
 
   return new DiffGen({
     i,

@@ -1,9 +1,9 @@
-import { applyPatch, calcPatch } from "./diff-internal";
 import { Packr } from "msgpackr";
 import { gunzip, gzip } from "zlib";
+import { applyPatch, calcPatch } from "./lib/fast-myers-diff";
 
 const MAX_HISTORY = 25; // max history item
-const MAX_DIFF_TIMEOUT = 50; // in ms
+const MAX_FMD_TIMEOUT = 100; // in ms
 
 const packr = new Packr({});
 
@@ -12,9 +12,14 @@ type PATCH_RESULT =
       mode: "new";
       ts: string;
       data: number[];
+    }  
+  | {
+      mode: "patch-fmd";
+      ts: string;
+      diff: any;
     }
   | {
-      mode: "patch";
+      mode: "patch-fd";
       ts: string;
       diff: any;
     };
@@ -74,12 +79,13 @@ export class Diff<T> {
                 return old_data[key1] === this._data[key2];
               },
               () => {
-                return performance.now() - now > MAX_DIFF_TIMEOUT;
+                return performance.now() - now > MAX_FMD_TIMEOUT;
               }
             ),
           ];
 
-          if (performance.now() - now <= MAX_DIFF_TIMEOUT) {
+          if (performance.now() - now <= MAX_FMD_TIMEOUT) {
+            console.log(Math.round(performance.now() - now) + "ms");
             done(
               new Uint8Array(
                 packr.pack({ diff: result_diff, mode: "patch", ts: this.ts })
@@ -100,6 +106,7 @@ export class Diff<T> {
 
   async applyPatch(_patch: Uint8Array) {
     const patch = packr.unpack(_patch) as PATCH_RESULT;
+    console.log(patch.mode, `size: ${hmn(_patch.length)}`);
     if (patch.mode === "new") {
       this.ts = patch.ts;
       if (patch.data) this._data = patch.data;
@@ -113,7 +120,7 @@ export class Diff<T> {
           }
         } else {
           num_array.push(num);
-        } 
+        }
       }
       this._data = num_array;
     }
@@ -156,3 +163,13 @@ export const gunzipAsync = (bin: Uint8Array) => {
     });
   });
 };
+
+function hmn(bytes: number): string {
+  const sizes = ["bytes", "KB", "MB", "GB", "TB"];
+  if (bytes === 0) return "0 bytes";
+
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const size = i === 0 ? bytes : (bytes / Math.pow(1024, i)).toFixed(2);
+
+  return `${size} ${sizes[i]}`;
+}
