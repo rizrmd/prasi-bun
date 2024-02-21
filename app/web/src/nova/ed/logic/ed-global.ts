@@ -8,6 +8,7 @@ import { IItem } from "../../../utils/types/item";
 import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
 import { GenMetaP, IMeta as LogicMeta } from "../../vi/utils/types";
 import { createRouter } from "radix3";
+import { FEntry } from "../panel/file/type";
 export type IMeta = LogicMeta;
 
 export const EmptySite = {
@@ -231,7 +232,22 @@ export const EDGlobal = {
       open: {} as Record<string, string[]>,
     },
     popup: {
-      file: { enabled: false, open: true },
+      file: {
+        enabled: false,
+        open: true,
+        path: "/",
+        expanded: JSON.parse(
+          localStorage.getItem("panel-file-expanded") || "{}"
+        ) as Record<string, string[]>,
+        entry: {} as Record<string, FEntry[]>,
+        tree: [] as NodeModel<FEntry>[],
+        renaming: "",
+        ctx_path: "",
+        ctx_menu_event: null as null | React.MouseEvent<
+          HTMLElement,
+          MouseEvent
+        >,
+      },
       code: {
         init: false,
         open: false,

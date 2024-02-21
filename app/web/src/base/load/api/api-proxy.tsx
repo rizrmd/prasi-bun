@@ -47,9 +47,10 @@ export const apiProxy = (api_url: string) => {
 
                   if (api_ref) {
                     if (actionName === "_raw") {
-                      const url = `${base_url}${rest.join("")}`;
+                      const pathname = rest[0];
+                      const url = `${base_url}${pathname}`;
 
-                      const result = await fetchSendApi(url, rest);
+                      const result = await fetchSendApi(url, rest.slice(1));
                       resolve(result);
                       return;
                     }

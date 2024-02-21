@@ -23,8 +23,7 @@ export const createServer = async () => {
 
   g.server = Bun.serve({
     port: g.port,
-    maxRequestBodySize: 9999999,
-    development: true,
+    maxRequestBodySize: 1024 * 1024 * 128,
     websocket: await serveWS(wsHandler),
     async fetch(req, server) {
       const url = new URL(req.url);

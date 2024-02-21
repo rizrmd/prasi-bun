@@ -42,6 +42,7 @@ export const viLoadLegacy = async (vi: {
 
     let api_url = vi.site.api_url;
     if (!api_url) api_url = ((site.config as any) || {}).api_url || "";
+    if (!api_url) return;
 
     try {
       const apiURL = new URL(api_url);

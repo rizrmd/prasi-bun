@@ -43,7 +43,7 @@ export const serveAPI = {
             return params[e];
           });
 
-      if (req.method !== "GET") {
+      if (req.method !== "GET" && !found.raw) {
         if (req.method === "OPTIONS") {
           return new Response("OK", {
             headers: CORS_HEADERS,
@@ -57,7 +57,7 @@ export const serveAPI = {
             const text = await req.text();
             const json = JSON.parse(text, replacer);
 
-            if (typeof json === "object") {
+            if (typeof json === "object" && !!json) {
               if (Array.isArray(json)) {
                 args = json;
                 for (let i = 0; i < json.length; i++) {
