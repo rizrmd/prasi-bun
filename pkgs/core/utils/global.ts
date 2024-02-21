@@ -14,6 +14,7 @@ import { dbProxy } from "../../../app/web/src/base/load/db/db-proxy";
 type SingleRoute = {
   url: string;
   args: string[];
+  raw: boolean;
   fn: (...arg: any[]) => Promise<any>;
   path: string;
 };

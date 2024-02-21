@@ -1,17 +1,16 @@
 import { useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { useGlobal, useLocal } from "web-utils";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useGlobal } from "web-utils";
 import { apiProxy } from "../../../../base/load/api/api-proxy";
 import { Modal } from "../../../../utils/ui/modal";
 import { EDGlobal } from "../../logic/ed-global";
-import { EdFileTree } from "./file-tree";
+import { EdFileTree, reloadFileTree } from "./file-tree";
 import { FEntry } from "./type";
-
+import { EdFileTop } from "./file-top";
+import { uploadFile } from "./file-upload";
 export const EdFileBrowser = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const local = useLocal({
-    entry: {} as Record<string, FEntry[]>,
-  });
 
   useEffect(() => {
     if (!p.script.api && p.site.config?.api_url) {
@@ -19,20 +18,21 @@ export const EdFileBrowser = () => {
       p.render();
     }
 
+    if (!p.script.api) return () => {};
+
     p.script.api._raw(`/_file/?dir`).then((e: FEntry[]) => {
       if (Array.isArray(e)) {
-        local.entry = { "/": e };
+        p.ui.popup.file.entry = { "/": e };
         p.ui.popup.file.enabled = true;
         p.render();
       }
     });
+
+    reloadFileTree(p);
   }, []);
 
-  const onDrop = useCallback((acceptedFiles: any[]) => {
-    console.log(acceptedFiles);
-  }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+    onDrop: (files) => uploadFile(p, files),
     noClick: true,
   });
 
@@ -74,44 +74,60 @@ export const EdFileBrowser = () => {
           }
         }}
       >
-        <div
-          {...getRootProps()}
-          className={cx(
-            "bg-white select-none fixed inset-[50px] flex",
-            css`
-              outline: none;
-            `
-          )}
-        >
-          <input {...getInputProps()} />
-          {isDragActive && (
-            <div className="absolute inset-0 flex items-center justify-center flex-col bg-blue-50 border-4 border-blue-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="lucide lucide-upload"
-                viewBox="0 0 24 24"
-              >
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-                <path d="M17 8L12 3 7 8"></path>
-                <path d="M12 3L12 15"></path>
-              </svg>
-              <div>Drag Here to Upload</div>
-            </div>
-          )}
+        <div className={cx("bg-white select-none fixed inset-[50px] flex")}>
+          <PanelGroup direction="horizontal" className="text-sm">
+            <Panel
+              id="tree"
+              defaultSize={parseInt(
+                localStorage.getItem("panel-file-left") || "18"
+              )}
+              minSize={8}
+              order={1}
+              className="border-r"
+              onResize={(e) => {
+                localStorage.setItem("panel-file-left", e + "");
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+              }}
+            >
+              <EdFileTree />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel order={2}>
+              <div className="flex-1 flex h-full flex-col">
+                <EdFileTop />
 
-          <div className="flex flex-1 items-stretch">
-            <div className="flex min-w-[200px] border-r">
-              <EdFileTree entry={local.entry} />
-            </div>
-            <div>Moko</div>
-          </div>
+                <div
+                  className={cx("flex-1 flex h-full outline-none relative")}
+                  {...getRootProps()}
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive && (
+                    <div className="absolute inset-0 flex items-center justify-center flex-col bg-blue-50 border-4 border-blue-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        className="lucide lucide-upload"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                        <path d="M17 8L12 3 7 8"></path>
+                        <path d="M12 3L12 15"></path>
+                      </svg>
+                      <div>Drag Here to Upload</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Panel>
+          </PanelGroup>
         </div>
       </Modal>
     </>

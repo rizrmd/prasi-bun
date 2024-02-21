@@ -1,52 +1,323 @@
 import {
+  Tree as DNDTree,
   MultiBackend,
   NodeModel,
-  Tree as DNDTree,
   getBackendOptions,
 } from "@minoru/react-dnd-treeview";
-import { DndProvider } from "react-dnd";
-import { FEntry } from "./type";
 import { FC } from "react";
+import { DndProvider } from "react-dnd";
+import { useGlobal, useLocal } from "web-utils";
+import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
+import { EDGlobal, PG } from "../../logic/ed-global";
+import { FEntry } from "./type";
 
 const Tree = DNDTree<FEntry>;
 
-export const EdFileTree: FC<{ entry: Record<string, FEntry[]> }> = ({
-  entry,
-}) => {
-  const tree: NodeModel<FEntry>[] = [];
-  for (const [path, entries] of Object.entries(entry)) {
-    const arr = path.split("/");
-    const name = arr.pop() || "/";
-    tree.push({ id: path, text: name, parent: arr.join("/") });
-    for (const e of entries) {
-      if (e.type === "dir") {
-        tree.push({
-          id: (path === "/" ? "" : path) + "/" + e.name,
-          text: e.name,
-          parent: path,
-        });
-      }
-    }
+export const EdFileTree: FC<{}> = ({}) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+
+  if (!p.ui.popup.file.expanded[p.site.id]) {
+    p.ui.popup.file.expanded[p.site.id] = [];
   }
 
   return (
     <DndProvider backend={MultiBackend} options={getBackendOptions()}>
       <Tree
-        tree={tree}
+        tree={p.ui.popup.file.tree}
         dragPreviewRender={() => <></>}
         rootId=""
-        initialOpen={true}
-        onDrop={async (newTree, opt) => {}}
-        render={(node, { depth, isOpen, onToggle, hasChild }) => (
-          <div
-            className={cx(css`
-              padding-left: ${(depth * 10) + 10}px;
-            `)}
-          >
-            {node.text}
-          </div>
-        )}
+        initialOpen={[...(p.ui.popup.file.expanded[p.site.id] || []), "/"]}
+        canDrop={(newTree, opt) => {
+          const to = opt.dropTargetId + "";
+          const from = opt.dragSourceId + "";
+
+          if (to.startsWith(from)) return false;
+
+          const from_arr = from.split("/").filter((e) => e);
+          const to_arr = to.split("/").filter((e) => e);
+          if (
+            from_arr.slice(0, from_arr.length - 1).join("/") ===
+            to_arr.join("/")
+          )
+            return false;
+
+          return true;
+        }}
+        onDrop={async (newTree, { dropTargetId, dragSourceId }) => {
+          await p.script.api._raw(`/_file${dragSourceId}?move=${dropTargetId}`);
+          await reloadFileTree(p);
+        }}
+        render={(
+          node,
+          { depth, isOpen, onToggle, hasChild, isDragging, isDropTarget }
+        ) => <TreeItem node={node} depth={depth} isDropTarget={isDropTarget} />}
       ></Tree>
     </DndProvider>
   );
+};
+
+const TreeItem: FC<{
+  node: NodeModel<FEntry>;
+  depth: number;
+  isDropTarget: boolean;
+}> = ({ node, depth, isDropTarget }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+  const path = node.id + "";
+  const f = p.ui.popup.file;
+  const local = useLocal({ renaming: node.text });
+
+  const expanded = f.expanded[p.site.id]?.includes(path);
+
+  return (
+    <div
+      className={cx(
+        "flex items-center space-x-1 flex-nowrap hover:bg-blue-50 py-[2px]",
+        isDropTarget && "bg-blue-500 text-white",
+        css`
+          padding-left: ${depth * 10 + 10}px;
+        `,
+        f.path === path && "border-r-2 bg-blue-100 border-r-blue-700"
+      )}
+      onClick={() => {
+        if (f.path === path) {
+          toggleDir(p, path);
+        }
+
+        f.path = path;
+        p.render();
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!expanded) {
+          toggleDir(p, path);
+        }
+        f.ctx_path = path;
+        f.ctx_menu_event = e;
+        p.render();
+      }}
+    >
+      {f.ctx_menu_event && (
+        <Menu
+          mouseEvent={f.ctx_menu_event}
+          onClose={() => {
+            setTimeout(() => {
+              f.ctx_path = "";
+              f.ctx_menu_event = null;
+              p.render();
+            }, 100);
+          }}
+        >
+          <MenuItem
+            label={"New Folder"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              f.ctx_menu_event = null;
+              p.render();
+              setTimeout(() => {
+                f.tree.push({
+                  id: f.ctx_path + "/new_folder",
+                  parent: f.ctx_path,
+                  text: "new_folder",
+                  data: {
+                    name: "new_folder",
+                    type: "dir",
+                    size: 0,
+                  },
+                });
+                f.expanded[p.site.id]?.push(f.ctx_path);
+                p.render();
+                f.path = f.ctx_path + "/new_folder";
+                f.renaming = f.ctx_path + "/new_folder";
+                f.ctx_path = "";
+                p.render();
+              });
+            }}
+          />
+          <MenuItem
+            label={"Rename"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              f.path = f.ctx_path;
+              f.renaming = f.ctx_path;
+              p.render();
+            }}
+          />
+          <MenuItem
+            label={"Delete"}
+            disabled={
+              !(f.entry[f.ctx_path] && f.entry[f.ctx_path]?.length === 0)
+            }
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (!(f.entry[f.ctx_path] && f.entry[f.ctx_path]?.length === 0)) {
+                alert("Can only delete empty folder!");
+              } else {
+                await p.script.api._raw(`/_file${f.ctx_path}?del`);
+                await reloadFileTree(p);
+              }
+            }}
+          />
+        </Menu>
+      )}
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleDir(p, path);
+        }}
+      >
+        {expanded || path === "/" ? <FolderOpen /> : <Folder />}
+      </div>
+      {f.renaming === path ? (
+        <input
+          type="text"
+          spellCheck={false}
+          value={local.renaming}
+          autoFocus
+          onChange={(e) => {
+            local.renaming = e.currentTarget.value.replace(/\W/gi, "_");
+            local.render();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.currentTarget.blur();
+            }
+          }}
+          onFocus={(e) => {
+            e.currentTarget.select();
+          }}
+          onBlur={async () => {
+            if (local.renaming !== node.text) {
+              node.text = local.renaming;
+              const res = await p.script.api._raw(
+                `/_file${f.renaming}?rename=${local.renaming}`
+              );
+
+              if (res && res.newname) {
+                f.path = res.newname;
+              }
+              await reloadFileTree(p);
+            }
+            f.renaming = "";
+            p.render();
+          }}
+          className="flex-1 border border-blue-500 outline-none"
+        />
+      ) : (
+        <div className="flex-1 text-ellipsis truncate">{node.text}</div>
+      )}
+    </div>
+  );
+};
+
+const size = 14;
+
+const FolderOpen = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeWidth="2"
+    strokeLinejoin="round"
+    viewBox="0 0 24 24"
+  >
+    <path d="M6 14l1.5-2.9A2 2 0 019.24 10H20a2 2 0 011.94 2.5l-1.54 6a2 2 0 01-1.95 1.5H4a2 2 0 01-2-2V5a2 2 0 012-2h3.9a2 2 0 011.69.9l.81 1.2a2 2 0 001.67.9H18a2 2 0 012 2v2"></path>
+  </svg>
+);
+
+const Folder = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    fill="none"
+    strokeWidth="2"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M20 20a2 2 0 002-2V8a2 2 0 00-2-2h-7.9a2 2 0 01-1.69-.9L9.6 3.9A2 2 0 007.93 3H4a2 2 0 00-2 2v13a2 2 0 002 2z"></path>
+  </svg>
+);
+
+const toggleDir = (p: PG, path: string) => {
+  if (path === "/") return;
+  const expanded = p.ui.popup.file.expanded[p.site.id];
+  if (expanded) {
+    if (expanded.includes(path)) {
+      p.ui.popup.file.expanded[p.site.id] = expanded.filter((e) => e !== path);
+    } else {
+      p.ui.popup.file.expanded[p.site.id] = [...expanded, path];
+    }
+  }
+  localStorage.setItem(
+    "panel-file-expanded",
+    JSON.stringify(p.ui.popup.file.expanded)
+  );
+  reloadFileTree(p);
+};
+
+export const reloadFileTree = async (p: PG) => {
+  const exp = p.ui.popup.file.expanded[p.site.id];
+
+  const e = await p.script.api._raw(`/_file/?dir`);
+  if (Array.isArray(e)) {
+    p.ui.popup.file.entry = { "/": e };
+  }
+
+  if (exp) {
+    for (const [k, v] of Object.entries(p.ui.popup.file.entry)) {
+      if (p.ui.popup.file.entry[k] && !exp.includes(k) && k !== "/") {
+        delete p.ui.popup.file.entry[k];
+      }
+    }
+
+    const promises = [];
+    for (const e of exp) {
+      if (e) {
+        if (!p.ui.popup.file.entry[e]) {
+          promises.push(
+            p.script.api._raw(`/_file${e}/?dir`).then((fe: FEntry[]) => {
+              if (Array.isArray(fe)) {
+                p.ui.popup.file.entry[e] = fe;
+              }
+            })
+          );
+        }
+      }
+    }
+    await Promise.all(promises);
+  }
+
+  const tree: NodeModel<FEntry>[] = p.ui.popup.file.tree;
+
+  tree.length = 0;
+  tree.push({ id: "/", text: "/", parent: "" });
+  const added = new Set<string>(["/"]);
+  for (const [path, entries] of Object.entries(p.ui.popup.file.entry)) {
+    const arr = path.split("/");
+    for (const e of entries) {
+      let id = path + (path.endsWith("/") ? "" : "/") + e.name;
+      if (!id.startsWith("/")) id = "/" + id;
+
+      if (e.type === "dir" && !added.has(id)) {
+        tree.push({
+          id,
+          text: e.name,
+          parent: path || "/",
+        });
+      }
+    }
+  }
+  p.ui.popup.file.tree = tree.sort(
+    (a, b) => (a.id + "").length - (b.id + "").length
+  );
+  p.render();
 };
