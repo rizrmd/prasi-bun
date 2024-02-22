@@ -1,7 +1,5 @@
-import { apiContext } from "service-srv";
-import { gzipAsync } from "../../../app/srv/ws/sync/entity/zlib";
-import { CORS_HEADERS } from "../server/serve-api";
 import brotliPromise from "brotli-wasm";
+import { apiContext } from "service-srv";
 
 const brotli = await brotliPromise;
 
@@ -12,11 +10,22 @@ export const _ = {
     const { req } = apiContext(this);
 
     try {
-      const url = new URL(decodeURIComponent(req.params["_"]));
+      const url = new URL(
+        decodeURIComponent(decodeURIComponent(req.params["_"]))
+      );
       const body = await req.arrayBuffer();
+      const headers = {} as Record<string, string>;
+      req.headers.forEach((v, k) => {
+        if (k.startsWith("sec-")) return;
+        if (k.startsWith("connection")) return;
+        if (k.startsWith("dnt")) return;
+        if (k.startsWith("host")) return;
+        headers[k] = v;
+      });
+
       return await fetch(url, {
         method: req.method || "POST",
-        headers: req.headers,
+        headers,
         body,
       });
     } catch (e: any) {

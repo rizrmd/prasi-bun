@@ -27,6 +27,25 @@ export const apiProxy = (api_url: string) => {
       {},
       {
         get: (_, actionName: string) => {
+          if (actionName === "_url") {
+            return (pathname: string) => {
+              const to_url = new URL(base_url);
+              to_url.pathname = pathname;
+
+              const cur_url = new URL(location.href);
+              let final_url = "";
+
+              if (to_url.host === cur_url.host) {
+                final_url = to_url.toString();
+              } else {
+                final_url = `${cur_url.protocol}//${
+                  cur_url.host
+                }/_proxy/${encodeURIComponent(to_url.toString())}`;
+              }
+              return final_url;
+            };
+          }
+
           const createFn = (actionName: string) => {
             return function (
               this: { api_url: string } | undefined,
