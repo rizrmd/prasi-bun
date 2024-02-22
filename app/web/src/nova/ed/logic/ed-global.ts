@@ -243,6 +243,7 @@ export const EDGlobal = {
         tree: [] as NodeModel<FEntry>[],
         renaming: "",
         ctx_path: "",
+        selected: new Set<string>(),
         ctx_menu_event: null as null | React.MouseEvent<
           HTMLElement,
           MouseEvent

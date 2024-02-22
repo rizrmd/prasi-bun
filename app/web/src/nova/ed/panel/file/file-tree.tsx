@@ -43,9 +43,17 @@ export const EdFileTree: FC<{}> = ({}) => {
 
           return true;
         }}
-        onDrop={async (newTree, { dropTargetId, dragSourceId }) => {
-          await p.script.api._raw(`/_file${dragSourceId}?move=${dropTargetId}`);
-          await reloadFileTree(p);
+        onDrop={async (newTree, { dropTargetId, dragSourceId, dragSource }) => {
+          if (dragSource) {
+            if (dragSource.data?.type === "file") {
+              
+            } else {
+              await p.script.api._raw(
+                `/_file${dragSourceId}?move=${dropTargetId}`
+              );
+              await reloadFileTree(p);
+            }
+          }
         }}
         render={(
           node,
@@ -84,6 +92,16 @@ const TreeItem: FC<{
         }
 
         f.path = path;
+
+        if (!f.entry[path]) {
+          p.script.api._raw(`/_file${path}/?dir`).then((fe: FEntry[]) => {
+            if (Array.isArray(fe)) {
+              f.entry[path] = fe;
+              p.render();
+            }
+          });
+        }
+
         p.render();
       }}
       onContextMenu={(e) => {
@@ -274,7 +292,12 @@ export const reloadFileTree = async (p: PG) => {
 
   if (exp) {
     for (const [k, v] of Object.entries(p.ui.popup.file.entry)) {
-      if (p.ui.popup.file.entry[k] && !exp.includes(k) && k !== "/") {
+      if (
+        p.ui.popup.file.entry[k] &&
+        !exp.includes(k) &&
+        k !== "/" &&
+        k !== p.ui.popup.file.path
+      ) {
         delete p.ui.popup.file.entry[k];
       }
     }
@@ -294,6 +317,16 @@ export const reloadFileTree = async (p: PG) => {
       }
     }
     await Promise.all(promises);
+  }
+
+  const f = p.ui.popup.file;
+  if (!f.entry[f.path]) {
+    p.script.api._raw(`/_file${f.path}/?dir`).then((fe: FEntry[]) => {
+      if (Array.isArray(fe)) {
+        f.entry[f.path] = fe;
+        p.render();
+      }
+    });
   }
 
   const tree: NodeModel<FEntry>[] = p.ui.popup.file.tree;
