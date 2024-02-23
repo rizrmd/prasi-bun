@@ -4,7 +4,7 @@ import {
   NodeModel,
   getBackendOptions,
 } from "@minoru/react-dnd-treeview";
-import { FC } from "react";
+import { FC, useRef } from "react";
 import { DndProvider } from "react-dnd";
 import { useGlobal, useLocal } from "web-utils";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
@@ -28,31 +28,49 @@ export const EdFileTree: FC<{}> = ({}) => {
         rootId=""
         initialOpen={[...(p.ui.popup.file.expanded[p.site.id] || []), "/"]}
         canDrop={(newTree, opt) => {
-          const to = opt.dropTargetId + "";
-          const from = opt.dragSourceId + "";
+          const source = opt.dragSource?.data;
+          if (source) {
+            if (source.type === "file") {
+              if (opt.dropTargetId !== p.ui.popup.file.path) {
+                return true;
+              }
+            }
+          } else {
+            const to = opt.dropTargetId + "";
+            const from = opt.dragSourceId + "";
 
-          if (to.startsWith(from)) return false;
+            if (to.startsWith(from)) return false;
 
-          const from_arr = from.split("/").filter((e) => e);
-          const to_arr = to.split("/").filter((e) => e);
-          if (
-            from_arr.slice(0, from_arr.length - 1).join("/") ===
-            to_arr.join("/")
-          )
-            return false;
+            const from_arr = from.split("/").filter((e) => e);
+            const to_arr = to.split("/").filter((e) => e);
+            if (
+              from_arr.slice(0, from_arr.length - 1).join("/") ===
+              to_arr.join("/")
+            )
+              return false;
 
-          return true;
+            return true;
+          }
+          return false;
         }}
         onDrop={async (newTree, { dropTargetId, dragSourceId, dragSource }) => {
           if (dragSource) {
             if (dragSource.data?.type === "file") {
-              
+              const f = p.ui.popup.file;
+              const path = f.path;
+
+              for (const file of f.selected) {
+                const from = path + (path.endsWith("/") ? "" : "/") + file;
+                await p.script.api._raw(`/_file${from}?move=${dropTargetId}`);
+                f.selected.delete(file);
+                p.render();
+              }
             } else {
               await p.script.api._raw(
                 `/_file${dragSourceId}?move=${dropTargetId}`
               );
-              await reloadFileTree(p);
             }
+            await reloadFileTree(p);
           }
         }}
         render={(
@@ -73,7 +91,6 @@ const TreeItem: FC<{
   const path = node.id + "";
   const f = p.ui.popup.file;
   const local = useLocal({ renaming: node.text });
-
   const expanded = f.expanded[p.site.id]?.includes(path);
 
   return (
@@ -87,22 +104,11 @@ const TreeItem: FC<{
         f.path === path && "border-r-2 bg-blue-100 border-r-blue-700"
       )}
       onClick={() => {
-        if (f.path === path) {
-          toggleDir(p, path);
-        }
-
         f.path = path;
-
-        if (!f.entry[path]) {
-          p.script.api._raw(`/_file${path}/?dir`).then((fe: FEntry[]) => {
-            if (Array.isArray(fe)) {
-              f.entry[path] = fe;
-              p.render();
-            }
-          });
-        }
-
         p.render();
+        if (!f.expanded[path] || !f.entry[path]) {
+          toggleDir(p, path, true);
+        }
       }}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -111,18 +117,18 @@ const TreeItem: FC<{
         if (!expanded) {
           toggleDir(p, path);
         }
-        f.ctx_path = path;
-        f.ctx_menu_event = e;
+        f.tree_ctx_path = path;
+        f.tree_ctx_menu_event = e;
         p.render();
       }}
     >
-      {f.ctx_menu_event && (
+      {f.tree_ctx_menu_event && (
         <Menu
-          mouseEvent={f.ctx_menu_event}
+          mouseEvent={f.tree_ctx_menu_event}
           onClose={() => {
             setTimeout(() => {
-              f.ctx_path = "";
-              f.ctx_menu_event = null;
+              f.tree_ctx_path = "";
+              f.tree_ctx_menu_event = null;
               p.render();
             }, 100);
           }}
@@ -132,12 +138,12 @@ const TreeItem: FC<{
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              f.ctx_menu_event = null;
+              f.tree_ctx_menu_event = null;
               p.render();
               setTimeout(() => {
                 f.tree.push({
-                  id: f.ctx_path + "/new_folder",
-                  parent: f.ctx_path,
+                  id: f.tree_ctx_path + "/new_folder",
+                  parent: f.tree_ctx_path,
                   text: "new_folder",
                   data: {
                     name: "new_folder",
@@ -145,11 +151,11 @@ const TreeItem: FC<{
                     size: 0,
                   },
                 });
-                f.expanded[p.site.id]?.push(f.ctx_path);
+                f.expanded[p.site.id]?.push(f.tree_ctx_path);
                 p.render();
-                f.path = f.ctx_path + "/new_folder";
-                f.renaming = f.ctx_path + "/new_folder";
-                f.ctx_path = "";
+                f.path = f.tree_ctx_path + "/new_folder";
+                f.tree_renaming = f.tree_ctx_path + "/new_folder";
+                f.tree_ctx_path = "";
                 p.render();
               });
             }}
@@ -159,24 +165,24 @@ const TreeItem: FC<{
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              f.path = f.ctx_path;
-              f.renaming = f.ctx_path;
+              f.path = f.tree_ctx_path;
+              f.tree_renaming = f.tree_ctx_path;
               p.render();
             }}
           />
           <MenuItem
             label={"Delete"}
             disabled={
-              !(f.entry[f.ctx_path] && f.entry[f.ctx_path]?.length === 0)
+              !(f.entry[f.tree_ctx_path] && f.entry[f.tree_ctx_path]?.length === 0)
             }
             onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
 
-              if (!(f.entry[f.ctx_path] && f.entry[f.ctx_path]?.length === 0)) {
+              if (!(f.entry[f.tree_ctx_path] && f.entry[f.tree_ctx_path]?.length === 0)) {
                 alert("Can only delete empty folder!");
               } else {
-                await p.script.api._raw(`/_file${f.ctx_path}?del`);
+                await p.script.api._raw(`/_file${f.tree_ctx_path}?del`);
                 await reloadFileTree(p);
               }
             }}
@@ -191,7 +197,7 @@ const TreeItem: FC<{
       >
         {expanded || path === "/" ? <FolderOpen /> : <Folder />}
       </div>
-      {f.renaming === path ? (
+      {f.tree_renaming === path ? (
         <input
           type="text"
           spellCheck={false}
@@ -213,7 +219,7 @@ const TreeItem: FC<{
             if (local.renaming !== node.text) {
               node.text = local.renaming;
               const res = await p.script.api._raw(
-                `/_file${f.renaming}?rename=${local.renaming}`
+                `/_file${f.tree_renaming}?rename=${local.renaming}`
               );
 
               if (res && res.newname) {
@@ -221,7 +227,7 @@ const TreeItem: FC<{
               }
               await reloadFileTree(p);
             }
-            f.renaming = "";
+            f.tree_renaming = "";
             p.render();
           }}
           className="flex-1 border border-blue-500 outline-none"
@@ -265,11 +271,12 @@ const Folder = () => (
   </svg>
 );
 
-const toggleDir = (p: PG, path: string) => {
+const toggleDir = (p: PG, path: string, forceExpand?: boolean) => {
   if (path === "/") return;
-  const expanded = p.ui.popup.file.expanded[p.site.id];
+  let expanded = p.ui.popup.file.expanded[p.site.id];
+
   if (expanded) {
-    if (expanded.includes(path)) {
+    if (expanded.includes(path) && !forceExpand) {
       p.ui.popup.file.expanded[p.site.id] = expanded.filter((e) => e !== path);
     } else {
       p.ui.popup.file.expanded[p.site.id] = [...expanded, path];

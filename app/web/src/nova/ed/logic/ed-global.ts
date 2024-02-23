@@ -240,11 +240,18 @@ export const EDGlobal = {
           localStorage.getItem("panel-file-expanded") || "{}"
         ) as Record<string, string[]>,
         entry: {} as Record<string, FEntry[]>,
-        tree: [] as NodeModel<FEntry>[],
-        renaming: "",
-        ctx_path: "",
         selected: new Set<string>(),
-        ctx_menu_event: null as null | React.MouseEvent<
+
+        file_renaming: "",
+        file_ctx_menu_event: null as null | React.MouseEvent<
+          HTMLElement,
+          MouseEvent
+        >,
+
+        tree: [] as NodeModel<FEntry>[],
+        tree_renaming: "",
+        tree_ctx_path: "",
+        tree_ctx_menu_event: null as null | React.MouseEvent<
           HTMLElement,
           MouseEvent
         >,
