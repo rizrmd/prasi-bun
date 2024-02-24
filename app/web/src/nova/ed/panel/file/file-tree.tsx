@@ -104,6 +104,7 @@ const TreeItem: FC<{
         f.path === path && "border-r-2 bg-blue-100 border-r-blue-700"
       )}
       onClick={() => {
+        f.selected.clear(); 
         f.path = path;
         p.render();
         if (!f.expanded[path] || !f.entry[path]) {
@@ -173,13 +174,21 @@ const TreeItem: FC<{
           <MenuItem
             label={"Delete"}
             disabled={
-              !(f.entry[f.tree_ctx_path] && f.entry[f.tree_ctx_path]?.length === 0)
+              !(
+                f.entry[f.tree_ctx_path] &&
+                f.entry[f.tree_ctx_path]?.length === 0
+              )
             }
             onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
 
-              if (!(f.entry[f.tree_ctx_path] && f.entry[f.tree_ctx_path]?.length === 0)) {
+              if (
+                !(
+                  f.entry[f.tree_ctx_path] &&
+                  f.entry[f.tree_ctx_path]?.length === 0
+                )
+              ) {
                 alert("Can only delete empty folder!");
               } else {
                 await p.script.api._raw(`/_file${f.tree_ctx_path}?del`);

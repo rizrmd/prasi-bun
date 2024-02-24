@@ -36,7 +36,7 @@ export const MenuItem = forwardRef<
   return (
     <button
       {...props}
-      className="MenuItem flex justify-between items-center"
+      className="MenuItem flex justify-between items-center select-none"
       ref={ref}
       role="menuitem"
       disabled={disabled}

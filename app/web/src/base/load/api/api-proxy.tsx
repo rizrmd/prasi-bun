@@ -28,14 +28,17 @@ export const apiProxy = (api_url: string) => {
       {
         get: (_, actionName: string) => {
           if (actionName === "_url") {
-            return (pathname: string) => {
+            return (pathname: string, proxy?: boolean) => {
               const to_url = new URL(base_url);
-              to_url.pathname = pathname;
+              to_url.pathname = pathname
+                .split("/")
+                .filter((e) => e)
+                .join("/");
 
               const cur_url = new URL(location.href);
               let final_url = "";
 
-              if (to_url.host === cur_url.host) {
+              if (to_url.host === cur_url.host || proxy === false) {
                 final_url = to_url.toString();
               } else {
                 final_url = `${cur_url.protocol}//${
@@ -155,3 +158,4 @@ const fetchSendApi = async (url: string, params: any) => {
     "content-type": "application/json",
   });
 };
+ 

@@ -255,6 +255,12 @@ export const EDGlobal = {
           HTMLElement,
           MouseEvent
         >,
+
+        preview: true,
+        upload: {
+          started: false,
+          progress: {} as Record<string, number>,
+        },
       },
       code: {
         init: false,
