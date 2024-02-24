@@ -10,10 +10,11 @@ import { EdFileTop } from "./file-top";
 import { EdFileTree, reloadFileTree } from "./file-tree";
 import { uploadFile } from "./file-upload";
 import { FEntry } from "./type";
+import { EdFilePreview } from "./file-preview";
 
 export const EdFileBrowser = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
-
+  const f = p.ui.popup.file;
   useEffect(() => {
     if (!p.script.api && p.site.config?.api_url) {
       p.script.api = apiProxy(p.site.config.api_url);
@@ -24,12 +25,12 @@ export const EdFileBrowser = () => {
 
     p.script.api._raw(`/_file/?dir`).then((e: FEntry[]) => {
       if (Array.isArray(e)) {
-        p.ui.popup.file.entry = { "/": e };
+        f.entry = { "/": e };
 
-        if (p.ui.popup.file.open) {
+        if (f.open) {
           reloadFileTree(p);
         }
-        p.ui.popup.file.enabled = true;
+        f.enabled = true;
         p.render();
       }
     });
@@ -40,14 +41,14 @@ export const EdFileBrowser = () => {
     noClick: true,
   });
 
-  if (!p.ui.popup.file.enabled) return null;
+  if (!f.enabled) return null;
 
   return (
     <>
       <div
         className="items-center flex px-2 cursor-pointer border border-transparent hover:bg-slate-200 transition-all hover:border-black"
         onClick={() => {
-          p.ui.popup.file.open = true;
+          f.open = true;
           p.render();
           reloadFileTree(p);
         }}
@@ -71,10 +72,10 @@ export const EdFileBrowser = () => {
 
       <Modal
         fade={false}
-        open={p.ui.popup.file.open}
+        open={f.open}
         onOpenChange={(open) => {
           if (!open) {
-            p.ui.popup.file.open = false;
+            f.open = false;
             p.render();
           }
         }}
@@ -82,7 +83,6 @@ export const EdFileBrowser = () => {
         <div className={cx("bg-white select-none fixed inset-[50px] flex")}>
           <PanelGroup direction="horizontal" className="text-sm">
             <Panel
-              id="tree"
               defaultSize={parseInt(
                 localStorage.getItem("panel-file-left") || "18"
               )}
@@ -102,35 +102,93 @@ export const EdFileBrowser = () => {
             <Panel order={2}>
               <div className="flex-1 flex h-full flex-col">
                 <EdFileTop />
-
-                <div
-                  className={cx("flex-1 flex h-full outline-none relative")}
-                  {...getRootProps()}
-                >
-                  <EdFileList />
-                  <input {...getInputProps()} />
-                  {isDragActive && (
-                    <div className="absolute inset-0 flex items-center justify-center flex-col bg-blue-50 border-4 border-blue-500">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        className="lucide lucide-upload"
-                        viewBox="0 0 24 24"
+                <PanelGroup direction="horizontal">
+                  <Panel order={1}>
+                    {f.upload.started ? (
+                      <div className="flex flex-col items-center justify-center flex-1 h-full">
+                        <div
+                          className={cx(
+                            "flex flex-col items-stretch min-w-[30%]"
+                          )}
+                        >
+                          <div className="border-b pb-2">
+                            Uploading {Object.keys(f.upload.progress).length}{" "}
+                            files
+                          </div>
+                          {Object.entries(f.upload.progress).map(
+                            ([name, progress]) => {
+                              return (
+                                <div
+                                  className="flex justify-between border-b p-1"
+                                  key={name}
+                                >
+                                  <div>{name}</div>
+                                  <div>{Math.round(progress * 100)}%</div>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        className={cx(
+                          "flex-1 flex h-full outline-none relative"
+                        )}
+                        {...getRootProps()}
                       >
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-                        <path d="M17 8L12 3 7 8"></path>
-                        <path d="M12 3L12 15"></path>
-                      </svg>
-                      <div>Drag Here to Upload</div>
-                    </div>
+                        <EdFileList />
+                        <input {...getInputProps()} />
+                        {isDragActive && (
+                          <div className="absolute inset-0 flex items-center justify-center flex-col bg-blue-50 border-4 border-blue-500">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              className="lucide lucide-upload"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                              <path d="M17 8L12 3 7 8"></path>
+                              <path d="M12 3L12 15"></path>
+                            </svg>
+                            <div>Drag Here to Upload</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Panel>
+                  {f.preview && (
+                    <>
+                      <PanelResizeHandle
+                        className={cx(
+                          "border-r",
+                          css`
+                            width: 10px;
+                          `
+                        )}
+                      />
+                      <Panel
+                        order={2}
+                        onResize={(e) => {
+                          localStorage.setItem("panel-file-right", e + "");
+                        }}
+                        defaultSize={parseInt(
+                          localStorage.getItem("panel-file-right") || "18"
+                        )}
+                        className="flex items-center justify-center"
+                        minSize={12}
+                      >
+                        <EdFilePreview />
+                      </Panel>
+                    </>
                   )}
-                </div>
+                </PanelGroup>
               </div>
             </Panel>
           </PanelGroup>

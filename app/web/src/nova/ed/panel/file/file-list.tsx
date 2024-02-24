@@ -7,9 +7,10 @@ import {
 import { FC, useCallback, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { useGlobal, useLocal } from "web-utils";
+import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, PG } from "../../logic/ed-global";
 import { FEntry } from "./type";
-import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
+import { reloadFileTree } from "./file-tree";
 
 const Tree = DNDTree<FEntry>;
 
@@ -33,28 +34,38 @@ export const EdFileList = () => {
     container: null as null | HTMLDivElement,
   });
 
-  const onKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.shiftKey || e.ctrlKey || e.metaKey) {
-      local.multi = true;
-      local.render();
-    }
-
-    if (e.altKey) {
-      local.inverse = true;
-    }
-
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
-      f.selected.clear();
-      for (const item of tree) {
-        if (item.data) f.selected.add(item.data.name);
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        local.multi = true;
+        p.render();
       }
-      local.render();
-    }
-  }, []);
+
+      if (e.altKey) {
+        local.inverse = true;
+        local.multi = true;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+        if (document.activeElement?.tagName.toLowerCase() !== "input") {
+          f.selected.clear();
+          const tree = f.entry[f.path];
+          if (tree) {
+            for (const item of tree) {
+              if (item.name) f.selected.add(item.name);
+            }
+          }
+          p.render();
+        }
+      }
+    },
+    [f.entry[f.path]]
+  );
+
   const onKeyUp = useCallback(() => {
     local.multi = false;
     local.inverse = false;
-    local.render();
+    p.render();
   }, []);
 
   useEffect(() => {
@@ -87,22 +98,51 @@ export const EdFileList = () => {
         >
           <MenuItem
             label={"Rename"}
-            disabled={f.selected.size === 0}
+            disabled={f.selected.size !== 1}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              f.file_ctx_menu_event = null;
+              p.render();
+              setTimeout(async () => {
+                const selected = [...f.selected];
+                const rename_to = prompt("Rename to:", selected[0]);
+
+                await p.script.api._raw(
+                  `/_file${join(f.path, selected[0])}?rename=${rename_to}`
+                );
+
+                reloadFileList(p);
+              }, 100);
             }}
           />
           <MenuItem
             label={"Delete"}
             disabled={f.selected.size === 0}
-            onClick={async (e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-
-              if (confirm("Delete this file ?")) {
-                await p.script.api._raw(`/_file${f.path}?del`);
-              }
+              f.file_ctx_menu_event = null;
+              p.render();
+              setTimeout(async () => {
+                const selected = [...f.selected].map((e) =>
+                  f.path.endsWith("/") ? e : "/" + e
+                );
+                if (f.selected.size === 1) {
+                  if (confirm("Delete this file ?")) {
+                    await p.script.api._raw(
+                      `/_file${join(f.path, selected[0])}?del`
+                    );
+                  }
+                } else {
+                  if (confirm(`Delete ${f.selected.size} files?`)) {
+                    for (const s of selected) {
+                      await p.script.api._raw(`/_file${join(f.path, s)}?del`);
+                    }
+                  }
+                }
+                reloadFileTree(p);
+              }, 100);
             }}
           />
         </Menu>
@@ -148,7 +188,9 @@ export const EdFileList = () => {
             }
 
             if (sq.el && sq.box.w > 5 && sq.box.h > 5) {
-              f.selected.clear();
+              if (!local.multi) {
+                f.selected.clear();
+              }
               for (const [name, el] of Object.entries(local.els)) {
                 if (overlaps(sq.el, el)) {
                   if (!local.inverse) {
@@ -163,17 +205,16 @@ export const EdFileList = () => {
                 local.square.up = () => {
                   window.removeEventListener("pointerup", local.square.up);
                   local.square.up = null;
-                  local.multi = false;
                   setTimeout(() => {
                     local.square.started = false;
-                    local.render();
+                    p.render();
                   });
                 };
                 window.addEventListener("pointerup", local.square.up);
               }
             }
 
-            local.render();
+            p.render();
           }
         }}
         onPointerDown={(e) => {
@@ -184,7 +225,7 @@ export const EdFileList = () => {
             sq.start.x = e.clientX - box.x;
             sq.start.y = el.scrollTop + e.clientY - box.y;
             sq.box = { x: 0, y: 0, w: 0, h: 0 };
-            local.render();
+            p.render();
           }
         }}
         onPointerUp={() => {
@@ -192,7 +233,7 @@ export const EdFileList = () => {
           if (!sq.disabled && sq.started) {
             sq.started = false;
           }
-          local.render();
+          p.render();
         }}
       >
         <div
@@ -202,14 +243,17 @@ export const EdFileList = () => {
             }
           }}
           className={cx(
-            "bg-blue-200 border border-blue-500 absolute z-10 bg-opacity-30 transition-opacity pointer-events-none",
+            "border absolute z-10 bg-opacity-30 transition-opacity pointer-events-none",
             css`
               left: ${sq.box.x}px;
               top: ${sq.box.y}px;
               width: ${sq.box.w}px;
               height: ${sq.box.h}px;
             `,
-            sq.started ? "opacity-100" : "opacity-0"
+            sq.started ? "opacity-100" : "opacity-0",
+            local.inverse
+              ? "bg-orange-200 border-orange-500"
+              : "bg-blue-200  border-blue-500"
           )}
         ></div>
 
@@ -221,13 +265,18 @@ export const EdFileList = () => {
                 display: flex;
                 flex: 1;
                 flex-wrap: wrap;
+
+                li {
+                  margin-left: 5px;
+                  margin-top: 5px;
+                }
               }
             `
           )}
           onPointerDown={() => {
-            if (!sq.disabled) {
+            if (!sq.disabled && !local.multi) {
               f.selected.clear();
-              local.render();
+              p.render();
             }
           }}
         >
@@ -259,7 +308,7 @@ export const EdFileList = () => {
                             sq.start.x = e.clientX - container.x;
                             sq.start.y = el.scrollTop + e.clientY - container.y;
                             sq.box = { x: 0, y: 0, w: 0, h: 0 };
-                            local.render();
+                            p.render();
                           }
                         }
                       }}
@@ -270,11 +319,11 @@ export const EdFileList = () => {
               }}
               onDragStart={() => {
                 sq.started = false;
-                local.render();
+                p.render();
               }}
               onDragEnd={() => {
                 sq.item_drag = false;
-                local.render();
+                p.render();
               }}
             />
           </DndProvider>
@@ -331,7 +380,7 @@ const FileItem: FC<{
       onPointerDown={(ev) => {
         if (f.selected.has(e.name)) {
           local.square.disabled = true;
-          local.render();
+          p.render();
           return;
         }
         if (!local.square.item_drag) {
@@ -341,9 +390,11 @@ const FileItem: FC<{
         }
         if (!local.square.started && f.selected.size <= 1) {
           local.square.disabled = true;
-          f.selected.clear();
+          if (!local.multi) {
+            f.selected.clear();
+          }
           f.selected.add(e.name);
-          local.render();
+          p.render();
         }
       }}
       onPointerUp={(ev) => {
@@ -351,7 +402,7 @@ const FileItem: FC<{
         if (local.square.disabled) {
           ev.stopPropagation();
           local.square.disabled = false;
-          local.render();
+          p.render();
         } else {
           setTimeout(() => {
             if (
@@ -359,9 +410,11 @@ const FileItem: FC<{
               local.square.box.h < 10 &&
               !f.selected.has(e.name)
             ) {
-              f.selected.clear();
+              if (!local.multi) {
+                f.selected.clear();
+              }
               f.selected.add(e.name);
-              local.render();
+              p.render();
             }
           });
         }
@@ -385,7 +438,11 @@ const FileItem: FC<{
             {isImage(ext) ? (
               <img
                 draggable={false}
-                src={p.script.api._url(`/_img/${f.path}/${e.name}?w=100`)}
+                src={p.script.api._url(
+                  `/_img${f.path.startsWith("/") ? f.path : `/${f.path}`}/${
+                    e.name
+                  }?w=100`
+                )}
                 alt={e.name + " thumbnail (100px)"}
                 onError={() => {
                   item.no_image = true;
@@ -411,7 +468,7 @@ const FileItem: FC<{
   );
 };
 
-const isImage = (ext: string) => {
+export const isImage = (ext: string) => {
   if (["gif", "jpeg", "jpg", "png", "svg", "webp"].includes(ext)) return true;
 };
 function overlaps(a: HTMLDivElement, b: HTMLDivElement) {
@@ -424,3 +481,24 @@ function overlaps(a: HTMLDivElement, b: HTMLDivElement) {
   const isOverlapping = isInHoriztonalBounds && isInVerticalBounds;
   return isOverlapping;
 }
+
+export const reloadFileList = async (p: PG) => {
+  const f = p.ui.popup.file;
+  const res = await p.script.api._raw(`/_file${f.path}?dir`);
+
+  f.entry[f.path] = res;
+  p.render();
+};
+
+const join = (...arg: string[]) => {
+  let arr: string[] = [];
+
+  for (const s of arg) {
+    s.split("/").forEach((e) => {
+      arr.push(e);
+    });
+  }
+  arr = arr.filter((e) => e);
+
+  return "/" + arg.join("/");
+};

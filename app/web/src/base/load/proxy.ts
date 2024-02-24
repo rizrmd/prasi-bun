@@ -1,3 +1,5 @@
+import axios from "axios";
+
 (BigInt.prototype as any).toJSON = function (): string {
   return `BigInt::` + this.toString();
 };
@@ -12,6 +14,7 @@ export const fetchViaProxy = async (
 
   let body = null as any;
   let isFile = false;
+  let uploadProgress = null as any;
 
   const files: File[] = [];
   if (Array.isArray(data)) {
@@ -20,11 +23,15 @@ export const fetchViaProxy = async (
         files.push(item);
         isFile = true;
       }
+      if (typeof item === "function") {
+        uploadProgress = item;
+      }
     }
   } else if (data instanceof File) {
     isFile = true;
     files.push(data);
   }
+
   if (!isFile) {
     body = JSON.stringify(data);
     headers["content-type"] = "aplication/json";
@@ -53,21 +60,32 @@ export const fetchViaProxy = async (
     }
 
     if (final_url) {
-      const res = await fetch(
-        final_url,
-        data
-          ? {
-              method: "POST",
-              body,
-              headers,
-            }
-          : undefined
-      );
-      const raw = await res.text();
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        return raw;
+      if (uploadProgress) {
+        const res = await axios({
+          method: data ? "post" : undefined,
+          url: final_url,
+          data: body,
+          onUploadProgress: uploadProgress,
+        });
+
+        return res.data;
+      } else {
+        const res = await fetch(
+          final_url,
+          data
+            ? {
+                method: "POST",
+                body,
+                headers,
+              }
+            : undefined
+        );
+        const raw = await res.text();
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          return raw;
+        }
       }
     }
   }
