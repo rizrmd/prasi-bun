@@ -169,7 +169,7 @@ export const EdFileBrowser = () => {
                         className={cx(
                           "border-r",
                           css`
-                            width: 10px;
+                            width: 5px;
                           `
                         )}
                       />
