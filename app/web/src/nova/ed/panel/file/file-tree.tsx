@@ -104,7 +104,7 @@ const TreeItem: FC<{
         f.path === path && "border-r-2 bg-blue-100 border-r-blue-700"
       )}
       onClick={() => {
-        f.selected.clear(); 
+        f.selected.clear();
         f.path = path;
         p.render();
         if (!f.expanded[path] || !f.entry[path]) {
@@ -287,10 +287,12 @@ const toggleDir = (p: PG, path: string, forceExpand?: boolean) => {
   if (expanded) {
     if (expanded.includes(path) && !forceExpand) {
       p.ui.popup.file.expanded[p.site.id] = expanded.filter((e) => e !== path);
+      refreshTree(p);
     } else {
       p.ui.popup.file.expanded[p.site.id] = [...expanded, path];
     }
   }
+
   localStorage.setItem(
     "panel-file-expanded",
     JSON.stringify(p.ui.popup.file.expanded)
@@ -307,32 +309,51 @@ export const reloadFileTree = async (p: PG) => {
   }
 
   if (exp) {
-    for (const [k, v] of Object.entries(p.ui.popup.file.entry)) {
-      if (
-        p.ui.popup.file.entry[k] &&
-        !exp.includes(k) &&
-        k !== "/" &&
-        k !== p.ui.popup.file.path
-      ) {
-        delete p.ui.popup.file.entry[k];
-      }
-    }
-
-    const promises = [];
-    for (const e of exp) {
+    const promises: Promise<any>[] = [];
+    const added = new Set<string>();
+    const fetched = new Set<string>();
+    for (const e of exp.sort((a, b) => a.length - b.length)) {
       if (e) {
         if (!p.ui.popup.file.entry[e]) {
-          promises.push(
-            p.script.api._raw(`/_file${e}/?dir`).then((fe: FEntry[]) => {
-              if (Array.isArray(fe)) {
-                p.ui.popup.file.entry[e] = fe;
+          let exists = false;
+
+          if (e.split("/").length <= 2) {
+            added.add(e);
+            exists = true;
+          } else {
+            for (const a of added) {
+              if (e.startsWith(a)) {
+                exists = true;
+                break;
               }
-            })
-          );
+            }
+          }
+
+          if (exists) {
+            const url = `/_file${e}/?dir`;
+            if (!fetched.has(url)) {
+              fetched.add(url);
+              promises.push(
+                p.script.api._raw(url).then((fe: FEntry[]) => {
+                  if (Array.isArray(fe)) {
+                    p.ui.popup.file.entry[e] = fe;
+                  } else {
+                    p.ui.popup.file.expanded[p.site.id] = exp.filter(
+                      (item) => item !== e
+                    );
+                  }
+                })
+              );
+            }
+          }
         }
       }
     }
     await Promise.all(promises);
+    localStorage.setItem(
+      "panel-file-expanded",
+      JSON.stringify(p.ui.popup.file.expanded)
+    );
   }
 
   const f = p.ui.popup.file;
@@ -345,8 +366,23 @@ export const reloadFileTree = async (p: PG) => {
     });
   }
 
-  const tree: NodeModel<FEntry>[] = p.ui.popup.file.tree;
+  refreshTree(p);
+};
 
+const refreshTree = (p: PG) => {
+  const exp = p.ui.popup.file.expanded[p.site.id];
+  for (const [k, v] of Object.entries(p.ui.popup.file.entry)) {
+    if (
+      p.ui.popup.file.entry[k] &&
+      !exp.includes(k) &&
+      k !== "/" &&
+      k !== p.ui.popup.file.path
+    ) {
+      delete p.ui.popup.file.entry[k];
+    }
+  }
+
+  const tree: NodeModel<FEntry>[] = p.ui.popup.file.tree;
   tree.length = 0;
   tree.push({ id: "/", text: "/", parent: "" });
   const added = new Set<string>(["/"]);
