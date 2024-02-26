@@ -21,6 +21,7 @@ export const EdFileBrowser = () => {
       p.render();
     }
 
+    console.log(p.site);
     if (!p.script.api) return () => {};
 
     p.script.api._raw(`/_file/?dir`).then((e: FEntry[]) => {
@@ -40,7 +41,7 @@ export const EdFileBrowser = () => {
         p.render();
       }
     });
-  }, []);
+  }, [p.site]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (files) => uploadFile(p, files),
