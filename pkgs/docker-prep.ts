@@ -8,7 +8,10 @@ if (!g.dockerPrepared) {
   g.dockerPrepared = true;
   const dir = {
     path(...allpath: any[]) {
-      return path.join(process.cwd(), ...allpath);
+      return path.join(
+        process.cwd(),
+        ...allpath.map((e) => (Array.isArray(e) ? e.join("") : e))
+      );
     },
     read(dirPath: string, baseDir?: string[]): Record<string, string> {
       const result: Record<string, string> = {};

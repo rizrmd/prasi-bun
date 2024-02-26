@@ -159,16 +159,18 @@ export const Root = () => {
 
               if (load_urls.length > 0) {
                 const pages = await loadUrls(load_urls);
-                for (const page of pages) {
-                  const p = {
-                    id: page.id,
-                    url: page.url,
-                    root: page.root,
-                    meta: {},
-                  };
-                  await scanComponent(page.root.childs);
-                  rebuildMeta(p.meta, page.root);
-                  base.page.cache[p.id] = p;
+                if (Array.isArray(pages)) {
+                  for (const page of pages) {
+                    const p = {
+                      id: page.id,
+                      url: page.url,
+                      root: page.root,
+                      meta: {},
+                    };
+                    await scanComponent(page.root.childs);
+                    rebuildMeta(p.meta, page.root);
+                    base.page.cache[p.id] = p;
+                  }
                 }
               }
             }}
