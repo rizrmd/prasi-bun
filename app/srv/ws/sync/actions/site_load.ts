@@ -51,7 +51,7 @@ export const site_load: SAction["site"]["load"] = async function (
           compressed[key] = { bin: await gzipAsync(value.bin) };
         }
       }
-
+ 
       return {
         id: site.id,
         name: site.name,

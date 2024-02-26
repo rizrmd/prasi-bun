@@ -3,7 +3,7 @@ import { xxhash32 } from "hash-wasm";
 import { UseStore, get, set } from "idb-keyval";
 import { Packr } from "msgpackr";
 import { stringify } from "safe-stable-stringify";
-import { SyncActions } from "../../../../srv/ws/sync/actions";
+import type { SyncActions } from "../../../../srv/ws/sync/actions";
 import {
   SyncActionDefinition,
   SyncActionPaths,

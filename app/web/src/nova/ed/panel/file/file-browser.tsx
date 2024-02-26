@@ -31,6 +31,12 @@ export const EdFileBrowser = () => {
           reloadFileTree(p);
         }
         f.enabled = true;
+        if (!f.action) {
+          f.action = {
+            label: "Insert as <img>",
+            submit: () => {},
+          };
+        }
         p.render();
       }
     });

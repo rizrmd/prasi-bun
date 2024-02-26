@@ -107,7 +107,7 @@ const TreeItem: FC<{
         f.selected.clear();
         f.path = path;
         p.render();
-        if (!f.expanded[path] || !f.entry[path]) {
+        if (!f.expanded[p.site.id].includes(path) || !f.entry[path]) {
           toggleDir(p, path, true);
         }
       }}
@@ -266,7 +266,7 @@ const FolderOpen = () => (
   </svg>
 );
 
-const Folder = () => (
+export const Folder = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}

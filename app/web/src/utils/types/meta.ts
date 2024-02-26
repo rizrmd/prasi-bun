@@ -1,4 +1,4 @@
-import { parseJs } from "../../../../srv/ws/sync/editor/parser/parse-js";
+import type { parseJs } from "../../../../srv/ws/sync/editor/parser/parse-js";
 import {
   FMAdv,
   FMBackground,
@@ -12,7 +12,7 @@ import {
   FNBorder,
   FNDimension,
   FNFont,
-  FNPadding
+  FNPadding,
 } from "./meta-fn";
 
 export type MetaItem = {

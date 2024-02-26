@@ -4,7 +4,7 @@ import trim from "lodash.trim";
 import { FC, useEffect } from "react";
 import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
-import { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
+import type { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
 import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";

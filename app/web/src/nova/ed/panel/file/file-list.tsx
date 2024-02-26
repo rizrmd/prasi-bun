@@ -10,7 +10,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, PG } from "../../logic/ed-global";
 import { FEntry } from "./type";
-import { reloadFileTree } from "./file-tree";
+import { Folder, reloadFileTree } from "./file-tree";
 
 const Tree = DNDTree<FEntry>;
 
@@ -77,7 +77,13 @@ export const EdFileList = () => {
     };
   }, []);
 
-  const tree: NodeModel<FEntry>[] = (f.entry[f.path] || [])
+  const folder_tree: NodeModel<FEntry>[] = (f.entry[f.path] || [])
+    .filter((e) => e.type === "dir")
+    .map((e) => {
+      return { id: e.name, parent: "", text: e.name, data: e };
+    });
+
+  const file_tree: NodeModel<FEntry>[] = (f.entry[f.path] || [])
     .filter((e) => e.type === "file")
     .map((e) => {
       return { id: e.name, parent: "", text: e.name, data: e };
@@ -96,6 +102,30 @@ export const EdFileList = () => {
             }, 100);
           }}
         >
+          {f.selected.size === 0 && (
+            <MenuItem
+              label={"New Folder"}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                f.file_ctx_menu_event = null;
+                p.render();
+                setTimeout(async () => {
+                  const new_folder = prompt("New Folder:");
+                  if (new_folder) {
+                    await p.script.api._raw(
+                      `/_file/${join(
+                        f.path,
+                        "new_folder"
+                      )}?rename=${new_folder}`
+                    );
+
+                    await reloadFileTree(p);
+                  }
+                }, 100);
+              }}
+            />
+          )}
           <MenuItem
             label={"Rename"}
             disabled={f.selected.size !== 1}
@@ -112,7 +142,7 @@ export const EdFileList = () => {
                   `/_file${join(f.path, selected[0])}?rename=${rename_to}`
                 );
 
-                reloadFileList(p);
+                reloadFileTree(p);
               }, 100);
             }}
           />
@@ -259,7 +289,7 @@ export const EdFileList = () => {
 
         <div
           className={cx(
-            "absolute inset-0 flex flex-wrap items-start content-start",
+            "absolute inset-0 flex flex-col",
             css`
               ul {
                 display: flex;
@@ -280,56 +310,228 @@ export const EdFileList = () => {
             }
           }}
         >
-          {/* <div className="absolute left-0 top-0 z-100 bg-white">
-            {JSON.stringify([...f.selected])}
-            {JSON.stringify(sq.item_drag)}
-          </div> */}
-          <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-            <Tree
-              tree={tree}
-              dragPreviewRender={() => <></>}
-              rootId=""
-              onDrop={() => {}}
-              render={(node, {}) => {
-                if (node.data) {
-                  return (
-                    <FileItem
-                      p={p}
-                      e={node.data}
-                      local={local}
-                      onSquare={(e) => {
-                        e.stopPropagation();
-                        if (!sq.disabled) {
-                          const el = e.currentTarget;
-                          const container =
-                            local.container?.getBoundingClientRect();
-                          if (container) {
-                            sq.started = true;
-                            sq.start.x = e.clientX - container.x;
-                            sq.start.y = el.scrollTop + e.clientY - container.y;
-                            sq.box = { x: 0, y: 0, w: 0, h: 0 };
-                            p.render();
+          <div className="flex flex-wrap items-start content-start">
+            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+              <Tree
+                tree={folder_tree}
+                dragPreviewRender={() => <></>}
+                rootId=""
+                sort={false}
+                canDrop={(newTree, opt) => {
+                  const source = opt.dragSource?.data;
+                  if (source) {
+                    if (source.type === "file") {
+                      if (opt.dropTargetId !== p.ui.popup.file.path) {
+                        return true;
+                      }
+                    }
+                  } else {
+                    const to = opt.dropTargetId + "";
+                    const from = opt.dragSourceId + "";
+
+                    if (to.startsWith(from)) return false;
+
+                    const from_arr = from.split("/").filter((e) => e);
+                    const to_arr = to.split("/").filter((e) => e);
+                    if (
+                      from_arr.slice(0, from_arr.length - 1).join("/") ===
+                      to_arr.join("/")
+                    )
+                      return false;
+
+                    return true;
+                  }
+                  return false;
+                }}
+                onDrop={async (
+                  newTree,
+                  { dropTargetId, dragSourceId, dragSource }
+                ) => {
+                  if (dragSource) {
+                    if (dragSource.data?.type === "file") {
+                      const f = p.ui.popup.file;
+                      const path = f.path;
+
+                      for (const file of f.selected) {
+                        const from =
+                          path + (path.endsWith("/") ? "" : "/") + file;
+                        await p.script.api._raw(
+                          `/_file${from}?move=${dropTargetId}`
+                        );
+                        f.selected.delete(file);
+                        p.render();
+                      }
+                    } else {
+                      await p.script.api._raw(
+                        `/_file${dragSourceId}?move=${dropTargetId}`
+                      );
+                    }
+                    await reloadFileTree(p);
+                  }
+                }}
+                render={(node, { isDropTarget }) => {
+                  if (node.data) {
+                    return (
+                      <DirItem
+                        p={p}
+                        e={node.data}
+                        local={local}
+                        isDropTarget={isDropTarget}
+                        onSquare={(e) => {
+                          e.stopPropagation();
+                          if (!sq.disabled) {
+                            const el = e.currentTarget;
+                            const container =
+                              local.container?.getBoundingClientRect();
+                            if (container) {
+                              sq.started = true;
+                              sq.start.x = e.clientX - container.x;
+                              sq.start.y =
+                                el.scrollTop + e.clientY - container.y;
+                              sq.box = { x: 0, y: 0, w: 0, h: 0 };
+                              p.render();
+                            }
                           }
-                        }
-                      }}
-                    />
-                  );
-                }
-                return <></>;
-              }}
-              onDragStart={() => {
-                sq.started = false;
-                p.render();
-              }}
-              onDragEnd={() => {
-                sq.item_drag = false;
-                p.render();
-              }}
-            />
-          </DndProvider>
+                        }}
+                      />
+                    );
+                  }
+                  return <></>;
+                }}
+                onDragStart={() => {
+                  sq.started = false;
+                  p.render();
+                }}
+                onDragEnd={() => {
+                  sq.item_drag = false;
+                  p.render();
+                }}
+              />
+            </DndProvider>
+          </div>
+          <div className="flex flex-wrap items-start content-start">
+            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+              <Tree
+                tree={file_tree}
+                dragPreviewRender={() => <></>}
+                rootId=""
+                sort={false}
+                onDrop={() => {}}
+                render={(node, {}) => {
+                  if (node.data) {
+                    return (
+                      <FileItem
+                        p={p}
+                        e={node.data}
+                        local={local}
+                        onSquare={(e) => {
+                          e.stopPropagation();
+                          if (!sq.disabled) {
+                            const el = e.currentTarget;
+                            const container =
+                              local.container?.getBoundingClientRect();
+                            if (container) {
+                              sq.started = true;
+                              sq.start.x = e.clientX - container.x;
+                              sq.start.y =
+                                el.scrollTop + e.clientY - container.y;
+                              sq.box = { x: 0, y: 0, w: 0, h: 0 };
+                              p.render();
+                            }
+                          }
+                        }}
+                      />
+                    );
+                  }
+                  return <></>;
+                }}
+                onDragStart={() => {
+                  sq.started = false;
+                  p.render();
+                }}
+                onDragEnd={() => {
+                  sq.item_drag = false;
+                  p.render();
+                }}
+              />
+            </DndProvider>
+          </div>
         </div>
       </div>
     </>
+  );
+};
+
+const DirItem: FC<{
+  p: PG;
+  e: FEntry;
+  isDropTarget: boolean;
+  local: {
+    multi: boolean;
+    render: () => void;
+    square: {
+      started: boolean;
+      disabled: boolean;
+      item_drag: boolean;
+      box: any;
+    };
+    els: Record<string, HTMLDivElement>;
+  };
+  onSquare: (e: any) => void;
+}> = ({ e, local, p, isDropTarget }) => {
+  const f = p.ui.popup.file;
+  useEffect(() => {
+    return () => {
+      if (local.els[e.name]) {
+        delete local.els[e.name];
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      key={e.name}
+      ref={(el) => {
+        if (el) local.els[e.name] = el;
+      }}
+      className={cx(
+        "flex border py-[3px] px-2 select-none items-center cursor-pointer hover:bg-blue-100 hover:border-blue-600",
+        isDropTarget && "bg-blue-500 text-white",
+        css`
+          width: 150px;
+        `
+      )}
+      onPointerDown={(ev) => {
+        f.selected.clear();
+        f.path = f.path + (!f.path.endsWith("/") ? "/" : "") + e.name;
+        reloadFileTree(p);
+      }}
+      onPointerUp={(ev) => {
+        local.square.item_drag = false;
+        if (local.square.disabled) {
+          ev.stopPropagation();
+          local.square.disabled = false;
+          p.render();
+        } else {
+          setTimeout(() => {
+            if (
+              local.square.box.w < 10 &&
+              local.square.box.h < 10 &&
+              !f.selected.has(e.name)
+            ) {
+              if (!local.multi) {
+                f.selected.clear();
+              }
+              f.selected.add(e.name);
+              p.render();
+            }
+          });
+        }
+      }}
+    >
+      <Folder />
+      <div className="pl-1">{e.name}</div>
+    </div>
   );
 };
 
@@ -368,14 +570,12 @@ const FileItem: FC<{
         if (el) local.els[e.name] = el;
       }}
       className={cx(
-        "flex items-stretch flex-col p-1 border-2 select-none",
+        "flex items-stretch flex-col p-1 border select-none",
         css`
           width: 100px;
           height: 100%;
         `,
-        f.selected.has(e.name)
-          ? "bg-blue-100  border-blue-600"
-          : "border-transparent"
+        f.selected.has(e.name) ? "bg-blue-100  border-blue-600" : ""
       )}
       onPointerDown={(ev) => {
         if (f.selected.has(e.name)) {
@@ -426,7 +626,7 @@ const FileItem: FC<{
           css`
             min-height: 80px;
           `,
-          f.selected.has(e.name) && "border-blue-300"
+          f.selected.has(e.name) ? "border-blue-300" : "border-transparent"
         )}
         onPointerDown={() => {
           local.square.item_drag = true;
