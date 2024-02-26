@@ -10,17 +10,28 @@ export const EdFilePreview = () => {
   const file_by_ext: Record<string, string[]> = {};
   let ext = "";
   let first = undefined as FEntry | undefined;
+  const tree = f.entry[f.path];
   for (const file of f.selected) {
-    const f_ext = file.split(".").pop() || "";
-    if (f_ext) {
-      if (!ext) {
-        ext = f_ext;
-        first = f.entry[f.path]?.find((e) => e.name === file);
+    const node = tree.find((e) => e.name === file);
+
+    if (node) {
+      if (node.type === "file") {
+        const f_ext = file.split(".").pop() || "";
+        if (f_ext) {
+          if (!ext) {
+            ext = f_ext;
+            first = f.entry[f.path]?.find((e) => e.name === file);
+          }
+          if (!file_by_ext[f_ext]) file_by_ext[f_ext] = [];
+
+          file_by_ext[f_ext].push(file);
+        }
+      } else {
+        if (!file_by_ext["folder"]) {
+          file_by_ext["folder"] = [];
+        }
+        file_by_ext["folder"].push(file);
       }
-
-      if (!file_by_ext[f_ext]) file_by_ext[f_ext] = [];
-
-      file_by_ext[f_ext].push(file);
     }
   }
 

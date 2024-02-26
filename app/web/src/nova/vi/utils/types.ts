@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { IContent } from "../../../utils/types/general";
 import { IItem, MItem } from "../../../utils/types/item";
 import { createViLocal } from "../render/script/local";

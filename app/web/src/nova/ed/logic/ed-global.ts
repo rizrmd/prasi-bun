@@ -1,8 +1,8 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { page } from "dbgen";
 import { deepClone } from "web-utils";
-import { SAction } from "../../../../../srv/ws/sync/actions";
-import { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
+import type { SAction } from "../../../../../srv/ws/sync/actions";
+import type { parseJs } from "../../../../../srv/ws/sync/editor/parser/parse-js";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { IItem } from "../../../utils/types/item";
 import { DCode, DComp, DPage, IRoot } from "../../../utils/types/root";
@@ -234,13 +234,18 @@ export const EDGlobal = {
     popup: {
       file: {
         enabled: false,
-        open: true,
+        open: false,
         path: "/",
         expanded: JSON.parse(
           localStorage.getItem("panel-file-expanded") || "{}"
         ) as Record<string, string[]>,
         entry: {} as Record<string, FEntry[]>,
         selected: new Set<string>(),
+
+        action: null as null | {
+          label: string;
+          submit: () => void | Promise<void>;
+        },
 
         file_renaming: "",
         file_ctx_menu_event: null as null | React.MouseEvent<

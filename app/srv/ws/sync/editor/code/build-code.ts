@@ -44,7 +44,9 @@ export const server = createServer({
     await dirAsync(build_path);
 
     const build_file = `${build_path}/index.js`;
-    await writeAsync(build_file, "");
+    if (!(await existsAsync(build_file))) {
+      await writeAsync(build_file, "");
+    }
 
     code.esbuild[id_site].server = await context({
       absWorkingDir: src_path,
@@ -212,7 +214,7 @@ if (typeof global.server_hook === "function") {
       "//# sourceMappingURL=index.js.map",
       `//# sourceMappingURL=/nova-load/code/${id_site}/${mode}/index.js.map`
     );
-    await Bun.write(out, src);
+    // await Bun.write(out, src);
   }
 };
 
