@@ -64,13 +64,13 @@ export const EdMid: FC<{}> = () => {
           <div className=" text-slate-400 flex items-center pr-1 ">
             <ResponsiveToggle />
           </div>
-          <a href={`/vi/${params.site_id}/${params.page_id}`} target="_blank">
+          <a href={`/prod/${params.site_id}/${params.page_id}`} target="_blank">
             <TopBtn style="slim" className="font-mono text-[9px]">
               PREVIEW
             </TopBtn>
           </a>
         </div>
-      </div>
+      </div> 
     </div>
   );
-};
+}; 

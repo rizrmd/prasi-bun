@@ -20,7 +20,6 @@ export const EdFileBrowser = () => {
     (async () => {
       if (!p.script.api && p.site.config?.api_url) {
         p.script.api = apiProxy(p.site.config.api_url);
-        await waitUntil(() => w.prasiApi[p.site.config.api_url]);
         p.render();
       }
 

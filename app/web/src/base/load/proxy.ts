@@ -82,7 +82,7 @@ export const fetchViaProxy = async (
         );
         const raw = await res.text();
         try {
-          return JSON.parse(raw);
+          return JSON.parse(raw, replacer);
         } catch (e) {
           return raw;
         }
@@ -90,4 +90,11 @@ export const fetchViaProxy = async (
     }
   }
   return null;
+};
+
+const replacer = (key: string, value: string) => {
+  if (typeof value === "string" && value.startsWith("BigInt::")) {
+    return BigInt(value.substring(8));
+  }
+  return value; 
 };
