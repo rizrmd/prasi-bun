@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useGlobal } from "web-utils";
+import { useGlobal, waitUntil } from "web-utils";
 import { apiProxy } from "../../../../base/load/api/api-proxy";
 import { Modal } from "../../../../utils/ui/modal";
 import { EDGlobal } from "../../logic/ed-global";
@@ -11,36 +11,39 @@ import { EdFileTree, reloadFileTree } from "./file-tree";
 import { uploadFile } from "./file-upload";
 import { FEntry } from "./type";
 import { EdFilePreview } from "./file-preview";
+import { w } from "../../../../utils/types/general";
 
 export const EdFileBrowser = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const f = p.ui.popup.file;
   useEffect(() => {
-    if (!p.script.api && p.site.config?.api_url) {
-      p.script.api = apiProxy(p.site.config.api_url);
-      p.render();
-    }
-
-    console.log(p.site);
-    if (!p.script.api) return () => {};
-
-    p.script.api._raw(`/_file/?dir`).then((e: FEntry[]) => {
-      if (Array.isArray(e)) {
-        f.entry = { "/": e };
-
-        if (f.open) {
-          reloadFileTree(p);
-        }
-        f.enabled = true;
-        if (!f.action) {
-          f.action = {
-            label: "Insert as <img>",
-            submit: () => {},
-          };
-        }
+    (async () => {
+      if (!p.script.api && p.site.config?.api_url) {
+        p.script.api = apiProxy(p.site.config.api_url);
+        await waitUntil(() => w.prasiApi[p.site.config.api_url]);
         p.render();
       }
-    });
+
+      if (!p.script.api) return () => {};
+
+      p.script.api._raw(`/_file/?dir`).then((e: FEntry[]) => {
+        if (Array.isArray(e)) {
+          f.entry = { "/": e };
+
+          if (f.open) {
+            reloadFileTree(p);
+          }
+          f.enabled = true;
+          if (!f.action) {
+            f.action = {
+              label: "Insert as <img>",
+              submit: () => {},
+            };
+          }
+          p.render();
+        }
+      });
+    })();
   }, [p.site]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
