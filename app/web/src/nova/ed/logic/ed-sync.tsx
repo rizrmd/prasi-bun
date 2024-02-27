@@ -83,50 +83,65 @@ export const edInitSync = (p: PG) => {
 
   if (!params.page_id) {
     if (location.pathname.startsWith("/ed")) {
-      if (!params.site_id) {
-        _db.page
-          .findFirst({
+      (async () => {
+        const e = await _db.page.findFirst({
+          where: {
+            is_deleted: false,
+            is_default_layout: false,
+            site: params.site_id
+              ? { id: params.site_id }
+              : {
+                  id_user: p.user.id,
+                },
+            name: {
+              contains: "root",
+              mode: "insensitive",
+            },
+          },
+          select: { id: true, id_site: true },
+          orderBy: {
+            site: {
+              name: "asc",
+            },
+          },
+        });
+        if (e) location.href = `/ed/${e.id_site}/${e.id}`;
+        else {
+          const e = await _db.page.findFirst({
             where: {
               is_deleted: false,
               is_default_layout: false,
-              site: {
-                id_user: p.user.id,
+              site: params.site_id
+                ? { id: params.site_id }
+                : {
+                    id_user: p.user.id,
+                  },
+              name: {
+                contains: "home",
+                mode: "insensitive",
               },
             },
             select: { id: true, id_site: true },
-          })
-          .then((e) => {
+          });
+
+          if (e) location.href = `/ed/${e.id_site}/${e.id}`;
+          else {
+            const e = await _db.page.findFirst({
+              where: {
+                is_deleted: false,
+                is_default_layout: false,
+                site: params.site_id
+                  ? { id: params.site_id }
+                  : {
+                      id_user: p.user.id,
+                    },
+              },
+              select: { id: true, id_site: true },
+            });
             if (e) location.href = `/ed/${e.id_site}/${e.id}`;
-          });
-      } else {
-        _db.page
-          .findFirst({
-            where: {
-              is_deleted: false,
-              is_default_layout: false,
-              id_site: params.site_id,
-            },
-            select: { id: true, id_site: true },
-          })
-          .then(async (e) => {
-            if (e) location.href = `/ed/${params.site_id}/${e.id}`;
-            else {
-              const res = await _db.page.create({
-                data: {
-                  content_tree: {
-                    childs: [],
-                    id: "root",
-                    type: "root",
-                  },
-                  name: "home",
-                  url: "/",
-                  site: { connect: { id: params.site_id } },
-                },
-              });
-              if (res) location.href = `/ed/${params.site_id}/${res.id}`;
-            }
-          });
-      }
+          }
+        }
+      })();
       return false;
     }
   }

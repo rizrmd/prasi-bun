@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
-import { Root } from "./root";
+import { Root, isPreview } from "./root";
 import { initBaseConfig } from "./base/base";
 import { w } from "./w";
 
@@ -14,15 +14,7 @@ import { w } from "./w";
 
     w.navigateOverride = (_href: string) => {
       if (_href && _href.startsWith("/")) {
-        if (
-          location.hostname.split(".").length === 4 ||
-          location.hostname === "prasi.app" ||
-          location.hostname === "prasi.avolut.com" ||
-          location.hostname.includes("ngrok") ||
-          location.hostname === "localhost" ||
-          location.hostname === "127.0.0.1" ||
-          location.hostname === "10.0.2.2" // android localhost
-        ) {
+        if (isPreview()) {
           if (
             location.pathname.startsWith("/prod") &&
             !_href.startsWith("/prod")
