@@ -3,17 +3,20 @@ import { IRoot } from "../../../utils/types/root";
 import { prodCache } from "./cache";
 import { get, set } from "idb-keyval";
 
-export const loadPage = (page_id: string) => {
+export const loadPage = (page_id: string, use_cache?: boolean) => {
   return new Promise<{
     id: string;
     url: string;
     root: IRoot;
   }>(async (done) => {
     let returned = false;
-    const cached = await get(`page-${page_id}`, prodCache);
-    if (cached) {
-      done(cached);
-      returned = true;
+
+    if (use_cache !== false) {
+      const cached = await get(`page-${page_id}`, prodCache);
+      if (cached) {
+        done(cached);
+        returned = true;
+      }
     }
 
     const res = (await (

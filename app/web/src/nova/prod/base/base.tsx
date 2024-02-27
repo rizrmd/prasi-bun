@@ -43,6 +43,7 @@ export const base = {
   mode: "" as "desktop" | "mobile",
   route: {
     status: "init" as "init" | "loading" | "ready",
+    pages: [] as { id: string; url: string }[],
     router: null as null | RadixRouter<{ id: string; url: string }>,
   },
   comp: {

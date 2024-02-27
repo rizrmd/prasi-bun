@@ -34,6 +34,7 @@ const getRoute = () => {
 
 export const initBaseRoute = async () => {
   const router = createRouter<{ id: string; url: string }>();
+  const pages = [] as { id: string; url: string }[];
   try {
     const res = await getRoute();
 
@@ -61,11 +62,12 @@ export const initBaseRoute = async () => {
 
       for (const item of res.urls) {
         router.insert(item.url, item);
+        pages.push(item);
       }
     }
   } catch (e) {}
 
-  return router;
+  return { router, pages };
 };
 
 const injectSiteScript = () => {

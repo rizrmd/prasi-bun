@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { validate } from "uuid";
 import { GlobalContext, useLocal } from "web-utils";
 import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
@@ -10,6 +11,18 @@ import { loadPage, loadUrls } from "./base/page";
 import { detectResponsiveMode } from "./base/responsive";
 import { initBaseRoute, rebuildMeta } from "./base/route";
 import { w } from "./w";
+
+export const isPreview = () => {
+  return (
+    location.hostname.split(".").length === 4 ||
+    location.hostname === "prasi.app" ||
+    location.hostname === "prasi.avolut.com" ||
+    location.hostname.includes("ngrok") ||
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "10.0.2.2"
+  ); // android localhost
+};
 
 export const Root = () => {
   // #region context
@@ -24,10 +37,11 @@ export const Root = () => {
   if (base.route.status !== "ready") {
     if (base.route.status === "init") {
       base.route.status = "loading";
-      initBaseRoute().then(async (router) => {
+      initBaseRoute().then(async ({ router, pages }) => {
         detectResponsiveMode();
         base.route.status = "ready";
         base.route.router = router;
+        base.route.pages = pages;
 
         const site_script = evalCJS(
           await (
@@ -53,7 +67,22 @@ export const Root = () => {
   const router = base.route.router;
   if (!router) return <DeadEnd>Failed to create Router</DeadEnd>;
 
-  const page = router.lookup(base.pathname);
+  let page_id_from_url = "";
+  const isPreviewProd = isPreview() && location.pathname.startsWith("/prod");
+  if (isPreviewProd) {
+    const parts = location.pathname.split("/");
+    if (validate(parts[3])) {
+      page_id_from_url = parts[3];
+    }
+  }
+
+  let page = router.lookup(base.pathname);
+  if (page_id_from_url) {
+    const found = base.route.pages.find((e) => page_id_from_url === e.id);
+    if (found) {
+      page = found;
+    }
+  }
   if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
 
   if (page.id !== local.page_id) {
@@ -67,18 +96,20 @@ export const Root = () => {
   const cache = base.page.cache[page.id];
 
   if (!cache) {
-    loadPage(page.id)
+    loadPage(page.id, !isPreviewProd)
       .then(async ({ root }) => {
-        const p = {
-          id: page.id,
-          url: page.url,
-          root,
-          meta: {},
-        };
-        await scanComponent(root.childs);
-        rebuildMeta(p.meta, root);
-        base.page.cache[p.id] = p;
-        render();
+        if (page) {
+          const p = {
+            id: page.id,
+            url: page.url,
+            root,
+            meta: {},
+          };
+          await scanComponent(root.childs);
+          rebuildMeta(p.meta, root);
+          base.page.cache[p.id] = p;
+          render();
+        }
       })
       .catch(() => {
         render();
