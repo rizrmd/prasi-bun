@@ -54,6 +54,7 @@ export const server = createServer({
       bundle: true,
       outfile: build_file,
       minify: true,
+      platform: "node",
       treeShaking: true,
       format: "cjs",
       logLevel: "silent",
@@ -101,7 +102,10 @@ if (typeof global.server_hook === "function") {
             ancestors.push(val);
 
             if (val.constructor && val.constructor.name !== "Object"){
-              return '[class] ' + val.constructor.name;
+              if (val.constructor.name === 'Error') {
+                return '[Error] ' + val.message;
+              }
+              return '[Class] ' + val.constructor.name;
             }
           }
         }
