@@ -7,6 +7,7 @@ import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { prodCache } from "./cache";
+import { scanComponent } from "./component";
 
 const getRoute = () => {
   return new Promise<{
@@ -32,7 +33,7 @@ const getRoute = () => {
   });
 };
 
-export const initBaseRoute = async () => {
+export const initBaseRoute = async (isPreviewProd: boolean) => {
   const router = createRouter<{ id: string; url: string }>();
   const pages = [] as { id: string; url: string }[];
   try {
@@ -44,6 +45,7 @@ export const initBaseRoute = async () => {
         base.layout.root = res.layout.root;
         base.layout.meta = {};
         if (base.layout.root) {
+          await scanComponent(base.layout.root.childs, !isPreviewProd);
           rebuildMeta(base.layout.meta, base.layout.root);
         }
       }
