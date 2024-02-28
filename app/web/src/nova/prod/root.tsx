@@ -105,7 +105,7 @@ export const Root = () => {
             root,
             meta: {},
           };
-          await scanComponent(root.childs);
+          await scanComponent(root.childs, !isPreviewProd);
           rebuildMeta(p.meta, root);
           base.page.cache[p.id] = p;
           render();
@@ -198,7 +198,7 @@ export const Root = () => {
                       root: page.root,
                       meta: {},
                     };
-                    await scanComponent(page.root.childs);
+                    await scanComponent(page.root.childs, !isPreviewProd);
                     rebuildMeta(p.meta, page.root);
                     base.page.cache[p.id] = p;
                   }
