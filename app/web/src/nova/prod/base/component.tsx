@@ -17,7 +17,7 @@ export const scanComponent = async (items: IContent[], use_cache?: boolean) => {
   if (comp.pending.size > 0) {
     let all_found = true;
     const founds: any = [];
-    if (!use_cache) {
+    if (use_cache !== false) {
       for (const id of [...comp.pending]) {
         const item = await get(`comp-${id}`, prodCache);
         if (!item) {

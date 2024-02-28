@@ -34,10 +34,12 @@ export const Root = () => {
   // #endregion
 
   // #region init
+  const isPreviewProd = isPreview() && location.pathname.startsWith("/prod");
+
   if (base.route.status !== "ready") {
     if (base.route.status === "init") {
       base.route.status = "loading";
-      initBaseRoute().then(async ({ router, pages }) => {
+      initBaseRoute(isPreviewProd).then(async ({ router, pages }) => {
         detectResponsiveMode();
         base.route.status = "ready";
         base.route.router = router;
@@ -68,7 +70,6 @@ export const Root = () => {
   if (!router) return <DeadEnd>Failed to create Router</DeadEnd>;
 
   let page_id_from_url = "";
-  const isPreviewProd = isPreview() && location.pathname.startsWith("/prod");
   if (isPreviewProd) {
     const parts = location.pathname.split("/");
     if (validate(parts[3])) {
