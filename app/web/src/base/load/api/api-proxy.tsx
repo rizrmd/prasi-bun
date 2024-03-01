@@ -148,7 +148,6 @@ export const apiProxy = (api_url: string) => {
       }
     );
   } catch (e) {
-    console.warn("Init API failed for URL: ", JSON.stringify(api_url));
     return null;
   }
 };
@@ -158,4 +157,3 @@ const fetchSendApi = async (url: string, params: any) => {
     "content-type": "application/json",
   });
 };
- 

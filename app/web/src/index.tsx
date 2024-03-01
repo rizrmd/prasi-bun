@@ -23,7 +23,9 @@ const start = async () => {
     await loadApiProxyDef(base_url, false);
     w._api = apiProxy(base_url);
   } catch (e) {
-    console.warn("Failed to load API:", base_url);
+    if (cur.host) {
+      console.warn("Failed to load API:", base_url);
+    }
   }
 
   w.serverurl = base_url;
