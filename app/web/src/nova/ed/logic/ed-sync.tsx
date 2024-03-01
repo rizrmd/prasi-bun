@@ -91,7 +91,13 @@ export const edInitSync = (p: PG) => {
             site: params.site_id
               ? { id: params.site_id }
               : {
-                  id_user: p.user.id,
+                  org: {
+                    org_user: {
+                      some: {
+                        id_user: p.user.id,
+                      },
+                    },
+                  },
                 },
             name: {
               contains: "root",
@@ -114,10 +120,16 @@ export const edInitSync = (p: PG) => {
               site: params.site_id
                 ? { id: params.site_id }
                 : {
-                    id_user: p.user.id,
+                    org: {
+                      org_user: {
+                        some: {
+                          id_user: p.user.id,
+                        },
+                      },
+                    }, 
                   },
               name: {
-                contains: "home",
+                contains: "home", 
                 mode: "insensitive",
               },
             },
@@ -133,7 +145,13 @@ export const edInitSync = (p: PG) => {
                 site: params.site_id
                   ? { id: params.site_id }
                   : {
-                      id_user: p.user.id,
+                      org: {
+                        org_user: {
+                          some: {
+                            id_user: p.user.id,
+                          },
+                        },
+                      },
                     },
               },
               select: { id: true, id_site: true },
