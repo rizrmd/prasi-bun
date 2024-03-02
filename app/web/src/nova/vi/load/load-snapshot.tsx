@@ -44,8 +44,10 @@ export const viLoadSnapshot = async (p: PG) => {
       if (!p.script.db) p.script.db = dbProxy(api_url);
       if (!p.script.api) p.script.api = apiProxy(api_url);
     }
-  } catch (e) {
-    console.warn("Failed to load API:", api_url);
+  } catch (e: any) {
+    if (e && !e.message.toLowerCase().includes("invalid url")) {
+      console.warn("Failed to load API [Snapshot]:", api_url);
+    }
   }
 
   if (p.site.code.snapshot) {

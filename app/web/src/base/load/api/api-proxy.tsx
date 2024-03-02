@@ -124,7 +124,8 @@ export const apiProxy = (api_url: string) => {
                       console.error(`API Not Found: ${actionName.toString()}`);
                     }
                   } else {
-                    reject("Failed to load API: " + base_url);
+
+                    reject("Failed to load API [Proxy]: " + base_url);
                   }
                 } catch (e) {
                   reject(e);
