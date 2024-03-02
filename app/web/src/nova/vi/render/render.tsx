@@ -56,6 +56,7 @@ export const ViRender: FC<{
   if (!meta) return null;
   if (meta.item.hidden) return null;
 
+
   if (meta.item.adv?.js || meta.item.component?.id) {
     return (
       <ErrorBox meta={meta}>
@@ -92,7 +93,7 @@ export const ViChild: FC<{
           <ErrorBox meta={meta}>
             <ViScript
               meta={meta}
-              is_layout={is_layout}
+              is_layout={false}
               passprop={passprop}
             ></ViScript>
           </ErrorBox>
@@ -103,6 +104,7 @@ export const ViChild: FC<{
         childs.push(<div {...parts.props} />);
       }
     }
+
     return (
       <>
         {childs.map((e, idx) => (
@@ -111,6 +113,7 @@ export const ViChild: FC<{
       </>
     );
   }
+
   const parts = viParts(vi, meta, is_layout, passprop);
   if (vi.visit) vi.visit(meta, parts);
 

@@ -28,5 +28,5 @@ export const ViScript: FC<{
     if (meta.script) return meta.script.result;
   }
 
-  return <ViChild meta={meta} passprop={_pass} is_layout={is_layout}></ViChild>;
+  return <ViChild meta={meta} passprop={_pass} is_layout={is_layout} />;
 };
