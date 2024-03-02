@@ -51,7 +51,7 @@ export const EdScriptWorkbench = () => {
           )}
         >
           <div className={cx("flex items-stretch")}>
-            <div className="border-r px-2 flex items-center">
+            {/* <div className="border-r px-2 flex items-center">
               <div
                 className={cx(
                   scriptNav.canBack
@@ -102,7 +102,7 @@ export const EdScriptWorkbench = () => {
               >
                 <ChevronRight />
               </div>
-            </div>
+            </div> */}
             {p.ui.popup.script.type === "prop-master" && <CompTitleMaster />}
             {p.ui.popup.script.type === "prop-instance" && (
               <CompTitleInstance />

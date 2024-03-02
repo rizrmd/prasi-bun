@@ -50,7 +50,7 @@ export const viLoadLegacy = async (vi: {
         try {
           await loadApiProxyDef(api_url, true);
         } catch (e) {
-          console.warn("Failed to load API:", api_url);
+          console.warn("Failed to load API [Legacy]:", api_url);
         }
       }
     } catch (e) {}

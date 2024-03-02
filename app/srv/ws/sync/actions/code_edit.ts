@@ -61,7 +61,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
               });
             }
             let adv = mitem.get("adv");
-            const jscript = parseJs(adv?.get("js")) || false;
+            const jscript = parseJs(src) || false;
 
             doc?.transact(() => {
               if (!adv) {
@@ -106,7 +106,10 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 },
               });
             }
+
+            return jscript
           } catch (e: any) {
+            console.log('e', e)
             return e.message.toString();
           }
         } else {
@@ -166,10 +169,10 @@ export const code_edit: SAction["code"]["edit"] = async function (
               const res =
                 prop_kind !== "typings"
                   ? await transform(`return ${src}`, {
-                      jsx: "transform",
-                      format: "cjs",
-                      loader: "tsx",
-                    })
+                    jsx: "transform",
+                    format: "cjs",
+                    loader: "tsx",
+                  })
                   : { code: src };
               doc?.transact(() => {
                 if (prop_kind === "value") {

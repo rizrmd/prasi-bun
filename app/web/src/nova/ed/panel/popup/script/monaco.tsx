@@ -9,14 +9,13 @@ import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
 import { Loading } from "../../../../../utils/ui/loading";
-import { getActiveMeta, getMetaById } from "../../../logic/active/get-meta";
+import { getActiveMeta } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
 import { declareScope } from "./scope/scope";
 
 // @ts-ignore
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
-import { addScope } from "./scope/add-scope";
 
 const scriptEdit = {
   timeout: null as any,
@@ -100,6 +99,7 @@ export const EdScriptMonaco: FC<{}> = () => {
           if (p.ui.popup.script.mode === "js") {
             const w = window as any;
             const types: any = {};
+            const values: any = {};
             for (const prop_name of p.global_prop) {
               if (prop_name === "_types") continue;
               types[prop_name] = "any";
@@ -139,38 +139,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                   break;
                 case "prop-instance":
                   {
-                    let parent_meta = null;
-                    const parent_id = meta.parent?.id;
-                    if (parent_id) {
-                      if (active.comp_id) {
-                        parent_meta =
-                          p.comp.list[active.comp_id].meta[parent_id];
-                      } else {
-                        parent_meta = p.page.meta[parent_id];
-                      }
-                    }
-                    if (parent_meta) {
-                      const scope = declareScope(p, parent_meta, monaco);
-                      for (const [k, v] of Object.entries(scope.exports)) {
-                        addScope(p, monaco, `file:///${k}`, v);
-                      }
-                      addScope(
-                        p,
-                        monaco,
-                        `file:///prop-global.d.ts`,
-                        `\
-${Object.entries(scope.vars).map(([var_name, var_from]) => {
-  return `import {${var_name} as ___${var_name}} from "./${var_from}"`;
-})}
-declare global {
-  ${Object.entries(scope.vars).map(([var_name]) => {
-    return `const ${var_name} = ___${var_name}`;
-  })}
-}
-`
-                      );
-                    }
-
                     const nmodel = monaco.editor.createModel(
                       val,
                       "typescript",
@@ -204,38 +172,15 @@ declare global {
                   break;
                 case "item":
                   {
-                    const { exports, imports } = declareScope(p, meta, monaco);
-                    const im = imports[active.item_id];
-                    const im_src = [];
+                    types._raw = declareScope(p, meta, monaco);
 
-                    if (im) {
-                      for (const [var_name, item] of Object.entries(im)) {
-                        im_src.push(
-                          `import { ${var_name} } from "./${item.id}_${var_name}_${item.type}";`
-                        );
-                      }
-                    }
-                    for (const [k, v] of Object.entries(exports)) {
-                      addScope(p, monaco, `file:///${k}`, v);
-                    }
-                    let active_src =
-                      im_src.length > 0
-                        ? `${im_src.join("\n")}\n${IMPORT_SEPARATOR}\n${val}`
-                        : val;
                     const model = monaco.editor.createModel(
-                      active_src,
+                      val,
                       "typescript",
                       monaco.Uri.parse("file:///active.tsx")
                     );
                     editor.setModel(model);
                     editor.trigger("fold", "editor.foldAllMarkerRegions", {});
-                    if (active_src) {
-                      const end_hide = active_src
-                        .split(IMPORT_SEPARATOR)[0]
-                        .split("\n").length;
-                      const range = new monaco.Range(1, 1, end_hide, 1);
-                      (editor as any).setHiddenAreas([range]);
-                    }
 
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
@@ -271,7 +216,7 @@ declare global {
               monaco,
               {
                 types,
-                values: {},
+                values,
               }
             );
             await jsMount(editor, monaco, p);
