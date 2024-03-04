@@ -130,7 +130,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-master":
                   {
                     const nmodel = monaco.editor.createModel(
-                      val,
+                      trim(val),
                       "typescript",
                       monaco.Uri.parse("file:///active.tsx")
                     );
@@ -140,7 +140,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-instance":
                   {
                     const nmodel = monaco.editor.createModel(
-                      val,
+                      trim(val),
                       "typescript",
                       monaco.Uri.parse("file:///active.tsx")
                     );
@@ -175,7 +175,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     types._raw = declareScope(p, meta, monaco);
 
                     const model = monaco.editor.createModel(
-                      val,
+                      trim(val),
                       "typescript",
                       monaco.Uri.parse("file:///active.tsx")
                     );
