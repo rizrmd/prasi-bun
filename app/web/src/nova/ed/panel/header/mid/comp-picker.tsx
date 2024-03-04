@@ -9,7 +9,6 @@ import { loadComponent } from "../../../logic/comp/load";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
-import { useEffect } from "react";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

@@ -31,9 +31,19 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
-  const vars: Record<string, { mode: "local"; val: string }> = {};
+  const vars: Record<string, { mode: "local" | "prop"; val: string }> = {};
   for (const m of cur_path) {
     if (m !== meta) {
+      if (m.item.component?.id === active.comp_id) {
+        for (const [name, prop] of Object.entries(m.item.component.props)) {
+          if (prop.meta?.type === "content-element") {
+            vars[name] = { mode: "prop", val: "ReactElement" };
+          } else {
+            vars[name] = { mode: "prop", val: prop.value };
+          }
+        }
+      }
+
       const script = m.item.script;
       if (script) {
         if (script.local) {
@@ -50,6 +60,10 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 const \$\$_${k} = ${v.val};
 const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });
 `);
+    } else if (v.mode === "prop") {
+      raw_types.push(`\
+const \$\$_${k} = ${v.val};
+const ${k} = null as unknown as typeof \$\$_${k};`);
     }
   }
 
