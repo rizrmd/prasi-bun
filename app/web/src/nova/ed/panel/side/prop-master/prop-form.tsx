@@ -60,51 +60,100 @@ export const EdPropPopoverForm: FC<{
         closing && "hidden"
       )}
     >
-      <div className="px-2 py-1 flex space-x-1">
-        {[
-          { label: "TXT", type: "text" },
-          { label: "OPT", type: "option" },
-          { label: "JSX", type: "content-element" },
-        ].map((e) => {
-          return (
-            <div
-              key={e.type}
-              className={cx(
-                type === e.type
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-100",
-                " px-2 cursor-pointer"
-              )}
-              onClick={() => {
-                if (e.type === "content-element") {
-                  mprop.doc?.transact(() => {
+      <div className="flex justify-between px-2 py-1">
+        <div className="flex space-x-1">
+          {[
+            { label: "TXT", type: "text" },
+            { label: "OPT", type: "option" },
+            { label: "JSX", type: "content-element" },
+          ].map((e) => {
+            return (
+              <div
+                key={e.type}
+                className={cx(
+                  type === e.type
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-blue-100",
+                  " px-2 cursor-pointer"
+                )}
+                onClick={() => {
+                  if (e.type === "content-element") {
+                    mprop.doc?.transact(() => {
+                      mmeta.set("type", e.type as any);
+                      if (!mprop.get("content")) {
+                        const json = {
+                          id: createId(),
+                          name: name,
+                          type: "item",
+                          dim: { w: "full", h: "full" },
+                          childs: [],
+                          adv: {
+                            css: "",
+                          },
+                        } as IItem;
+                        const map = new Y.Map() as MItem;
+                        syncronize(map as any, fillID(json));
+                        mprop.set("content", map);
+                      }
+                    });
+                  } else {
                     mmeta.set("type", e.type as any);
-                    if (!mprop.get("content")) {
-                      const json = {
-                        id: createId(),
-                        name: name,
-                        type: "item",
-                        dim: { w: "full", h: "full" },
-                        childs: [],
-                        adv: {
-                          css: "",
-                        },
-                      } as IItem;
-                      const map = new Y.Map() as MItem;
-                      syncronize(map as any, fillID(json));
-                      mprop.set("content", map);
-                    }
-                  });
-                } else {
-                  mmeta.set("type", e.type as any);
-                }
-                propPopover.render();
-              }}
+                  }
+                  propPopover.render();
+                }}
+              >
+                {e.label}
+              </div>
+            );
+          })}
+        </div>
+
+        {type === "text" && (
+          <div
+            className="flex cursor-pointer items-center space-x-1 select-none"
+            onClick={() => {
+              mprop.doc?.transact(() => {
+                (mprop.parent as any)?.forEach((p: any, k: string) => {
+                  console.log(k, p);
+
+                  if (k === name) {
+                    p.set("is_name", !p.get("is_name"));
+                  } else {
+                    p.set("is_name", false);
+                  }
+                });
+              });
+            }}
+          >
+            <span
+              className={cx(
+                css`
+                  width: 17px;
+                `,
+                mprop.get("is_name") && "text-green-500"
+              )}
             >
-              {e.label}
-            </div>
-          );
-        })}
+              {!mprop.get("is_name") ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 7C5.23858 7 3 9.23858 3 12C3 14.7614 5.23858 17 8 17H16C18.7614 17 21 14.7614 21 12C21 9.23858 18.7614 7 16 7H8ZM8 5H16C19.866 5 23 8.13401 23 12C23 15.866 19.866 19 16 19H8C4.13401 19 1 15.866 1 12C1 8.13401 4.13401 5 8 5ZM8 15C6.34315 15 5 13.6569 5 12C5 10.3431 6.34315 9 8 9C9.65685 9 11 10.3431 11 12C11 13.6569 9.65685 15 8 15Z"></path>
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5H16C19.866 5 23 8.13401 23 12C23 15.866 19.866 19 16 19H8C4.13401 19 1 15.866 1 12C1 8.13401 4.13401 5 8 5ZM16 15C17.6569 15 19 13.6569 19 12C19 10.3431 17.6569 9 16 9C14.3431 9 13 10.3431 13 12C13 13.6569 14.3431 15 16 15Z"></path>
+                </svg>
+              )}
+            </span>
+            <span className="text-xs">Default Name</span>
+          </div>
+        )}
       </div>
       <div className="border-t border-slate-300 px-2 pt-2 pb-1 flex flex-col items-stretch">
         <div className="uppercase text-xs text-slate-500">Name</div>
