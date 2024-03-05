@@ -12,6 +12,8 @@ import { parseJs } from "../editor/parser/parse-js";
 import { snapshot } from "../entity/snapshot";
 import { validate } from "uuid";
 import { gzipAsync } from "utils/diff/diff";
+import { user } from "../entity/user";
+import { loadComponent } from "../editor/load-component";
 const decoder = new TextDecoder();
 
 const timeout = {
@@ -40,6 +42,8 @@ export const code_edit: SAction["code"]["edit"] = async function (
     } else if (comp_id) {
       save_to = "comp";
       const ref = docs.comp[comp_id];
+
+      await loadComponent(comp_id, this);
       if (ref) {
         root = ref.doc.getMap("map").get("root");
         doc = ref.doc as Doc;
