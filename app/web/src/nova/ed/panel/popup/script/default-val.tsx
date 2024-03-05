@@ -11,7 +11,10 @@ export const edMonacoDefaultVal = (p: PG, adv: FNAdv, mitem: MItem) => {
 
     if (val === "") {
       if (mode === "js") {
-        val = `<div {...props}>{children}</div>`;
+        val = `\
+<div {...props} className={cx(props.className, "")}>
+  {children}
+</div>`;
       } else if (mode === "css") {
         val = `\
 & {
