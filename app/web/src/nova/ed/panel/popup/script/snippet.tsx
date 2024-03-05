@@ -60,12 +60,12 @@ effect={async (local) => {
           p.script.do_edit(
             `\
 <div {...props}>
-{(local.list || []).map((item, idx) => (
-<Fragment key={idx}>
-  <PassProp item={item} children={children} />
-</Fragment>
+{[].map((item, idx) => (
+  <Fragment key={idx}>
+    <PassProp item={item} children={children} />
+  </Fragment>
 ))}
-</div>   
+</div>  
 `,
             true
           );
@@ -109,6 +109,21 @@ true ? (
         }}
       >
         &lt;If Else /&gt;
+      </Button>
+      <Button
+        className={cx(btn_style)}
+        onClick={() => {
+          p.script.do_edit(
+            `\
+<div {...props} className={cx(props.className, "relative")}>
+  <div className="absolute inset-0">{children}</div>
+</div> 
+`,
+            true
+          );
+        }}
+      >
+        &lt;Scrollable /&gt;
       </Button>
     </div>
   );
