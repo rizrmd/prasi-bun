@@ -13,9 +13,10 @@ import { EDGlobal } from "../../../logic/ed-global";
 
 export const EdPropInstanceText: FC<{
   name: string;
+  label?: string;
   mprop: FMCompDef;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ name, mprop, labelClick }) => {
+}> = ({ label, name, mprop, labelClick }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const val = mprop.get("value");
 
@@ -32,7 +33,7 @@ export const EdPropInstanceText: FC<{
 
   return (
     <div className="flex items-center min-h-[28px]">
-      <EdPropLabel name={name} labelClick={labelClick} />
+      <EdPropLabel name={label || name} labelClick={labelClick} />
       <AutoHeightTextarea
         className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}

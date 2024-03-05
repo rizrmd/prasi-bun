@@ -29,9 +29,12 @@ export const EdPropCompTreeItem: FC<{
   if (node.data?.prop.meta?.type === "option") type = "OPT";
   else if (node.data?.prop.meta?.type === "content-element") type = "JSX";
 
+  const plabel = node.data?.prop.label;
   const label = (
     <div className="flex items-center justify-between flex-1">
-      <div>{node.text}</div>
+      <div>
+        {node.text} {plabel && <span className="border px-1 ml-2 text-xs">{plabel}</span>}
+      </div>
       <div className="text-[9px] px-1 border border-slate-400 ml-1 text-slate-500">
         {type}
       </div>

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { useGlobal, useLocal } from "web-utils";
 import { TypedMap } from "yjs-types";
@@ -23,11 +23,17 @@ export const EdPropPopoverForm: FC<{
   const mmeta = mprop.get("meta");
   const local = useLocal({
     name,
+    label: "",
     rename_timeout: null as any,
   });
 
   if (!mmeta) return null;
   const type = mmeta.get("type");
+
+  useEffect(() => {
+    local.label = mprop.get("label") || local.name.replace(/\_/gi, " ");
+    local.render();
+  }, []);
 
   const rename = () => {
     const keys = Object.keys(mprop.parent?.toJSON());
@@ -113,11 +119,41 @@ export const EdPropPopoverForm: FC<{
               .toLowerCase()
               .replace(/\W/gi, "_");
 
+            if (!local.label) {
+              local.label = local.name.replace(/\_/gi, " ");
+            }
+
             local.render();
           }}
           onBlur={() => {
             if (local.name !== name) {
               rename();
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.currentTarget.blur();
+            }
+          }}
+        />
+      </div>
+
+      <div className="border-t border-slate-300 px-2 pt-2 pb-1 flex flex-col items-stretch">
+        <div className="uppercase text-xs text-slate-500">Label</div>
+        <input
+          spellCheck={false}
+          type="text"
+          className="p-1 outline-none border focus:border-blue-500"
+          value={local.label}
+          onChange={(e) => {
+            local.label = e.currentTarget.value;
+            local.render();
+          }}
+          onBlur={() => {
+            mprop.set("label", local.label);
+            if (!local.label) {
+              local.label = local.name.replace(/\_/gi, " ");
+              local.render();
             }
           }}
           onKeyDown={(e) => {
@@ -139,7 +175,7 @@ export const EdPropPopoverForm: FC<{
               EDIT CODE
             </div>
           </div>
-          
+
           <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center">
             <div className="uppercase text-xs label self-stretch flex items-center">
               Visible

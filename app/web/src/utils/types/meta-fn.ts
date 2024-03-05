@@ -29,6 +29,7 @@ export type FNCompDef = {
   idx: number;
   typings: string;
   type: string;
+  label?: string;
   value: any;
   valueBuilt: any;
   gen?: string;

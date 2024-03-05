@@ -238,6 +238,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                         <EdPropInstanceCode
                           mprop={mprop}
                           name={name}
+                          label={cprop.label}
                           labelClick={labelClick}
                           onEditCode={createEditScript(p, "value", mprop, name)}
                         />
@@ -247,6 +248,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                         {type === "text" && (
                           <EdPropInstanceText
                             mprop={mprop}
+                            label={cprop.label}
                             name={name}
                             labelClick={labelClick}
                           />

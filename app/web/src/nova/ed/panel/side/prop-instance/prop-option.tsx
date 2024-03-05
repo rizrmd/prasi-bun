@@ -100,7 +100,7 @@ else metaOptions = resOpt;
 
   return (
     <div className="flex items-stretch min-h-[28px]">
-      <EdPropLabel name={name} labelClick={labelClick} />
+      <EdPropLabel name={cprop.label || name} labelClick={labelClick} />
       <div className="flex flex-1 justify-end">
         {mode === "dropdown" && (
           <>

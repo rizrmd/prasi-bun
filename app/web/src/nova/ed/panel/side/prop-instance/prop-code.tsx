@@ -5,15 +5,16 @@ import { useGlobal } from "web-utils";
 import { EDGlobal, active } from "../../../logic/ed-global";
 
 export const EdPropInstanceCode: FC<{
+  label?: string;
   name: string;
   mprop: FMCompDef;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
   onEditCode: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ name, labelClick, onEditCode }) => {
+}> = ({ label, name, labelClick, onEditCode }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   return (
     <div className="flex items-center min-h-[28px]">
-      <EdPropLabel name={name} labelClick={labelClick} />
+      <EdPropLabel name={label || name} labelClick={labelClick} />
       <div className="flex-1 flex justify-end pr-1">
         <div
           className="m-1 px-1 bg-white cursor-pointer hover:bg-blue-500 hover:text-white hover:border-blue-500 font-mono border border-slate-300 text-[11px] select-none"
