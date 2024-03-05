@@ -1,12 +1,11 @@
-import Downshift from "downshift";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../../../base/load/db/db-proxy";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal } from "../../../logic/ed-global";
-import { EdPropLabel } from "./prop-label";
 import { treeRebuild } from "../../../logic/tree/build";
+import { EdPropLabel } from "./prop-label";
 
 export const EdPropInstanceOptions: FC<{
   name: string;
@@ -87,7 +86,7 @@ else metaOptions = resOpt;
     p.render();
   };
 
-  let mode = prop.meta?.option_mode;
+  let mode = cprop.meta?.option_mode;
   if (!mode) mode = "button";
 
   if (metaOptions && metaOptions.length > 0) {
@@ -101,8 +100,27 @@ else metaOptions = resOpt;
   return (
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={cprop.label || name} labelClick={labelClick} />
-      <div className="flex flex-1 justify-end">
+      <div className="flex flex-1 justify-end items-stretch">
         {mode === "dropdown" && (
+          <select
+            value={evalue}
+            className="flex-1 border-l outline-none"
+            onChange={(ev) => {
+              onChange(`"${ev.currentTarget.value}"`);
+            }}
+          >
+            {Array.isArray(metaOptions) &&
+              metaOptions.map((item, idx) => {
+                return (
+                  <option key={idx} value={item.value}>
+                    {item.label}
+                  </option>
+                );
+              })}
+          </select>
+        )}
+
+        {/* {mode === "dropdown" && (
           <>
             <Downshift
               inputValue={local.val}
@@ -200,7 +218,7 @@ else metaOptions = resOpt;
               )}
             </Downshift>
           </>
-        )}
+        )} */}
         {mode === "button" && (
           <div className="flex-1 pt-1 px-1 flex flex-wrap justify-end space-x-1">
             {Array.isArray(metaOptions) &&

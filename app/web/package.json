@@ -26,7 +26,6 @@
     "date-fns": "^2.30.0",
     "safe-flat": "^2.1.0",
     "dbgen": "workspace:*",
-    "downshift": "^8.2.3",
     "esbuild-wasm": "^0.19.10",
     "hash-wasm": "^4.11.0",
     "idb-keyval": "^6.2.1",
