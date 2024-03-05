@@ -1,10 +1,9 @@
 import { FC, useEffect } from "react";
-import { CPArgs } from "./types";
-import { CPCoded } from "./CPCoded";
 import { useGlobal, useLocal } from "web-utils";
 import { Loading } from "../../../../../utils/ui/loading";
-import Downshift from "downshift";
 import { EditorGlobal } from "../../../logic/global";
+import { CPCoded } from "./CPCoded";
+import { CPArgs } from "./types";
 
 export const CPOption: FC<CPArgs> = ({ prop, onChange, editCode, reset }) => {
   const local = useLocal({
@@ -100,7 +99,7 @@ else metaOptions = resOpt;
         <Loading backdrop={false}></Loading>
       ) : (
         <>
-          {mode === "dropdown" && (
+          {/* {mode === "dropdown" && (
             <>
               <Downshift
                 inputValue={local.val}
@@ -193,7 +192,7 @@ else metaOptions = resOpt;
                 )}
               </Downshift>
             </>
-          )}
+          )} */}
           {mode === "button" && (
             <div className="flex-1 pt-1 px-2 flex flex-wrap justify-end space-x-1">
               {Array.isArray(metaOptions) &&
