@@ -14,7 +14,6 @@ export const edActionClone = (p: PG, item: IContent) => {
         if (e.get("id") === mitem.get("id")) {
           const json = e.toJSON() as IItem;
           fillID(json);
-          if (json.component) json.component.ref_ids = {};
           const map = new Y.Map();
           syncronize(map, json);
           mitem.parent.insert(idx, [map]);

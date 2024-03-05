@@ -28,6 +28,7 @@ export const EdTreeSearch = () => {
           local.render();
         }
       }}
+      className="flex-1"
       onMouseLeave={() => {
         local.hover = false;
         local.render();

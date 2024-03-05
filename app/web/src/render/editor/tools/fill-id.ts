@@ -23,7 +23,7 @@ export const fillID = (
     object.component.props
   ) {
     for (const p of Object.values(object.component.props)) {
-      if (p.meta?.type === "content-element" && p.content) {
+      if (p.content) {
         fillID(p.content, modify, _depth);
       }
     }
