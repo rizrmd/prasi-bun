@@ -141,6 +141,7 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
 }) => {
   if (is_jsx_prop) {
     let comp_label = "";
+    const comp_id = meta?.item.component?.id;
     for (const prop of Object.values(meta?.item.component?.props || {})) {
       if (prop.is_name) {
         try {
@@ -164,7 +165,9 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
           {name}
           {comp_label && `: ${comp_label}`}
         </div>
-        {meta && meta.mitem && <GenerateJSX meta={meta} />}
+        {meta && meta.mitem && active.comp_id !== comp_id && (
+          <GenerateJSX meta={meta} />
+        )}
         {meta && !meta.mitem && (
           <Tooltip
             delay={0}
