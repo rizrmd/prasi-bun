@@ -140,6 +140,18 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
   meta,
 }) => {
   if (is_jsx_prop) {
+    let comp_label = "";
+    for (const prop of Object.values(meta?.item.component?.props || {})) {
+      if (prop.is_name) {
+        try {
+          eval(`comp_label = ${prop.valueBuilt}`);
+        } catch (e) {}
+        if (typeof comp_label !== "string" && typeof comp_label !== "number") {
+          comp_label = "asdas";
+        }
+      }
+    }
+
     return (
       <div className={cx("flex items-center space-x-1 pr-1")}>
         <Tooltip
@@ -148,7 +160,10 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
         >
           P
         </Tooltip>
-        <div className="flex-1">{name}</div>
+        <div className="flex-1">
+          {name}
+          {comp_label && `: ${comp_label}`}
+        </div>
         {meta && meta.mitem && <GenerateJSX meta={meta} />}
         {meta && !meta.mitem && (
           <Tooltip

@@ -34,6 +34,7 @@ export type FNCompDef = {
   valueBuilt: any;
   gen?: string;
   genBuilt?: string;
+  is_name?: boolean;
   jsxCalledBy?: string[];
   content?: IItem;
   visible?: string;
@@ -127,12 +128,12 @@ export type FNFont = {
   height?: number | "auto";
   align?: "center" | "left" | "right";
   whitespace?:
-    | "whitespace-normal"
-    | "whitespace-nowrap"
-    | "whitespace-pre"
-    | "whitespace-pre-line"
-    | "whitespace-pre-wrap"
-    | "whitespace-break-spaces";
+  | "whitespace-normal"
+  | "whitespace-nowrap"
+  | "whitespace-pre"
+  | "whitespace-pre-line"
+  | "whitespace-pre-wrap"
+  | "whitespace-break-spaces";
   wordBreak?: "break-normal" | "break-words" | "break-all" | "break-keep";
 };
 export type FMFont = TypedMap<FNFont>;
