@@ -77,7 +77,6 @@ let db = new Proxy({}, {
 });
 let api = {};
 if (typeof global.server_hook === "function") {
-  createServerRuntime("${id_site}");
   const log = global.console.log;
   console.log = function (...arg) {
     const out = "${code.path(id_site, "site", "src", "server.log")}";
