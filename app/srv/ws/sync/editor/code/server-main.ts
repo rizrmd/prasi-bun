@@ -8,7 +8,7 @@ import { WSData } from "../../../../../../pkgs/core/server/create";
 import { codeBuild } from "./build-code";
 import { prodIndex } from "../../../../util/prod-index";
 
-import "./server-create";
+import "./server-runtime";
 
 const serverMain = () => ({
   handler: {} as Record<string, PrasiServer>,
@@ -39,6 +39,7 @@ const serverMain = () => ({
         );
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
+
         if (svr && svr.server) {
           if (typeof svr.server === "function") {
             this.handler[site_id] = await svr.server(site_id);

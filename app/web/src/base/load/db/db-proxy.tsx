@@ -7,32 +7,6 @@ export const dbProxy = (dburl: string) => {
     {},
     {
       get(_, table: string) {
-        if (table === "_tables") {
-          return () => {
-            return fetchSendDb(
-              {
-                name,
-                action: "definition",
-                table: "*",
-              },
-              dburl
-            );
-          };
-        }
-
-        if (table === "_definition") {
-          return (table: string) => {
-            return fetchSendDb(
-              {
-                name,
-                action: "definition",
-                table,
-              },
-              dburl
-            );
-          };
-        }
-
         if (table.startsWith("$")) {
           return (...params: any[]) => {
             return fetchSendDb(
