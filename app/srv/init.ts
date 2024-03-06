@@ -1,6 +1,8 @@
 import { validate } from "uuid";
 import { glb } from "./global";
 import { server } from "./ws/sync/editor/code/server-main";
+import { g } from "utils/global";
+import { waitUntil } from "web-utils";
 glb.npm = { page: {}, site: {} };
 
 glb.ws_hook = {
@@ -31,12 +33,19 @@ glb.server_hook = async (arg) => {
     const site_id = arr[2];
 
     if (arr.length >= 3 && validate(site_id)) {
-      const res = await server.http(site_id, arg);
+      try {
+        if (!g.server_runtime[site_id]) {
+          await g.createServerRuntime(site_id)
+        }
 
-      if (res instanceof Response) {
-        return res;
-      } else {
-        return new Response("403: Please see server.log", { status: 403 });
+        const res = await server.http(site_id, arg);
+        if (res instanceof Response) {
+          return res;
+        } else {
+          return new Response("403: Please see server.log", { status: 403 });
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
   }

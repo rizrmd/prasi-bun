@@ -21,6 +21,8 @@ if (!g.createServerRuntime) {
             api: null as any,
           };
         } catch (e) { }
+      } else {
+        g.server_runtime[site_id] = { db: null as any, api: null }
       }
     }
   };
