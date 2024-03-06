@@ -35,9 +35,7 @@ export const g = global as unknown as {
       db: ReturnType<typeof dbProxy>;
     }
   >;
-  createServer: (
-    arg: PrasiServer & { api: any; db: any }
-  ) => (site_id: string) => Promise<PrasiServer & { api: any; db: any }>;
+  createServerRuntime: (site_id: string) => Promise<void>;
   ws_hook?: WebSocketHandler<WSData>;
   _db: PrismaClient;
   dburl: string;

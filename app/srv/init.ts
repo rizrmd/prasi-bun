@@ -32,6 +32,7 @@ glb.server_hook = async (arg) => {
 
     if (arr.length >= 3 && validate(site_id)) {
       const res = await server.http(site_id, arg);
+
       if (res instanceof Response) {
         return res;
       } else {

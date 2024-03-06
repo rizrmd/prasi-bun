@@ -4,6 +4,7 @@ import axios from "axios";
   return `BigInt::` + this.toString();
 };
 let w = (typeof window !== "undefined" ? window : null) as any;
+let g = global as any;
 
 export const fetchViaProxy = async (
   target_url: string,
@@ -51,12 +52,11 @@ export const fetchViaProxy = async (
     const cur_url = new URL(location.href);
     let final_url = "";
 
-    if (to_url.host === cur_url.host) {
+    if (to_url.host === cur_url.host || typeof g.server_hook === 'function') {
       final_url = to_url.toString();
     } else {
-      final_url = `${cur_url.protocol}//${
-        cur_url.host
-      }/_proxy/${encodeURIComponent(to_url.toString())}`;
+      final_url = `${cur_url.protocol}//${cur_url.host
+        }/_proxy/${encodeURIComponent(to_url.toString())}`;
     }
 
     if (final_url) {
@@ -74,10 +74,10 @@ export const fetchViaProxy = async (
           final_url,
           data
             ? {
-                method: "POST",
-                body,
-                headers,
-              }
+              method: "POST",
+              body,
+              headers,
+            }
             : undefined
         );
         const raw = await res.text();
@@ -89,12 +89,27 @@ export const fetchViaProxy = async (
       }
     }
   }
-  return null;
+  const res = await fetch(
+    to_url,
+    data
+      ? {
+        method: "POST",
+        body,
+        headers,
+      }
+      : undefined
+  );
+  const raw = await res.text();
+  try {
+    return JSON.parse(raw, replacer);
+  } catch (e) {
+    return raw;
+  }
 };
 
 const replacer = (key: string, value: string) => {
   if (typeof value === "string" && value.startsWith("BigInt::")) {
     return BigInt(value.substring(8));
   }
-  return value; 
+  return value;
 };

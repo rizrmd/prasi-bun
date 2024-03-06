@@ -69,19 +69,15 @@ typeof global.server_hook === "function"
 
 let db = new Proxy({}, {
   get(_, key) {
-    if (key === '___site_id') {
-      return (site_id) => { _.site_id = site_id } 
-    }
-    if (_.site_id) {
-      const runtime = global.server_runtime[_.site_id];
-      if (runtime && runtime.db) {
-        return runtime.db[key];
-      }
+    const runtime = global.server_runtime["${id_site}"];
+    if (runtime && runtime.db) {
+      return runtime.db[key];
     }
   }
 });
 let api = {};
 if (typeof global.server_hook === "function") {
+  createServerRuntime("${id_site}");
   const log = global.console.log;
   console.log = function (...arg) {
     const out = "${code.path(id_site, "site", "src", "server.log")}";

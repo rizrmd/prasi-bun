@@ -29,8 +29,10 @@ export const _ = {
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
           const file = Bun.file(build_path);
+
           if (!(await file.exists()))
             return new Response("Code file not found", { status: 403 });
+
           return new Response(file);
         }
         case "route": {
