@@ -19,7 +19,7 @@ export const EdScriptSnippet: FC<{}> = ({}) => {
         onClick={() => {
           p.script.do_edit(
             `\
-<div {...props}>
+<div {...props} className={cx(props.className, "")}>
 <Local
 name="local"
 value={
@@ -59,7 +59,7 @@ effect={async (local) => {
         onClick={() => {
           p.script.do_edit(
             `\
-<div {...props}>
+<div {...props} className={cx(props.className, "")}>
 {[].map((item, idx) => (
   <Fragment key={idx}>
     <PassProp item={item} children={children} />
@@ -78,7 +78,7 @@ effect={async (local) => {
         onClick={() => {
           p.script.do_edit(
             `\
-<>{true && <div {...props}>{children}</div>}</>   
+<>{true && <div {...props} className={cx(props.className, "")}>{children}</div>}</>   
 `,
             true
           );
@@ -96,10 +96,10 @@ effect={async (local) => {
 /**if condition */
 true ? (
 /** then  */
-<div {...props}>{children}</div>
+<div {...props} className={cx(props.className, "")}>{children}</div>
 ) : (
 /** else  */
-<div {...props}>ELSE CONDITION</div>
+<div {...props} className={cx(props.className, "")}>ELSE CONDITION</div>
 )
 }
 </>
@@ -107,7 +107,7 @@ true ? (
             true
           );
         }}
-      >
+      > 
         &lt;If Else /&gt;
       </Button>
       <Button

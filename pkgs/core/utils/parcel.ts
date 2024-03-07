@@ -33,7 +33,7 @@ export const parcelBuild = async () => {
       let decoded = false;
       (async () => {
         if (parcel.stdout) {
-          for await (const chunk of parcel.stdout) {
+          for await (const chunk of parcel.stdout as any) {
             if (!decoded && decoder.decode(chunk).includes("✨")) {
               resolve();
               decoded = true;
@@ -45,7 +45,7 @@ export const parcelBuild = async () => {
 
       (async () => {
         if (parcel.stderr) {
-          for await (const chunk of parcel.stderr) {
+          for await (const chunk of parcel.stderr as any) {
             if (output) process.stderr.write(chunk);
           }
         }

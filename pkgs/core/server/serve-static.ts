@@ -57,13 +57,17 @@ export const serveStatic = {
       watch(dir.path(`app/static`), async (_, filename) => {
         if (filename) {
           const path = join("static", filename);
-          const file = Bun.file(dir.path(`app/${path}`));
-          if (await file.exists()) {
-            cache.static[`/${filename}`] = {
-              type: mime.getType(path) || "application/octet-stream",
-              compression: g.mode === "prod" ? "br" : "",
-              content: await file.arrayBuffer(),
-            };
+          try {
+            const file = Bun.file(dir.path(`app/${path}`));
+            if (await file.exists()) {
+              cache.static[`/${filename}`] = {
+                type: mime.getType(path) || "application/octet-stream",
+                compression: g.mode === "prod" ? "br" : "",
+                content: await file.arrayBuffer(),
+              };
+            }
+          } catch (e: any) {
+            cache.static = {}
           }
         }
       });
@@ -77,7 +81,7 @@ export const serveStatic = {
     if (file) {
       return new Response(file.content, {
         headers: {
-					...CORS_HEADERS,
+          ...CORS_HEADERS,
           ...{ "content-type": file.type },
           ...(file.compression ? { "content-encoding": file.compression } : {}),
         },

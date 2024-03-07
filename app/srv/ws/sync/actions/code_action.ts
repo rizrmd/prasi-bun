@@ -8,6 +8,7 @@ import { SyncConnection } from "../type";
 import { dirAsync } from "fs-jetpack";
 import path from "path";
 import { gunzipAsync } from "../entity/zlib";
+import { prismaExtendType } from "../../../../web/src/utils/script/prisma-extend";
 
 const decoder = new TextDecoder();
 const code_startup = {
@@ -80,7 +81,7 @@ export const code_action: SAction["code"]["action"] = async function (
         ) {
           return { type: "check-typings", hash: true };
         }
-      } catch (e) {}
+      } catch (e) { }
       return { type: "check-typings", hash: false };
     }
     case "push-typings": {
@@ -104,14 +105,13 @@ export const code_action: SAction["code"]["action"] = async function (
       );
       await Bun.write(
         Bun.file(path.join(dir, "global.d.ts")),
-        `\
+        `//@ts-ignore 
 import type * as SRVAPI from "gen/srv/api/srv";
-
 import { Server, WebSocketHandler } from "bun";
-import prisma from "./prisma";
+import prisma from "./prisma"; 
 
 declare global {
-  const db: prisma.PrismaClient;
+  const db: prisma.PrismaClient & ${prismaExtendType};
 
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
