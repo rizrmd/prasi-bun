@@ -4,7 +4,7 @@ import axios from "axios";
   return `BigInt::` + this.toString();
 };
 let w = (typeof window !== "undefined" ? window : null) as any;
-let g = global as any;
+let g = (typeof global !== "undefined" ? global : undefined) as any;
 
 export const fetchViaProxy = async (
   target_url: string,
