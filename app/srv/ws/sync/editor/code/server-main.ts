@@ -40,13 +40,8 @@ const serverMain = () => ({
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
 
-        if (svr && svr.server) {
-          if (typeof svr.server === "function") {
-            this.handler[site_id] = await svr.server(site_id);
-          } else {
-            this.handler[site_id] = svr.server;
-          }
-
+        if (svr && typeof svr.server === 'object') {
+          this.handler[site_id] = svr.server;
           this.handler[site_id].site_id = site_id;
         }
 

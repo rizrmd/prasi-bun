@@ -52,12 +52,13 @@ export const fetchViaProxy = async (
     const cur_url = new URL(location.href);
     let final_url = "";
 
-    if (to_url.host === cur_url.host || typeof g.server_hook === 'function') {
+    if (to_url.host === cur_url.host ||
+      (!!g && typeof g.server_hook === 'function')) {
       final_url = to_url.toString();
     } else {
       final_url = `${cur_url.protocol}//${cur_url.host
         }/_proxy/${encodeURIComponent(to_url.toString())}`;
-    }
+    } 
 
     if (final_url) {
       if (uploadProgress) {
