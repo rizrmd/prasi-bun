@@ -5,6 +5,7 @@ import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
 import { g } from "utils/global";
 import { baseTypings } from "../../web/src/utils/script/types/base";
 import { dir } from "dir";
+import { prismaExtendType } from "../../web/src/utils/script/prisma-extend";
 
 export const _ = {
   url: "/code/:site_id/:action",
@@ -52,24 +53,24 @@ import {
 } from "react";
 import * as prisma from "./prisma";
 ${iftext(
-  apiPath,
-  `\
+            apiPath,
+            `\
 import "./api-types";
 import type * as SRVAPI from "${apiPath}";
   `
-)}
+          )}
 
 declare global {
-  const db: prisma.PrismaClient;
+  const db: prisma.PrismaClient & ${prismaExtendType};
   ${baseTypings}
   ${iftext(
-    apiPath,
-    `\
+            apiPath,
+            `\
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
   const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] };
   `
-  )}
+          )}
 }
 
 `

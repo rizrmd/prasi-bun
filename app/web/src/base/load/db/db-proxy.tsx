@@ -7,6 +7,44 @@ export const dbProxy = (dburl: string) => {
     {},
     {
       get(_, table: string) {
+        if (table === "_schema") {
+          return {
+            tables: async () => {
+              return fetchSendDb(
+                {
+                  name,
+                  action: "schema_tables",
+                  table: "",
+                  params: [],
+                },
+                dburl
+              );
+            },
+            columns: async (table: string) => {
+              return fetchSendDb(
+                {
+                  name,
+                  action: "schema_columns",
+                  table,
+                  params: [],
+                },
+                dburl
+              );
+            },
+            rels: async (table: string) => {
+              return fetchSendDb(
+                {
+                  name,
+                  action: "schema_rels",
+                  table,
+                  params: [],
+                },
+                dburl
+              );
+            },
+          };
+        }
+
         if (table.startsWith("$")) {
           return (...params: any[]) => {
             return fetchSendDb(
