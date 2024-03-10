@@ -28,7 +28,6 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
-  console.log(cur_path, active.comp_id);
   const vars: Record<string, { mode: "local" | "prop"; val: string }> = {};
   for (const m of cur_path) {
     if (m.item.component?.id === active.comp_id) {
