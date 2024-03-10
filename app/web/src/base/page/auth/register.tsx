@@ -47,6 +47,8 @@ export default page({
               form.render();
               alert(s.reason);
             } else {
+              await _api.login(form.username, form.password);
+              alert("Registration success!");
               navigate("/ed");
             }
           }}

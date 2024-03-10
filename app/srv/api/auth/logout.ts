@@ -6,5 +6,7 @@ export const _ = {
   async api() {
     const { res } = apiContext(this);
     res.setHeader("set-cookie", `${session.cookieKey}=X`);
+
+    return res;
   },
 };

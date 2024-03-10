@@ -10,7 +10,7 @@ import {
   iconNewTab,
   iconScrollOff,
   iconScrollOn,
-  iconUpload
+  iconUpload,
 } from "./icons";
 
 export const code = {
@@ -290,46 +290,21 @@ const CodeBody = () => {
         </div>
       )}
 
-      {code_mode === "vsc" ? (
-        <div className="flex flex-1 relative">
-          {!p.ui.popup.code.open ? (
-            <Loading backdrop={false} />
-          ) : (
-            <>
-              <iframe
-                className="flex flex-1 absolute inset-0 w-full h-full z-10"
-                src={`${vscode_url}folder=/site/${p.site.id}/site/src`}
-              ></iframe>
-              <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
-                Loading VSCode...
-              </div>
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col flex-1 relative items-center justify-center space-y-2">
-          <div className="text-xs">VSCode is turned off</div>
-          <div
-            className="flex items-center p-2 cursor-pointer text-xs font-mono space-x-1 bg-green-700 text-white hover:opacity-40 transition-all"
-            onClick={async () => {
-              if (
-                confirm(
-                  "Are you sure want to turn on VSCode?\nThis will disable old npm module (you can enable it again later)."
-                )
-              ) {
-                localStorage.vsc_opened = "yes";
-                await _db.site.update({
-                  where: { id: p.site.id },
-                  data: { code_mode: "vsc" },
-                });
-                location.reload();
-              }
-            }}
-          >
-            <div>Turn on VSCode</div>
-          </div>
-        </div>
-      )}
+      <div className="flex flex-1 relative">
+        {!p.ui.popup.code.open ? (
+          <Loading backdrop={false} />
+        ) : (
+          <>
+            <iframe
+              className="flex flex-1 absolute inset-0 w-full h-full z-10"
+              src={`${vscode_url}folder=/site/${p.site.id}/site/src`}
+            ></iframe>
+            <div className="flex flex-1 absolute inset-0 z-0 items-center justify-center">
+              Loading VSCode...
+            </div>
+          </>
+        )}
+      </div>
 
       {(local.namePicker || local.codeAssign) && (
         <div

@@ -1,14 +1,12 @@
 import { useEffect } from "react";
 import { page, useGlobal } from "web-utils";
 import { EDGlobal } from "../../nova/ed/logic/ed-global";
-import { edInitSync } from "../../nova/ed/logic/ed-sync";
-import { Loading } from "../../utils/ui/loading";
 import { isLocalhost } from "../../utils/ui/is-localhost";
+import { Loading } from "../../utils/ui/loading";
 
 export default page({
   url: "**",
   component: ({}) => {
-
     const p = useGlobal(EDGlobal, "EDITOR");
     useEffect(() => {
       if (localStorage.getItem("prasi-session")) {
@@ -16,7 +14,7 @@ export default page({
           location.pathname === "/ed" ||
           location.pathname.startsWith("/ed/")
         ) {
-          edInitSync(p);
+          location.href = "/ed/_/_"; 
         } else if (location.pathname.startsWith("/editor")) {
           const arr = location.pathname.split("/");
           if (arr.length <= 2) {

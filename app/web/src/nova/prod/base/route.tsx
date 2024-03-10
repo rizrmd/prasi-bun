@@ -51,7 +51,7 @@ export const initBaseRoute = async (isPreviewProd: boolean) => {
       }
 
       base.site = res.site;
-      base.site.code = { mode: "new" };
+      base.site.code = { mode: "vsc" };
       await injectSiteScript();
 
       base.site.api = apiProxy(base.site.api_url);

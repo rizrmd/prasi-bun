@@ -34,7 +34,7 @@ export const base = {
     domain: string;
     api_url: string;
     code: {
-      mode: "new";
+      mode: "new" | "vsc";
     };
     api: any;
     db: any;

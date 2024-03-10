@@ -39,7 +39,20 @@ export const EdLeft = () => {
             "h-[35px] border-b flex p-1 items-stretch text-[12px] justify-between"
           )}
         >
-          <EdSitePicker />
+          <div className="flex items-stretch">
+            <EdSitePicker />
+            <div
+              className="flex items-center ml-2 text-[12px] cursor-pointer"
+              onClick={() => {
+                if (confirm("Logout ?")) {
+                  location.href = "/logout";
+                }
+              }}
+            >
+              <div>Logout</div>
+            </div>
+          </div>
+
           <div className="flex items-stretch space-x-1 pl-2">
             <EdSiteJS />
             <EdApi />
