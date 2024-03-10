@@ -3,18 +3,15 @@ import { useGlobal, useLocal } from "web-utils";
 import { isLocalhost } from "../../../../../utils/ui/is-localhost";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
-import { Popover } from "../../../../../utils/ui/popover";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import {
-  iconChevronDown,
   iconDownload,
   iconNewTab,
   iconScrollOff,
   iconScrollOn,
-  iconUpload,
+  iconUpload
 } from "./icons";
-import { CodeNameItem, CodeNameList } from "./name-list";
 
 export const code = {
   mode: "" as "" | "old" | "new",
@@ -33,16 +30,12 @@ export const EdPopCode = () => {
 
   useEffect(() => {
     if (code.mode === "" && p.site.id) {
-      _db.code.findFirst({ where: { id_site: p.site.id } }).then((e) => {
-        code.mode = e ? "new" : "old";
+      if (localStorage.vsc_opened === "yes") {
+        localStorage.removeItem("vsc_opened");
+        p.ui.popup.code.open = true;
+      }
 
-        if (localStorage.vsc_opened === "yes") {
-          localStorage.removeItem("vsc_opened");
-          p.ui.popup.code.open = true;
-        }
-
-        p.render();
-      });
+      p.render();
     }
   }, [p.site.id]);
 
@@ -77,35 +70,7 @@ export const EdPopCode = () => {
       <div
         className={cx("bg-white select-none fixed inset-[50px] bottom-0 flex")}
       >
-        {!code.mode && <Loading note="checking-version" backdrop={false} />}
-        {code.mode === "new" && <CodeBody />}
-        {code.mode === "old" && (
-          <div className="flex items-center justify-center flex-col flex-1">
-            <div>This site still using old code</div>
-            <div
-              onClick={() => {
-                if (
-                  confirm(
-                    "Old code will not load, are you sure want to upgrade ?"
-                  )
-                ) {
-                  code.mode = "new";
-                  _db.code.create({
-                    data: { id_site: p.site.id, name: "site" },
-                  });
-                  p.ui.popup.code.open = false;
-                  p.render();
-                }
-              }}
-              className="border border-blue-500 cursor-pointer bg-blue-100 p-2 hover:bg-blue-200"
-            >
-              Upgrade to New Code Project
-            </div>
-            <div className="text-xs py-2">
-              Warning: old code will not load once upgraded.
-            </div>
-          </div>
-        )}
+        <CodeBody />
       </div>
     </Modal>
   );
@@ -128,69 +93,6 @@ const CodeBody = () => {
     <div className="relative w-full h-full flex flex-col">
       <div className="border-b flex justify-between h-[40px] items-stretch">
         <div className="flex items-stretch">
-          {/* <Popover
-            placement="bottom"
-            offset={0}
-            arrow={false}
-            backdrop={false}
-            content={
-              <CodeNameList
-                onPick={async (e) => {
-                  local.namePicker = false;
-                  p.ui.popup.code.name = e.name;
-                  p.render();
-                }}
-              />
-            }
-            popoverClassName="bg-white shadow-md"
-            className={cx(
-              "flex items-center px-2 w-[200px] hover:bg-blue-50  space-x-1",
-              "cursor-pointer justify-between border-r "
-            )}
-            open={local.namePicker}
-            onOpenChange={(open) => {
-              local.namePicker = open;
-              local.render();
-            }}
-          >
-            <div className="capitalize overflow-ellipsis flex-1 flex items-center space-x-2">
-              <CodeNameItem name={p.ui.popup.code.name} />
-            </div>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: iconChevronDown,
-              }}
-            ></div>
-          </Popover> */}
-
-          {/* <Tooltip
-            content="STDOUT Log"
-            delay={0}
-            placement="bottom"
-            className={cx(
-              "flex items-stretch relative border-l",
-              p.ui.popup.code.error && "bg-red-500 text-white"
-            )}
-            onClick={() => {
-              p.ui.popup.code.show_log = !p.ui.popup.code.show_log;
-              p.render();
-            }}
-          >
-            {p.ui.popup.code.show_log && (
-              <div className="absolute bottom-[-4px] left-0 right-[1px] h-[5px] bg-white"></div>
-            )}
-            <div
-              className={cx(
-                "border-r flex text-center items-center hover:bg-blue-50 cursor-pointer px-2 transition-all",
-                p.ui.popup.code.loading
-                  ? "border-b-2 border-b-orange-400"
-                  : "border-b-2 border-b-transparent"
-              )}
-              dangerouslySetInnerHTML={{
-                __html: p.ui.popup.code.loading ? iconLog : iconLoading,
-              }}
-            ></div>
-          </Tooltip> */}
           {p.ui.popup.code.startup_status !== "disabled" && (
             <Tooltip
               content={`Startup Script: ${p.ui.popup.code.startup_status}`}

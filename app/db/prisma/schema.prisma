@@ -7,19 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model billing_account {
-  id              String   @id(map: "billing_account_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_organization String   @db.Uuid
-  user_created    String   @db.Uuid
-  payment_info    Json?
-  payment_method  String
-  is_default      Boolean
-  created_at      DateTime @default(now()) @db.Timestamp(6)
-  updated_at      DateTime @default(now()) @db.Timestamp(6)
-  org             org      @relation(fields: [id_organization], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user            user     @relation(fields: [user_created], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
 model component {
   id                 String           @id(map: "component_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name               String
@@ -36,7 +23,6 @@ model component_group {
   id             String           @id(map: "site_comp_group_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name           String
   shared         Boolean          @default(false)
-  code_assign    code_assign[]
   component      component[]
   component_site component_site[]
 }
@@ -49,58 +35,6 @@ model component_site {
   site               site            @relation(fields: [id_site], references: [id], onDelete: Cascade)
 
   @@id([id_component_group, id_site], map: "component_site_id_component_group_id_site")
-}
-
-model discount {
-  id           String         @id(map: "discount_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String
-  code         String         @unique(map: "discount_code")
-  date_start   DateTime       @db.Timestamp(6)
-  date_end     DateTime       @db.Timestamp(6)
-  price        Decimal?       @db.Decimal(18, 3)
-  percent      Float?         @db.Real
-  max_precent  Float?         @db.Real
-  description  String?
-  invoice_item invoice_item[]
-}
-
-model feature {
-  id                 String         @id(map: "feature_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  feature            Json?
-  price              Decimal        @db.Decimal(18, 3)
-  created_at         DateTime?      @default(now()) @db.Timestamp(6)
-  updated_at         DateTime?      @default(now()) @db.Timestamp(6)
-  name               String
-  trial_duration     Int?
-  subscribe_duration Int?
-  invoice_item       invoice_item[]
-}
-
-model invoice {
-  id           String         @id(map: "invoice_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code         String
-  user_id      String         @db.Uuid
-  status       String
-  total        Decimal        @default(0) @db.Decimal(18, 3)
-  due_date     DateTime?      @default(now()) @db.Timestamp(6)
-  created_at   DateTime?      @default(now()) @db.Timestamp(6)
-  updated_at   DateTime?      @default(now()) @db.Timestamp(6)
-  user         user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  invoice_item invoice_item[]
-  payment      payment[]
-}
-
-model invoice_item {
-  id           String    @id(map: "invoice_item_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  invoice_id   String    @db.Uuid
-  feature_id   String    @db.Uuid
-  discount_id  String?   @db.Uuid
-  price        Decimal   @default(0) @db.Decimal(18, 3)
-  discount_val Decimal   @default(0) @db.Decimal(18, 3)
-  created_at   DateTime? @default(now()) @db.Timestamp(6)
-  discount     discount? @relation(fields: [discount_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  feature      feature   @relation(fields: [feature_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  invoice      invoice   @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model npm_page {
@@ -125,15 +59,14 @@ model npm_site {
 }
 
 model org {
-  id              String            @id(map: "organization_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String
-  created_at      DateTime?         @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?         @db.Timestamp(6)
-  created_by      String?           @db.Uuid
-  billing_account billing_account[]
-  user            user?             @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "organization_user_created_fkey")
-  org_user        org_user[]
-  site            site[]
+  id         String     @id(map: "organization_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at DateTime?  @db.Timestamp(6)
+  created_by String?    @db.Uuid
+  user       user?      @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "organization_user_created_fkey")
+  org_user   org_user[]
+  site       site[]
 }
 
 model org_user {
@@ -159,7 +92,6 @@ model page {
   is_deleted        Boolean        @default(false)
   id_layout         String?        @db.Uuid
   is_default_layout Boolean        @default(false)
-  code_assign       code_assign[]
   page_folder       page_folder?   @relation(fields: [id_folder], references: [id], onDelete: NoAction, onUpdate: NoAction)
   page              page?          @relation("pageTopage", fields: [id_layout], references: [id], onDelete: NoAction, onUpdate: NoAction)
   other_page        page[]         @relation("pageTopage")
@@ -175,39 +107,6 @@ model page_folder {
   is_deleted Boolean @default(false)
   page       page[]
   site       site    @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model payment {
-  id                    String            @id(map: "payment_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nominal               Decimal           @default(0) @db.Decimal(18, 3)
-  id_invoice            String            @db.Uuid
-  type                  String?           @db.VarChar(10)
-  payment_method        String            @default("CC") @db.VarChar(30)
-  payment_method_detail Json?
-  status                String
-  payment_date          DateTime?         @db.Timestamp(6)
-  expired_date          DateTime          @db.Timestamp(6)
-  description           String
-  created_at            DateTime?         @default(now()) @db.Timestamp(6)
-  updated_at            DateTime?         @default(now()) @db.Timestamp(6)
-  invoice               invoice           @relation(fields: [id_invoice], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  payment_history       payment_history[]
-}
-
-model payment_history {
-  id         String    @id(map: "payment_history_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  payment_id String    @db.Uuid
-  status     String
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  payment    payment   @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model plugin {
-  id          String        @id(map: "plugin_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  desc        String
-  init_script String?       @default("")
-  site_plugin site_plugin[]
 }
 
 model site {
@@ -227,25 +126,13 @@ model site {
   responsive     String           @default("all")
   npm_cache      String           @default(" ") @db.VarChar
   code_mode      String           @default("old") @db.VarChar(5)
-  code           code[]
   component_site component_site[]
   npm_site       npm_site[]
   page           page[]
   page_folder    page_folder[]
   org            org?             @relation(fields: [id_org], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "site_id_organization_fkey")
   user           user             @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  site_plugin    site_plugin[]
   site_query     site_query[]
-}
-
-model site_plugin {
-  id_site   String @db.Uuid
-  id_plugin String @db.Uuid
-  config    Json
-  plugin    plugin @relation(fields: [id_plugin], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  site      site   @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([id_site, id_plugin], map: "id_site_plugin")
 }
 
 model site_query {
@@ -264,49 +151,19 @@ model site_use_comp {
 }
 
 model user {
-  id                           String            @id(map: "user_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username                     String            @unique(map: "user_username")
+  id                           String     @id(map: "user_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                     String     @unique(map: "user_username")
   password                     String
   phone                        String
   email                        String
-  created_at                   DateTime?         @default(now()) @db.Timestamp(6)
+  created_at                   DateTime?  @default(now()) @db.Timestamp(6)
   token_reset_password         String?
-  token_reset_password_expired DateTime?         @db.Timestamp(6)
-  updated_at                   DateTime?         @default(now()) @db.Timestamp(6)
-  nominal_deposit              Decimal           @default(0) @db.Decimal(18, 3)
-  billing_account              billing_account[]
-  invoice                      invoice[]
+  token_reset_password_expired DateTime?  @db.Timestamp(6)
+  updated_at                   DateTime?  @default(now()) @db.Timestamp(6)
+  nominal_deposit              Decimal    @default(0) @db.Decimal(18, 3)
   org                          org[]
   org_user                     org_user[]
   site                         site[]
-}
-
-model code {
-  id          String        @id(map: "code_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_site     String        @db.Uuid
-  name        String        @default("site")
-  site        site          @relation(fields: [id_site], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  code_assign code_assign[]
-  code_file   code_file[]
-}
-
-model code_file {
-  path    String
-  content String
-  id_code String @db.Uuid
-  code    code   @relation(fields: [id_code], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@id([path, id_code], map: "id_code_file")
-}
-
-model code_assign {
-  id_code            String           @db.Uuid
-  id_component_group String?          @db.Uuid
-  id_page            String?          @db.Uuid
-  id                 String           @id(map: "code_assign_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code               code             @relation(fields: [id_code], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  component_group    component_group? @relation(fields: [id_component_group], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  page               page?            @relation(fields: [id_page], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model page_history {
