@@ -246,7 +246,7 @@ const CodeBody = () => {
             ></div>
           </Tooltip>
         </div>
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           {code_mode === "vsc" && (
             <div
               className="flex items-center p-[2px] px-2 mr-2 cursor-pointer text-[11px] space-x-1 hover:bg-blue-100 hover:border-slate-200 border border-transparent transition-all"
@@ -282,7 +282,7 @@ const CodeBody = () => {
               <div>Turn off VSCode</div>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
       {p.ui.popup.code.show_log && (
         <div className="h-[150px] overflow-auto font-mono p-2 text-xs whitespace-pre-wrap border-b">
