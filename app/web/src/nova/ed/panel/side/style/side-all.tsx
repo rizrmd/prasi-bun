@@ -20,9 +20,9 @@ export const EdStyleAll = () => {
     ? p.comp.list[active.comp_id].meta[active.item_id]
     : p.page.meta[active.item_id];
 
-  let item = meta.item;
+  let item = meta?.item;
   let is_inherit = false;
-  if (item.component?.id) {
+  if (item?.component?.id) {
     const comp = p.comp.list[item.component.id].doc
       .getMap("map")
       .get("root")

@@ -3,12 +3,10 @@ import { useGlobal } from "web-utils";
 import { produceCSS } from "../../../../../utils/css/gen";
 import { IItem } from "../../../../../utils/types/item";
 import { IText } from "../../../../../utils/types/text";
+import { loadComponent } from "../../../logic/comp/load";
 import { EDGlobal, PG, active } from "../../../logic/ed-global";
 import { EdCompPreviewTree } from "./comp-preview-tree";
 import { compPicker, reloadCompPicker } from "./comp-reload";
-import { loadComponent } from "../../../logic/comp/load";
-import { NodeModel } from "@minoru/react-dnd-treeview";
-import { CompItem } from "./comp-tree";
 
 export const EdCompPreview = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

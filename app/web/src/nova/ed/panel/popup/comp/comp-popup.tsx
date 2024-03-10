@@ -131,6 +131,10 @@ export const EdPopComp = () => {
                       className={cx(
                         "absolute inset-0",
                         css`
+                          > .container {
+                            max-width: 100%;
+                          }
+
                           > .tree-root > .listitem:first-child > div {
                             border-top: 0;
                           }
@@ -216,7 +220,6 @@ export const EdPopComp = () => {
                     </div>
                   </div>
                 </div>
-                <EdCompPreview />
               </>
             )}
           </div>

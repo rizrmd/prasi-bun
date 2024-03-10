@@ -4,7 +4,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { treeRebuild } from "../../../logic/tree/build";
-
+import tc from "tinycolor2";
 export type CompItem = {
   id: string;
   name: string;
@@ -21,10 +21,64 @@ export const edPageTreeRender: NodeRender<CompItem> = (
 
   const isTrashed = !!compPicker.trash.find((e) => e.id === item.id);
 
+  const addComponent = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    if (isTrashed) {
+      p.ui.popup.comp.preview_id = item.id;
+      p.ui.popup.comp_group = {
+        mouse_event: e,
+        async on_pick(group_id) {
+          await _db.component.update({
+            where: { id: item.id },
+            data: { id_component_group: group_id },
+          });
+          await reloadCompPicker(p);
+          treeRebuild(p);
+          p.render();
+        },
+      };
+      p.render();
+    } else {
+      if (p.ui.popup.comp.open) {
+        p.ui.popup.comp.open(item.id);
+      }
+      p.ui.popup.comp.open = null;
+      active.item_id = compPicker.active_id;
+      compPicker.active_id = "";
+      treeRebuild(p);
+      p.render();
+    }
+  };
+
+  const delComponent = async (comp_id: string) => {
+    if (isTrashed) {
+      if (confirm("Permanently delete this component?")) {
+        await _db.component.delete({
+          where: { id: p.ui.popup.comp.preview_id },
+        });
+        const idx = compPicker.tree.findIndex((e) => e.id === comp_id) + 1;
+
+        if (idx >= 0 && compPicker.tree[idx])
+          p.ui.popup.comp.preview_id = compPicker.tree[idx].id as any;
+
+        compPicker.tree = compPicker.tree.filter((e) => e.id !== comp_id);
+        p.render();
+      }
+    } else {
+      if (confirm("Move component to trash?")) {
+        await _db.component.update({
+          where: { id: comp_id },
+          data: { id_component_group: compPicker.trash_id },
+        });
+        await reloadCompPicker(p);
+        p.render();
+      }
+    }
+  };
+
   return (
     <div
       className={cx(
-        "flex hover:bg-blue-50 cursor-pointer",
+        "flex flex-col hover:bg-blue-50 cursor-pointer",
         css`
           .btn {
             opacity: 0;
@@ -34,144 +88,142 @@ export const edPageTreeRender: NodeRender<CompItem> = (
           }
         `,
         item.id === p.page.cur.id && `bg-blue-50`,
-        item.type === "component" && "m-1 border flex-1",
-        item.type === "folder" && "border-t py-[2px] items-center",
+        item.type === "component" && "ml-1 mr-2 mb-3 border flex-1",
+        item.type === "component" &&
+          css`
+            min-width: 190px;
+          `,
+        item.type === "folder" && "border-t py-[2px] ",
         item.id === p.ui.popup.comp.preview_id &&
           css`
             border: 1px solid blue !important;
           `
       )}
-      onClick={() => {
+      onClick={(e) => {
         if (item.type === "folder") {
           onToggle();
         } else {
-          if (p.ui.popup.comp.preview_id !== item.id) {
-            p.ui.popup.comp.preview_id = item.id;
-          } else {
-            p.ui.popup.comp.preview_id = "";
-          }
-          p.render();
+          addComponent(e);
         }
       }}
     >
-      {item.id === p.page.cur.id && (
-        <div className="absolute left-0 top-0 bottom-0 bg-blue-500 w-1"></div>
-      )}
+      {item.type === "component" && <Pic name={item.name} />}
       <div
         className={cx(
-          "h-[13px]",
-          item.type === "folder" && "pl-1",
-          item.type === "component" && "hidden"
-        )}
-      ></div>
-      {item.type === "folder" && (
-        <>
-          {isOpen && <FolderOpen />}
-          {!isOpen && <FolderClose />}
-        </>
-      )}
-      <div
-        className={cx(
-          "flex flex-1 px-1",
-          item.type === "component" && "border-r"
+          "flex",
+          item.type === "component" && "items-stretch",
+          item.type === "folder" && "items-center"
         )}
       >
-        {local.renaming ? (
-          <input
-            value={local.rename_to}
-            autoFocus
-            onBlur={async () => {
-              local.renaming = false;
-              item.name = local.rename_to;
-              if (item.id === "") {
-                if (item.name) {
-                  _db.page_folder.create({
-                    data: { name: local.rename_to, id_site: p.site.id },
-                  });
-                }
-                await reloadCompPicker(p);
-              } else {
-                _db.page_folder.update({
-                  where: { id: item.id },
-                  data: { name: local.rename_to },
-                });
-              }
-              local.render();
-            }}
-            className="border px-1 bg-white flex-1 outline-none mr-1 border-blue-500 "
-            onChange={(e) => {
-              local.rename_to = e.currentTarget.value;
-              local.render();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") e.currentTarget.blur();
-              if (e.key === "Escape") {
-                local.rename_to = item.name;
-                local.render();
-                e.currentTarget.blur();
-              }
-            }}
-          />
-        ) : (
-          <Name name={node.text} />
+        {item.id === p.page.cur.id && (
+          <div className="absolute left-0 top-0 bottom-0 bg-blue-500 w-1"></div>
         )}
-      </div>
-
-      {item.type === "component" && (
         <div
           className={cx(
-            "transition-all bg-white flex items-center px-1 hover:border-blue-300 hover:bg-blue-100 opacity-20 hover:opacity-100",
-            css`
-              &:hover {
-                .normal {
-                  display: none;
-                }
-                .over {
-                  display: block;
-                }
-              }
-            `
+            "h-[13px]",
+            item.type === "folder" && "pl-1",
+            item.type === "component" && "hidden"
           )}
-          onClick={async (e) => {
-            e.stopPropagation();
-
-            if (isTrashed) {
-              p.ui.popup.comp.preview_id = item.id;
-              p.ui.popup.comp_group = {
-                mouse_event: e,
-                async on_pick(group_id) {
-                  await _db.component.update({
-                    where: { id: item.id },
-                    data: { id_component_group: group_id },
-                  });
-                  await reloadCompPicker(p);
-                  treeRebuild(p);
-                  p.render();
-                },
-              };
-              p.render();
-            } else {
-              if (p.ui.popup.comp.open) {
-                p.ui.popup.comp.open(item.id);
-              }
-              p.ui.popup.comp.open = null;
-              active.item_id = compPicker.active_id;
-              compPicker.active_id = "";
-              treeRebuild(p);
-              p.render();
-            }
-          }}
+        ></div>
+        {item.type === "folder" && (
+          <>
+            {isOpen && <FolderOpen />}
+            {!isOpen && <FolderClose />}
+          </>
+        )}
+        <div
+          className={cx(
+            "flex flex-1 px-1",
+            item.type === "component" && "border-r"
+          )}
         >
-          <div className="normal">
-            <PlayIcon />
-          </div>
-          <div className="over hidden">
-            {isTrashed ? <ResetIcon /> : <CheckIcon />}
-          </div>
+          {local.renaming ? (
+            <input
+              value={local.rename_to}
+              autoFocus
+              onBlur={async () => {
+                local.renaming = false;
+                item.name = local.rename_to;
+                if (item.id === "") {
+                  if (item.name) {
+                    _db.page_folder.create({
+                      data: { name: local.rename_to, id_site: p.site.id },
+                    });
+                  }
+                  await reloadCompPicker(p);
+                } else {
+                  _db.page_folder.update({
+                    where: { id: item.id },
+                    data: { name: local.rename_to },
+                  });
+                }
+                local.render();
+              }}
+              className="border px-1 bg-white flex-1 outline-none mr-1 border-blue-500 "
+              onChange={(e) => {
+                local.rename_to = e.currentTarget.value;
+                local.render();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+                if (e.key === "Escape") {
+                  local.rename_to = item.name;
+                  local.render();
+                  e.currentTarget.blur();
+                }
+              }}
+            />
+          ) : (
+            <Name name={node.text} />
+          )}
         </div>
-      )}
+
+        {item.type === "component" && (
+          <div
+            className={cx(
+              "transition-all bg-white flex items-center px-1 hover:border-blue-300 hover:bg-blue-100 opacity-20 hover:opacity-100",
+              css`
+                &:hover {
+                  .normal {
+                    display: none;
+                  }
+                  .over {
+                    display: block;
+                  }
+                }
+              `
+            )}
+            onClick={async (e) => {
+              e.stopPropagation();
+              delComponent(item.id);
+            }}
+          >
+            <div className="normal">
+              <DeleteIcon />
+            </div>
+            <div className="over hidden text-red-600">
+              <DeleteIcon />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
+};
+
+const colorize = (str: string) => {
+  let hash = 0;
+  if (str.length === 0) return "";
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  var color = "#";
+  for (var i = 0; i < 3; i++) {
+    var value = (hash >> (i * 8)) & 255;
+    color += ("00" + value.toString(16)).substr(-2);
+  }
+  return color;
 };
 
 const Name: FC<{ name: ReactNode }> = ({ name }) => {
@@ -190,6 +242,26 @@ const Name: FC<{ name: ReactNode }> = ({ name }) => {
   }
 
   return <div>{name}</div>;
+};
+
+const Pic: FC<{ name: string }> = ({ name }) => {
+  const bg = colorize(name);
+  const fg = tc(bg);
+  return (
+    <div
+      className={cx(
+        "capitalize text-center flex items-center justify-center",
+        css`
+          height: 50px;
+          background-color: ${bg};
+          opacity: 0.8;
+          color: ${fg.isDark() ? "white" : "black"};
+        `
+      )}
+    >
+      {name.split("_").join(" ")}
+    </div>
+  );
 };
 
 const CheckIcon = () => (
