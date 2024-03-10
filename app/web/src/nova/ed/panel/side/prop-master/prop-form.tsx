@@ -311,6 +311,8 @@ export const EdPropPopoverForm: FC<{
                   if (meta) {
                     meta.set("option_mode", e as any);
                   }
+
+                  local.render()
                 }}
                 className={cx(
                   "m-1 px-1 capitalize text-center cursor-pointer  font-mono border border-slate-300 text-[11px]",
