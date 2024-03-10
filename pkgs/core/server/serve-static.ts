@@ -4,7 +4,6 @@ import { InspectTreeResult } from "fs-jetpack/types";
 import { join } from "path";
 import { watch } from "fs";
 import { CORS_HEADERS } from "./serve-api";
-
 import mime from "mime";
 import { g } from "utils/global";
 
@@ -26,8 +25,30 @@ const cache = {
   >,
 };
 
-export const serveStatic = {
-  init: async () => {
+export const serveStatic: any = {
+  async init() {
+    await this.walk();
+    if (g.mode === "dev") {
+      watch(dir.path(`app/static`), async (_, filename) => {
+        if (filename) {
+          const path = join("static", filename);
+          try {
+            const file = Bun.file(dir.path(`app/${path}`));
+            if (await file.exists()) {
+              cache.static[`/${filename}`] = {
+                type: mime.getType(path) || "application/octet-stream",
+                compression: g.mode === "prod" ? "br" : "",
+                content: await file.arrayBuffer(),
+              };
+            }
+          } catch (e: any) {
+            cache.static = {}
+          }
+        }
+      });
+    }
+  },
+  walk: async () => {
     const list = await inspectTreeAsync(dir.path(`app/${web.path}`));
     const walk = async (
       list: InspectTreeResult,
@@ -52,31 +73,11 @@ export const serveStatic = {
     if (list) {
       await walk(list);
     }
-
-    if (g.mode === "dev") {
-      watch(dir.path(`app/static`), async (_, filename) => {
-        if (filename) {
-          const path = join("static", filename);
-          try {
-            const file = Bun.file(dir.path(`app/${path}`));
-            if (await file.exists()) {
-              cache.static[`/${filename}`] = {
-                type: mime.getType(path) || "application/octet-stream",
-                compression: g.mode === "prod" ? "br" : "",
-                content: await file.arrayBuffer(),
-              };
-            }
-          } catch (e: any) {
-            cache.static = {}
-          }
-        }
-      });
-    }
   },
   exists: (url: URL) => {
     return !!cache.static[url.pathname];
   },
-  serve: (url: URL) => {
+  async serve(url: URL) {
     let file = cache.static[url.pathname];
     if (file) {
       return new Response(file.content, {
@@ -86,6 +87,10 @@ export const serveStatic = {
           ...(file.compression ? { "content-encoding": file.compression } : {}),
         },
       });
+    }
+
+    if (g.mode === 'dev' && url.pathname.endsWith('.js')) {
+      await this.walk();
     }
 
     file = cache.static["/index.html"];

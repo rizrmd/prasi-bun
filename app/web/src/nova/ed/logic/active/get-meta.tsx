@@ -18,5 +18,17 @@ export const getMetaById = (p: PG, id: string) => {
 };
 
 export const getActiveMeta = (p: PG) => {
-  return getMetaById(p, active.item_id);
+  const meta = getMetaById(p, active.item_id);
+  if (meta) return meta;
+
+  if (active.comp_id) {
+    const comp = p.comp.list[active.comp_id];
+    if (comp) {
+      const first = comp.tree.find((e) => e.parent === "root");
+      if (first && first.data?.item) return first.data;
+    }
+  }
+
+  const first = p.page.tree.find((e) => e.parent === "root");
+  if (first && first.data?.item) return first.data;
 };

@@ -9,6 +9,7 @@ import { loadComponent } from "../../../logic/comp/load";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
+import { useEffect } from "react";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -36,7 +37,9 @@ export const EdCompPicker = () => {
       let active_meta = getActiveMeta(p);
       if (!active_meta) {
         alert("Please select an item/section to add component!");
-      } else {
+      }
+
+      if (active_meta) {
         let item = active_meta.item as IContent;
         if (
           item.type === "item" &&
@@ -68,9 +71,9 @@ export const EdCompPicker = () => {
     p.render();
   };
 
-  // useEffect(() => {
-  //   activatePopup();
-  // }, []);
+  useEffect(() => {
+    activatePopup();
+  }, []);
 
   return (
     <TopBtn
