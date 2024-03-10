@@ -1,10 +1,10 @@
 import { createRouter } from "radix3";
 import { FC, Suspense, lazy } from "react";
+import { Geiger } from "react-geiger";
 import { GlobalContext, useLocal } from "web-utils";
-import { Loading } from "../utils/ui/loading";
 import { w } from "../utils/types/general";
+import { Loading } from "../utils/ui/loading";
 import * as pages from "./pages";
-
 export const Root: FC<{}> = ({}) => {
   const local = useLocal(
     {
