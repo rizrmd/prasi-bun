@@ -14,7 +14,11 @@ export default page({
           location.pathname === "/ed" ||
           location.pathname.startsWith("/ed/")
         ) {
-          location.href = "/ed/_/_"; 
+          if (params.site_id) {
+            navigate(`/ed/${params.site_id}/_`);
+          } else {
+            navigate("/ed/_/_");
+          }
         } else if (location.pathname.startsWith("/editor")) {
           const arr = location.pathname.split("/");
           if (arr.length <= 2) {
