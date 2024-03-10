@@ -46,6 +46,24 @@ export const Vi: FC<{
   vi.entry = entry;
   vi.on_preload = on_preload;
 
+  w.siteurl = (pathname: string) => {
+    if (vi.site.api_url) {
+      if (!vi.site_url) {
+        vi.site_url = new URL(vi.site.api_url);
+      }
+    }
+
+    if (vi.site_url) {
+      const u = vi.site_url;
+      let path = pathname;
+      if (!path.startsWith("/")) {
+        path = "/" + path;
+      }
+      return `${u.protocol}//${u.hostname}${path}`;
+    }
+
+    return pathname;
+  };
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
   w.preload = (_urls: string | string[]) => {

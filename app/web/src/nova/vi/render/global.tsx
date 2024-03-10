@@ -18,6 +18,7 @@ export const ViGlobal = {
       mode: "old" as "old" | "vsc",
     },
   },
+  site_url: null as unknown as URL,
   script: {
     init_local_effect: undefined as undefined | Record<string, boolean>,
   },
