@@ -138,11 +138,13 @@ export const EdFileList = () => {
                 const selected = [...f.selected];
                 const rename_to = prompt("Rename to:", selected[0]);
 
-                await p.script.api._raw(
-                  `/_file${join(f.path, selected[0])}?rename=${rename_to}`
-                );
+                if (rename_to) {
+                  await p.script.api._raw(
+                    `/_file${join(f.path, selected[0])}?rename=${rename_to}`
+                  );
 
-                reloadFileTree(p);
+                  reloadFileTree(p);
+                }
               }, 100);
             }}
           />
@@ -690,7 +692,7 @@ export const reloadFileList = async (p: PG) => {
   p.render();
 };
 
-const join = (...arg: string[]) => {
+export const join = (...arg: string[]) => {
   let arr: string[] = [];
 
   for (const s of arg) {

@@ -1,6 +1,7 @@
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal } from "../../logic/ed-global";
-import { isImage } from "./file-list";
+import { isImage, join } from "./file-list";
+import { reloadFileTree } from "./file-tree";
 import { FEntry } from "./type";
 
 export const EdFilePreview = () => {
@@ -94,7 +95,25 @@ export const EdFilePreview = () => {
             )}
           </a>
           <div className="p-2 border-b flex justify-between">
-            <div>{first?.name}</div>
+            <div
+              className="cursor-pointer hover:text-blue-500 hover:underline"
+              onClick={() => {
+                setTimeout(async () => {
+                  const selected = [...f.selected];
+                  const rename_to = prompt("Rename to:", selected[0]);
+
+                  if (rename_to) {
+                    await p.script.api._raw(
+                      `/_file${join(f.path, selected[0])}?rename=${rename_to}`
+                    );
+
+                    reloadFileTree(p);
+                  }
+                }, 100);
+              }}
+            >
+              {first?.name}
+            </div>
             <div>{fileSize(first?.size || 0)}</div>
           </div>
           <input
