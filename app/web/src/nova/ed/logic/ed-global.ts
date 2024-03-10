@@ -146,7 +146,8 @@ export const EDGlobal = {
     | "reload"
     | "site-not-found"
     | "page-not-found"
-    | "ready",
+    | "ready"
+    | "no-site",
   preview: {
     url_cache: new Set<string>(),
     route_cache: createRouter<{ url: string; id: string }>(),

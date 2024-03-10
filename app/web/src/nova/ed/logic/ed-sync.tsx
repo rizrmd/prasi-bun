@@ -18,7 +18,7 @@ const page = {
   route: null as null | RadixRouter<{ id: string; url: string }>,
 };
 
-export const edInitSync = (p: PG) => {
+export const loadSession = (p: PG) => {
   const session = JSON.parse(
     localStorage.getItem("prasi-session") || "null"
   ) as { data: { user: { id: string; username: string } } };
@@ -35,6 +35,10 @@ export const edInitSync = (p: PG) => {
     p.user.username = "anonymous";
   }
 
+};
+
+export const edInitSync = (p: PG) => {
+  loadSession(p);
   if (location.pathname.startsWith("/vi/")) {
     if (page.list.length === 0) {
       _db.page
@@ -81,89 +85,6 @@ export const edInitSync = (p: PG) => {
     }
   }
 
-  if (!params.page_id) {
-    if (location.pathname.startsWith("/ed")) {
-      (async () => {
-        const e = await _db.page.findFirst({
-          where: {
-            is_deleted: false,
-            is_default_layout: false,
-            site: params.site_id
-              ? { id: params.site_id }
-              : {
-                  org: {
-                    org_user: {
-                      some: {
-                        id_user: p.user.id,
-                      },
-                    },
-                  },
-                },
-            name: {
-              contains: "root",
-              mode: "insensitive",
-            },
-          },
-          select: { id: true, id_site: true },
-          orderBy: {
-            site: {
-              name: "asc",
-            },
-          },
-        });
-        if (e) location.href = `/ed/${e.id_site}/${e.id}`;
-        else {
-          const e = await _db.page.findFirst({
-            where: {
-              is_deleted: false,
-              is_default_layout: false,
-              site: params.site_id
-                ? { id: params.site_id }
-                : {
-                    org: {
-                      org_user: {
-                        some: {
-                          id_user: p.user.id,
-                        },
-                      },
-                    }, 
-                  },
-              name: {
-                contains: "home", 
-                mode: "insensitive",
-              },
-            },
-            select: { id: true, id_site: true },
-          });
-
-          if (e) location.href = `/ed/${e.id_site}/${e.id}`;
-          else {
-            const e = await _db.page.findFirst({
-              where: {
-                is_deleted: false,
-                is_default_layout: false,
-                site: params.site_id
-                  ? { id: params.site_id }
-                  : {
-                      org: {
-                        org_user: {
-                          some: {
-                            id_user: p.user.id,
-                          },
-                        },
-                      },
-                    },
-              },
-              select: { id: true, id_site: true },
-            });
-            if (e) location.href = `/ed/${e.id_site}/${e.id}`;
-          }
-        }
-      })();
-      return false;
-    }
-  }
-
   if (p.sync) {
     if (p.site.id === "--loading--") return false;
     if (params.site_id !== p.site.id) {
@@ -199,6 +120,10 @@ export const edInitSync = (p: PG) => {
           select: { id: true },
         })
         .then((e) => {
+          if (params.site_id === "_") {
+            alert("asdsa");
+            return;
+          }
           if (e) location.href = `/ed/${params.site_id}/${e.id}`;
         });
       return false;
