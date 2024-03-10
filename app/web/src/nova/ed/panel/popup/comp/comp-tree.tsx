@@ -250,7 +250,7 @@ const Pic: FC<{ name: string }> = ({ name }) => {
   return (
     <div
       className={cx(
-        "capitalize text-center flex items-center justify-center",
+        "capitalize text-center flex items-center justify-center font-black",
         css`
           height: 50px;
           background-color: ${bg};

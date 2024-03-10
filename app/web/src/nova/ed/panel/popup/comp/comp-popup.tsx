@@ -11,10 +11,9 @@ import { fuzzy } from "../../../../../utils/ui/fuzzy";
 import { Loading } from "../../../../../utils/ui/loading";
 import { Modal } from "../../../../../utils/ui/modal";
 import { EDGlobal, active } from "../../../logic/ed-global";
-import { EdCompPreview } from "./comp-preview";
+import { EdCompImport } from "./comp-import";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { CompItem, edPageTreeRender } from "./comp-tree";
-import { EdCompImport } from "./comp-import";
 
 export const EdPopComp = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
