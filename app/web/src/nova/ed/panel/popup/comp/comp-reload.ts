@@ -12,7 +12,7 @@ export const compPicker = {
   trash_id: "",
   status: "ready" as "loading" | "ready",
   active_id: "",
-  render: () => {},
+  render: () => { },
   search: "",
 };
 
