@@ -25,6 +25,10 @@ export const EdPopComp = () => {
   compPicker.render = local.render;
 
   useEffect(() => {
+    if (!p.ui.popup.comp.open) local.tab = "Components";
+  }, [p.ui.popup.comp.open]);
+
+  useEffect(() => {
     local.tree?.openAll();
   }, [p.ui.popup.comp.open, compPicker.site_id, local.tab]);
 
@@ -103,6 +107,16 @@ export const EdPopComp = () => {
                       })}
                     </div>
                     <div className="flex flex-1 mr-1 justify-end items-stretch">
+                      <div
+                        className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
+                        onClick={async () => {
+                          reloadCompPicker(p);
+                          p.render();
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-ccw"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>`,
+                        }}
+                      ></div>
                       <div
                         className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
                         onClick={() => {

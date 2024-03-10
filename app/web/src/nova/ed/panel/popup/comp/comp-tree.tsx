@@ -53,14 +53,9 @@ export const edPageTreeRender: NodeRender<CompItem> = (
     if (isTrashed) {
       if (confirm("Permanently delete this component?")) {
         await _db.component.delete({
-          where: { id: p.ui.popup.comp.preview_id },
+          where: { id: comp_id },
         });
-        const idx = compPicker.tree.findIndex((e) => e.id === comp_id) + 1;
-
-        if (idx >= 0 && compPicker.tree[idx])
-          p.ui.popup.comp.preview_id = compPicker.tree[idx].id as any;
-
-        compPicker.tree = compPicker.tree.filter((e) => e.id !== comp_id);
+        await reloadCompPicker(p);
         p.render();
       }
     } else {
