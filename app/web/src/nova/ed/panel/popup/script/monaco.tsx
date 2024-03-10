@@ -21,8 +21,6 @@ const scriptEdit = {
   timeout: null as any,
 };
 
-const IMPORT_SEPARATOR = "//SCRIPT//";
-
 const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
 export const EdScriptMonaco: FC<{}> = () => {
@@ -185,7 +183,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
                       const prop = component.props[prop_name];
-                      if (typeof prop.typings === "string") {
+                      if (!!prop && typeof prop.typings === "string") {
                         const typings_src = prop.typings.substring(
                           `const typings = `.length
                         );
@@ -256,10 +254,6 @@ export const EdScriptMonaco: FC<{}> = () => {
           ?.getValue()
           .replace(/\{\s*children\s*\}/gi, newval);
 
-        if (curval.includes(IMPORT_SEPARATOR)) {
-          curval = curval.split(IMPORT_SEPARATOR + "\n").pop() || "";
-        }
-
         const text = trim(
           await prettier.format(all ? newval : curval, {
             parser: "typescript",
@@ -269,9 +263,7 @@ export const EdScriptMonaco: FC<{}> = () => {
         );
 
         let final_src = text;
-        if (local.imports) {
-          final_src = `${local.imports}\n${IMPORT_SEPARATOR}\n${text}`;
-        }
+
         local.editor.executeEdits(null, [
           {
             range: {
@@ -322,22 +314,8 @@ export const EdScriptMonaco: FC<{}> = () => {
         p.ui.popup.script.typings.status = "loading";
         p.ui.popup.script.wb_render();
 
-        if ((value || "").includes(IMPORT_SEPARATOR)) {
-          const valparts = (value || "").split(IMPORT_SEPARATOR);
-          if (valparts.length > 1) local.value = valparts[1];
-          if (
-            stype === "prop-instance" &&
-            local.value.includes(
-              `export const ${p.ui.popup.script.prop_name} = `
-            )
-          ) {
-            local.value = local.value.substring(
-              `export const ${p.ui.popup.script.prop_name} = `.length
-            );
-          }
-        } else {
-          local.value = value || "";
-        }
+        local.value = value || "";
+
         local.render();
         const applyChanges = async () => {
           if (!p.sync) return;
