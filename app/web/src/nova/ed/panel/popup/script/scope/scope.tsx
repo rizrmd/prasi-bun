@@ -18,12 +18,9 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
   const cur_path = [] as IMeta[];
   for (const path of paths) {
-    if (path.includes(meta)) {
+    if (path.find((e) => e.item.id === meta.item.id)) {
       for (const m of path) {
         if (m) {
-          if (m.instances) {
-            cur_path.length = 0;
-          }
           cur_path.push(m);
         }
       }
@@ -31,19 +28,19 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
+  console.log(cur_path, active.comp_id);
   const vars: Record<string, { mode: "local" | "prop"; val: string }> = {};
   for (const m of cur_path) {
-    if (m !== meta) {
-      if (m.item.component?.id === active.comp_id) {
-        for (const [name, prop] of Object.entries(m.item.component.props)) {
-          if (prop.meta?.type === "content-element") {
-            vars[name] = { mode: "prop", val: "ReactElement" };
-          } else {
-            vars[name] = { mode: "prop", val: prop.value };
-          }
+    if (m.item.component?.id === active.comp_id) {
+      for (const [name, prop] of Object.entries(m.item.component.props)) {
+        if (prop.meta?.type === "content-element") {
+          vars[name] = { mode: "prop", val: "ReactElement" };
+        } else {
+          vars[name] = { mode: "prop", val: prop.value };
         }
       }
-
+    }
+    if (m.item.id !== meta.item.id) {
       const script = m.item.script;
       if (script) {
         if (script.local) {
@@ -84,26 +81,11 @@ const map_childs = (
       paths.push([...(curpath || []), meta]);
       if (meta.item.component?.id && meta.item.component?.props) {
         for (const [name, prop] of Object.entries(meta.item.component.props)) {
-          if (
-            prop.meta?.type === "content-element" &&
-            prop.content &&
-            prop.jsxCalledBy
-          ) {
-            const m = metas[prop.jsxCalledBy[0]];
-            if (m && m.instances) {
-              const instances = m.instances[prop.jsxCalledBy[0]];
-              if (instances) {
-                const instance_id = instances[prop.jsxCalledBy[1]];
-                if (instance_id) {
-                  const meta_parent = metas[instance_id];
-                  map_childs(monaco, p, metas, [prop.content], paths, [
-                    ...(curpath || []),
-                    meta,
-                    meta_parent,
-                  ]);
-                }
-              }
-            }
+          if (prop.meta?.type === "content-element" && prop.content) {
+            map_childs(monaco, p, metas, [prop.content], paths, [
+              ...(curpath || []),
+              meta,
+            ]);
           }
         }
       }
