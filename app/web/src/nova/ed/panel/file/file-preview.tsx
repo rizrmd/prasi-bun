@@ -36,6 +36,10 @@ export const EdFilePreview = () => {
     }
   }
 
+  const pathname = `/_file${
+    f.path.startsWith("/") ? f.path : `/${f.path}`
+  }/${first?.name}`;
+
   return (
     <>
       {f.selected.size === 0 && (
@@ -119,12 +123,7 @@ export const EdFilePreview = () => {
           <input
             type="text"
             className="p-2 border-b flex justify-between"
-            value={p.script.api._url(
-              `/_file${
-                f.path.startsWith("/") ? f.path : `/${f.path}`
-              }/${first?.name}`,
-              false
-            )}
+            value={`siteurl("${pathname}")`}
             readOnly
             onFocus={(e) => {
               e.currentTarget.select();
