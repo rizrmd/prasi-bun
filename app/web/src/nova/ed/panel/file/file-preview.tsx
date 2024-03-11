@@ -13,6 +13,7 @@ export const EdFilePreview = () => {
   let first = undefined as FEntry | undefined;
   const tree = f.entry[f.path];
   for (const file of f.selected) {
+    if (!tree) break;
     const node = tree.find((e) => e.name === file);
 
     if (node) {
@@ -36,9 +37,10 @@ export const EdFilePreview = () => {
     }
   }
 
-  const pathname = `/_file${
-    f.path.startsWith("/") ? f.path : `/${f.path}`
-  }/${first?.name}`;
+  const fname = first?.name || "";
+  const dname =
+    f.path.startsWith("/") || !f.path.trim() ? f.path : `/${f.path}`;
+  const pathname = `/_file${dname}${dname === "/" ? fname : `/${fname}`}`;
 
   return (
     <>
@@ -62,11 +64,7 @@ export const EdFilePreview = () => {
                 }
               `
             )}
-            href={p.script.api._url(
-              `/_file${
-                f.path.startsWith("/") ? f.path : `/${f.path}`
-              }/${first?.name}`
-            )}
+            href={p.script.api._url(pathname)}
             target="_blank"
           >
             {!local.no_image ? (
@@ -74,12 +72,8 @@ export const EdFilePreview = () => {
                 {isImage(ext) ? (
                   <img
                     draggable={false}
-                    className="absolute inset-0 w-full h-full"
-                    src={p.script.api._url(
-                      `/_img${
-                        f.path.startsWith("/") ? f.path : `/${f.path}`
-                      }/${first?.name}?w=500&f=jpg`
-                    )}
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    src={p.script.api._url(pathname + '?w=500')}
                     alt={" thumbnail (500px)"}
                     onError={() => {
                       local.no_image = true;
@@ -120,15 +114,38 @@ export const EdFilePreview = () => {
             </div>
             <div>{fileSize(first?.size || 0)}</div>
           </div>
-          <input
-            type="text"
-            className="p-2 border-b flex justify-between"
-            value={`siteurl("${pathname}")`}
-            readOnly
-            onFocus={(e) => {
-              e.currentTarget.select();
-            }}
-          />
+          <label className="flex items-stretch border-b">
+            <div className="flex items-center border-r px-1">Code</div>
+            <input
+              type="text"
+              className="p-2 flex justify-between font-mono text-xs flex-1"
+              value={`siteurl("${pathname}")`}
+              readOnly
+              onFocus={(e) => {
+                e.currentTarget.select();
+              }}
+            />
+          </label>
+
+          {f.picker.on_pick && (
+            <div className="flex items-center justify-center p-3">
+              {!f.picker.multi && f.selected.size === 1 && (
+                <div
+                  className="bg-blue-600 rounded-sm text-white px-4 py-2 cursor-pointer"
+                  onClick={() => {
+                    if (typeof f.picker.on_pick === "function") {
+                      f.picker.on_pick(pathname);
+                      f.open = false;
+                      f.picker.on_pick = false;
+                      p.render();
+                    }
+                  }}
+                >
+                  Select File
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
       {f.selected.size > 1 && (
