@@ -74,7 +74,8 @@ export const EdPropInstanceFile: FC<{
 
 const Preview: FC<{ filename: string }> = ({ filename }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const is_image = isImage(filename.split(".").pop() || "");
+  const ext = filename.split(".").pop() || "";
+  const is_image = isImage(ext);
   return (
     <div className="flex ">
       {is_image && (
@@ -84,6 +85,9 @@ const Preview: FC<{ filename: string }> = ({ filename }) => {
           alt={" thumbnail (20px)"}
           className={cx("w-[20px] h-[20px] border mr-1")}
         />
+      )}
+      {!is_image && (
+        <div className="uppercase font-bold text-lg text-slate-300">{ext}</div>
       )}
       Browse File
     </div>
