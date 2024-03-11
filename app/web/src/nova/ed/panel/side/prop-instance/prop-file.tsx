@@ -77,7 +77,7 @@ const Preview: FC<{ filename: string }> = ({ filename }) => {
   const ext = filename.split(".").pop() || "";
   const is_image = isImage(ext);
   return (
-    <div className="flex ">
+    <div className="flex items-center ">
       {is_image && (
         <img
           draggable={false}
@@ -87,7 +87,7 @@ const Preview: FC<{ filename: string }> = ({ filename }) => {
         />
       )}
       {!is_image && (
-        <div className="uppercase font-bold text-lg text-slate-300">{ext}</div>
+        <div className="uppercase font-bold text-sm text-slate-300 mx-1">{ext}</div>
       )}
       Browse File
     </div>
