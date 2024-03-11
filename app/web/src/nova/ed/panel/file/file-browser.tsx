@@ -1,17 +1,16 @@
 import { useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useGlobal, waitUntil } from "web-utils";
+import { useGlobal } from "web-utils";
 import { apiProxy } from "../../../../base/load/api/api-proxy";
 import { Modal } from "../../../../utils/ui/modal";
 import { EDGlobal } from "../../logic/ed-global";
 import { EdFileList } from "./file-list";
+import { EdFilePreview } from "./file-preview";
 import { EdFileTop } from "./file-top";
 import { EdFileTree, reloadFileTree } from "./file-tree";
 import { uploadFile } from "./file-upload";
 import { FEntry } from "./type";
-import { EdFilePreview } from "./file-preview";
-import { w } from "../../../../utils/types/general";
 
 export const EdFileBrowser = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -45,6 +44,22 @@ export const EdFileBrowser = () => {
     })();
   }, [p.site]);
 
+  useEffect(() => {
+    if (f.open) {
+      if (typeof f.picker.on_pick === "function") {
+        const parts = f.picker.value.split("/");
+        const file = parts.pop();
+        if (file) {
+          f.selected.clear();
+          f.selected.add(file);
+        }
+        f.path = parts.join("/");
+        if (!f.path) f.path = "/";
+      }
+      reloadFileTree(p);
+    }
+  }, [f.open]);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (files) => uploadFile(p, files),
     noClick: true,
@@ -59,7 +74,6 @@ export const EdFileBrowser = () => {
         onClick={() => {
           f.open = true;
           p.render();
-          reloadFileTree(p);
         }}
       >
         <svg
@@ -81,7 +95,7 @@ export const EdFileBrowser = () => {
 
       <Modal
         fade={false}
-        open={f.open}
+        open={!!f.open}
         onOpenChange={(open) => {
           if (!open) {
             f.open = false;

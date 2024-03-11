@@ -24,11 +24,14 @@ export const EdPropInstanceText: FC<{
     value: unquote(val),
     codeEditing: false,
     timeout: null as any,
+    focus: false,
   });
 
   useEffect(() => {
-    local.value = unquote(val);
-    local.render();
+    if (!local.focus) {
+      local.value = unquote(val);
+      local.render();
+    }
   }, [val]);
 
   return (
@@ -38,6 +41,14 @@ export const EdPropInstanceText: FC<{
         className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}
         spellCheck={false}
+        onFocus={() => {
+          local.focus = true;
+          local.render();
+        }}
+        onBlur={() => {
+          local.focus = false;
+          local.render();
+        }}
         onChange={(e) => {
           local.value = e.currentTarget.value;
           local.render();

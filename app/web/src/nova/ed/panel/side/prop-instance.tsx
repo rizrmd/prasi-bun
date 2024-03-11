@@ -219,7 +219,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   hasCode = false;
                 }
 
-                if (type === "file" && !value.startsWith("siteurl("))
+                if (type === "file" && !!value && !value.startsWith("siteurl("))
                   hasCode = true;
 
                 if (value.length > 100) {

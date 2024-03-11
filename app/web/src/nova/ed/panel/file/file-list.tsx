@@ -565,6 +565,11 @@ const FileItem: FC<{
     };
   }, []);
 
+  let disable_thumb = false;
+  if (f.path.startsWith("/upload/thumb") && e.type === "file") {
+    disable_thumb = true;
+  }
+
   return (
     <div
       key={e.name}
@@ -637,7 +642,7 @@ const FileItem: FC<{
       >
         {!item.no_image ? (
           <>
-            {isImage(ext) ? (
+            {isImage(ext) && !disable_thumb ? (
               <img
                 draggable={false}
                 src={p.script.api._url(

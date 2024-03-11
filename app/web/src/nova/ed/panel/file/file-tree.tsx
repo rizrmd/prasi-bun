@@ -387,7 +387,6 @@ const refreshTree = (p: PG) => {
   tree.push({ id: "/", text: "/", parent: "" });
   const added = new Set<string>(["/"]);
   for (const [path, entries] of Object.entries(p.ui.popup.file.entry)) {
-    const arr = path.split("/");
     for (const e of entries) {
       let id = path + (path.endsWith("/") ? "" : "/") + e.name;
       if (!id.startsWith("/")) id = "/" + id;

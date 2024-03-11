@@ -7,9 +7,10 @@ import {
 } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { FMCompDef } from "../../../../../utils/types/meta-fn";
+import { EDGlobal } from "../../../logic/ed-global";
 import { EdPropLabel } from "./prop-label";
 import { treeRebuild } from "../../../logic/tree/build";
-import { EDGlobal } from "../../../logic/ed-global";
+import { isImage } from "../../file/file-list";
 
 export const EdPropInstanceFile: FC<{
   name: string;
@@ -18,6 +19,8 @@ export const EdPropInstanceFile: FC<{
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 }> = ({ label, name, mprop, labelClick }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const f = p.ui.popup.file;
+
   const val = mprop.get("value");
 
   const local = useLocal({
@@ -31,14 +34,66 @@ export const EdPropInstanceFile: FC<{
     local.render();
   }, [val]);
 
-  const is_file = local.value.startsWith("siteurl(");
+  const filename = parseval(val);
 
   return (
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={label || name} labelClick={labelClick} />
-      <div className={cx("border-l flex-1")}></div>
+      <div className={cx("border-l flex-1 flex items-stretch  p-[2px]")}>
+        <div
+          className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer"
+          onClick={() => {
+            f.open = true;
+            f.picker.multi = false;
+            f.picker.value = parseval(val);
+            f.picker.on_pick = (file) => {
+              const val = `siteurl(\`${file}\`)`;
+              mprop.doc?.transact(() => {
+                mprop.set("value", val);
+                mprop.set("valueBuilt", val);
+              });
+              treeRebuild(p);
+              p.render();
+            };
+            p.render();
+          }}
+        >
+          {local.value ? <></> : <></>}
+          <div className="flex items-center">
+            {filename ? (
+              <Preview filename={filename} />
+            ) : (
+              <div className="px-1">Browse File</div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
+};
+
+const Preview: FC<{ filename: string }> = ({ filename }) => {
+  const p = useGlobal(EDGlobal, "EDITOR");
+  const is_image = isImage(filename.split(".").pop() || "");
+  return (
+    <div className="flex ">
+      {is_image && (
+        <img
+          draggable={false}
+          src={p.script.api._url("/_file" + filename + "?w=20")}
+          alt={" thumbnail (20px)"}
+          className={cx("w-[20px] h-[20px] border mr-1")}
+        />
+      )}
+      Browse File
+    </div>
+  );
+};
+
+const parseval = (text: string) => {
+  const val = text.substring(`siteurl('/_file`.length);
+
+  return val.substring(0, val.length - '")'.length);
 };
 
 const unquote = (text: any) => {
@@ -55,61 +110,3 @@ const unquote = (text: any) => {
   }
   return "";
 };
-
-export function AutoHeightTextarea({
-  minRows = 1,
-  ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement> & { minRows?: number }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-
-  const calculateAndSetHeight = useCallback(() => {
-    if (!ref.current) {
-      return;
-    }
-    const {
-      borderBottomWidth,
-      borderTopWidth,
-      boxSizing,
-      lineHeight,
-      paddingBottom,
-      paddingTop,
-    } = window.getComputedStyle(ref.current);
-    ref.current.style.height = lineHeight; // set height temporarily to a single row to obtain scrollHeight, disregarding empty space after text (otherwise, scrollHeight would be equal to the height of the element) - this solves auto-shrinking of the textarea (it's not needed for auto-growing it)
-    const { scrollHeight } = ref.current; // scrollHeight = content height + padding top + padding bottom
-
-    if (boxSizing === "border-box") {
-      const minHeight =
-        parseFloat(lineHeight) * minRows +
-        parseFloat(paddingTop) +
-        parseFloat(paddingBottom) +
-        parseFloat(borderTopWidth) +
-        parseFloat(borderBottomWidth);
-      const allTextHeight =
-        scrollHeight +
-        parseFloat(borderTopWidth) +
-        parseFloat(borderBottomWidth);
-      ref.current.style.height = `${Math.max(minHeight, allTextHeight)}px`;
-    } else if (boxSizing === "content-box") {
-      const minHeight = parseFloat(lineHeight) * minRows;
-      const allTextHeight =
-        scrollHeight - parseFloat(paddingTop) - parseFloat(paddingBottom);
-      ref.current.style.height = `${Math.max(minHeight, allTextHeight)}px`;
-    } else {
-      console.error("Unknown box-sizing value.");
-    }
-  }, [minRows]);
-
-  useEffect(() => {
-    calculateAndSetHeight();
-  }, [calculateAndSetHeight]);
-
-  const handleChange: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-    calculateAndSetHeight();
-    if (props.onChange) {
-      props.onChange(e);
-    }
-  };
-  calculateAndSetHeight();
-
-  return <textarea {...props} onChange={handleChange} ref={ref} />;
-}

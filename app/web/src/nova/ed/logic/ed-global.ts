@@ -236,6 +236,11 @@ export const EDGlobal = {
       file: {
         enabled: false,
         open: false,
+        picker: {
+          value: "",
+          on_pick: false as boolean | ((file: string) => void | Promise<void>),
+          multi: false,
+        },
         path: "/",
         expanded: JSON.parse(
           localStorage.getItem("panel-file-expanded") || "{}"
