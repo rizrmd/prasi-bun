@@ -27,6 +27,7 @@ export const EdPropCompTreeItem: FC<{
 
   let type = "TXT";
   if (node.data?.prop.meta?.type === "option") type = "OPT";
+  else if (node.data?.prop.meta?.type === "file") type = "FILE";
   else if (node.data?.prop.meta?.type === "content-element") type = "JSX";
 
   const plabel = node.data?.prop.label;
