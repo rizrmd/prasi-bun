@@ -43,7 +43,7 @@ export const EdTreeIndent = ({
       <div
         className={cx(
           "flex items-stretch ml-1",
-          prm.depth > 0 ? "-mr-2" : "-mr-1"
+          prm.depth > 0 ? "-mr-[7px]" : "-mr-[2px]"
         )}
       >
         {Array.from({ length: prm.depth }, (_, n) => n).map((n) => {
@@ -51,7 +51,7 @@ export const EdTreeIndent = ({
             <div
               key={n}
               className={cx(
-                "border-l  mr-2",
+                "border-l  mr-[4px] border-opacity-50",
                 n === 0 && "border-l-slate-100",
                 n === 1 && "border-l-slate-200",
                 n === 2 && "border-l-slate-300",
