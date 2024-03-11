@@ -303,6 +303,7 @@ const SingleProp: FC<{
                 (
                   {
                     option: "OPT",
+                    file: "FILE",
                     text: "TXT",
                     "content-element": "JSX",
                   } as any
@@ -421,6 +422,7 @@ const SinglePopover: FC<{
             {[
               { label: "TXT", type: "text" },
               { label: "OPT", type: "option" },
+              { label: "FILE", type: "file" },
               { label: "JSX", type: "content-element" },
             ].map((e) => {
               return (
