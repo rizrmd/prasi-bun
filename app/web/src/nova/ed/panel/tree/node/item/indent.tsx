@@ -51,7 +51,7 @@ export const EdTreeIndent = ({
             <div
               key={n}
               className={cx(
-                "border-l  mr-[4px] border-opacity-50",
+                "border-l  mr-[4px] border-opacity-30",
                 n === 0 && "border-l-slate-100",
                 n === 1 && "border-l-slate-200",
                 n === 2 && "border-l-slate-300",
