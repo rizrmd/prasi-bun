@@ -41,10 +41,30 @@ export const EdTreeIndent = ({
       }}
     >
       <div
-        className={cx(css`
-          width: ${prm.depth * DEPTH_WIDTH}px;
-        `)}
-      ></div>
+        className={cx(
+          "flex items-stretch ml-1",
+          prm.depth > 0 ? "-mr-2" : "-mr-1"
+        )}
+      >
+        {Array.from({ length: prm.depth }, (_, n) => n).map((n) => {
+          return (
+            <div
+              key={n}
+              className={cx(
+                "border-l  mr-2",
+                n === 0 && "border-l-slate-100",
+                n === 1 && "border-l-slate-200",
+                n === 2 && "border-l-slate-300",
+                n === 3 && "border-l-slate-300",
+                n === 4 && "border-l-slate-400",
+                n === 5 && "border-l-slate-400",
+                n === 6 && "border-l-slate-500",
+                n > 6 && "border-l-purple-600"
+              )}
+            ></div>
+          );
+        })}
+      </div>
       <div className={cx("flex items-center justify-center w-[20px]")}>
         {item.type === "text" && (
           <div className="-mt-[2px]">
