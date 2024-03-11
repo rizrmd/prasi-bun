@@ -107,8 +107,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     });
 
     filtered = filtered.sort((a, b) => {
-      const aidx = a.mprop.get("idx") || 0;
-      const bidx = b.mprop.get("idx") || 0;
+      const aidx = a.cprop.idx || 0;
+      const bidx = b.cprop.idx || 0;
       return aidx - bidx;
     });
   }
