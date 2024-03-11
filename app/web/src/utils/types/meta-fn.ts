@@ -41,7 +41,7 @@ export type FNCompDef = {
   meta?: FNCompMeta;
 };
 type FNCompMeta = {
-  type: "text" | "option" | "content-element";
+  type: "file" | "text" | "option" | "content-element";
   options?: string;
   optionsBuilt?: string;
   option_mode?: "dropdown" | "button";
@@ -128,12 +128,12 @@ export type FNFont = {
   height?: number | "auto";
   align?: "center" | "left" | "right";
   whitespace?:
-  | "whitespace-normal"
-  | "whitespace-nowrap"
-  | "whitespace-pre"
-  | "whitespace-pre-line"
-  | "whitespace-pre-wrap"
-  | "whitespace-break-spaces";
+    | "whitespace-normal"
+    | "whitespace-nowrap"
+    | "whitespace-pre"
+    | "whitespace-pre-line"
+    | "whitespace-pre-wrap"
+    | "whitespace-break-spaces";
   wordBreak?: "break-normal" | "break-words" | "break-all" | "break-keep";
 };
 export type FMFont = TypedMap<FNFont>;

@@ -10,6 +10,7 @@ import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 import { EdStyleAll } from "./style/side-all";
+import { EdPropInstanceFile } from "./prop-instance/prop-file";
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -215,8 +216,12 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   (![`"`, "'", "`"].includes(value[0]) ||
                     ![`"`, "'", "`"].includes(value[value.length - 1]))
                 ) {
-                  hasCode = true;
+                  hasCode = false;
                 }
+
+                if (type === "file" && !value.startsWith("siteurl("))
+                  hasCode = true;
+
                 if (value.length > 100) {
                   hasCode = true;
                 }
@@ -238,6 +243,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                         <EdPropInstanceCode
                           mprop={mprop}
                           name={name}
+                          comp_id={comp_id}
                           label={cprop.label}
                           labelClick={labelClick}
                           onEditCode={createEditScript(p, "value", mprop, name)}
@@ -245,6 +251,14 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                       </>
                     ) : (
                       <>
+                        {type === "file" && (
+                          <EdPropInstanceFile
+                            mprop={mprop}
+                            label={cprop.label}
+                            name={name}
+                            labelClick={labelClick}
+                          />
+                        )}
                         {type === "text" && (
                           <EdPropInstanceText
                             mprop={mprop}

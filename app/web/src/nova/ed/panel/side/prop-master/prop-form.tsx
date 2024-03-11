@@ -64,6 +64,7 @@ export const EdPropPopoverForm: FC<{
         <div className="flex space-x-1">
           {[
             { label: "TXT", type: "text" },
+            { label: "FILE", type: "file" },
             { label: "OPT", type: "option" },
             { label: "JSX", type: "content-element" },
           ].map((e) => {
@@ -110,7 +111,10 @@ export const EdPropPopoverForm: FC<{
 
         {type === "text" && (
           <div
-            className="flex cursor-pointer items-center space-x-1 select-none"
+            className={cx(
+              "flex cursor-pointer items-center space-x-1 select-none",
+              mprop.get("is_name") && "text-green-500"
+            )}
             onClick={() => {
               mprop.doc?.transact(() => {
                 (mprop.parent as any)?.forEach((p: any, k: string) => {
@@ -126,12 +130,9 @@ export const EdPropPopoverForm: FC<{
             }}
           >
             <span
-              className={cx(
-                css`
-                  width: 17px;
-                `,
-                mprop.get("is_name") && "text-green-500"
-              )}
+              className={cx(css`
+                width: 17px;
+              `)}
             >
               {!mprop.get("is_name") ? (
                 <svg
@@ -151,7 +152,7 @@ export const EdPropPopoverForm: FC<{
                 </svg>
               )}
             </span>
-            <span className="text-xs">Default Name</span>
+            <span className="text-xs">As Name</span>
           </div>
         )}
       </div>
@@ -312,7 +313,7 @@ export const EdPropPopoverForm: FC<{
                     meta.set("option_mode", e as any);
                   }
 
-                  local.render()
+                  local.render();
                 }}
                 className={cx(
                   "m-1 px-1 capitalize text-center cursor-pointer  font-mono border border-slate-300 text-[11px]",
