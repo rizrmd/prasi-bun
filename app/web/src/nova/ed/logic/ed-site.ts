@@ -6,13 +6,13 @@ export const loadSite = async (p: PG, site: ESite, note: string) => {
   p.site = site;
 
   if (!p.script.db && !p.script.api) {
-    if (p.site.code.mode === "old") {
+    if (p.site.code.mode === "old" && !location.pathname.startsWith('/ed/')) {
       await viLoadLegacy({
         mode: p.mode,
         site: {
           api_url: p.site.config.api_url,
           id: p.site.id,
-          api: {
+          api: { 
             get() {
               return p.script.api;
             },
