@@ -107,6 +107,12 @@ export const EdPopComp = () => {
                       })}
                     </div>
                     <div className="flex flex-1 mr-1 justify-end items-stretch">
+                      <div className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer">
+                        + Prasi
+                        <span className="font-bold text-slate-600 text-xs">
+                          UI
+                        </span>
+                      </div>
                       <div
                         className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
                         onClick={async () => {
