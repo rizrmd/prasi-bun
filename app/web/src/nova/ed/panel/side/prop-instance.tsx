@@ -216,15 +216,16 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   (![`"`, "'", "`"].includes(value[0]) ||
                     ![`"`, "'", "`"].includes(value[value.length - 1]))
                 ) {
-                  hasCode = false;
+                  hasCode = true;
                 }
-
+ 
                 if (type === "file" && !!value && !value.startsWith("siteurl("))
                   hasCode = true;
 
                 if (value.length > 100) {
                   hasCode = true;
                 }
+
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
                   e.preventDefault();
                   local.pick = { mprop, name };
