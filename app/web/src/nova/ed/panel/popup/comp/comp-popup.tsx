@@ -15,6 +15,8 @@ import { EdCompImport } from "./comp-import";
 import { compPicker, reloadCompPicker } from "./comp-reload";
 import { CompItem, edPageTreeRender } from "./comp-tree";
 
+const ID_PRASI_UI = "13143272-d4e3-4301-b790-2b3fd3e524e6";
+
 export const EdPopComp = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({
@@ -53,6 +55,10 @@ export const EdPopComp = () => {
     tree.forEach((e) => (e.parent = "comp-root"));
     tree = tree.filter((e) => e.data?.type === "component");
   }
+
+  const has_prasi_ui = !!tree.find(
+    (e) => e.data?.type === "folder" && e.data?.id === ID_PRASI_UI
+  );
 
   return (
     <>
@@ -129,8 +135,39 @@ export const EdPopComp = () => {
                       >
                         + Folder
                       </div>
-                      <div className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer">
-                        + Prasi
+                      <div
+                        className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
+                        onClick={async () => {
+                          if (
+                            has_prasi_ui &&
+                            confirm("Remove Prasi UI? You can add it later")
+                          ) {
+                            await _db.component_site.deleteMany({
+                              where: {
+                                id_site: p.site.id,
+                                id_component_group: ID_PRASI_UI,
+                              },
+                            });
+                          } else if (confirm("Add Prasi UI?")) {
+                            await _db.component_site.create({
+                              data: {
+                                id_site: p.site.id,
+                                id_component_group: ID_PRASI_UI,
+                              },
+                            });
+                          }
+
+                          await reloadCompPicker(p);
+                          p.render();
+                        }}
+                      >
+                        {!has_prasi_ui && (
+                          <span className="mr-[2px] text-green-700">Add</span>
+                        )}
+                        {has_prasi_ui && (
+                          <span className="mr-[2px] text-red-500">Remove</span>
+                        )}
+                        <span>Prasi</span>
                         <span className="font-bold text-slate-600 text-xs">
                           UI
                         </span>
