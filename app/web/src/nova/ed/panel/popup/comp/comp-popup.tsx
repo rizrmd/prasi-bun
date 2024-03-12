@@ -107,6 +107,28 @@ export const EdPopComp = () => {
                       })}
                     </div>
                     <div className="flex flex-1 mr-1 justify-end items-stretch">
+                      <div
+                        className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer"
+                        onClick={async () => {
+                          const name = prompt("Folder Name:");
+                          if (name) {
+                            await _db.component_group.create({
+                              data: {
+                                name,
+                                component_site: {
+                                  create: {
+                                    id_site: p.site.id,
+                                    is_owner: true,
+                                  },
+                                },
+                              },
+                            });
+                            await reloadCompPicker(p);
+                          }
+                        }}
+                      >
+                        + Folder
+                      </div>
                       <div className="bg-white text-xs border px-2 mr-1 my-1 flex items-center hover:border-blue-500 hover:bg-blue-50 cursor-pointer">
                         + Prasi
                         <span className="font-bold text-slate-600 text-xs">
