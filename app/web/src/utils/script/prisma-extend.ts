@@ -1,5 +1,11 @@
 export const prismaExtendType = `\
 {
+  _batch: {
+    update: (
+      table: string, 
+      batch: { data: any, where: any }[]
+    ) => Promise<void>;
+  };
   _schema: {
     tables: () => Promise<string[]>;
     columns: (table: string) => Promise<
@@ -26,9 +32,9 @@ export const prismaExtendType = `\
       }
     }>;
   }
-}`
+}`;
 
 const rel_types = `\
 {
   
-}`
+}`;

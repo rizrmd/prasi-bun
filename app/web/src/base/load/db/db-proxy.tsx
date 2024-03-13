@@ -7,6 +7,21 @@ export const dbProxy = (dburl: string) => {
     {},
     {
       get(_, table: string) {
+        if (table === "_batch") {
+          return {
+            update: async (table: string, batch: any) => {
+              return fetchSendDb(
+                {
+                  name,
+                  action: "batch_update",
+                  table: "",
+                  params: { table, batch },
+                },
+                dburl
+              );
+            },
+          };
+        }
         if (table === "_schema") {
           return {
             tables: async () => {

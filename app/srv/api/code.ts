@@ -1,11 +1,10 @@
+import { dir } from "dir";
 import { dirAsync } from "fs-jetpack";
 import trim from "lodash.trim";
 import { dirname } from "path";
 import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
-import { g } from "utils/global";
-import { baseTypings } from "../../web/src/utils/script/types/base";
-import { dir } from "dir";
 import { prismaExtendType } from "../../web/src/utils/script/prisma-extend";
+import { baseTypings } from "../../web/src/utils/script/types/base";
 
 export const _ = {
   url: "/code/:site_id/:action",
