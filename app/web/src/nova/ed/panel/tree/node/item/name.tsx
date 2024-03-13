@@ -47,7 +47,7 @@ export const EdTreeName = ({
           )}
           autoFocus
           spellCheck={false}
-          value={local.rename}
+          defaultValue={local.rename}
           onFocus={(e) => {
             if (node.data?.jsx_prop?.is_root) {
               p.ui.tree.rename_id = "";
