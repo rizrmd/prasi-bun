@@ -43,7 +43,7 @@ export const EdTreeName = ({
       {isRenaming ? (
         <input
           className={cx(
-            "rename-item absolute inset-0 outline-none border border-blue-500 my-[2px] mr-[1px] px-1"
+            "rename-item absolute  inset-0 outline-none border border-blue-500 my-[2px] mr-[1px] px-1"
           )}
           autoFocus
           spellCheck={false}
