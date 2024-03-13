@@ -9,6 +9,7 @@ export const dbProxy = (dburl: string) => {
       get(_, table: string) {
         if (table === "_batch") {
           return {
+            // pancingan ini table batch
             update: async (batch: any) => {
               return fetchSendDb(
                 {
