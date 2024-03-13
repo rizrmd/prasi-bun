@@ -34,7 +34,7 @@ export const viEvalScript = (
       scope: passprop,
       result: null,
       Local: createViLocal(vi, is_layout, meta),
-      PassProp: createViPassProp(vi, meta),
+      PassProp: createViPassProp(vi, is_layout, meta),
     };
   } else {
     meta.script.scope = passprop;
