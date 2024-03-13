@@ -2,8 +2,11 @@ export const prismaExtendType = `\
 {
   _batch: {
     update: (
-      table: string, 
-      batch: { data: any, where: any }[]
+      batch: { 
+        table: string, 
+        data: any, 
+        where: any 
+      }[]
     ) => Promise<void>;
   };
   _schema: {
