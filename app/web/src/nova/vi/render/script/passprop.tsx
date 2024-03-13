@@ -1,8 +1,13 @@
 import { ReactNode, isValidElement } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
+import { ViChild } from "../render";
 
-export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
+export const createViPassProp = (
+  vi: { meta: VG["meta"] },
+  is_layout: boolean,
+  meta: IMeta
+) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
     if (!meta.item.script) {
       meta.item.script = {};
@@ -19,6 +24,18 @@ export const createViPassProp = (vi: { meta: VG["meta"] }, meta: IMeta) => {
           is_changed = true;
           meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
         }
+      }
+    }
+
+    if (
+      !Array.isArray(arg.children) &&
+      !isValidElement(arg.children) &&
+      typeof arg.children === "object"
+    ) {
+      const child_id = (arg.children as any).id;
+      if (child_id) {
+        const meta = vi.meta[child_id];
+        return <ViChild is_layout={is_layout} meta={meta} />;
       }
     }
 
