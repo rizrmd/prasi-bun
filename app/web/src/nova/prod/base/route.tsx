@@ -1,4 +1,3 @@
-import { get, set } from "idb-keyval";
 import { createRouter } from "radix3";
 import { apiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
@@ -6,7 +5,6 @@ import { IRoot } from "../../../utils/types/root";
 import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
-import { prodCache } from "./cache";
 import { scanComponent } from "./component";
 
 const getRoute = () => {
@@ -19,21 +17,15 @@ const getRoute = () => {
     layout: any;
   }>(async (done) => {
     let is_done = false;
-    const route_cache = await get("route", prodCache);
-    if (route_cache) {
-      done(route_cache);
-      is_done = true;
-    }
 
     let res = await (await fetch(base.url`_prasi/route`)).json();
-    await set("route", res, prodCache);
     if (!is_done) {
       done(res);
     }
   });
 };
 
-export const initBaseRoute = async (isPreviewProd: boolean) => {
+export const initBaseRoute = async () => {
   const router = createRouter<{ id: string; url: string }>();
   const pages = [] as { id: string; url: string }[];
   try {
@@ -45,7 +37,7 @@ export const initBaseRoute = async (isPreviewProd: boolean) => {
         base.layout.root = res.layout.root;
         base.layout.meta = {};
         if (base.layout.root) {
-          await scanComponent(base.layout.root.childs, !isPreviewProd);
+          await scanComponent(base.layout.root.childs);
           rebuildMeta(base.layout.meta, base.layout.root);
         }
       }

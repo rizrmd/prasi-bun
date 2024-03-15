@@ -3,9 +3,8 @@ import { IContent } from "../../../utils/types/general";
 import { IItem } from "../../../utils/types/item";
 import { ISection } from "../../../utils/types/section";
 import { base } from "./base";
-import { prodCache } from "./cache";
 
-export const scanComponent = async (items: IContent[], use_cache?: boolean) => {
+export const scanComponent = async (items: IContent[]) => {
   const comp = base.comp;
 
   for (const item of items) {
@@ -17,23 +16,12 @@ export const scanComponent = async (items: IContent[], use_cache?: boolean) => {
   if (comp.pending.size > 0) {
     let all_found = true;
     const founds: any = [];
-    if (use_cache !== false) {
+    if (all_found) {
       for (const id of [...comp.pending]) {
-        const item = await get(`comp-${id}`, prodCache);
-        if (!item) {
-          all_found = false;
-        }
-        comp.list[id] = item;
-        founds.push(item);
+        comp.pending.delete(id);
       }
-
-      if (all_found) {
-        for (const id of [...comp.pending]) {
-          comp.pending.delete(id);
-        }
-        await scanComponent(founds, use_cache);
-        return;
-      }
+      await scanComponent(founds);
+      return;
     }
   }
 
@@ -49,9 +37,9 @@ export const scanComponent = async (items: IContent[], use_cache?: boolean) => {
         comp.pending.delete(id);
         comp.list[id] = item;
 
-        await set(`comp-${id}`, item, prodCache);
+        await set(`comp-${id}`, item);
       }
-      await scanComponent(Object.values(res), use_cache);
+      await scanComponent(Object.values(res));
     } catch (e) {}
   }
 };
