@@ -47,6 +47,9 @@ export const Vi: FC<{
   vi.on_preload = on_preload;
 
   w.siteurl = (pathname: string, forceOriginal?: boolean) => {
+    if (pathname.startsWith("http://") || pathname.startsWith("https://"))
+      return pathname;
+
     if (["prasi.avolut.com"].includes(location.hostname)) {
       if (vi.site.api_url) {
         if (!vi.site_url) {
