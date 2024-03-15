@@ -17,5 +17,8 @@
     "y-pojo": "^0.0.8",
     "yjs": "^13.6.10",
     "yjs-types": "^0.0.1"
+  },
+  "devDependencies": {
+    "bun-types": "^1.0.30"
   }
 }
