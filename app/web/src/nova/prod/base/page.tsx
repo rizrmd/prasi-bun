@@ -1,9 +1,8 @@
 import { base } from "./base";
 import { IRoot } from "../../../utils/types/root";
-import { prodCache } from "./cache";
 import { get, set } from "idb-keyval";
 
-export const loadPage = (page_id: string, use_cache?: boolean) => {
+export const loadPage = (page_id: string) => {
   return new Promise<{
     id: string;
     url: string;
@@ -11,12 +10,10 @@ export const loadPage = (page_id: string, use_cache?: boolean) => {
   }>(async (done) => {
     let returned = false;
 
-    if (use_cache !== false) {
-      const cached = await get(`page-${page_id}`, prodCache);
-      if (cached) {
-        done(cached);
-        returned = true;
-      }
+    const cached = await get(`page-${page_id}`);
+    if (cached) {
+      done(cached);
+      returned = true;
     }
 
     const res = (await (
@@ -26,11 +23,6 @@ export const loadPage = (page_id: string, use_cache?: boolean) => {
       url: string;
       root: IRoot;
     };
-    set(
-      `page-${page_id}`,
-      { id: page_id, url: res.url, root: res.root },
-      prodCache
-    );
 
     if (!returned) done(res);
   });
@@ -48,7 +40,7 @@ export const loadPages = (page_ids: string[]) => {
     const ids = [...new Set(page_ids)];
     let is_done = true;
     for (const id of ids) {
-      const page = await get(`page-${id}`, prodCache);
+      const page = await get(`page-${id}`);
       if (page) {
         result[id] = page;
       } else {
@@ -70,10 +62,6 @@ export const loadPages = (page_ids: string[]) => {
       url: string;
       root: IRoot;
     }[];
-
-    for (const [k, v] of Object.entries(res)) {
-      set(`page-${k}`, v, prodCache);
-    }
 
     if (!is_done) {
       done(res);

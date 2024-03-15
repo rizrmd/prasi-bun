@@ -39,7 +39,7 @@ export const Root = () => {
   if (base.route.status !== "ready") {
     if (base.route.status === "init") {
       base.route.status = "loading";
-      initBaseRoute(isPreviewProd).then(async ({ router, pages }) => {
+      initBaseRoute().then(async ({ router, pages }) => {
         detectResponsiveMode();
         base.route.status = "ready";
         base.route.router = router;
@@ -97,7 +97,7 @@ export const Root = () => {
   const cache = base.page.cache[page.id];
 
   if (!cache) {
-    loadPage(page.id, !isPreviewProd)
+    loadPage(page.id)
       .then(async ({ root }) => {
         if (page) {
           const p = {
@@ -106,7 +106,7 @@ export const Root = () => {
             root,
             meta: {},
           };
-          await scanComponent(root.childs, !isPreviewProd);
+          await scanComponent(root.childs);
           rebuildMeta(p.meta, root);
           base.page.cache[p.id] = p;
           render();
@@ -199,7 +199,7 @@ export const Root = () => {
                       root: page.root,
                       meta: {},
                     };
-                    await scanComponent(page.root.childs, !isPreviewProd);
+                    await scanComponent(page.root.childs);
                     rebuildMeta(p.meta, page.root);
                     base.page.cache[p.id] = p;
                   }
