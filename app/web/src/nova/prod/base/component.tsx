@@ -14,18 +14,6 @@ export const scanComponent = async (items: IContent[]) => {
   }
 
   if (comp.pending.size > 0) {
-    let all_found = true;
-    const founds: any = [];
-    if (all_found) {
-      for (const id of [...comp.pending]) {
-        comp.pending.delete(id);
-      }
-      await scanComponent(founds);
-      return;
-    }
-  }
-
-  if (comp.pending.size > 0) {
     try {
       const res = (await (
         await fetch(base.url`_prasi/comp`, {
@@ -48,6 +36,7 @@ const scanSingle = (item: IItem | ISection) => {
   const comp = base.comp;
   if (item.type === "item") {
     const comp_id = item.component?.id;
+
     if (comp_id) {
       if (!comp.list[comp_id] && !comp.pending.has(comp_id)) {
         comp.pending.add(comp_id);
@@ -63,8 +52,9 @@ const scanSingle = (item: IItem | ISection) => {
 
   if (item.childs) {
     for (const child of item.childs) {
-      if (child && child.type !== "text") {
-        scanSingle(child);
+      let c = child;
+      if (c && c.type !== "text") {
+        scanSingle(c);
       }
     }
   }
