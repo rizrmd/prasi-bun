@@ -47,9 +47,16 @@ export const Vi: FC<{
   vi.on_preload = on_preload;
 
   w.siteurl = (pathname: string) => {
-    if (vi.site.api_url) {
+    if (["prasi.avolut.com"].includes(location.hostname)) {
+      if (vi.site.api_url) {
+        if (!vi.site_url) {
+          vi.site_url = new URL(vi.site.api_url);
+        }
+      }
+    } else {
       if (!vi.site_url) {
-        vi.site_url = new URL(vi.site.api_url);
+        vi.site_url = new URL(location.href);
+        vi.site_url.pathname = "";
       }
     }
 
