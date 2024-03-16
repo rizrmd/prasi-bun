@@ -176,7 +176,14 @@ if (typeof global.server_hook === "function") {
         {
           name: "prasi",
           setup(setup) {
-            setup.onEnd((res) => {
+            setup.onEnd(async (res) => {
+              if (res.errors.length > 0) {
+                await codeError(
+                  id_site,
+                  res.errors.map((e) => e.text).join("\n\n"),
+                  "site"
+                );
+              }
               const cdoc = docs.code[id_site];
               if (cdoc) {
                 const doc = cdoc.build["site"];
@@ -200,8 +207,8 @@ if (typeof global.server_hook === "function") {
     if (esbuild) {
       try {
         await esbuild.rebuild();
-      } catch (e) {
-        console.error(e);
+      } catch (e: any) {
+        await codeError(id_site, e.message, mode);
       }
     }
 
@@ -235,4 +242,19 @@ const codeApplyChanges = (path: string, doc: DCode) => {
   });
 
   return doc;
+};
+
+const codeError = async (
+  id_site: string,
+  error: string,
+  mode: "server" | "site"
+) => {
+  const path = code.path(
+    id_site,
+    "site",
+    "build",
+    mode === "server" ? "server.log" : "error.log"
+  );
+
+  await Bun.write(path, error);
 };
