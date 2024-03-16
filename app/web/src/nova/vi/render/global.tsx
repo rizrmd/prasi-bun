@@ -39,7 +39,7 @@ export const ViGlobal = {
   },
   on_preload: undefined as
     | undefined
-    | ((arg: { urls: string[] }) => Promise<void>),
+    | ((arg: { urls: string[]; opt: { pre_render?: boolean } }) => Promise<void>),
 };
 
 export type VG = typeof ViGlobal & { render: () => void };

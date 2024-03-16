@@ -178,7 +178,8 @@ export const Root = () => {
                 : undefined
             }
             script={{ init_local_effect: base.init_local_effect }}
-            on_preload={async ({ urls }) => {
+            on_preload={async ({ urls, opt }) => {
+              console.log(urls, opt);
               const load_urls: string[] = [];
               if (base.cache.urls) {
                 for (const url of urls) {
