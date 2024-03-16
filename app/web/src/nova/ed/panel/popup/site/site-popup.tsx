@@ -94,12 +94,11 @@ export const EdPopSite = () => {
           }
         }}
       >
+        {local.status === "loading" && (
+          <Loading note="listing-site" backdrop={false} />
+        )}
         <div className={cx("absolute inset-[5%] bg-white flex")}>
           <div className="relative flex flex-1">
-            {local.status === "loading" && (
-              <Loading note="listing-site" backdrop={false} />
-            )}
-
             {(local.status === "ready" || local.group.length > 0) && (
               <SitePicker
                 group={local.group}

@@ -24,7 +24,10 @@ export const Vi: FC<{
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
   on_status_changed?: (status: VG["status"]) => void;
-  on_preload?: (arg: { urls: string[] }) => Promise<void>;
+  on_preload?: (arg: {
+    urls: string[];
+    opt?: { pre_render?: boolean };
+  }) => Promise<void>;
 }> = ({
   meta,
   entry,
@@ -80,7 +83,7 @@ export const Vi: FC<{
   };
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
-  w.preload = (_urls: string | string[]) => {
+  w.preload = (_urls: string | string[], opt: { pre_render?: boolean }) => {
     if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
     const urls = typeof _urls === "string" ? [_urls] : _urls;
     for (const url of urls) {
@@ -91,6 +94,9 @@ export const Vi: FC<{
       if (vi.on_preload) {
         vi.on_preload({
           urls: Array.from(vi.page.navs[page_id]),
+          opt: {
+            pre_render: !!opt?.pre_render,
+          },
         });
       }
     }, 100);
