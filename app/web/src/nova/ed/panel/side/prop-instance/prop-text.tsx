@@ -34,9 +34,39 @@ export const EdPropInstanceText: FC<{
     }
   }, [val]);
 
+  const valnum = parseInt(unquote(val));
+
   return (
     <div className="flex items-center min-h-[28px]">
-      <EdPropLabel name={label || name} labelClick={labelClick} />
+      <EdPropLabel
+        name={label || name}
+        labelClick={labelClick}
+        dragnum={
+          typeof valnum === "number" && !isNaN(valnum)
+            ? {
+                value: valnum,
+                onChange(value) {
+                  local.value = Math.round(value) + "";
+                  local.render();
+                },
+                onChanged(value) {
+                  local.value = Math.round(value) + "";
+                  local.render();
+
+                  clearTimeout(local.timeout);
+                  local.timeout = setTimeout(() => {
+                    mprop.doc?.transact(() => {
+                      mprop.set("value", `\`${local.value}\``);
+                      mprop.set("valueBuilt", `\`${local.value}\``);
+                    });
+                    treeRebuild(p);
+                    p.render();
+                  }, 200);
+                },
+              }
+            : undefined
+        }
+      />
       <AutoHeightTextarea
         className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}
