@@ -218,12 +218,13 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 ) {
                   hasCode = true;
                 }
- 
-                if (type === "file" && !!value && !value.startsWith("siteurl("))
-                  hasCode = true;
 
                 if (value.length > 100) {
                   hasCode = true;
+                }
+                if (type === "file") {
+                  if (!!value && !value.startsWith("siteurl(")) hasCode = true;
+                  else hasCode = false
                 }
 
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
