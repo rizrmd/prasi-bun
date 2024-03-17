@@ -44,10 +44,12 @@ export const createViPassProp = (
           is_meta = false;
         }
       }
-      return arg.children.map(({ id }) => {
-        const meta = vi.meta[id];
-        return <ViChild key={id} is_layout={is_layout} meta={meta} />;
-      });
+      if (is_meta) {
+        return arg.children.map(({ id }) => {
+          const meta = vi.meta[id];
+          return <ViChild key={id} is_layout={is_layout} meta={meta} />;
+        });
+      }
     }
 
     return modifyChild(arg, meta.script?.scope);
