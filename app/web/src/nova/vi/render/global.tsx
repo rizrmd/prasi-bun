@@ -1,3 +1,4 @@
+import { IContent } from "../../../utils/types/general";
 import { IRoot } from "../../../utils/types/root";
 import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
@@ -48,7 +49,11 @@ export const ViGlobal = {
               id: string;
               url: string;
               root: IRoot;
-            }[]
+            }[],
+            walk: (
+              root: { root: IRoot }[],
+              visit: (item: IContent) => void | Promise<void>
+            ) => void
           ) => void;
         };
       }) => Promise<void>),

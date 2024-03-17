@@ -76,5 +76,6 @@ export const loadUrls = async (urls: string[]) => {
     })
     .filter((e) => e && e.id);
 
-  return await loadPages(founds.map((e) => e?.id) as string[]);
+  const result = await loadPages(founds.map((e) => e?.id) as string[]);
+  return result;
 };
