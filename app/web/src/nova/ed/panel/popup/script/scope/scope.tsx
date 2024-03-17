@@ -80,7 +80,7 @@ const map_childs = (
       paths.push([...(curpath || []), meta]);
       if (meta.item.component?.id && meta.item.component?.props) {
         for (const [name, prop] of Object.entries(meta.item.component.props)) {
-          if (prop.meta?.type === "content-element" && prop.content) {
+          if (prop.content) {
             map_childs(monaco, p, metas, [prop.content], paths, [
               ...(curpath || []),
               meta,
