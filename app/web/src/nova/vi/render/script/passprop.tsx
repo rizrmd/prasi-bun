@@ -40,9 +40,7 @@ export const createViPassProp = (
     } else if (Array.isArray(arg.children)) {
       let is_meta = true;
       for (const c of arg.children) {
-        if (
-          !(!isValidElement(arg.children) && typeof arg.children === "object")
-        ) {
+        if (!(!isValidElement(c) && typeof c === "object")) {
           is_meta = false;
         }
       }
