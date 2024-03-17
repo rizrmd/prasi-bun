@@ -15,7 +15,7 @@ export const baseTypings = `
   const isMobile: boolean;
   const isDesktop: boolean;
   const siteurl: (path:string) => string;
-  const preload: (urls: string | string[], opt: {pre_render?: boolean}) => ReactNode;
+  const preload: (urls: string | string[], opt: {on_load?: boolean}) => ReactNode;
   const apiHeaders: Record<string, any>;
   const navigate: (url: string) => void;
   const params: any;
