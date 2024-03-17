@@ -53,7 +53,7 @@ export const Vi: FC<{
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;
 
-    if (["prasi.avolut.com"].includes(location.hostname)) {
+    if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
       if (vi.site.api_url) {
         if (!vi.site_url) {
           vi.site_url = new URL(vi.site.api_url);

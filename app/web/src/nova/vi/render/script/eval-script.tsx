@@ -40,6 +40,7 @@ export const viEvalScript = (
     meta.script.scope = passprop;
   }
 
+
   const script = meta.script;
   const exports = (window as any).exports;
   const arg = {
