@@ -90,16 +90,19 @@ export const createViPassProp = (
         }
       }
       if (is_meta) {
-        return arg.children.map(({ id }) => {
-          const meta = vi.meta[id];
-          return (
-            <ViRender
-              key={id}
-              is_layout={is_layout}
-              meta={meta}
-              passprop={_pass}
-            />
-          );
+        return arg.children.map((item) => {
+          if (item && item.id) {
+            const meta = vi.meta[item.id];
+            return (
+              <ViRender
+                key={item.id}
+                is_layout={is_layout}
+                meta={meta}
+                passprop={_pass}
+              />
+            );
+          }
+          return null;
         });
       }
     }
