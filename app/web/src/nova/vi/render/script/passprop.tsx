@@ -1,10 +1,8 @@
+import get from "lodash.get";
 import { ReactNode, isValidElement } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
-import get from "lodash.get";
-import { GenMetaArg } from "../../utils/types";
-import { genMeta } from "../../meta/meta";
 
 export const createViPassProp = (
   vi: { meta: VG["meta"] },
@@ -80,9 +78,9 @@ export const createViPassProp = (
       const child_id = (arg.children as any).id;
       if (child_id) {
         const meta = vi.meta[child_id];
-        return <ViRender is_layout={is_layout} meta={meta} />;
+        return <ViRender is_layout={is_layout} meta={meta} passprop={_pass} />;
       }
-    } 
+    }
 
     return modifyChild(arg, meta.script?.scope);
   };
