@@ -127,6 +127,10 @@ export const EdScriptMonaco: FC<{}> = () => {
               switch (type) {
                 case "prop-master":
                   {
+                    for (const prop_name of Object.keys(component.props)) {
+                      types[prop_name] = "any";
+                    }
+
                     const nmodel = monaco.editor.createModel(
                       trim(val),
                       "typescript",
