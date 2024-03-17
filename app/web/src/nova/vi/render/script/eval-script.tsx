@@ -34,12 +34,11 @@ export const viEvalScript = (
       scope: passprop,
       result: null,
       Local: createViLocal(vi, is_layout, meta),
-      PassProp: createViPassProp(vi, is_layout, meta),
+      PassProp: createViPassProp(vi, is_layout, meta, passprop),
     };
   } else {
     meta.script.scope = passprop;
   }
-
 
   const script = meta.script;
   const exports = (window as any).exports;

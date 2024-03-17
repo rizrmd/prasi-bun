@@ -35,7 +35,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
       p.meta[meta.item.id] = meta;
     }
   }
-
+ 
   if (item.childs) {
     for (const [_, v] of Object.entries(item.childs)) {
       if (v.id) {
@@ -57,8 +57,7 @@ export const genMeta = (p: GenMetaP, arg: GenMetaArg) => {
           };
         }
         genMeta(p, carg);
-      } else {
-      }
+      } 
     }
   }
 };

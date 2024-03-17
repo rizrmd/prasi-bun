@@ -102,6 +102,7 @@ export const rebuildMeta = (meta: Record<string, IMeta>, root: IRoot) => {
   for (const item of root.childs) {
     genMeta(
       {
+        set_meta: true,
         comps: base.comp.list,
         meta,
         mode: "page",

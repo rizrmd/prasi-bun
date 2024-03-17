@@ -3,11 +3,14 @@ import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
 import get from "lodash.get";
+import { GenMetaArg } from "../../utils/types";
+import { genMeta } from "../../meta/meta";
 
 export const createViPassProp = (
   vi: { meta: VG["meta"] },
   is_layout: boolean,
-  meta: IMeta
+  meta: IMeta,
+  passprop: any
 ) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
     if (!meta.item.script) {
@@ -18,15 +21,19 @@ export const createViPassProp = (
       meta.item.script.passprop = {};
     }
 
+    const script_pass: any = {};
     if (meta.item.script.passprop) {
       let is_changed = false;
       for (const [k, v] of Object.entries(arg)) {
         if (!["children", "key"].includes(k)) {
           is_changed = true;
+          script_pass[k] = v;
           meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
         }
       }
     }
+
+    const _pass = { ...passprop, ...script_pass };
 
     if (
       !Array.isArray(arg.children) &&
@@ -46,9 +53,20 @@ export const createViPassProp = (
           }
         }
         if (is_meta) {
-          return children.map(({ id }) => {
-            const meta = vi.meta[id];
-            return <ViRender key={id} is_layout={is_layout} meta={meta} />;
+          return children.map((item) => {
+            const cmeta = vi.meta[item.id];
+
+            if (cmeta) {
+              return (
+                <ViRender
+                  key={item.id}
+                  is_layout={is_layout}
+                  meta={cmeta}
+                  passprop={_pass}
+                />
+              );
+            }
+            return null;
           });
         }
       }
@@ -74,7 +92,14 @@ export const createViPassProp = (
       if (is_meta) {
         return arg.children.map(({ id }) => {
           const meta = vi.meta[id];
-          return <ViRender key={id} is_layout={is_layout} meta={meta} />;
+          return (
+            <ViRender
+              key={id}
+              is_layout={is_layout}
+              meta={meta}
+              passprop={_pass}
+            />
+          );
         });
       }
     }

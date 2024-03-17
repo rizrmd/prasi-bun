@@ -57,6 +57,7 @@ export const ViRender: FC<{
   if (meta.item.hidden) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
+
     return (
       <ErrorBox meta={meta}>
         <ViScript
