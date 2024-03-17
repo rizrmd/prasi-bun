@@ -8,6 +8,9 @@ import { nav } from "./render/script/extract-nav";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
 
+type PRELOAD = Exclude<VG["on_preload"], undefined>;
+type PRELOAD_ARGS = Parameters<PRELOAD>[0];
+
 const w = window as any;
 export const Vi: FC<{
   meta: Record<string, IMeta>;
@@ -24,10 +27,7 @@ export const Vi: FC<{
   visit?: VG["visit"];
   render_stat?: "enabled" | "disabled";
   on_status_changed?: (status: VG["status"]) => void;
-  on_preload?: (arg: {
-    urls: string[];
-    opt?: { pre_render?: boolean };
-  }) => Promise<void>;
+  on_preload?: VG["on_preload"];
 }> = ({
   meta,
   entry,
@@ -83,7 +83,7 @@ export const Vi: FC<{
   };
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
-  w.preload = (_urls: string | string[], opt: { pre_render?: boolean }) => {
+  w.preload = (_urls: PRELOAD_ARGS["urls"], opt: PRELOAD_ARGS["opt"]) => {
     if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
     const urls = typeof _urls === "string" ? [_urls] : _urls;
     for (const url of urls) {
@@ -95,7 +95,7 @@ export const Vi: FC<{
         vi.on_preload({
           urls: Array.from(vi.page.navs[page_id]),
           opt: {
-            pre_render: !!opt?.pre_render,
+            on_load: opt?.on_load,
           },
         });
       }
@@ -133,6 +133,9 @@ export const Vi: FC<{
         if (nav) {
           on_preload({
             urls: Array.from(nav),
+            opt: {
+              on_load(pages) {},
+            },
           });
         }
       }, 500);

@@ -1,3 +1,4 @@
+import { IRoot } from "../../../utils/types/root";
 import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
 
@@ -39,7 +40,18 @@ export const ViGlobal = {
   },
   on_preload: undefined as
     | undefined
-    | ((arg: { urls: string[]; opt: { pre_render?: boolean } }) => Promise<void>),
+    | ((arg: {
+        urls: string[];
+        opt: {
+          on_load?: (
+            pages: {
+              id: string;
+              url: string;
+              root: IRoot;
+            }[]
+          ) => void;
+        };
+      }) => Promise<void>),
 };
 
 export type VG = typeof ViGlobal & { render: () => void };
