@@ -82,30 +82,7 @@ export const createViPassProp = (
         const meta = vi.meta[child_id];
         return <ViRender is_layout={is_layout} meta={meta} />;
       }
-    } else if (Array.isArray(arg.children)) {
-      let is_meta = true;
-      for (const c of arg.children) {
-        if (!(!isValidElement(c) && typeof c === "object")) {
-          is_meta = false;
-        }
-      }
-      if (is_meta) {
-        return arg.children.map((item) => {
-          if (item && item.id) {
-            const meta = vi.meta[item.id];
-            return (
-              <ViRender
-                key={item.id}
-                is_layout={is_layout}
-                meta={meta}
-                passprop={_pass}
-              />
-            );
-          }
-          return null;
-        });
-      }
-    }
+    } 
 
     return modifyChild(arg, meta.script?.scope);
   };
