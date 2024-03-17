@@ -11,6 +11,8 @@ import { loadPage, loadUrls } from "./base/page";
 import { detectResponsiveMode } from "./base/responsive";
 import { initBaseRoute, rebuildMeta } from "./base/route";
 import { w } from "./w";
+import { IRoot } from "../../utils/types/root";
+import { IContent } from "../../utils/types/general";
 
 export const isPreview = () => {
   return (
@@ -179,8 +181,8 @@ export const Root = () => {
             }
             script={{ init_local_effect: base.init_local_effect }}
             on_preload={async ({ urls, opt }) => {
-              console.log(urls, opt);
               const load_urls: string[] = [];
+              const loaded = {} as Record<string, any>;
               if (base.cache.urls) {
                 for (const url of urls) {
                   if (!base.cache.urls.has(url)) {
@@ -194,7 +196,7 @@ export const Root = () => {
                 const pages = await loadUrls(load_urls);
 
                 if (opt?.on_load) {
-                  opt.on_load(pages);
+                  opt.on_load(pages, walkRoot);
                 }
 
                 if (Array.isArray(pages)) {
@@ -217,4 +219,36 @@ export const Root = () => {
       </div>
     </Provider>
   );
+};
+
+const walkRoot = (
+  pages: { root: IRoot }[],
+  visit: (item: IContent) => void | Promise<void>
+) => {
+  for (const page of pages) {
+    for (const child of page.root.childs) {
+      walk(child, visit);
+    }
+  }
+};
+
+const walk = (
+  item: IContent,
+  visit: (item: IContent) => void | Promise<void>
+) => {
+  visit(item);
+
+  if (item.type !== "text") {
+    if (item.type === "item" && item.component?.props) {
+      for (const prop of Object.values(item.component.props)) {
+        if (prop.content) {
+          walk(prop.content, visit);
+        }
+      }
+    }
+
+    for (const child of item.childs) {
+      walk(child, visit);
+    }
+  }
 };

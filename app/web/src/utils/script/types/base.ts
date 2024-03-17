@@ -15,7 +15,18 @@ export const baseTypings = `
   const isMobile: boolean;
   const isDesktop: boolean;
   const siteurl: (path:string) => string;
-  const preload: (urls: string | string[], opt: {on_load?: boolean}) => ReactNode;
+  const preload: (urls: string | string[], opt: {
+    on_load?: (
+      pages: {
+        id: string;
+        url: string;
+        root: IRoot;
+      }[],
+      walk: (
+        root: { root: IRoot }[],
+        visit: (item: IContent) => void | Promise<void>
+      ) => void
+    ) => void;}) => ReactNode;
   const apiHeaders: Record<string, any>;
   const navigate: (url: string) => void;
   const params: any;
