@@ -89,7 +89,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     p.site.layout.id === p.page.cur.id &&
     arg?.note === "load-layout page-init";
 
-  console.log("component loading", p.comp.list, p.comp.loaded);
   for (const [k, v] of Object.entries(p.comp.list)) {
     if (!p.comp.loaded[k]) {
       const mcomp = v.doc.getMap("map").get("root");
