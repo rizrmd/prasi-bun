@@ -75,12 +75,17 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             for (const [k, v] of Object.entries(meta.item.script?.props)) {
               eval(`arg.${k} = ${v.value}`);
             }
+          } else if (meta.item.component) {
+            for (const [k, v] of Object.entries(meta.item.component.props)) {
+              eval(`arg.${k} = ${v.valueBuilt}`);
+            }
           }
 
           const visible_fn = new Function(
             ...Object.keys(arg),
             `return ${visible}`
           );
+
           const res = visible_fn(...Object.values(arg));
 
           if (!res) {
@@ -224,7 +229,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 }
                 if (type === "file") {
                   if (!!value && !value.startsWith("siteurl(")) hasCode = true;
-                  else hasCode = false
+                  else hasCode = false;
                 }
 
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
