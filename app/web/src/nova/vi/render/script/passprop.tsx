@@ -1,7 +1,8 @@
 import { ReactNode, isValidElement } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
-import { ViChild } from "../render";
+import { ViRender } from "../render";
+import get from "lodash.get";
 
 export const createViPassProp = (
   vi: { meta: VG["meta"] },
@@ -29,13 +30,39 @@ export const createViPassProp = (
 
     if (
       !Array.isArray(arg.children) &&
+      isValidElement(arg.children) &&
+      typeof arg.children === "object"
+    ) {
+      const children = get(
+        arg.children,
+        "props.meta.item.component.props.child.content.childs"
+      ) as unknown as any[];
+
+      if (Array.isArray(children)) {
+        let is_meta = true;
+        for (const c of children) {
+          if (!(!isValidElement(c) && typeof c === "object")) {
+            is_meta = false;
+          }
+        }
+        if (is_meta) {
+          return children.map(({ id }) => {
+            const meta = vi.meta[id];
+            return <ViRender key={id} is_layout={is_layout} meta={meta} />;
+          });
+        }
+      }
+    }
+
+    if (
+      !Array.isArray(arg.children) &&
       !isValidElement(arg.children) &&
       typeof arg.children === "object"
     ) {
       const child_id = (arg.children as any).id;
       if (child_id) {
         const meta = vi.meta[child_id];
-        return <ViChild is_layout={is_layout} meta={meta} />;
+        return <ViRender is_layout={is_layout} meta={meta} />;
       }
     } else if (Array.isArray(arg.children)) {
       let is_meta = true;
@@ -47,7 +74,7 @@ export const createViPassProp = (
       if (is_meta) {
         return arg.children.map(({ id }) => {
           const meta = vi.meta[id];
-          return <ViChild key={id} is_layout={is_layout} meta={meta} />;
+          return <ViRender key={id} is_layout={is_layout} meta={meta} />;
         });
       }
     }

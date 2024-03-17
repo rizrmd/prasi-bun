@@ -35,25 +35,37 @@ export const EdCompPicker = () => {
       }
 
       let active_meta = getActiveMeta(p);
+      console.log(active_meta);
       if (!active_meta) {
         alert("Please select an item/section to add component!");
       }
 
       if (active_meta) {
         let item = active_meta.item as IContent;
-        if (
-          item.type === "item" &&
-          item.component?.id &&
-          active_meta.parent?.id &&
-          item.component?.id !== active.comp_id
-        ) {
-          active_meta = getMetaById(p, active_meta.parent.id);
-
-          if (active_meta) {
-            item = active_meta.item;
+        if (item.type === "item" && item.component?.id) {
+          if (
+            item.component.props.child &&
+            item.component.props.child.content
+          ) {
+            const cmeta = getMetaById(p, item.component.props.child.content.id);
+            if (cmeta) {
+              active_meta = cmeta;
+              item = active_meta.item;
+            }
           } else {
-            alert("Warning: Please edit component first before adding. ");
-            return;
+            if (
+              active_meta.parent?.id &&
+              item.component?.id !== active.comp_id
+            ) {
+              active_meta = getMetaById(p, active_meta.parent.id);
+
+              if (active_meta) {
+                item = active_meta.item;
+              } else {
+                alert("Warning: Please edit component first before adding. ");
+                return;
+              }
+            }
           }
         }
 

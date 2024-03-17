@@ -71,8 +71,9 @@ export const EdPropInstanceText: FC<{
         className="flex-1 outline-none border-l p-1 overflow-hidden focus:bg-blue-50"
         value={local.value || ""}
         spellCheck={false}
-        onFocus={() => {
+        onFocus={(e) => {
           local.focus = true;
+          e.currentTarget.select();
           local.render();
         }}
         onBlur={() => {
