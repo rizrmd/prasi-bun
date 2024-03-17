@@ -15,7 +15,7 @@ export const baseTypings = `
   const isMobile: boolean;
   const isDesktop: boolean;
   const siteurl: (path:string) => string;
-  const preload: (urls: string | string[], opt: {
+  const preload: (urls: string | string[], opt?: {
     on_load?: (
       pages: {
         id: string;
