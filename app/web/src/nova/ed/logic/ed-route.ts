@@ -147,6 +147,7 @@ export const reloadPage = async (
   }
 
   if (remotePage.comps) {
+    console.log("page comps", remotePage.comps);
     for (const [id_comp, c] of Object.entries(remotePage.comps)) {
       if (c && c.snapshot) {
         await loadCompSnapshot(p, id_comp, c.snapshot);
@@ -177,7 +178,7 @@ export const reloadPage = async (
         location.reload();
         return;
       }
-      
+
       const res = await p.sync.yjs.sv_local(
         "page",
         p.page.cur.id,
