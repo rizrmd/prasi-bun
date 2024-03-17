@@ -4,12 +4,16 @@ import { IItem } from "../../../utils/types/item";
 import { ISection } from "../../../utils/types/section";
 import { base } from "./base";
 
-export const scanComponent = async (items: IContent[]) => {
+export const scanComponent = async (
+  items: IContent[],
+  _pending?: Record<string, IItem[]>
+) => {
   const comp = base.comp;
 
+  const pending = _pending || {};
   for (const item of items) {
     if (item && item.type !== "text") {
-      scanSingle(item);
+      scanSingle(item, pending);
     }
   }
 
@@ -27,12 +31,15 @@ export const scanComponent = async (items: IContent[]) => {
 
         await set(`comp-${id}`, item);
       }
-      await scanComponent(Object.values(res));
+      await scanComponent(Object.values(res), pending);
     } catch (e) {}
   }
 };
 
-const scanSingle = (item: IItem | ISection) => {
+const scanSingle = (
+  item: IItem | ISection,
+  pending: Record<string, IItem[]>
+) => {
   const comp = base.comp;
   if (item.type === "item") {
     const comp_id = item.component?.id;
@@ -41,11 +48,22 @@ const scanSingle = (item: IItem | ISection) => {
       if (!comp.list[comp_id] && !comp.pending.has(comp_id)) {
         comp.pending.add(comp_id);
       }
-
-      for (const prop of Object.values(item.component?.props || {})) {
-        if (prop.content && prop.meta?.type === "content-element") {
-          scanSingle(prop.content);
+      if (comp.pending.has(comp_id)) {
+        if (!pending[comp_id]) {
+          pending[comp_id] = [];
         }
+        pending[comp_id].push(item);
+      }
+
+      if (comp.list[comp_id] && pending[comp_id]) {
+        for (const item of pending[comp_id]) {
+          for (const prop of Object.values(item.component?.props || {})) {
+            if (prop.content) {
+              scanSingle(prop.content, pending);
+            }
+          }
+        }
+        delete pending[comp_id];
       }
     }
   }
@@ -54,7 +72,7 @@ const scanSingle = (item: IItem | ISection) => {
     for (const child of item.childs) {
       let c = child;
       if (c && c.type !== "text") {
-        scanSingle(c);
+        scanSingle(c, pending);
       }
     }
   }
