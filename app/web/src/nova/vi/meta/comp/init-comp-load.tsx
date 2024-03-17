@@ -29,7 +29,7 @@ export const initLoadComp = async (
 
             if (component?.props) {
               for (const [name, prop] of Object.entries(component.props)) {
-                if (prop.meta?.type === "content-element" && prop.content) {
+                if (prop.content) {
                   genMeta(
                     {
                       ...p,
