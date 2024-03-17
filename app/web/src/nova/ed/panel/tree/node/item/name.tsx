@@ -139,19 +139,22 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
   is_jsx_prop,
   meta,
 }) => {
-  if (is_jsx_prop) {
-    let comp_label = "";
-    const comp_id = meta?.item.component?.id;
+  let comp_label = "";
+  if (meta?.item.component?.id) {
     for (const prop of Object.values(meta?.item.component?.props || {})) {
       if (prop.is_name) {
         try {
           eval(`comp_label = ${prop.valueBuilt}`);
         } catch (e) {}
         if (typeof comp_label !== "string" && typeof comp_label !== "number") {
-          comp_label = "asdas";
+          comp_label = "";
         }
       }
     }
+  }
+
+  if (is_jsx_prop) {
+    const comp_id = meta?.item.component?.id;
 
     return (
       <div className={cx("flex items-center space-x-1 pr-1")}>
@@ -205,7 +208,12 @@ Please put {${name}} somewhere inside component JS.`}</div>
     );
   }
 
-  return <div>{name}</div>;
+  return (
+    <div>
+      {name}
+      {comp_label && `: ${comp_label}`}
+    </div>
+  );
 };
 
 const GenerateJSX: FC<{ meta: IMeta }> = ({ meta }) => {
