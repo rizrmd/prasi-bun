@@ -35,7 +35,6 @@ export const EdCompPicker = () => {
       }
 
       let active_meta = getActiveMeta(p);
-      console.log(active_meta);
       if (!active_meta) {
         alert("Please select an item/section to add component!");
       }
