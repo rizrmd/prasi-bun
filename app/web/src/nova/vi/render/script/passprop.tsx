@@ -82,7 +82,9 @@ export const createViPassProp = (
       }
     }
 
-    return modifyChild(arg, { ...meta.script?.scope, ...passprop });
+    const result = modifyChild(arg, meta.script?.scope);
+
+    return result;
   };
 };
 

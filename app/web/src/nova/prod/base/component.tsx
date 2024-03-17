@@ -55,15 +55,23 @@ const scanSingle = (
         pending[comp_id].push(item);
       }
 
-      if (comp.list[comp_id] && pending[comp_id]) {
-        for (const item of pending[comp_id]) {
+      if (pending[comp_id]) {
+        if (comp.list[comp_id]) {
+          for (const item of pending[comp_id]) {
+            for (const prop of Object.values(item.component?.props || {})) {
+              if (prop.content) {
+                scanSingle(prop.content, pending);
+              }
+            }
+          }
+          delete pending[comp_id];
+        } else if (item.component?.props) {
           for (const prop of Object.values(item.component?.props || {})) {
             if (prop.content) {
               scanSingle(prop.content, pending);
             }
           }
         }
-        delete pending[comp_id];
       }
     }
   }

@@ -38,6 +38,7 @@ export const initBaseRoute = async () => {
         base.layout.meta = {};
         if (base.layout.root) {
           await scanComponent(base.layout.root.childs);
+          console.log(Object.values(base.comp.list).map((e) => e.name));
           rebuildMeta(base.layout.meta, base.layout.root);
         }
       }
