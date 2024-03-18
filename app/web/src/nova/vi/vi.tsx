@@ -52,23 +52,25 @@ export const Vi: FC<{
   w.siteurl = (pathname: string, forceOriginal?: boolean) => {
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;
-
-    if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
-      if (vi.site.api_url) {
+    
+    try {
+      if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
+        if (vi.site.api_url) {
+          if (!vi.site_url) {
+            vi.site_url = new URL(vi.site.api_url);
+          }
+        }
+      } else {
         if (!vi.site_url) {
-          vi.site_url = new URL(vi.site.api_url);
+          if (forceOriginal && vi.site.api_url) {
+            vi.site_url = new URL(vi.site.api_url);
+          } else {
+            vi.site_url = new URL(location.href);
+          }
+          vi.site_url.pathname = "";
         }
       }
-    } else {
-      if (!vi.site_url) {
-        if (forceOriginal && vi.site.api_url) {
-          vi.site_url = new URL(vi.site.api_url);
-        } else {
-          vi.site_url = new URL(location.href);
-        }
-        vi.site_url.pathname = "";
-      }
-    }
+    } catch (e) {}
 
     if (vi.site_url) {
       const u = vi.site_url;
