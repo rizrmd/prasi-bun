@@ -62,7 +62,7 @@ export const applyEnv = async (p: PG) => {
 
   const url = `/prod/${p.site.id}/_prasi/code/index.js`;
   const fn = new Function("callback", `import("${url}").then(callback)`);
-  await new Promise((resolve) => {
+  await new Promise<void>((resolve) => {
     fn((exports: any) => {
       for (const [k, v] of Object.entries(exports)) {
         w[k] = v;
