@@ -3,7 +3,6 @@ import { validate } from "uuid";
 import { GlobalContext, useLocal } from "web-utils";
 import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
-import { evalCJS } from "../ed/logic/ed-sync";
 import { Vi } from "../vi/vi";
 import { base } from "./base/base";
 import { scanComponent } from "./base/component";
@@ -47,15 +46,11 @@ export const Root = () => {
         base.route.router = router;
         base.route.pages = pages;
 
-        const site_script = evalCJS(
-          await (
-            await fetch(
-              `${w._prasi.basepath}/_prasi/code/index.js`.replace("//", "/")
-            )
-          ).text()
+        const site_exports = await import(
+          `${w._prasi.basepath}/_prasi/code/index.js`.replace("//", "/")
         );
-        if (site_script) {
-          for (const [k, v] of Object.entries(site_script)) {
+        if (site_exports) {
+          for (const [k, v] of Object.entries(site_exports)) {
             (window as any)[k] = v;
           }
         }

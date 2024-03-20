@@ -81,7 +81,7 @@ export const code_action: SAction["code"]["action"] = async function (
         ) {
           return { type: "check-typings", hash: true };
         }
-      } catch (e) { }
+      } catch (e) {}
       return { type: "check-typings", hash: false };
     }
     case "push-typings": {

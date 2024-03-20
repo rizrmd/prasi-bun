@@ -155,10 +155,11 @@ if (typeof global.server_hook === "function") {
       absWorkingDir: src_path,
       entryPoints: ["index.tsx"],
       bundle: true,
-      outfile: build_file,
+      outdir: build_path,
       minify: true,
       treeShaking: true,
-      format: "cjs",
+      format: "esm",
+      splitting: true,
       logLevel: "silent",
       sourcemap: true,
       plugins: [
@@ -212,13 +213,13 @@ if (typeof global.server_hook === "function") {
       }
     }
 
-    const build_file = code.path(id_site, mode, "build", "index.js");
-    const out = Bun.file(build_file);
-    const src = (await out.text()).replace(
-      "//# sourceMappingURL=index.js.map",
-      `//# sourceMappingURL=/nova-load/code/${id_site}/${mode}/index.js.map`
-    );
-    // await Bun.write(out, src);
+    // const build_file = code.path(id_site, mode, "build", "index.js");
+    // const out = Bun.file(build_file);
+    // const src = (await out.text()).replace(
+    //   "//# sourceMappingURL=index.js.map",
+    //   `//# sourceMappingURL=/nova-load/code/${id_site}/${mode}/index.js.map`
+    // );
+    // // await Bun.write(out, src);
   }
 };
 
@@ -252,8 +253,8 @@ const codeError = async (
   const path = code.path(
     id_site,
     "site",
-    "build",
-    mode === "server" ? "server.log" : "error.log"
+    "src",
+    mode === "server" ? "server.log" : "index.log"
   );
 
   await Bun.write(path, error);

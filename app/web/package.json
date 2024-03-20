@@ -86,9 +86,6 @@
     "@types/react-is": "^18.2.3",
     "@types/textdiff-create": "^1.0.1",
     "@types/ua-parser-js": "^0.7.38",
-    "@parcel/config-default": "^2.10.3",
-    "@parcel/core": "^2.10.3",
-    "@parcel/transformer-raw": "^2.10.3",
     "@tinijs/parcel-reporter-copy-public": "0.0.2",
     "@types/lodash.capitalize": "4.2.8",
     "@types/lodash.debounce": "^4.0.8",
@@ -101,7 +98,7 @@
     "@types/tinycolor2": "^1.4.5",
     "@types/uuid": "9.0.6",
     "@types/vscode": "^1.83.1",
-    "parcel": "^2.10.3",
+    "parcel": "^2.12.0",
     "parcel-bundler-splitable": "0.0.4",
     "postcss": "8.4.31",
     "tailwindcss": "3.3.4"

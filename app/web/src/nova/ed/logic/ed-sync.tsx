@@ -34,7 +34,6 @@ export const loadSession = (p: PG) => {
     p.user.id = "ab1390f5-40d5-448e-a8c3-84b0fb600930";
     p.user.username = "anonymous";
   }
-
 };
 
 export const edInitSync = (p: PG) => {
@@ -241,21 +240,4 @@ export const edInitSync = (p: PG) => {
     }
   }
   return true;
-};
-
-export const evalCJS = (src: string) => {
-  if (src) {
-    const module = { exports: { __esModule: true as true | undefined } };
-    eval(`try {
-        ${src}
-      } catch(e) {
-        console.error(e);
-      }`);
-    const result = { ...module.exports };
-    if (result.__esModule) {
-      delete result.__esModule;
-    }
-    return result;
-  }
-  return {};
 };
