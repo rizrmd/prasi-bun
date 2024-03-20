@@ -151,7 +151,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     if (component.id) {
                       const prop_name = p.ui.popup.script.prop_name;
                       const prop = component.props[prop_name];
-                      if (typeof prop.typings === "string") {
+                      if (!!prop && typeof prop.typings === "string") {
                         try {
                           const typings_src = prop.typings.substring(
                             `const typings = `.length
