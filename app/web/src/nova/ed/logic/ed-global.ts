@@ -24,18 +24,17 @@ export const EmptySite = {
     meta: undefined as void | Record<string, IMeta>,
     entry: [] as string[],
   },
-  code: {
-    snapshot: {} as
-      | undefined
-      | Record<
-          string,
-          {
-            id_doc: number;
-            bin: Uint8Array;
-          }
-        >,
-    mode: "old" as "old" | "vsc",
-  },
+  // code: {
+  //   snapshot: {} as
+  //     | undefined
+  //     | Record<
+  //         string,
+  //         {
+  //           id_doc: number;
+  //           bin: Uint8Array;
+  //         }
+  //       >,
+  // },
 };
 
 export type ESite = typeof EmptySite;
@@ -297,7 +296,7 @@ export const EDGlobal = {
         open: false,
         mode: "js" as "js" | "css" | "html",
         lastMode: "js" as "js" | "css" | "html",
-        type: "item" as "item" | "prop-master" | "prop-instance",
+        type: "item" as "item" | "prop-master" | "prop-instance" | "comp-types",
         prop_kind: "" as PropFieldKind,
         prop_name: "",
         on_close: () => {},

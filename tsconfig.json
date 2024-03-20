@@ -5,6 +5,11 @@
     "app/static",
     "app/web/static",
   ],
+  "include": [
+    "app/srv/**/*",
+    "app/web/**/*",
+    "pkgs/**/*"
+  ],
   "compilerOptions": {
     "lib": [
       "ESNext"

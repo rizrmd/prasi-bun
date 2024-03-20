@@ -16,9 +16,6 @@ export const ViGlobal = {
     api_url: "",
     api: null as any,
     db: null as any,
-    code: {
-      mode: "old" as "old" | "vsc",
-    },
   },
   site_url: null as unknown as URL,
   script: {

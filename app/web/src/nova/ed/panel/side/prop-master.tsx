@@ -174,43 +174,61 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
               dragPreviewRender={() => <></>}
             />
           </DndProvider>
-          <div
-            className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none"
-            onClick={() => {
-              if (mprops) {
-                const indexes: (number | undefined)[] = [];
-                mprops.forEach((e) => indexes.push(e.get("idx")));
-                let idx: any = (indexes.sort().pop() || 0) + 1;
-                if (indexes.length === 0) {
-                  idx = 1;
-                } else {
-                  idx = parseInt(idx) + 1;
-                }
+          <div className="flex">
+            <div
+              className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex-1"
+              onClick={() => {
+                if (mprops) {
+                  const indexes: (number | undefined)[] = [];
+                  mprops.forEach((e) => indexes.push(e.get("idx")));
+                  let idx: any = (indexes.sort().pop() || 0) + 1;
+                  if (indexes.length === 0) {
+                    idx = 1;
+                  } else {
+                    idx = parseInt(idx) + 1;
+                  }
 
-                let name = `prop_${idx}`;
-                while (mprops.get(name)) {
-                  idx = parseInt(idx) + 1;
-                  name = `prop_${idx}`;
-                }
+                  let name = `prop_${idx}`;
+                  while (mprops.get(name)) {
+                    idx = parseInt(idx) + 1;
+                    name = `prop_${idx}`;
+                  }
 
-                const map = new Y.Map() as FMCompDef;
-                syncronize(map, {
-                  idx: idx,
-                  name,
-                  type: "string",
-                  value: '"hello"',
-                  valueBuilt: '"hello"',
-                  meta: {
-                    type: "text",
-                  },
-                });
-                mprops.set(name, map);
-                propPopover.name = name;
+                  const map = new Y.Map() as FMCompDef;
+                  syncronize(map, {
+                    idx: idx,
+                    name,
+                    type: "string",
+                    value: '"hello"',
+                    valueBuilt: '"hello"',
+                    meta: {
+                      type: "text",
+                    },
+                  });
+                  mprops.set(name, map);
+                  propPopover.name = name;
+                  p.render();
+                }
+              }}
+            >
+              + New Prop
+            </div>
+            <div
+              className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1"
+              onClick={() => {
+                p.ui.popup.script.mode = "js";
+                p.ui.popup.script.open = true;
+                p.ui.popup.script.type = "comp-types";
                 p.render();
-              }
-            }}
-          >
-            + New Prop
+              }}
+            >
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pilcrow"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 12H9.5a2.5 2.5 0 0 1 0-5H17"/><path d="M12 7v10"/><path d="M16 7v10"/></svg>`,
+                }}
+              ></span>
+              <span>Typings</span>
+            </div>
           </div>
         </div>
       </div>

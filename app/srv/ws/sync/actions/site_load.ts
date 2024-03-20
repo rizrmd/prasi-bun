@@ -65,10 +65,9 @@ export const site_load: SAction["site"]["load"] = async function (
           meta: undefined,
           entry: [],
         },
-        code: {
-          snapshot: compressed,
-          mode: site.code_mode as "old" | "vsc",
-        },
+        // code: {
+        //   snapshot: compressed,
+        // },
       };
     }
   }

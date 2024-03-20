@@ -4,10 +4,19 @@ import { BuildContext } from "esbuild";
 import { dirAsync, exists, existsAsync, writeAsync } from "fs-jetpack";
 import { dirname } from "path";
 
-export type CodeMode = "site" | "server";
+export type CodeBuild = {
+  server: BuildContext | null;
+  site: BuildContext | null;
+};
+export type CodeMode = keyof CodeBuild;
 
 export const code = {
-  path(id_site: string, mode: CodeMode, type: "src" | "build", path?: string) {
+  path(
+    id_site: string,
+    mode: CodeMode,
+    type: "src" | "build" | "build_cache",
+    path?: string
+  ) {
     let file_path = "";
     if (path) {
       file_path = path[0] === "/" ? path : `/${path}`;
@@ -15,7 +24,7 @@ export const code = {
     return dir.data(`/code/${id_site}/${mode}/${type}${file_path}`);
   },
   server: {} as Record<string, {}>,
-  esbuild: {} as Record<string, Record<CodeMode, null | BuildContext>>,
+  esbuild: {} as Record<string, CodeBuild>,
   prep(id_site: string, mode: CodeMode) {
     if (exists(dir.data(""))) {
       Bun.spawn({
