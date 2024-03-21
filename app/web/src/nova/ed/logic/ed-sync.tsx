@@ -190,16 +190,20 @@ export const edInitSync = (p: PG) => {
             "callback",
             `import("${url}").then(callback)`
           );
-          await new Promise<void>((resolve) => {
-            fn((exports: any) => {
-              p.site_exports = {};
-              for (const [k, v] of Object.entries(exports)) {
-                p.site_exports[k] = v;
-                w[k] = v;
-              }
-              resolve();
+          try {
+            await new Promise<void>((resolve) => {
+              fn((exports: any) => {
+                p.site_exports = {};
+                for (const [k, v] of Object.entries(exports)) {
+                  p.site_exports[k] = v;
+                  w[k] = v;
+                }
+                resolve();
+              });
             });
-          });
+          } catch (e) {
+            console.log("Failed to load site code", e);
+          }
           await treeRebuild(p);
           p.render();
         },
