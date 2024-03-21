@@ -21,7 +21,7 @@ export const codeBuild = async (id_site: any) => {
   const src_path = code.path(id_site, "site", "src");
   if (!(await existsAsync(src_path))) return;
   if (!code.esbuild[id_site]) {
-    code.esbuild[id_site] = { site: null, server: null };
+    code.esbuild[id_site] = { site: null, server: null, site_ts: Date.now() };
   }
 
   if (!code.esbuild[id_site].server) {
@@ -193,22 +193,24 @@ if (typeof global.server_hook === "function") {
                   res.errors.map((e) => e.text).join("\n\n"),
                   "site"
                 );
+              } else {
+                code.esbuild[id_site].site_ts = Date.now();
+                const client_ids = new Set<string>();
+                user.active.findAll({ site_id: id_site }).forEach((e) => {
+                  client_ids.add(e.client_id);
+                });
+
+                client_ids.forEach((client_id) => {
+                  const ws = conns.get(client_id)?.ws;
+                  if (ws) {
+                    sendWS(ws, {
+                      type: SyncType.Event,
+                      event: "code_changes",
+                      data: { ts: code.esbuild[id_site].site_ts },
+                    });
+                  }
+                });
               }
-
-              const client_ids = new Set<string>();
-              user.active.findAll({ site_id: id_site }).forEach((e) => {
-                client_ids.add(e.client_id);
-              });
-
-              client_ids.forEach((client_id) => {
-                const ws = conns.get(client_id)?.ws;
-                if (ws) {
-                  sendWS(ws, {
-                    type: SyncType.Event,
-                    event: "code_changes",
-                  });
-                }
-              });
             });
           },
         },

@@ -182,19 +182,19 @@ export const edInitSync = (p: PG) => {
           }
           p.render();
         },
-        async code_changes() {
+        async code_changes({ ts }) {
           const w = window as any;
 
-          const url = `/prod/${
-            p.site.id
-          }/_prasi/code/index.js?ts=${Date.now()}`;
+          const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${ts}`;
           const fn = new Function(
             "callback",
             `import("${url}").then(callback)`
           );
           await new Promise<void>((resolve) => {
             fn((exports: any) => {
+              p.site_exports = {};
               for (const [k, v] of Object.entries(exports)) {
+                p.site_exports[k] = v;
                 w[k] = v;
               }
               resolve();

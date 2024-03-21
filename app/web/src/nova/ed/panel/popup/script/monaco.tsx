@@ -110,6 +110,10 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             }
 
+            for (const [k, v] of Object.entries(p.site_exports)) {
+              values[k] = v;
+            }
+
             let component = { id: "", props: {} as Record<string, FNCompDef> };
             if (meta?.item.component?.id && meta.item.component.props) {
               component.id = meta.item.component.id;

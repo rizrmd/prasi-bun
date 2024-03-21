@@ -8,9 +8,6 @@ export const code_load: SAction["code"]["load"] = async function (
   type
 ) {
   const snap = await prepCodeSnapshot(site_id, "site");
-  if (snap && snap.type === "code") {
-    return { id: site_id, snapshot: snap.build };
-  }
 
-  return { id: site_id, snapshot: null };
+  return { id: site_id };
 };
