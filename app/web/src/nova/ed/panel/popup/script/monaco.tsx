@@ -16,6 +16,7 @@ import { declareScope } from "./scope/scope";
 
 // @ts-ignore
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
+import { editorLocalValue } from "../../../../vi/render/script/local";
 
 const scriptEdit = {
   timeout: null as any,
@@ -142,7 +143,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-instance":
                   {
                     types._raw = declareScope(p, meta, monaco);
-                    
+
                     const nmodel = monaco.editor.createModel(
                       trim(val),
                       "typescript",
@@ -363,6 +364,8 @@ export const EdScriptMonaco: FC<{}> = () => {
                 scope = code_result;
               }
             } else {
+              editorLocalValue[active.item_id] = null;
+
               const code_result = await p.sync.code.edit({
                 type: "adv",
                 mode: mode,

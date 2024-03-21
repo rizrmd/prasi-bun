@@ -4,6 +4,8 @@ import { updatePropScope } from "./eval-prop";
 import { modifyChild } from "./passprop";
 import { VG } from "../global";
 
+export const editorLocalValue = {} as Record<string, any>;
+
 export const createViLocal = (
   vi: {
     layout: VG["layout"];
@@ -23,10 +25,17 @@ export const createViLocal = (
     hook?: (local: T) => void;
     effect?: (local: T) => void | Promise<void>;
   }) => {
+    const isEditor =
+      ["localhost", "prasi.avolut.com"].includes(location.hostname) &&
+      location.pathname.startsWith("/ed/");
+    let id = meta.item.id;
+
     const { children } = arg;
     const init_local_effect = vi.script?.init_local_effect;
     const metas = is_layout ? vi.layout?.meta : vi.meta;
-    const ref = useRef<any>(arg.value);
+    const ref = useRef<any>(
+      editorLocalValue[id] ? editorLocalValue[id] : arg.value
+    );
     const local = ref.current;
     local.render = meta.render;
 
@@ -37,8 +46,6 @@ export const createViLocal = (
     }
 
     useEffect(() => {
-      let id = meta.item.id;
-
       if (meta.parent?.instance_id && metas) {
         const parent_meta = metas[meta.parent?.instance_id];
         if (parent_meta && parent_meta.instances) {
@@ -61,6 +68,9 @@ export const createViLocal = (
         const fn = async () => {
           if (arg.effect) {
             await arg.effect(local);
+            if (isEditor) {
+              editorLocalValue[id] = local;
+            }
           }
         };
 
@@ -69,6 +79,22 @@ export const createViLocal = (
 
       return () => {};
     }, [location.pathname]);
+
+    useEffect(() => {
+      if (isEditor) {
+        if (editorLocalValue[id] === null) {
+          const fn = async () => {
+            if (arg.effect) {
+              await arg.effect(local);
+              if (isEditor) {
+                editorLocalValue[id] = local;
+              }
+            }
+          };
+          fn();
+        }
+      }
+    }, [editorLocalValue[id]]);
 
     return modifyChild(children, {
       ...meta.script?.scope,
