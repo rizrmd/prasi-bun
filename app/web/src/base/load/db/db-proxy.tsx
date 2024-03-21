@@ -108,29 +108,31 @@ const cachedQueryResult: Record<
 > = {};
 
 export const fetchSendDb = async (params: any, dburl: string) => {
-  const base = new URL(dburl);
-  base.pathname = `/_dbs`;
-  if (params.table) {
-    base.pathname += `/${params.table}`;
-  }
-  const url = base.toString();
+  try {
+    const base = new URL(dburl);
+    base.pathname = `/_dbs`;
+    if (params.table) {
+      base.pathname += `/${params.table}`;
+    }
+    const url = base.toString();
 
-  const hsum = hash_sum(params);
-  const cached = cachedQueryResult[hsum];
+    const hsum = hash_sum(params);
+    const cached = cachedQueryResult[hsum];
 
-  if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
-    cachedQueryResult[hsum] = {
-      timestamp: Date.now(),
-      promise: fetchViaProxy(url, params, {
-        "content-type": "application/json",
-      }),
-      result: null,
-    };
+    if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
+      cachedQueryResult[hsum] = {
+        timestamp: Date.now(),
+        promise: fetchViaProxy(url, params, {
+          "content-type": "application/json",
+        }),
+        result: null,
+      };
 
-    const result = await cachedQueryResult[hsum].promise;
-    cachedQueryResult[hsum].result = result;
-    return result;
-  }
+      const result = await cachedQueryResult[hsum].promise;
+      cachedQueryResult[hsum].result = result;
+      return result;
+    }
 
-  return await cached.promise;
+    return await cached.promise;
+  } catch (e) {}
 };
