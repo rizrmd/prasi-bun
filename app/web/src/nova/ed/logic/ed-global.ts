@@ -24,17 +24,7 @@ export const EmptySite = {
     meta: undefined as void | Record<string, IMeta>,
     entry: [] as string[],
   },
-  // code: {
-  //   snapshot: {} as
-  //     | undefined
-  //     | Record<
-  //         string,
-  //         {
-  //           id_doc: number;
-  //           bin: Uint8Array;
-  //         }
-  //       >,
-  // },
+  code_ts: 0,
 };
 
 export type ESite = typeof EmptySite;
@@ -159,6 +149,7 @@ export const EDGlobal = {
   sync: null as null | Awaited<ReturnType<typeof clientStartSync>>,
   sync_assigned: false,
   site: deepClone(EmptySite),
+  site_exports: {} as Record<string, any>,
   site_dts: "",
   script: {
     site_types: {} as Record<string, string>,

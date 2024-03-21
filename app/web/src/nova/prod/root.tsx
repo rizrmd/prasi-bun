@@ -46,14 +46,16 @@ export const Root = () => {
         base.route.router = router;
         base.route.pages = pages;
 
-        const site_exports = await import(
-          `${w._prasi.basepath}/_prasi/code/index.js`.replace("//", "/")
-        );
-        if (site_exports) {
-          for (const [k, v] of Object.entries(site_exports)) {
-            (window as any)[k] = v;
-          }
-        }
+        const url = `${w._prasi.basepath}/_prasi/code/index.js`;
+        const fn = new Function("callback", `import("${url}").then(callback)`);
+        await new Promise<void>((resolve) => {
+          fn((exports: any) => {
+            for (const [k, v] of Object.entries(exports)) {
+              (w as any)[k] = v;
+            }
+            resolve();
+          });
+        });
 
         render();
       });

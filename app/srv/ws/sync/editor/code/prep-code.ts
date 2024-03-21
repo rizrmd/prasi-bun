@@ -12,4 +12,5 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
     .await();
 
   await codeBuild(id_site);
+  return { ts: code.esbuild[id_site].site_ts };
 };

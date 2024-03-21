@@ -1,9 +1,8 @@
 import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
-import { prepCodeSnapshot } from "../editor/code/prep-code";
 import { SyncConnection } from "../type";
-import { gzipAsync } from "../entity/zlib";
+import { prepCodeSnapshot } from "../editor/code/prep-code";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -44,14 +43,8 @@ export const site_load: SAction["site"]["load"] = async function (
         }
       }
 
-      const snap = await prepCodeSnapshot(site_id, "site");
-      const compressed: any = {};
-      if (snap) {
-        for (const [key, value] of Object.entries(snap.build)) {
-          compressed[key] = { bin: await gzipAsync(value.bin) };
-        }
-      }
- 
+      const code = await prepCodeSnapshot(site.id, "site");
+
       return {
         id: site.id,
         name: site.name,
@@ -65,9 +58,7 @@ export const site_load: SAction["site"]["load"] = async function (
           meta: undefined,
           entry: [],
         },
-        // code: {
-        //   snapshot: compressed,
-        // },
+        code_ts: code.ts,
       };
     }
   }

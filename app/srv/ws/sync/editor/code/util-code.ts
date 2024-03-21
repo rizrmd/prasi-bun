@@ -7,6 +7,7 @@ import { dirname } from "path";
 export type CodeBuild = {
   server: BuildContext | null;
   site: BuildContext | null;
+  site_ts: number;
 };
 export type CodeMode = keyof CodeBuild;
 
