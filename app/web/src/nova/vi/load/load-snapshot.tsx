@@ -16,6 +16,7 @@ export const viLoadSnapshot = async (p: PG) => {
     if (api_url && apiURL.hostname) {
       await loadApiProxyDef(api_url, true);
 
+
       const api = w.prasiApi[api_url];
       if (api && api.apiTypes && api.prismaTypes) {
         const zip = JSON.stringify({
@@ -46,6 +47,8 @@ export const viLoadSnapshot = async (p: PG) => {
   } catch (e: any) {
     if (e && !e.message.toLowerCase().includes("invalid url")) {
       console.warn("Failed to load API [Snapshot]:", api_url);
+    } else {
+      console.error(e);
     }
   }
 
@@ -62,6 +65,7 @@ export const applyEnv = async (p: PG) => {
 
   const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${p.site.code_ts}`;
   const fn = new Function("callback", `import("${url}").then(callback)`);
+ 
   try {
     await new Promise<void>((resolve) => {
       fn((exports: any) => {
