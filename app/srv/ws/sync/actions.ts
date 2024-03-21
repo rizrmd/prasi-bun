@@ -67,12 +67,12 @@ export const SyncActions = {
       bin: Uint8Array
     ) => ({}) as { diff: Uint8Array; sv: Uint8Array } | void,
     diff_local: async (
-      mode: "page" | "comp" | "site" | "code",
+      mode: "page" | "comp" | "site" ,
       id: string,
       bin: Uint8Array
     ) => {},
     sv_remote: async (
-      mode: "page" | "comp" | "site" | "code",
+      mode: "page" | "comp" | "site" ,
       id: string,
       sv: Uint8Array,
       diff: Uint8Array

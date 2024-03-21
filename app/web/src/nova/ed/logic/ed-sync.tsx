@@ -182,14 +182,33 @@ export const edInitSync = (p: PG) => {
           }
           p.render();
         },
+        async code_changes() {
+          const w = window as any;
+
+          const url = `/prod/${
+            p.site.id
+          }/_prasi/code/index.js?ts=${Date.now()}`;
+          const fn = new Function(
+            "callback",
+            `import("${url}").then(callback)`
+          );
+          await new Promise<void>((resolve) => {
+            fn((exports: any) => {
+              for (const [k, v] of Object.entries(exports)) {
+                w[k] = v;
+              }
+              resolve();
+            });
+          });
+          await treeRebuild(p);
+          p.render();
+        },
         async remote_svlocal(data) {
           let doc = null as any;
           if (data.type === "page" && p.page.cur.id === data.id) {
             doc = p.page.doc as Y.Doc;
           } else if (data.type === "comp" && p.comp.list[data.id]) {
             doc = p.comp.list[data.id].doc;
-          } else if (data.type === "code") {
-            doc = p.code.site.doc;
           }
 
           if (doc && p.sync) {

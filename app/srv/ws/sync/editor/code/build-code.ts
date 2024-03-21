@@ -2,11 +2,20 @@ import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import { style } from "@hyrious/esbuild-plugin-style";
 import { context } from "esbuild";
 import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
-import { DCode } from "../../../../../web/src/utils/types/root";
-import { readDirectoryRecursively } from "../../../../api/site-export";
-import { docs } from "../../entity/docs";
-import { code } from "./util-code";
 import { server } from "./server-main";
+import { code } from "./util-code";
+import { user } from "../../entity/user";
+import { conns } from "../../entity/conn";
+import { SyncType } from "../../type";
+import { Packr } from "msgpackr";
+import { ServerWebSocket } from "bun";
+import { WSData } from "../../../../../../pkgs/core/server/create";
+
+const packr = new Packr({ structuredClone: true });
+
+const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
+  ws.sendBinary(packr.pack(msg));
+};
 
 export const codeBuild = async (id_site: any) => {
   const src_path = code.path(id_site, "site", "src");
@@ -185,14 +194,21 @@ if (typeof global.server_hook === "function") {
                   "site"
                 );
               }
-              const cdoc = docs.code[id_site];
-              if (cdoc) {
-                const doc = cdoc.build["site"];
-                const build_dir = code.path(id_site, "site", "build");
-                if (doc) {
-                  codeApplyChanges(build_dir, doc);
+
+              const client_ids = new Set<string>();
+              user.active.findAll({ site_id: id_site }).forEach((e) => {
+                client_ids.add(e.client_id);
+              });
+
+              client_ids.forEach((client_id) => {
+                const ws = conns.get(client_id)?.ws;
+                if (ws) {
+                  sendWS(ws, {
+                    type: SyncType.Event,
+                    event: "code_changes",
+                  });
                 }
-              }
+              });
             });
           },
         },
@@ -223,27 +239,27 @@ if (typeof global.server_hook === "function") {
   }
 };
 
-const codeApplyChanges = (path: string, doc: DCode) => {
-  const map = doc.getMap("map");
+// const codeApplyChanges = (path: string, doc: DCode) => {
+//   const map = doc.getMap("map");
 
-  const files = map.get("files");
+//   const files = map.get("files");
 
-  const dirs = readDirectoryRecursively(path);
-  doc.transact(() => {
-    files?.forEach((v, k) => {
-      if (!dirs[k]) {
-        files?.delete(k);
-      }
-    });
-    for (const [k, v] of Object.entries(dirs)) {
-      if (files) {
-        files.set(k, v);
-      }
-    }
-  });
+//   const dirs = readDirectoryRecursively(path);
+//   doc.transact(() => {
+//     files?.forEach((v, k) => {
+//       if (!dirs[k]) {
+//         files?.delete(k);
+//       }
+//     });
+//     for (const [k, v] of Object.entries(dirs)) {
+//       if (files) {
+//         files.set(k, v);
+//       }
+//     }
+//   });
 
-  return doc;
-};
+//   return doc;
+// };
 
 const codeError = async (
   id_site: string,

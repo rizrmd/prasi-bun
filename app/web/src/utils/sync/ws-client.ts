@@ -79,7 +79,7 @@ export const clientStartSync = async (arg: {
   events: {
     editor_start: (arg: UserConf) => void;
     remote_svlocal: (arg: {
-      type: "page" | "comp" | "code";
+      type: "page" | "comp";
       id: string;
       sv_local: Uint8Array;
     }) => void;
@@ -91,6 +91,7 @@ export const clientStartSync = async (arg: {
         }
       >
     ) => void;
+    code_changes: () => void;
     disconnected: () => { reconnect: boolean };
     opened: () => void;
     shakehand: (client_id: string) => void;
