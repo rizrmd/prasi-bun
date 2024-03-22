@@ -103,20 +103,22 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       for (const child of Object.values(item.childs)) {
         if (child?.name?.startsWith("jsx:")) continue;
 
-        genMeta(
-          { ...p, mode: "comp" },
-          {
-            item: child,
-            is_root: false,
-            root: arg.root || arg.item,
-            parent: {
-              item,
-              instance_id: item.id,
-              root_instances: instances,
-              comp: item_comp,
-            },
-          }
-        );
+        if (child && Object.keys(child).length > 1) {
+          genMeta(
+            { ...p, mode: "comp" },
+            {
+              item: child,
+              is_root: false,
+              root: arg.root || arg.item,
+              parent: {
+                item,
+                instance_id: item.id,
+                root_instances: instances,
+                comp: item_comp,
+              },
+            }
+          );
+        }
       }
     }
   }
