@@ -1,7 +1,13 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import { style } from "@hyrious/esbuild-plugin-style";
 import { context } from "esbuild";
-import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
+import {
+  dirAsync,
+  existsAsync,
+  removeAsync,
+  writeAsync,
+  moveAsync,
+} from "fs-jetpack";
 import { server } from "./server-main";
 import { code } from "./util-code";
 import { user } from "../../entity/user";
@@ -149,7 +155,7 @@ if (typeof global.server_hook === "function") {
   }
 
   if (!code.esbuild[id_site].site) {
-    const build_path = code.path(id_site, "site", "build");
+    const build_path = code.path(id_site, "site", "build_cache");
     await removeAsync(build_path);
     await dirAsync(build_path);
     const build_file = `${build_path}/index.js`;
@@ -194,6 +200,15 @@ if (typeof global.server_hook === "function") {
                   "site"
                 );
               } else {
+                await removeAsync(code.path(id_site, "site", "build"));
+                await moveAsync(
+                  code.path(id_site, "site", "build_cache"),
+                  code.path(id_site, "site", "build")
+                );
+                await removeAsync(
+                  code.path(id_site, "site", "src", "index.log")
+                );
+
                 code.esbuild[id_site].site_ts = Date.now();
                 const client_ids = new Set<string>();
                 user.active.findAll({ site_id: id_site }).forEach((e) => {
