@@ -164,9 +164,12 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
         >
           P
         </Tooltip>
-        <div className="flex-1">
-          {name}
-          {comp_label && `: ${comp_label}`}
+        <div className="flex-1 relative self-stretch">
+          <div className="absolute inset-0 flex items-center">
+            <div className="truncate text-ellipsis">
+              {name + (comp_label ? `: ${comp_label}` : "")}
+            </div>
+          </div>
         </div>
         {meta && meta.mitem && active.comp_id !== comp_id && (
           <GenerateJSX meta={meta} />
