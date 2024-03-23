@@ -49,6 +49,7 @@ export const Vi: FC<{
   vi.entry = entry;
   vi.on_preload = on_preload;
 
+
   w.siteurl = (pathname: string, forceOriginal?: boolean) => {
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;

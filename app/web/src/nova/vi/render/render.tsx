@@ -5,6 +5,7 @@ import { ErrorBox } from "../utils/error-box";
 import { ViGlobal } from "./global";
 import { viParts } from "./parts";
 import { ViScript } from "./script";
+import get from "lodash.get";
 
 const MAX_RENDER_IN_SECOND = 70;
 export const render_stat = {
@@ -57,7 +58,6 @@ export const ViRender: FC<{
   if (meta.item.hidden) return null;
 
   if (meta.item.adv?.js || meta.item.component?.id) {
-
     return (
       <ErrorBox meta={meta}>
         <ViScript
