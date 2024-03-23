@@ -113,6 +113,10 @@ export const assignMitem = (arg: {
         }
       }
     }
+
+    if (!m.mitem) {
+      console.log(arg);
+    }
   }
 };
 
