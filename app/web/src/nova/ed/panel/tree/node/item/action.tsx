@@ -78,7 +78,7 @@ export const EdTreeAction = ({
             mode === "css" &&
               `bg-green-100  border-green-200 hover:border-green-500 hover:text-green-900 hover:bg-green-300`,
             mode === "html" &&
-              `bg-blue-100  border-blue-200 hover:border-blue-500 hover:text-blue-900 hover:bg-blue-300`
+              `bg-blue-400 text-white border-blue-400 hover:border-blue-500 hover:bg-blue-300`
           )}
           onClick={() => {
             p.ui.popup.script.open = true;

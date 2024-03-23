@@ -23,6 +23,10 @@ export const ViScript: FC<{
     viEvalProps(vi, meta, is_layout, _pass);
   }
 
+  if (meta.item.adv?.html) {
+    return <ViChild meta={meta} passprop={_pass} is_layout={is_layout} />;
+  }
+
   if (meta.item.adv?.js) {
     viEvalScript(vi, meta, is_layout, _pass);
     if (meta.script) return meta.script.result;
