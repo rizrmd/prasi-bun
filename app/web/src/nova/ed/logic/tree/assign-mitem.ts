@@ -115,20 +115,3 @@ export const assignMitem = (arg: {
     }
   }
 };
-
-// if (m.parent?.instance_id && m.parent?.instance_id === m.parent?.id) {
-//   const parent = meta[m.parent?.instance_id];
-//   if (parent.item.component?.id) {
-//     const lcomp = p.comp.list[parent.item.component.id];
-//     if (lcomp) {
-//       const mcomp = lcomp.doc.getMap("map").get("root");
-//       if (mcomp) {
-//         mcomp.get("childs")?.forEach((e) => {
-//           if (e.get("id") === m.item.originalId) {
-//             m.mitem = e;
-//           }
-//         });
-//       }
-//     }
-//   }
-// }
