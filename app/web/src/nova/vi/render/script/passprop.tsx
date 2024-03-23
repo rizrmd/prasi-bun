@@ -66,6 +66,10 @@ export const createViPassProp = (
                 }
               }
 
+              if (meta.item.name === "nav_menu") {
+                console.log(cmeta);
+              }
+
               return (
                 <ViRender
                   key={item.id}

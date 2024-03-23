@@ -37,7 +37,10 @@ export const edActionCut = async (p: PG, item: IContent) => {
   };
   walk(new_item);
 
-  let str = `prasi-clipboard:` + JSON.stringify(item);
+  if (perm.state !== "granted") {
+    await navigator.clipboard.read();
+  }
+  let str = `prasi-clipboard:` + JSON.stringify(new_item);
   navigator.clipboard.writeText(str);
 
   const mitem = getMetaById(p, item.id)?.mitem;
