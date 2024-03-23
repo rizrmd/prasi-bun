@@ -43,8 +43,6 @@ export const createViPassProp = (
         "props.meta.item.component.props.child.content.childs"
       ) as unknown as any[];
 
-      console.log(children);
-      
       if (Array.isArray(children)) {
         let is_meta = true;
         for (const c of children) {
@@ -62,9 +60,12 @@ export const createViPassProp = (
             }
 
             if (cmeta) {
-              if (Object.keys(cmeta.item).length === 1 && cmeta.mitem) {
-                cmeta.item = cmeta.mitem.toJSON() as any;
+              if (Object.keys(cmeta.item).length <= 2) {
+                if (cmeta.mitem) {
+                  cmeta.item = cmeta.mitem.toJSON() as any;
+                }
               }
+
               return (
                 <ViRender
                   key={item.id}
