@@ -38,12 +38,7 @@ export const assignMitem = (arg: {
     } else {
       let parent = meta[m.parent.id];
 
-      if (
-        !parent.mitem &&
-        m.parent.instance_id &&
-        meta[m.parent.instance_id] &&
-        meta[m.parent.instance_id].mitem
-      ) {
+      if (!parent.mitem && m.parent.instance_id && meta[m.parent.instance_id]) {
         parent = meta[m.parent.instance_id];
       }
 
@@ -77,15 +72,18 @@ export const assignMitem = (arg: {
           }
         } else {
           parent.mitem.get("childs")?.forEach((child) => {
-            if (child && child.get && child.get("id") === m.item.id) {
+            const id = child && child.get && child.get("id");
+            const original_id = child && child.get && child.get("originalId");
+            if (typeof id === "string" && id === m.item.id) {
+              m.mitem = child;
+            } else if (
+              typeof original_id === "string" &&
+              original_id === m.item.originalId
+            ) {
               m.mitem = child;
             }
           });
         }
-      }
-
-      if (m.item.name === "nav_menu") {
-        console.log(m);
       }
 
       if (m.item.component?.props) {
