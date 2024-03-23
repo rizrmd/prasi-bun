@@ -75,6 +75,10 @@ export const assignMitem = (arg: {
         }
       }
 
+      if (m.item.name === "nav_menu") {
+        console.log(m);
+      }
+
       if (m.item.component?.props) {
         for (const [prop_name, v] of Object.entries(m.item.component.props)) {
           let mprop = m.mitem?.get("component")?.get("props")?.get(prop_name);
