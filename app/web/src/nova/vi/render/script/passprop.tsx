@@ -43,6 +43,8 @@ export const createViPassProp = (
         "props.meta.item.component.props.child.content.childs"
       ) as unknown as any[];
 
+      console.log(children);
+      
       if (Array.isArray(children)) {
         let is_meta = true;
         for (const c of children) {
