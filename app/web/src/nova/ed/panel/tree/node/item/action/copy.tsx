@@ -25,7 +25,6 @@ export const edActionCopy = async (p: PG, item: IContent) => {
       for (const [key, child] of Object.entries(item.childs)) {
         if (child && Object.keys(child).length <= 2) {
           let meta = getMetaById(p, child.id);
-
           if (meta) {
             const new_child = deepClone(meta.item);
             item.childs[key as any] = new_child;

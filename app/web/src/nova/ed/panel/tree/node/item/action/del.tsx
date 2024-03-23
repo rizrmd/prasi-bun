@@ -16,6 +16,7 @@ export const edActionDelete = async (p: PG, item: IContent) => {
           }
         });
       });
+      p.render();
       await treeRebuild(p);
       p.render();
     }
@@ -34,6 +35,7 @@ export const edActionDeleteById = async (p: PG, id: string) => {
           }
         });
       });
+      p.render();
       await treeRebuild(p);
       p.render();
     }

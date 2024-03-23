@@ -73,15 +73,9 @@ export const assignMitem = (arg: {
         } else {
           parent.mitem.get("childs")?.forEach((child) => {
             const id = child && child.get && child.get("id");
-            const original_id = child && child.get && child.get("originalId");
             if (typeof id === "string" && id === m.item.id) {
               m.mitem = child;
-            } else if (
-              typeof original_id === "string" &&
-              original_id === m.item.originalId
-            ) {
-              m.mitem = child;
-            }
+            } 
           });
         }
       }
