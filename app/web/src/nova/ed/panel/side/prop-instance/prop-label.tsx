@@ -58,7 +58,12 @@ export const EdPropLabel: FC<{
   );
 
   return name.length > 8 ? (
-    <Tooltip content={name} placement="left" delay={100}>
+    <Tooltip
+      content={name}
+      placement="left"
+      delay={100}
+      className="flex items-center"
+    >
       {label}
     </Tooltip>
   ) : (
