@@ -8,7 +8,11 @@ export const simplifyItemChild = (item: IItem) => {
       newitem.childs = [];
       if (v && Array.isArray(v)) {
         for (const child of v) {
-          newitem.childs.push({ id: child.id, originalId: child.originalId });
+          if (child.type === "item" && child.component) {
+            newitem.childs.push(child);
+          } else {
+            newitem.childs.push({ id: child.id, originalId: child.originalId });
+          }
         }
       }
     } else {
