@@ -36,7 +36,16 @@ export const assignMitem = (arg: {
         m.mitem = mitem;
       }
     } else {
-      const parent = meta[m.parent.id];
+      let parent = meta[m.parent.id];
+
+      if (
+        !parent.mitem &&
+        m.parent.instance_id &&
+        meta[m.parent.instance_id] &&
+        meta[m.parent.instance_id].mitem
+      ) {
+        parent = meta[m.parent.instance_id];
+      }
 
       if (parent.mitem) {
         if (m.jsx_prop?.is_root === true) {
