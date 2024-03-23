@@ -11,6 +11,12 @@ import { loadComponent } from "../../../../../logic/comp/load";
 
 export const edActionPaste = async (p: PG, item: IContent) => {
   let mitem = getMetaById(p, item.id)?.mitem;
+
+  if ((item as IItem).component?.props["child"]) {
+    const content_id = (item as IItem).component?.props["child"]?.content?.id;
+    if (content_id) mitem = getMetaById(p, content_id)?.mitem;
+  }
+
   if (mitem) {
     const res = await navigator.clipboard.readText();
     if (typeof res === "string" && res.startsWith("prasi-clipboard:")) {

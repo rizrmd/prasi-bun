@@ -1,6 +1,7 @@
 import { deepClone } from "web-utils";
 import { IContent } from "../../../../../../../utils/types/general";
 import { PG } from "../../../../../logic/ed-global";
+import { getMetaById } from "../../../../../logic/active/get-meta";
 
 export const edActionCopy = async (p: PG, item: IContent) => {
   const perm = await navigator.permissions.query({
@@ -9,9 +10,18 @@ export const edActionCopy = async (p: PG, item: IContent) => {
   } as any);
 
   const new_item = deepClone(item);
+  const walk = (_item: IContent) => {
+    let item = _item;
 
-  const walk = (item: IContent) => {
     if (item.type !== "text") {
+      if (item.type === "item" && item.component?.props) {
+        for (const [k, v] of Object.entries(item.component.props)) {
+          if (v.content) {
+            walk(v.content);
+          }
+        }
+      }
+
       for (const [key, child] of Object.entries(item.childs)) {
         if (child && Object.keys(child).length === 1) {
           const meta = p.page.meta[child.id];
@@ -19,14 +29,6 @@ export const edActionCopy = async (p: PG, item: IContent) => {
             const new_child = deepClone(meta.item);
             item.childs[key as any] = new_child;
             walk(new_child);
-
-            if (new_child.component?.props) {
-              for (const [k, v] of Object.entries(new_child.component.props)) {
-                if (v.meta?.type === "content-element" && v.content) {
-                  walk(v.content);
-                }
-              }
-            }
           }
         }
       }

@@ -126,7 +126,8 @@ export const EdTreeCtxMenu = ({
       )}
       {local.allowCopy &&
         local.allowPaste &&
-        !isComponent &&
+        (!isComponent ||
+          (isComponent && (item as IItem).component?.props.child)) &&
         item.type !== "text" && (
           <MenuItem label="Paste" onClick={() => edActionPaste(p, item)} />
         )}
