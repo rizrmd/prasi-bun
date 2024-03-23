@@ -5,7 +5,7 @@ import { VG } from "../global";
 import { ViRender } from "../render";
 
 export const createViPassProp = (
-  vi: { meta: VG["meta"] },
+  vi: { meta: VG["meta"]; render: () => void },
   is_layout: boolean,
   meta: IMeta,
   passprop: any
@@ -52,9 +52,17 @@ export const createViPassProp = (
         }
         if (is_meta) {
           return children.map((item) => {
-            const cmeta = vi.meta[item.id];
+            let cmeta = vi.meta[item.id];
+
+            if (!cmeta) {
+              vi.meta[item.id] = { item };
+              cmeta = vi.meta[item.id];
+            }
 
             if (cmeta) {
+              if (Object.keys(cmeta.item).length === 1 && cmeta.mitem) {
+                cmeta.item = cmeta.mitem.toJSON() as any;
+              }
               return (
                 <ViRender
                   key={item.id}

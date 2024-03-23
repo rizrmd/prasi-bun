@@ -15,6 +15,7 @@ export const instantiate = (arg: {
   if (item.id) {
     newitem.id = item.id;
   }
+  newitem.hidden = item.hidden;
 
   if (newitem.component) {
     if (newitem.component.props && item.component) {

@@ -35,13 +35,15 @@ export const EdTreeAction = ({
               e.stopPropagation();
               const meta = getMetaById(p, item.id);
               if (meta) meta.mitem?.set("hidden", false);
+              treeRebuild(p, { note: "show" });
+              p.render();
             }}
           >
-            <HideAll />
+            <HideEditor />
           </div>
         </Tooltip>
       )}
-      {item.hidden === "only-editor" && (
+      {/* {item.hidden === "only-editor" && (
         <Tooltip content="Hidden: Only Editor">
           <div
             className="mx-1 cursor-pointer hover:opacity-60"
@@ -54,7 +56,7 @@ export const EdTreeAction = ({
             <HideEditor />
           </div>
         </Tooltip>
-      )}
+      )} */}
 
       {(!comp.enabled || (comp.enabled && comp.id === active.comp_id)) && (
         <Tooltip
