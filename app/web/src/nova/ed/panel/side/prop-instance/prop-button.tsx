@@ -16,7 +16,7 @@ export const EdPropInstanceButton: FC<{
 }> = ({ label, name, cprop, mprop, labelClick }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
-  const val = cprop?.value;
+  const val = cprop?.valueBuilt;
 
   const local = useLocal({
     value: [] as {
