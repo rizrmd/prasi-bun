@@ -235,6 +235,13 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
                 if (type === "button") hasCode = false;
 
+                if (
+                  type === "option" &&
+                  cprop.meta?.option_mode === "checkbox"
+                ) {
+                  hasCode = false;
+                }
+
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
                   e.preventDefault();
                   local.pick = { mprop, name };

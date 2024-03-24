@@ -337,7 +337,7 @@ export const EdPropPopoverForm: FC<{
           <div className="uppercase text-xs">MODE</div>
 
           <div className="flex pr-1">
-            {["button", "dropdown"].map((e) => (
+            {["button", "dropdown", "checkbox"].map((e) => (
               <div
                 key={e}
                 onClick={() => {

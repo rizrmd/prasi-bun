@@ -87,30 +87,6 @@ export const EdPropInstanceButton: FC<{
   );
 };
 
-const Preview: FC<{ filename: string }> = ({ filename }) => {
-  const p = useGlobal(EDGlobal, "EDITOR");
-  const ext = filename.split(".").pop() || "";
-  const is_image = isImage(ext);
-  return (
-    <div className="flex items-center ">
-      {is_image && (
-        <img
-          draggable={false}
-          src={p.script.api._url("/_file" + filename + "?w=20")}
-          alt={" thumbnail (20px)"}
-          className={cx("w-[20px] h-[20px] border mr-1")}
-        />
-      )}
-      {!is_image && (
-        <div className="uppercase font-bold text-sm text-slate-300 mx-1">
-          {ext}
-        </div>
-      )}
-      Browse File
-    </div>
-  );
-};
-
 const parseval = (text: string) => {
   const val = text.substring(`siteurl('/_file`.length);
 
