@@ -23,7 +23,7 @@ export const prismaExtendType = `\
         } 
       >
     >;
-    rels: (table: string) => Promise<{
+    rels: (table: string) => Promise<Record<string, {
       type: 'has-many' | 'has-one';
       to: {
         table: string, 
@@ -33,7 +33,7 @@ export const prismaExtendType = `\
         table: string, 
         fields: string[]
       }
-    }>;
+    }>>;
   }
 }`;
 
