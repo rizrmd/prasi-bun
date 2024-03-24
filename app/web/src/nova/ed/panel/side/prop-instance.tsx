@@ -6,11 +6,12 @@ import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { createEditScript } from "./prop-instance/edit-script";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
+import { EdPropInstanceFile } from "./prop-instance/prop-file";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 import { EdStyleAll } from "./style/side-all";
-import { EdPropInstanceFile } from "./prop-instance/prop-file";
+import { EdPropInstanceButton } from "./prop-instance/prop-button";
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -232,6 +233,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   else hasCode = false;
                 }
 
+                if (type === "button") hasCode = false;
+
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
                   e.preventDefault();
                   local.pick = { mprop, name };
@@ -258,6 +261,14 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                       </>
                     ) : (
                       <>
+                        {type === "button" && (
+                          <EdPropInstanceButton
+                            cprop={cprop}
+                            mprop={mprop}
+                            label={cprop.label}
+                            name={name}
+                          />
+                        )}
                         {type === "file" && (
                           <EdPropInstanceFile
                             mprop={mprop}

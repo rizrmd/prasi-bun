@@ -51,7 +51,7 @@ export const EdPropLabel: FC<{
         }}
       >
         <div className="select-none w-[70px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center">
-          {name}
+          {name.length > 1 ? name : ''}
         </div>
       </div>
     </>
