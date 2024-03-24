@@ -34,7 +34,9 @@ export const EdPropInstanceButton: FC<{
       if (!Array.isArray(local.value)) {
         local.value = [];
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
     local.render();
   }, [val]);
 
@@ -72,7 +74,7 @@ export const EdPropInstanceButton: FC<{
                     }
                   });
                   await treeRebuild(p);
-                  p.render()
+                  p.render();
                 }, props);
               }}
             >
