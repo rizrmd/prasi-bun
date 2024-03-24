@@ -295,6 +295,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                         {type === "option" && (
                           <EdPropInstanceOptions
                             mprop={mprop}
+                            meta={meta}
                             cprop={cprop}
                             name={name}
                             labelClick={labelClick}
