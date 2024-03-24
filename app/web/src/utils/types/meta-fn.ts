@@ -44,7 +44,7 @@ type FNCompMeta = {
   type: "file" | "text" | "option" | "content-element" | "button";
   options?: string;
   optionsBuilt?: string;
-  option_mode?: "dropdown" | "button";
+  option_mode?: "dropdown" | "button" | "checkbox";
 };
 
 export type FMCompDef = TypedMap<

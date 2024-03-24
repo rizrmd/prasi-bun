@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, Fragment, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../../../base/load/db/db-proxy";
@@ -6,6 +6,14 @@ import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
+import { ChevronDown } from "../../tree/node/item/indent";
+import { Popover } from "../../../../../utils/ui/popover";
+
+type MetaOption = {
+  label: string;
+  value: any;
+  options?: MetaOption[];
+};
 
 export const EdPropInstanceOptions: FC<{
   name: string;
@@ -20,11 +28,14 @@ export const EdPropInstanceOptions: FC<{
     loaded: false as any,
     isOpen: false,
     val: "",
-    metaFn: null as null | (() => Promise<{ label: string; value: any }[]>),
+    metaFn: null as null | (() => Promise<MetaOption[]>),
+    checkbox: {
+      width: 0,
+    },
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
-  let metaOptions: { label: string; value: any }[] = [];
+  let metaOptions: MetaOption[] = [];
 
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded) {
@@ -70,7 +81,7 @@ else metaOptions = resOpt;
   } catch (e) {}
 
   useEffect(() => {
-    if (Array.isArray(metaOptions)) {
+    if (Array.isArray(metaOptions) && !Array.isArray(evalue)) {
       local.val = evalue;
       local.render();
     }
@@ -120,105 +131,6 @@ else metaOptions = resOpt;
           </select>
         )}
 
-        {/* {mode === "dropdown" && (
-          <>
-            <Downshift
-              inputValue={local.val}
-              isOpen={local.isOpen}
-              onOuterClick={() => {
-                local.isOpen = false;
-                local.render();
-              }}
-              onInputValueChange={(e) => {
-                local.val = e;
-                local.isOpen = true;
-                local.render();
-              }}
-              onChange={(sel) => {
-                if (!sel) {
-                  local.val = evalue;
-                  local.isOpen = false;
-                  local.render();
-                } else {
-                  const val = JSON.stringify(sel.value);
-                  local.isOpen = false;
-                  onChange(val);
-                }
-              }}
-              itemToString={(item) => (item ? item.value : "")}
-            >
-              {({
-                getInputProps,
-                getItemProps,
-                getLabelProps,
-                getMenuProps,
-                isOpen,
-                inputValue,
-                highlightedIndex,
-                selectedItem,
-                getRootProps,
-              }) => (
-                <div className="border-l self-stretch">
-                  <div
-                    style={{ display: "inline-block" }}
-                    {...getRootProps({}, { suppressRefError: true })}
-                  >
-                    <input
-                      {...getInputProps()}
-                      onFocus={() => {
-                        local.val = "";
-                        local.isOpen = true;
-                        local.render();
-                      }}
-                      onClick={() => {
-                        local.isOpen = true;
-                        local.render();
-                      }}
-                      onBlur={() => {
-                        local.val = evalue;
-                        local.isOpen = false;
-                        local.render();
-                      }}
-                      type="search"
-                      spellCheck={false}
-                      className="flex-1 self-stretch font-mono border-2 border-transparent outline-none bg-transparent focus:bg-white focus:border-blue-500 border-slate-300 text-[11px] min-h-[28px] pl-1 "
-                    />
-                  </div>
-                  <ul
-                    {...getMenuProps()}
-                    className="absolute z-10 border right-0 bg-white max-h-[300px] overflow-y-auto overflow-x-hidden"
-                  >
-                    {isOpen
-                      ? metaOptions
-                          .filter(
-                            (item) =>
-                              !inputValue || item.value.includes(inputValue)
-                          )
-                          .map((item, index) => (
-                            <li
-                              {...getItemProps({
-                                key: item.value,
-                                index,
-                                item,
-                              })}
-                              className={cx(
-                                "min-w-[180px] px-2 py-[2px] border-b",
-                                selectedItem === item &&
-                                  highlightedIndex !== index &&
-                                  `bg-blue-500 text-white`,
-                                highlightedIndex === index && `bg-blue-200`
-                              )}
-                            >
-                              {item.label || item.value}
-                            </li>
-                          ))
-                      : null}
-                  </ul>
-                </div>
-              )}
-            </Downshift>
-          </>
-        )} */}
         {mode === "button" && (
           <div className="flex-1 pt-1 px-1 flex flex-wrap justify-end space-x-1">
             {Array.isArray(metaOptions) &&
@@ -242,7 +154,232 @@ else metaOptions = resOpt;
               })}
           </div>
         )}
+
+        {mode === "checkbox" && (
+          <Popover
+            placement="top"
+            content={
+              <div
+                className={cx(
+                  "relative max-h-[400px] min-w-[200px] overflow-y-auto overflow-x-hidden",
+                  css`
+                    margin: 0px -8px -6px -8px;
+                    background: white;
+                    padding: 5px 0px 0px 0px;
+                    width: ${local.checkbox.width}px;
+                  `
+                )}
+              >
+                <div className={cx("flex flex-col bg-white")}>
+                  {Array.isArray(metaOptions) &&
+                    metaOptions.map((item, idx) => {
+                      const val: any[] = Array.isArray(evalue) ? evalue : [];
+
+                      const found = val.find((e) => {
+                        if (!item.options) {
+                          return e === item.value;
+                        } else {
+                          if (typeof e === "object" && e.value === item.value) {
+                            return true;
+                          }
+                          return false;
+                        }
+                      });
+                      return (
+                        <Fragment key={idx}>
+                          <SingleCheckbox
+                            item={item}
+                            idx={idx}
+                            val={val}
+                            onChange={(val) => {
+                              onChange(JSON.stringify(val));
+                              local.render();
+                            }}
+                          />
+                          {item.options &&
+                            found &&
+                            item.options.map((child, idx) => {
+                              let checked: any[] = found.checked;
+
+                              return (
+                                <SingleCheckbox
+                                  item={child}
+                                  idx={idx}
+                                  depth={1}
+                                  val={checked}
+                                  onChange={(newval) => {
+                                    found.checked = newval;
+
+                                    onChange(JSON.stringify(val));
+                                    local.render();
+                                  }}
+                                />
+                              );
+                            })}
+                        </Fragment>
+                      );
+                    })}
+                </div>
+              </div>
+            }
+            asChild
+          >
+            <div
+              className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer m-[3px]"
+              onClick={() => {}}
+              ref={(el) => {
+                if (!local.checkbox.width && el) {
+                  const bound = el.getBoundingClientRect();
+                  local.checkbox.width = bound.width;
+                  local.render();
+                }
+              }}
+            >
+              <div className="flex-1 flex items-center">
+                <div className="px-1">
+                  {Array.isArray(evalue)
+                    ? evalue.length === 0
+                      ? "Select Item"
+                      : `${evalue.length} selected`
+                    : `Select Item`}
+                </div>
+              </div>
+              <div className="pr-1 pt-[2px]">
+                <ChevronDown />
+              </div>
+            </div>
+          </Popover>
+        )}
       </div>
     </div>
   );
 };
+
+const SingleCheckbox = ({
+  val,
+  item,
+  idx,
+  onChange,
+  depth,
+}: {
+  item: MetaOption;
+  idx: number;
+  depth?: number;
+  val: any[];
+  onChange: (val: MetaOption[]) => void;
+}) => {
+  const is_check = !!val.find((e) => {
+    if (!item.options) {
+      return e === item.value;
+    } else {
+      if (typeof e === "object" && e.value === item.value) {
+        return true;
+      }
+      return false;
+    }
+  });
+
+  return (
+    <div
+      className={cx(
+        "flex pl-1 text-xs cursor-pointer select-none space-x-1 items-center",
+        idx === 0 && !depth ? "" : "border-t",
+        depth &&
+          css`
+            padding-left: ${depth * 20}px;
+          `,
+        is_check
+          ? css`
+              color: green;
+              border-left: 3px solid green;
+
+              &:hover {
+                border-left: 3px solid #a8d4a8;
+              }
+
+              svg {
+                width: 14px;
+              }
+            `
+          : css`
+              border-left: 3px solid transparent;
+
+              svg {
+                color: gray;
+                width: 14px;
+              }
+              &:hover {
+                border-left: 3px solid #0084ff;
+                color: #0084ff;
+
+                svg {
+                  color: #0084ff;
+                }
+              }
+            `
+      )}
+      onClick={() => {
+        if (item.options) {
+          let idx = val.findIndex((e) => {
+            if (typeof e === "object" && e.value === item.value) {
+              return true;
+            }
+            return false;
+          });
+
+          if (idx >= 0) {
+            val.splice(idx, 1);
+          } else {
+            val.push({ value: item.value, checked: [] });
+          }
+        } else {
+          let idx = val.findIndex((e) => e === item.value);
+
+          if (idx >= 0) {
+            val.splice(idx, 1);
+          } else {
+            val.push(item.value);
+          }
+        }
+        onChange(val);
+      }}
+    >
+      {!is_check ? unchecked : checked}
+      <div>{item.label}</div>
+    </div>
+  );
+};
+
+const checked = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    className="lucide lucide-square-check-big"
+    viewBox="0 0 24 24"
+  >
+    <path d="M9 11l3 3L22 4"></path>
+    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+  </svg>
+);
+const unchecked = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    className="lucide lucide-square"
+    viewBox="0 0 24 24"
+  >
+    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+  </svg>
+);

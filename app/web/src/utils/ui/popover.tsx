@@ -187,6 +187,7 @@ export function Popover({
   children: React.ReactNode;
   content?: React.ReactNode;
   arrow?: boolean;
+  asChild?: boolean
 } & PopoverOptions) {
   const popover = usePopover({ modal, ...restOptions });
 
@@ -196,6 +197,7 @@ export function Popover({
   return (
     <PopoverContext.Provider value={popover}>
       <PopoverTrigger
+        asChild={restOptions.asChild}
         className={className}
         onClick={
           typeof restOptions.open !== "undefined"
