@@ -28,7 +28,7 @@ export const EdPropPopoverForm: FC<{
   });
 
   if (!mmeta) return null;
-  const type = mmeta.get("type");
+  let type = mmeta.get("type") as any;
 
   useEffect(() => {
     local.label = mprop.get("label") || local.name.replace(/\_/gi, " ");
@@ -53,6 +53,10 @@ export const EdPropPopoverForm: FC<{
     propPopover.render();
   };
 
+  if (!["text", "option", "content-element"].includes(type)) {
+    type = "other";
+  }
+
   return (
     <div
       className={cx(
@@ -64,9 +68,9 @@ export const EdPropPopoverForm: FC<{
         <div className="flex space-x-1">
           {[
             { label: "TXT", type: "text" },
-            { label: "FILE", type: "file" },
             { label: "OPT", type: "option" },
             { label: "JSX", type: "content-element" },
+            { label: "OTHER", type: "other" },
           ].map((e) => {
             return (
               <div
@@ -97,8 +101,10 @@ export const EdPropPopoverForm: FC<{
                         mprop.set("content", map);
                       }
                     });
-                  } else {
+                  } else if (e.type !== "other") {
                     mmeta.set("type", e.type as any);
+                  } else {
+                    mmeta.set("type", "button");
                   }
                   propPopover.render();
                 }}
@@ -156,6 +162,33 @@ export const EdPropPopoverForm: FC<{
           </div>
         )}
       </div>
+
+      {type === "other" && (
+        <div className="border-t border-slate-300 pl-2 pt-1 flex justify-between items-center select-none">
+          <div className="uppercase text-xs">PROP MODE</div>
+
+          <div className="flex pr-1">
+            {["file", "button"].map((e) => (
+              <div
+                key={e}
+                onClick={() => {
+                  mmeta.set("type", e as any);
+                  propPopover.render();
+                }}
+                className={cx(
+                  "m-1 px-1 capitalize text-center cursor-pointer  font-mono border border-slate-300 text-[11px]",
+                  e === mmeta.get("type") ||
+                    (e === "button" && !mmeta.get("type"))
+                    ? "bg-blue-500 text-white"
+                    : `hover:bg-blue-500 hover:text-white bg-white hover:border-blue-500`
+                )}
+              >
+                {e}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="border-t border-slate-300 px-2 pt-2 pb-1 flex flex-col items-stretch">
         <div className="uppercase text-xs text-slate-500">Name</div>
         <input
