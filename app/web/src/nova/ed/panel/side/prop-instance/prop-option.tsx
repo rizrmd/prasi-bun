@@ -3,7 +3,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../../../base/load/db/db-proxy";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
-import { EDGlobal } from "../../../logic/ed-global";
+import { EDGlobal, IMeta } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
 import { ChevronDown } from "../../tree/node/item/indent";
@@ -13,14 +13,20 @@ type MetaOption = {
   label: string;
   value: any;
   options?: MetaOption[];
+  reload?: string[];
+};
+
+const config = {
+  opt: {} as Record<string, () => void>,
 };
 
 export const EdPropInstanceOptions: FC<{
+  meta: IMeta;
   name: string;
   mprop: FMCompDef;
   cprop: FNCompDef;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ name, mprop, cprop, labelClick }) => {
+}> = ({ name, mprop, cprop, labelClick, meta }) => {
   const prop = mprop.toJSON() as FNCompDef;
   const local = useLocal({
     codeEditing: false,
@@ -37,6 +43,13 @@ export const EdPropInstanceOptions: FC<{
 
   let metaOptions: MetaOption[] = [];
 
+  config.opt[name] = () => {
+    local.metaFn = null;
+    local.loaded = null;
+    local.loading = false;
+    local.render();
+  };
+
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded) {
       try {
@@ -45,14 +58,24 @@ export const EdPropInstanceOptions: FC<{
           if (!p.script.api) p.script.api = apiProxy(p.site.config.api_url);
         }
 
-        const args = {
+        const arg = {
           ...window.exports,
           db: p.script.db,
           api: p.script.api,
         };
+
+        if (meta.item.script?.props) {
+          for (const [k, v] of Object.entries(meta.item.script?.props)) {
+            eval(`arg.${k} = ${v.value}`);
+          }
+        } else if (meta.item.component) {
+          for (const [k, v] of Object.entries(meta.item.component.props)) {
+            eval(`arg.${k} = ${v.valueBuilt}`);
+          }
+        }
         eval(`
-${Object.entries(args)
-  .map((e) => `const ${e[0]} = args["${e[0]}"]`)
+${Object.entries(arg)
+  .map((e) => `const ${e[0]} = arg["${e[0]}"]`)
   .join(";\n")}
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 if (typeof resOpt === 'function')  local.metaFn = resOpt;
@@ -87,7 +110,7 @@ else metaOptions = resOpt;
     }
   }, [evalue]);
 
-  const onChange = (val: string) => {
+  const onChange = (val: string, item: MetaOption | undefined) => {
     mprop.doc?.transact(() => {
       mprop.set("value", val);
       mprop.set("valueBuilt", val);
@@ -95,6 +118,16 @@ else metaOptions = resOpt;
 
     treeRebuild(p);
     p.render();
+
+    setTimeout(() => {
+      if (item?.reload) {
+        for (const name of item.reload) {
+          if (config.opt[name]) {
+            config.opt[name]();
+          }
+        }
+      }
+    });
   };
 
   let mode = cprop.meta?.option_mode;
@@ -117,7 +150,10 @@ else metaOptions = resOpt;
             value={evalue}
             className="flex-1 border-l outline-none"
             onChange={(ev) => {
-              onChange(`"${ev.currentTarget.value}"`);
+              onChange(
+                `"${ev.currentTarget.value}"`,
+                metaOptions.find((e) => e.value === ev.currentTarget.value)
+              );
             }}
           >
             {Array.isArray(metaOptions) &&
@@ -145,7 +181,7 @@ else metaOptions = resOpt;
                         : "bg-blue-700 text-white border-blue-700"
                     )}
                     onClick={() => {
-                      onChange(`"${item.value}"`);
+                      onChange(`"${item.value}"`, item);
                     }}
                   >
                     {item.label}
@@ -192,7 +228,7 @@ else metaOptions = resOpt;
                             idx={idx}
                             val={val}
                             onChange={(val) => {
-                              onChange(JSON.stringify(val));
+                              onChange(JSON.stringify(val), item);
                               local.render();
                             }}
                           />
@@ -203,6 +239,7 @@ else metaOptions = resOpt;
 
                               return (
                                 <SingleCheckbox
+                                  key={idx}
                                   item={child}
                                   idx={idx}
                                   depth={1}
@@ -210,7 +247,7 @@ else metaOptions = resOpt;
                                   onChange={(newval) => {
                                     found.checked = newval;
 
-                                    onChange(JSON.stringify(val));
+                                    onChange(JSON.stringify(val), child);
                                     local.render();
                                   }}
                                 />
@@ -266,7 +303,7 @@ const SingleCheckbox = ({
   idx: number;
   depth?: number;
   val: any[];
-  onChange: (val: MetaOption[]) => void;
+  onChange: (val: MetaOption[], item: MetaOption) => void;
 }) => {
   const is_check = !!val.find((e) => {
     if (!item.options) {
@@ -341,7 +378,7 @@ const SingleCheckbox = ({
             val.push(item.value);
           }
         }
-        onChange(val);
+        onChange(val, item);
       }}
     >
       {!is_check ? unchecked : checked}
