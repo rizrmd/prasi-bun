@@ -117,8 +117,6 @@ export const EdTreeName = ({
           }}
           onChange={(e) => {
             local.rename = e.target.value
-              .replace(/[^a-zA-Z\:\d\s:]+/g, "_")
-              .toLowerCase();
             p.render();
           }}
         />
