@@ -103,7 +103,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
       for (const child of Object.values(item.childs)) {
         if (child?.name?.startsWith("jsx:")) continue;
 
-        if (child && Object.keys(child).length > 2) {
+        if (child && Object.keys(child).length > 3) {
           genMeta(
             { ...p, mode: "comp" },
             {
