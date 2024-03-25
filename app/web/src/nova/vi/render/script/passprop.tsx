@@ -60,7 +60,7 @@ export const createViPassProp = (
             }
 
             if (cmeta) {
-              if (Object.keys(cmeta.item).length <= 2) {
+              if (Object.keys(cmeta.item).length <= 3) {
                 if (cmeta.mitem) {
                   const citem = { ...cmeta.item };
                   const ref_item = cmeta.mitem.toJSON() as any;

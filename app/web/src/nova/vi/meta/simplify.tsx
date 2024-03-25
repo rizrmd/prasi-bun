@@ -11,7 +11,11 @@ export const simplifyItemChild = (item: IItem) => {
           if (child.type === "item" && child.component) {
             newitem.childs.push(child);
           } else {
-            newitem.childs.push({ id: child.id, originalId: child.originalId });
+            newitem.childs.push({
+              name: child.name,
+              id: child.id,
+              originalId: child.originalId,
+            });
           }
         }
       }
