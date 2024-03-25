@@ -28,8 +28,35 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
-  const vars: Record<string, { mode: "local" | "prop"; val: string }> = {};
+  const vars: Record<string, { mode: "local" | "prop" | "type"; val: string }> =
+    {};
+  let m_prev = null;
   for (const m of cur_path) {
+    if (m.mitem?.parent && (m.mitem?.parent as any).get("meta")) {
+      let prop_name = "";
+      m.mitem?.parent.parent.forEach((c, key) => {
+        if (c === m.mitem?.parent) {
+          prop_name = key;
+        }
+      });
+
+      if (prop_name && m_prev && m_prev.item.component) {
+        const prop_typings = m_prev.item.component.props[prop_name].typings;
+        try {
+          const typings_src = prop_typings.substring(`const typings = `.length);
+          const typings_fn = new Function(`return ${typings_src}`);
+          const typings = typings_fn();
+          if (typeof typings === "object") {
+            for (const [k, v] of Object.entries(typings)) {
+              if (typeof v === "string") {
+                vars[k] = { mode: "type", val: v };
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
     if (m.item.component?.id === active.comp_id) {
       for (const [name, prop] of Object.entries(m.item.component.props)) {
         if (prop.meta?.type === "content-element") {
@@ -47,6 +74,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         }
       }
     }
+    m_prev = m;
   }
 
   const raw_types: string[] = [];
@@ -60,6 +88,10 @@ const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });
       raw_types.push(`\
 const \$\$_${k} = ${v.val};
 const ${k} = null as unknown as typeof \$\$_${k};`);
+    } else if (v.mode === "type") {
+      raw_types.push(`
+const ${k} = null as unknown as ${v.val};
+`);
     }
   }
 
