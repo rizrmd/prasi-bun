@@ -147,7 +147,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-instance":
                   {
                     types._raw = declareScope(p, meta, monaco);
-
                     const nmodel = monaco.editor.createModel(
                       trim(val),
                       "typescript",
@@ -177,6 +176,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                         } catch (e) {}
                       }
                     }
+
                   }
                   break;
                 case "item":
