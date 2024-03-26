@@ -270,6 +270,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                       <>
                         {type === "button" && (
                           <EdPropInstanceButton
+                            meta={meta}
                             cprop={cprop}
                             mprop={mprop}
                             label={cprop.label}

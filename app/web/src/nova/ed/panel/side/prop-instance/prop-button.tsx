@@ -1,21 +1,22 @@
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
-import { EDGlobal } from "../../../logic/ed-global";
-import { treeRebuild } from "../../../logic/tree/build";
-import { isImage } from "../../file/file-list";
-import { EdPropLabel } from "./prop-label";
 import { TypedMap } from "yjs-types";
+import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
+import { EDGlobal, IMeta } from "../../../logic/ed-global";
+import { treeRebuild } from "../../../logic/tree/build";
+import { EdPropLabel } from "./prop-label";
+
+export const w = window as any;
 
 export const EdPropInstanceButton: FC<{
   name: string;
   label?: string;
   mprop: FMCompDef;
   cprop: FNCompDef;
+  meta: IMeta;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ label, name, cprop, mprop, labelClick }) => {
+}> = ({ label, name, cprop, mprop, meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-
   const val = cprop?.valueBuilt;
 
   const local = useLocal({
@@ -27,20 +28,22 @@ export const EdPropInstanceButton: FC<{
     timeout: null as any,
   });
 
+  if (!w.prop_buttons) {
+    w.prop_buttons = {};
+  }
+  if (!w.prop_buttons[name]) {
+    w.prop_buttons[name] = {
+      meta: meta,
+      local: local,
+      src: val,
+    };
+  }
+
   useEffect(() => {
-    try {
-      eval(`local.value = ${val}`);
-
-      if (!Array.isArray(local.value)) {
-        local.value = [];
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    local.render();
-  }, [val]);
-
-  const filename = parseval(val);
+    return () => {
+      delete w.prop_buttons;
+    };
+  }, []);
 
   const props = mprop.parent?.toJSON();
 
