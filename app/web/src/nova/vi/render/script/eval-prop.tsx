@@ -8,6 +8,8 @@ import { replaceWithObject, replacement } from "./eval-script";
 import { extractNavigate } from "./extract-nav";
 import type { Doc } from "yjs";
 
+export const w = window as any;
+
 export const viEvalProps = (
   vi: {
     layout: VG["layout"];
@@ -145,6 +147,25 @@ export const viEvalProps = (
           }
         } catch (e) {
           fails.add(name);
+        }
+      }
+
+      if (w.prop_buttons) {
+        for (const [k, v] of Object.entries(w.prop_buttons)) {
+          const btn = v as {
+            meta: IMeta;
+            src: string;
+            local: { value: any; render: () => void };
+          };
+
+          if (btn.meta.item.originalId === meta.item.originalId) {
+            const fn = new Function(
+              ...Object.keys(passprop),
+              `return ${btn.src}`
+            );
+            btn.local.value = fn(...Object.values(passprop));
+            setTimeout(btn.local.render, 100);
+          }
         }
       }
     }
