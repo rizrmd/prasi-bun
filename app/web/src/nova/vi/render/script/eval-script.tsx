@@ -61,7 +61,6 @@ export const viEvalScript = (
     ...passprop,
   };
 
-
   if (typeof passprop === "object") {
     for (const [k, v] of Object.entries(passprop)) {
       if (typeof v === "object" && v && (v as any)._jsx) {

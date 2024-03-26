@@ -17,7 +17,6 @@ export const loadcomp = {
 };
 
 export const loadComponent = async (p: PG, id_comp: string, sync?: boolean) => {
-  console.log("load comp", id_comp);
   return new Promise<boolean>((resolve) => {
     if (p.comp.list[id_comp]) {
       resolve(true);

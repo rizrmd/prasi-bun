@@ -5,7 +5,7 @@ import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
 import { nav } from "../../../vi/render/script/extract-nav";
-import { loadCompSnapshot } from "../comp/load";
+import { loadCompSnapshot, loadComponent } from "../comp/load";
 import { IMeta, PG, active } from "../ed-global";
 import { assignMitem } from "./assign-mitem";
 import { pushTreeNode } from "./build/push-tree";
@@ -120,6 +120,12 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (!is_layout) {
                 if (m.parent?.instance_id !== m.parent?.id || m.jsx_prop) {
                   pushTreeNode(p, m, meta, p.page.tree);
+                }
+
+                if (m.item.component?.id) {
+                  if (!p.comp.loaded[m.item.component.id]) {
+                    loadComponent(p, m.item.component.id);
+                  }
                 }
 
                 assignMitem({
