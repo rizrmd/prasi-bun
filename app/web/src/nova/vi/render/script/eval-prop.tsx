@@ -1,9 +1,12 @@
+import { createId } from "@paralleldrive/cuid2";
+import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
 import { replaceWithObject, replacement } from "./eval-script";
 import { extractNavigate } from "./extract-nav";
+import type { Doc } from "yjs";
 
 export const viEvalProps = (
   vi: {
@@ -108,6 +111,14 @@ export const viEvalProps = (
             extractNavigate(vi, prop.value);
           }
 
+          if (!prop.valueBuilt && prop.value && meta.mitem) {
+            const mprop = meta.mitem?.get("component")?.get("props")?.get(name);
+            if (mprop) {
+              updatePropValueBuilt(mprop, prop.value);
+              return;
+            }
+          }
+
           const js = prop.valueBuilt || "";
           const src = replaceWithObject(js, replacement) || "";
           const fn = new Function(
@@ -138,6 +149,46 @@ export const viEvalProps = (
       }
     }
   }
+};
+
+const conf = {
+  timeout: null as any,
+  set: new WeakSet<FMCompDef>(),
+  map: {} as Record<string, { mprop: FMCompDef }>,
+  src: {} as Record<string, string>,
+};
+const updatePropValueBuilt = (mprop: FMCompDef, src: string) => {
+  if (!conf.set.has(mprop)) {
+    conf.set.add(mprop);
+    const id = createId();
+    conf.map[id] = { mprop };
+    conf.src[id] = src;
+  }
+  clearTimeout(conf.timeout);
+  conf.timeout = setTimeout(async () => {
+    const result = await _api.code_build(conf.src);
+
+    let doc = null as unknown as Doc;
+    for (const [k, v] of Object.entries(result)) {
+      const mprop = conf.map[k].mprop;
+      if (!doc && mprop.doc) {
+        doc = mprop.doc;
+        break;
+      }
+    }
+    if (doc) {
+      doc.transact(() => {
+        for (const [k, v] of Object.entries(result)) {
+          const mprop = conf.map[k].mprop;
+          mprop.set("valueBuilt", v);
+        }
+      });
+
+      conf.set = new WeakSet();
+      conf.map = {};
+      conf.src = {};
+    }
+  }, 300);
 };
 
 export const updatePropScope = (

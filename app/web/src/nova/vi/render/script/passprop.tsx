@@ -5,7 +5,7 @@ import { VG } from "../global";
 import { ViRender } from "../render";
 
 export const createViPassProp = (
-  vi: { meta: VG["meta"]; render: () => void },
+  vi: { meta: VG["meta"]; render?: () => void },
   is_layout: boolean,
   meta: IMeta,
   passprop: any
