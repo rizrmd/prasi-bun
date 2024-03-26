@@ -158,13 +158,27 @@ export const viEvalProps = (
             local: { value: any; render: () => void };
           };
 
-          if (btn.meta.item.originalId === meta.item.originalId) {
+          let found = false;
+          let cur = btn.meta;
+          while (cur && cur.parent) {
+            if (
+              (btn.meta.item.id === cur.item.id,
+              btn.meta.item.originalId === cur.item.originalId)
+            ) {
+              found = true;
+              break;
+            }
+            cur = vi.meta[cur.parent.id];
+          }
+
+          if (found) {
             const fn = new Function(
               ...Object.keys(passprop),
               `return ${btn.src}`
             );
             btn.local.value = fn(...Object.values(passprop));
-            setTimeout(btn.local.render, 100);
+            setTimeout(btn.local.render, 300);
+            setTimeout(btn.local.render, 1000);
           }
         }
       }
