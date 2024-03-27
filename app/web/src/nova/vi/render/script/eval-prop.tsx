@@ -41,6 +41,7 @@ export const viEvalProps = (
     meta.item.script.props = {};
     let fails = new Set<string>();
     if (!!meta.item.component.props) {
+      const _props: any = {};
       for (const [name, prop] of Object.entries(meta.item.component.props)) {
         try {
           if (prop.meta?.type === "content-element") {
@@ -141,6 +142,7 @@ export const viEvalProps = (
           }
 
           arg[name] = val;
+          _props[name] = val;
 
           if (passprop) {
             passprop[name] = val;
@@ -172,11 +174,13 @@ export const viEvalProps = (
           }
 
           if (found) {
+            const curprops = { ...passprop, _props };
+
             const fn = new Function(
-              ...Object.keys(passprop),
+              ...Object.keys(curprops),
               `return ${btn.src}`
             );
-            btn.local.value = fn(...Object.values(passprop));
+            btn.local.value = fn(...Object.values(curprops));
             setTimeout(btn.local.render, 300);
             setTimeout(btn.local.render, 1000);
           }
