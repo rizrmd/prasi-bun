@@ -9,7 +9,6 @@ import { loadComponent } from "../../../logic/comp/load";
 import { EDGlobal, active } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
 import { TopBtn } from "../top-btn";
-import { useEffect } from "react";
 
 export const EdCompPicker = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -111,11 +110,25 @@ const addComponent = (mitem: MItem | MSection, comp: IItem) => {
       comp.component.instances = {};
     }
 
+    const jsx = {} as Record<string, IItem>;
+    for (const child of comp.childs) {
+      if (child.name.startsWith("jsx:")) {
+        jsx[child.name.substring("jsx:".length).trim()] = child as IItem;
+      }
+    }
+
+    for (const [k, v] of Object.entries(comp.component?.props || {})) {
+      if (jsx[k] && v.content) {
+        v.content = jsx[k];
+      }
+    }
+
     syncronize(map as any, fillID(comp));
     const childs = mitem.get("childs");
     if (childs) {
       childs.push([map]);
     }
+
     const newitem = map.toJSON();
     active.item_id = newitem.id;
   }
