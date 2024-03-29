@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
-import { IMeta } from "../../../ed/logic/ed-global";
+import { IMeta, active } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
@@ -152,38 +152,14 @@ export const viEvalProps = (
         }
       }
 
-      if (w.prop_buttons) {
-        for (const [k, v] of Object.entries(w.prop_buttons)) {
-          const btn = v as {
-            meta: IMeta;
-            src: string;
-            local: { value: any; render: () => void };
-          };
-
-          let found = false;
-          let cur = btn.meta;
-          while (cur && cur.parent) {
-            if (
-              (btn.meta.item.id === cur.item.id,
-              btn.meta.item.originalId === cur.item.originalId)
-            ) {
-              found = true;
-              break;
-            }
-            cur = vi.meta[cur.parent.id];
+      if (location.pathname.startsWith("/ed/") && active.item_id) {
+        if (meta.item.id === active.item_id) {
+          active.scope = {};
+          for (const [k, v] of Object.entries(passprop)) {
+            active.scope[k] = v;
           }
 
-          if (found) {
-            const curprops = { ...passprop, _props };
-
-            const fn = new Function(
-              ...Object.keys(curprops),
-              `return ${btn.src}`
-            );
-            btn.local.value = fn(...Object.values(curprops));
-            setTimeout(btn.local.render, 300);
-            setTimeout(btn.local.render, 1000);
-          }
+          active.scope.self_props = _props;
         }
       }
     }

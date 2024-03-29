@@ -70,6 +70,7 @@ const target = {
 export const active = {
   should_render_main: true,
   hover: { id: "" },
+  scope: {} as any,
   script_nav: {
     list: [] as {
       item_id: string;

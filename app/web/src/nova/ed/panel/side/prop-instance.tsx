@@ -1,4 +1,4 @@
-import { FC, MouseEvent } from "react";
+import { FC, MouseEvent, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
@@ -12,6 +12,8 @@ import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 import { EdStyleAll } from "./style/side-all";
 import { EdPropInstanceButton } from "./prop-instance/prop-button";
+
+const w = window as any;
 
 export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -71,7 +73,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
       if (visible && visible !== "true") {
         try {
-          const arg: any = {};
+          const arg: any = { ...active.scope };
           if (meta.item.script?.props) {
             for (const [k, v] of Object.entries(meta.item.script?.props)) {
               eval(`arg.${k} = ${v.value}`);
@@ -93,6 +95,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             return;
           }
         } catch (e) {
+          console.log(e);
           return;
         }
       }
