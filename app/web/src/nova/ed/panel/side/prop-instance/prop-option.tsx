@@ -3,7 +3,7 @@ import { useGlobal, useLocal } from "web-utils";
 import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../../../base/load/db/db-proxy";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
-import { EDGlobal, IMeta } from "../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
 import { ChevronDown } from "../../tree/node/item/indent";
@@ -62,6 +62,7 @@ export const EdPropInstanceOptions: FC<{
           ...window.exports,
           db: p.script.db,
           api: p.script.api,
+          ...active.scope,
         };
 
         if (meta.item.script?.props) {
@@ -78,7 +79,7 @@ ${Object.entries(arg)
   .map((e) => `const ${e[0]} = arg["${e[0]}"]`)
   .join(";\n")}
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
-if (typeof resOpt === 'function')  local.metaFn = resOpt;
+if (typeof resOpt === 'function') local.metaFn = resOpt;
 else metaOptions = resOpt;
 `);
       } catch (e) {
@@ -90,11 +91,14 @@ else metaOptions = resOpt;
 
     if (local.metaFn && !local.loaded && !local.loading) {
       local.loading = true;
-      local.metaFn().then((e) => {
+      const res = local.metaFn();
+      const callback = (e: any) => {
         local.loading = false;
         local.loaded = e;
         local.render();
-      });
+      };
+      if (res instanceof Promise) res.then(callback);
+      else callback(res);
     }
   }
 

@@ -17,7 +17,6 @@ export const EdPropInstanceButton: FC<{
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 }> = ({ label, name, cprop, mprop, meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const val = cprop?.valueBuilt;
 
   const local = useLocal({
     value: [] as {
@@ -28,16 +27,6 @@ export const EdPropInstanceButton: FC<{
     timeout: null as any,
   });
 
-  if (!w.prop_buttons) {
-    w.prop_buttons = {};
-  }
-  if (!w.prop_buttons[name]) {
-    w.prop_buttons[name] = {
-      meta: meta,
-      local: local,
-      src: val,
-    };
-  }
 
   useEffect(() => {
     return () => {
