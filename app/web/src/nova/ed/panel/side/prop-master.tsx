@@ -7,13 +7,14 @@ import {
 } from "@minoru/react-dnd-treeview";
 import { FC, useState } from "react";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { EDGlobal, IMeta, active } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
 import { propPopover } from "./prop-master/prop-form";
 import { EdPropCompTreeItem, PropItem } from "./prop-master/tree-item";
+import { Popover } from "../../../../utils/ui/popover";
 
 const propRef = {
   el: null as any,
@@ -22,6 +23,10 @@ const propRef = {
 export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const item = meta?.item as IItem;
+  const local = useLocal({
+    json: "",
+    open: false,
+  });
   const [_, set] = useState({});
   const render = () => {
     set({});
@@ -213,22 +218,46 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
             >
               + New Prop
             </div>
-            <div
-              className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1"
-              onClick={() => {
-                p.ui.popup.script.mode = "js";
-                p.ui.popup.script.open = true;
-                p.ui.popup.script.type = "comp-types";
-                p.render();
+            <Popover
+              content={
+                <textarea
+                  className={cx(
+                    "font-mono",
+                    css`
+                      font-size: 12px;
+                      width: 500px;
+                      height: 500px;
+                    `
+                  )}
+                  onChange={(e) => {
+                    local.json = e.currentTarget.value;
+                    local.render();
+                  }}
+                  value={local.json}
+                ></textarea>
+              }
+              open={local.open}
+              onOpenChange={(open) => {
+                if (!open) {
+                  syncronize(mprops as any, JSON.parse(local.json));
+                  treeRebuild(p);
+                  p.render();
+                } else {
+                  local.json = JSON.stringify(mprops?.toJSON(), null, 2);
+                }
+                local.open = open;
+                local.render();
               }}
             >
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pilcrow"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 12H9.5a2.5 2.5 0 0 1 0-5H17"/><path d="M12 7v10"/><path d="M16 7v10"/></svg>`,
-                }}
-              ></span>
-              <span>Typings</span>
-            </div>
+              <div className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1">
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-json"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg>`,
+                  }}
+                ></span>
+                <span>JSON</span>
+              </div>
+            </Popover>
           </div>
         </div>
       </div>
