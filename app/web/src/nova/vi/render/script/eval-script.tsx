@@ -9,7 +9,6 @@ import { updatePropScope } from "./eval-prop";
 import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import get from "lodash.get";
 export const viEvalScript = (
   vi: {
     page: VG["page"];
