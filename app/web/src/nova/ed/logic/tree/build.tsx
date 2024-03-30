@@ -109,6 +109,13 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
   for (const mitem of mitems) {
     const item = mitem.toJSON() as IItem;
     if (item) {
+      await initLoadComp({ comps: p.comp.loaded, meta, mode: "page" }, item, {
+        async load(comp_ids) {
+          for (const id of comp_ids) {
+            await loadComponent(p, id);
+          }
+        },
+      });
       genMeta(
         {
           note: "tree-rebuild",
@@ -120,12 +127,6 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
               if (!is_layout) {
                 if (m.parent?.instance_id !== m.parent?.id || m.jsx_prop) {
                   pushTreeNode(p, m, meta, p.page.tree);
-                }
-
-                if (m.item.component?.id) {
-                  if (!p.comp.loaded[m.item.component.id]) {
-                    loadComponent(p, m.item.component.id);
-                  }
                 }
 
                 assignMitem({
