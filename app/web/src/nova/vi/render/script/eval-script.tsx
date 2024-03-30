@@ -59,6 +59,7 @@ export const viEvalScript = (
     ...viScriptArg(vi),
     ...exports,
     ...passprop,
+    _meta: vi.meta,
   };
 
   if (typeof passprop === "object") {
