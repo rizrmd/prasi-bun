@@ -27,7 +27,7 @@ export const EdTreeAction = ({
 
   let child_jsx_has_script = false;
   const child_id = item.component?.props?.child?.content?.id;
-  if (child_id) {
+  if (child_id && active.comp_id !== item.component?.id) {
     const meta = getMetaById(p, child_id);
     const item = meta?.item;
     child_jsx_has_script = true;
@@ -99,7 +99,10 @@ export const EdTreeAction = ({
               `bg-blue-400 text-white border-blue-400 hover:border-blue-500 hover:bg-blue-300`
           )}
           onClick={(e) => {
-            if (item.component?.props.child.content?.id) {
+            if (
+              item.component?.props.child.content?.id &&
+              child_jsx_has_script
+            ) {
               e.stopPropagation();
               e.preventDefault();
 
