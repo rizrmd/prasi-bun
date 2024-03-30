@@ -348,6 +348,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               {show_style && <EdStyleAll />}
             </>
           )}
+
+          <div className="p-2 text-gray-300">{comp_id}</div>
         </div>
       </div>
     </div>
