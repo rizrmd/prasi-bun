@@ -83,6 +83,9 @@ export const EdPropInstanceOptions: FC<{
           ...Object.keys(arg),
           `
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
+
+console.log(resOpt)
+
 if (typeof resOpt === 'function') local.metaFn = resOpt;
 else metaOptions = resOpt;`
         );
