@@ -27,30 +27,27 @@ export const EdPropInstanceButton: FC<{
     timeout: null as any,
   });
 
-  useEffect(() => {
-    try {
-      const arg: any = { ...active.scope };
-      if (meta.item.script?.props) {
-        for (const [k, v] of Object.entries(meta.item.script?.props)) {
-          eval(`try { arg.${k} = ${v.value} } catch(e) {}`);
-        }
-      } else if (meta.item.component) {
-        for (const [k, v] of Object.entries(meta.item.component.props)) {
-          eval(`try { arg.${k} = ${v.valueBuilt} } catch(e) {}`);
-        }
+  try {
+    const arg: any = { ...active.scope };
+    if (meta.item.script?.props) {
+      for (const [k, v] of Object.entries(meta.item.script?.props)) {
+        eval(`try { arg.${k} = ${v.value} } catch(e) {}`);
       }
-
-      const btn_fn = new Function(
-        ...Object.keys(arg),
-        `return ${cprop.valueBuilt}`
-      );
-
-      local.value = btn_fn(...Object.values(arg));
-      local.render();
-    } catch (e) {
-      console.error(e);
+    } else if (meta.item.component) {
+      for (const [k, v] of Object.entries(meta.item.component.props)) {
+        eval(`try { arg.${k} = ${v.valueBuilt} } catch(e) {}`);
+      }
     }
-  }, []);
+
+    const btn_fn = new Function(
+      ...Object.keys(arg),
+      `return ${cprop.valueBuilt}`
+    );
+
+    local.value = btn_fn(...Object.values(arg));
+  } catch (e) {
+    console.error(e);
+  }
 
   const props = mprop.parent?.toJSON();
 
