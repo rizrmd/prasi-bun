@@ -50,9 +50,8 @@ export const EdPropInstanceOptions: FC<{
     local.render();
   };
 
-  console.log(cprop.meta?.options || cprop.meta?.optionsBuilt, local);
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
-    if (!local.loaded) {
+    if (!local.loaded || !local.metaFn) {
       try {
         if (p.site.config.api_url) {
           if (!p.script.db) p.script.db = dbProxy(p.site.config.api_url);
@@ -87,6 +86,7 @@ const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 if (typeof resOpt === 'function') local.metaFn = resOpt;
 else metaOptions = resOpt;`
         );
+        console.log(res)
         res(...Object.values(arg));
       } catch (e) {
         console.error(e);
