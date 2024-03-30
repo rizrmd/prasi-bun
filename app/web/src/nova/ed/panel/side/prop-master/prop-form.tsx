@@ -124,8 +124,6 @@ export const EdPropPopoverForm: FC<{
             onClick={() => {
               mprop.doc?.transact(() => {
                 (mprop.parent as any)?.forEach((p: any, k: string) => {
-                  console.log(k, p);
-
                   if (k === name) {
                     p.set("is_name", !p.get("is_name"));
                   } else {
