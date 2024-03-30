@@ -26,7 +26,7 @@ export const EdTreeAction = ({
   if (!mode && item.adv?.html) mode = "html";
 
   let child_jsx_has_script = false;
-  const child_id = item.component?.props.child.content?.id;
+  const child_id = item.component?.props?.child?.content?.id;
   if (child_id) {
     const meta = getMetaById(p, child_id);
     const item = meta?.item;

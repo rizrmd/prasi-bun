@@ -58,7 +58,7 @@ export const pushTreeNode = (
         } else {
           if (meta.jsx_prop.name === "child" && meta.parent.instance_id) {
             const comp_meta = metas[meta.parent.instance_id] as IMeta;
-            const child_id = comp_meta.item.component?.props.child.content?.id;
+            const child_id = comp_meta.item.component?.props?.child?.content?.id;
             if (child_id && comp_meta.mitem) {
               const child_meta = metas[child_id];
               if (child_meta.item.childs.find((e) => meta.item.id === e.id)) {
