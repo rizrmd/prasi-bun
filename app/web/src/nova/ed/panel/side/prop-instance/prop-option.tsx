@@ -38,10 +38,9 @@ export const EdPropInstanceOptions: FC<{
     checkbox: {
       width: 0,
     },
+    options: [] as MetaOption[]
   });
   const p = useGlobal(EDGlobal, "EDITOR");
-
-  let metaOptions: MetaOption[] = [];
 
   config.opt[name] = () => {
     local.metaFn = null;
@@ -86,17 +85,14 @@ export const EdPropInstanceOptions: FC<{
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 
 if (typeof resOpt === 'function') local.metaFn = resOpt;
-else metaOptions = resOpt;
-
-
-console.log(metaOptions, local)`
+else local.options = resOpt;`
         );
         res(...Object.values(arg),local);
       } catch (e) {
         console.error(e);
       }
     } else {
-      metaOptions = local.loaded;
+      local.options = local.loaded;
     }
 
     if (local.metaFn && !local.loaded && !local.loading) {
@@ -118,7 +114,7 @@ console.log(metaOptions, local)`
   } catch (e) {}
 
   useEffect(() => {
-    if (Array.isArray(metaOptions) && !Array.isArray(evalue)) {
+    if (Array.isArray(local.options) && !Array.isArray(evalue)) {
       local.val = evalue;
       local.render();
     }
@@ -147,10 +143,10 @@ console.log(metaOptions, local)`
   let mode = cprop.meta?.option_mode;
   if (!mode) mode = "button";
 
-  if (metaOptions && metaOptions.length > 0) {
-    for (const [k, v] of Object.entries(metaOptions)) {
+  if (local.options && local.options.length > 0) {
+    for (const [k, v] of Object.entries(local.options)) {
       if (typeof v === "string") {
-        metaOptions[k as any] = { label: v, value: v };
+        local.options[k as any] = { label: v, value: v };
       }
     }
   }
@@ -166,12 +162,12 @@ console.log(metaOptions, local)`
             onChange={(ev) => {
               onChange(
                 `"${ev.currentTarget.value}"`,
-                metaOptions.find((e) => e.value === ev.currentTarget.value)
+                local.options.find((e) => e.value === ev.currentTarget.value)
               );
             }}
           >
-            {Array.isArray(metaOptions) &&
-              metaOptions.map((item, idx) => {
+            {Array.isArray(local.options) &&
+              local.options.map((item, idx) => {
                 return (
                   <option key={idx} value={item.value}>
                     {item.label}
@@ -183,8 +179,8 @@ console.log(metaOptions, local)`
 
         {mode === "button" && (
           <div className="flex-1 pt-1 px-1 flex flex-wrap justify-end space-x-1">
-            {Array.isArray(metaOptions) &&
-              metaOptions.map((item, idx) => {
+            {Array.isArray(local.options) &&
+              local.options.map((item, idx) => {
                 return (
                   <div
                     key={idx}
@@ -221,8 +217,8 @@ console.log(metaOptions, local)`
                 )}
               >
                 <div className={cx("flex flex-col bg-white")}>
-                  {Array.isArray(metaOptions) &&
-                    metaOptions.map((item, idx) => {
+                  {Array.isArray(local.options) &&
+                    local.options.map((item, idx) => {
                       const val: any[] = Array.isArray(evalue) ? evalue : [];
 
                       const found = val.find((e) => {
