@@ -67,11 +67,11 @@ export const EdPropInstanceOptions: FC<{
 
         if (meta.item.script?.props) {
           for (const [k, v] of Object.entries(meta.item.script?.props)) {
-            eval(`arg.${k} = ${v.value}`);
+            eval(`try { arg.${k} = ${v.value} } catch(e) {}`);
           }
         } else if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
-            eval(`arg.${k} = ${v.valueBuilt}`);
+            eval(`try { arg.${k} = ${v.valueBuilt} } catch(e) {}`);
           }
         }
         eval(`
