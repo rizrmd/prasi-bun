@@ -50,6 +50,7 @@ export const createViPassProp = (
             is_meta = false;
           }
         }
+
         if (is_meta) {
           return children.map((item) => {
             let cmeta = vi.meta[item.id];

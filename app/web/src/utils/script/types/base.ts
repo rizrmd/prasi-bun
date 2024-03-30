@@ -9,6 +9,7 @@ export const baseTypings = `
   const useEffect: typeof React.useEffect;
   const useState: typeof React.useState;
 
+  const _meta: Record<string, IContent>;
   const pathname: string;
   const isEditor: boolean;
   const isLayout: boolean;
