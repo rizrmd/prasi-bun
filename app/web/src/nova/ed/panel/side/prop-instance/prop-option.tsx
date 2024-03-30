@@ -89,7 +89,7 @@ console.log(resOpt)
 if (typeof resOpt === 'function') local.metaFn = resOpt;
 else metaOptions = resOpt;`
         );
-        console.log(res)
+        console.log(res);
         res(...Object.values(arg));
       } catch (e) {
         console.error(e);
@@ -98,6 +98,7 @@ else metaOptions = resOpt;`
       metaOptions = local.loaded;
     }
 
+    console.log(local.metaFn, local.loaded, local.loading);
     if (local.metaFn && !local.loaded && !local.loading) {
       local.loading = true;
       const res = local.metaFn();
