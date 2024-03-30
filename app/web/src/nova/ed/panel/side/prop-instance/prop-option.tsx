@@ -50,6 +50,7 @@ export const EdPropInstanceOptions: FC<{
     local.render();
   };
 
+  console.log(cprop.meta?.options || cprop.meta?.optionsBuilt, local);
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded) {
       try {
