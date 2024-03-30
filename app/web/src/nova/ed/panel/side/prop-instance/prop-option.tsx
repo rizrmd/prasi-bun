@@ -79,14 +79,15 @@ export const EdPropInstanceOptions: FC<{
             );
           }
         }
-        eval(`
-${Object.entries(arg)
-  .map((e) => `const ${e[0]} = arg["${e[0]}"]`)
-  .join(";\n")}
+
+        const res = new Function(
+          ...Object.keys(arg),
+          `
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 if (typeof resOpt === 'function') local.metaFn = resOpt;
-else metaOptions = resOpt;
-`);
+else metaOptions = resOpt;`
+        );
+        res(...Object.values(arg));
       } catch (e) {
         console.error(e);
       }
