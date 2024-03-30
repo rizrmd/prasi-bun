@@ -2,7 +2,7 @@ import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { TypedMap } from "yjs-types";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
-import { EDGlobal, IMeta } from "../../../logic/ed-global";
+import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
 
@@ -27,11 +27,25 @@ export const EdPropInstanceButton: FC<{
     timeout: null as any,
   });
 
-
   useEffect(() => {
-    return () => {
-      delete w.prop_buttons;
-    };
+    const arg: any = { ...active.scope };
+    if (meta.item.script?.props) {
+      for (const [k, v] of Object.entries(meta.item.script?.props)) {
+        eval(`arg.${k} = ${v.value}`);
+      }
+    } else if (meta.item.component) {
+      for (const [k, v] of Object.entries(meta.item.component.props)) {
+        eval(`arg.${k} = ${v.valueBuilt}`);
+      }
+    }
+
+    const btn_fn = new Function(
+      ...Object.keys(arg),
+      `return ${cprop.valueBuilt}`
+    );
+
+    local.value = btn_fn(...Object.values(arg));
+    local.render();
   }, []);
 
   const props = mprop.parent?.toJSON();
