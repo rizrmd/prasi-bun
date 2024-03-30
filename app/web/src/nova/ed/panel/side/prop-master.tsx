@@ -238,12 +238,16 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
               }
               open={local.open}
               onOpenChange={(open) => {
-                if (!open) {
-                  syncronize(mprops as any, JSON.parse(local.json));
-                  treeRebuild(p);
-                  p.render();
-                } else {
-                  local.json = JSON.stringify(mprops?.toJSON(), null, 2);
+                try {
+                  if (!open) {
+                    syncronize(mprops as any, JSON.parse(local.json));
+                    treeRebuild(p);
+                    p.render();
+                  } else {
+                    local.json = JSON.stringify(mprops?.toJSON(), null, 2);
+                  }
+                } catch (e) {
+                  console.log(e);
                 }
                 local.open = open;
                 local.render();
