@@ -25,9 +25,23 @@ export const EdTreeAction = ({
   if (!mode && item.adv?.css) mode = "css";
   if (!mode && item.adv?.html) mode = "html";
 
+  let child_jsx_has_script = false;
+  const child_id = item.component?.props.child.content?.id;
+  if (child_id) {
+    const meta = getMetaById(p, child_id);
+    const item = meta?.item;
+    child_jsx_has_script = true;
+    if (item) {
+      mode = "";
+      if (item.adv?.js) mode = "js";
+      if (!mode && item.adv?.css) mode = "css";
+      if (!mode && item.adv?.html) mode = "html";
+    }
+  }
+
   return (
     <div className="flex items-center pr-1 space-x-1">
-      {item.hidden === "all" && (
+      {!!item.hidden && (
         <Tooltip content="Hidden: All">
           <div
             className="mx-1 cursor-pointer hover:opacity-60"
@@ -58,7 +72,9 @@ export const EdTreeAction = ({
         </Tooltip>
       )} */}
 
-      {(!comp.enabled || (comp.enabled && comp.id === active.comp_id)) && (
+      {(!comp.enabled ||
+        (comp.enabled && comp.id === active.comp_id) ||
+        child_jsx_has_script) && (
         <Tooltip
           content={`Edit ${mode}`}
           className={cx(
@@ -82,7 +98,20 @@ export const EdTreeAction = ({
             mode === "html" &&
               `bg-blue-400 text-white border-blue-400 hover:border-blue-500 hover:bg-blue-300`
           )}
-          onClick={() => {
+          onClick={(e) => {
+            if (item.component?.props.child.content?.id) {
+              e.stopPropagation();
+              e.preventDefault();
+
+              active.item_id = item.component.props.child.content.id;
+              p.ui.popup.script.open = true;
+              p.ui.popup.script.type = "item";
+              p.ui.popup.script.mode = (mode || "js") as any;
+              p.render();
+
+              return;
+            }
+
             p.ui.popup.script.open = true;
             p.ui.popup.script.type = "item";
             p.ui.popup.script.mode = (mode || "js") as any;
