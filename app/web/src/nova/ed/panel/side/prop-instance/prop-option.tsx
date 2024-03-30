@@ -81,16 +81,14 @@ export const EdPropInstanceOptions: FC<{
 
         const res = new Function(
           ...Object.keys(arg),
+          'local',
           `
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
-
-console.log(resOpt)
 
 if (typeof resOpt === 'function') local.metaFn = resOpt;
 else metaOptions = resOpt;`
         );
-        res(...Object.values(arg));
-        console.log(arg, local.metaFn, local.loaded, local.loading);
+        res(...Object.values(arg),local);
       } catch (e) {
         console.error(e);
       }
@@ -102,7 +100,6 @@ else metaOptions = resOpt;`
       local.loading = true;
       const res = local.metaFn();
       const callback = (e: any) => {
-        console.log(name, e);
         local.loading = false;
         local.loaded = e;
         local.render();
