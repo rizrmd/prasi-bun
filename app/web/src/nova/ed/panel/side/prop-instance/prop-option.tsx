@@ -67,11 +67,15 @@ export const EdPropInstanceOptions: FC<{
 
         if (meta.item.script?.props) {
           for (const [k, v] of Object.entries(meta.item.script?.props)) {
-            eval(`try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`);
+            eval(
+              `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
+            );
           }
         } else if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
-            eval(`try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`);
+            eval(
+              `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
+            );
           }
         }
         eval(`
@@ -93,6 +97,7 @@ else metaOptions = resOpt;
       local.loading = true;
       const res = local.metaFn();
       const callback = (e: any) => {
+        console.log(name, e);
         local.loading = false;
         local.loaded = e;
         local.render();
