@@ -196,6 +196,7 @@ export const EdPopComp = () => {
                         placeholder="Search"
                         spellCheck={false}
                         className="my-1 bg-transparent bg-white border outline-none px-1 focus:border-blue-500 focus:w-[300px] transition-all"
+                        autoFocus
                         value={compPicker.search}
                         onChange={(e) => {
                           compPicker.search = e.currentTarget.value;
