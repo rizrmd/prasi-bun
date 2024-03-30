@@ -5,6 +5,7 @@ import { IItem, MItem } from "../../../../../../utils/types/item";
 import { Tooltip } from "../../../../../../utils/ui/tooltip";
 import { EDGlobal, IMeta, PG, active } from "../../../../logic/ed-global";
 import { treeRebuild } from "../../../../logic/tree/build";
+import { fillID } from "../../../../logic/tree/fill-id";
 
 export const EdTreeName = ({
   node,
@@ -116,7 +117,7 @@ export const EdTreeName = ({
             }
           }}
           onChange={(e) => {
-            local.rename = e.target.value
+            local.rename = e.target.value;
             p.render();
           }}
         />
@@ -237,7 +238,7 @@ const GenerateJSX: FC<{ meta: IMeta }> = ({ meta }) => {
         }
 
         if (mitem) {
-          const genJSX = findDefaultJSX(p, mitem);
+          const genJSX = fillID(findDefaultJSX(p, mitem));
           const ijson = mitem.toJSON() as IItem;
 
           mitem.doc?.transact(() => {
@@ -250,16 +251,6 @@ const GenerateJSX: FC<{ meta: IMeta }> = ({ meta }) => {
               id: ijson.id,
               hidden: false,
               originalId: ijson.originalId,
-              ...(is_child
-                ? {
-                    adv: {
-                      css: "",
-                      js: "<>{children}</>",
-                      jsBuilt:
-                        "render(/* @__PURE__ */ React.createElement(React.Fragment, null, children));\n",
-                    },
-                  }
-                : {}),
             });
           });
           treeRebuild(p);

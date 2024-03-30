@@ -1,8 +1,8 @@
+import { createId } from "@paralleldrive/cuid2";
 import { TypedMap } from "yjs-types";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
-import { IMeta, PG } from "../ed-global";
-import { createId } from "@paralleldrive/cuid2";
+import { IMeta } from "../ed-global";
 
 export const assignMitem = (arg: {
   m: IMeta;
