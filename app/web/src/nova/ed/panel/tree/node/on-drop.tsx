@@ -61,7 +61,7 @@ export const nodeOnDrop: (
             treeRebuild(p);
             p.render();
           } else {
-            const child_id = toMeta.item.component?.props.child.content?.id;
+            const child_id = toMeta.item.component?.props?.child?.content?.id;
             if (child_id) {
               const child_meta = getMetaById(p, child_id);
               if (child_meta) {

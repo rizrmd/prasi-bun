@@ -16,9 +16,17 @@ import { SideLabel } from "./ui/SideLabel";
 export const EdStyleAll = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
-  const meta = active.comp_id
+  let meta = active.comp_id
     ? p.comp.list[active.comp_id].meta[active.item_id]
     : p.page.meta[active.item_id];
+
+  if (
+    meta.item.component?.props?.child &&
+    meta.item.component?.props?.child?.content?.id &&
+    meta.item.component?.useStyle
+  ) {
+    meta = p.page.meta[meta.item.component.props.child.content.id];
+  }
 
   let item = meta?.item;
   let is_inherit = false;

@@ -238,7 +238,7 @@ const GenerateJSX: FC<{ meta: IMeta }> = ({ meta }) => {
         }
 
         if (mitem) {
-          const genJSX = fillID(findDefaultJSX(p, mitem));
+          const genJSX = findDefaultJSX(p, mitem);
           const ijson = mitem.toJSON() as IItem;
 
           mitem.doc?.transact(() => {
@@ -307,5 +307,5 @@ export const findDefaultJSX = (p: PG, mitem: MItem): IItem => {
     }
   }
 
-  return resetJSXProp;
+  return fillID(resetJSXProp) as any;
 };
