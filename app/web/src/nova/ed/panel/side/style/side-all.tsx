@@ -21,9 +21,9 @@ export const EdStyleAll = () => {
     : p.page.meta[active.item_id];
 
   if (
-    meta.item?.component?.props?.child &&
-    meta.item?.component?.props?.child?.content?.id &&
-    meta.item?.component?.useStyle
+    meta?.item?.component?.props?.child &&
+    meta?.item?.component?.props?.child?.content?.id &&
+    meta?.item?.component?.useStyle
   ) {
     meta = p.page.meta[meta.item.component.props.child.content.id];
   }
