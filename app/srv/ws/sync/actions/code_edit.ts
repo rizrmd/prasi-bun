@@ -111,9 +111,9 @@ export const code_edit: SAction["code"]["edit"] = async function (
               });
             }
 
-            return jscript
+            return jscript;
           } catch (e: any) {
-            console.log('e', e)
+            console.log("e", e);
             return e.message.toString();
           }
         } else {
@@ -173,10 +173,10 @@ export const code_edit: SAction["code"]["edit"] = async function (
               const res =
                 prop_kind !== "typings"
                   ? await transform(`return ${src}`, {
-                    jsx: "transform",
-                    format: "cjs",
-                    loader: "tsx",
-                  })
+                      jsx: "transform",
+                      format: "cjs",
+                      loader: "tsx",
+                    })
                   : { code: src };
               doc?.transact(() => {
                 if (prop_kind === "value") {
@@ -219,35 +219,37 @@ const findId = (mitem: MContent | MRoot, id: string) => {
   let found: null | MItem = null;
 
   const m = mitem as MItem;
-  if (m.get("id") === id) {
-    return m;
-  }
+  if (m) {
+    if (m.get("id") === id) {
+      return m;
+    }
 
-  const childs = m.get("childs");
-  if (childs) {
-    childs.forEach((child) => {
-      const f = findId(child, id);
-      if (f) {
-        found = f;
-      }
-    });
-  }
-
-  if (!found) {
-    const mprops = m.get("component")?.get("props");
-
-    if (mprops) {
-      mprops.forEach((mprop) => {
-        const mcontent = mprop.get("content");
-        if (mcontent) {
-          const f = findId(mcontent, id);
-          if (f) {
-            found = f;
-          }
+    const childs = m.get("childs");
+    if (childs) {
+      childs.forEach((child) => {
+        const f = findId(child, id);
+        if (f) {
+          found = f;
         }
       });
     }
-  }
 
-  if (found) return found;
+    if (!found) {
+      const mprops = m.get("component")?.get("props");
+
+      if (mprops) {
+        mprops.forEach((mprop) => {
+          const mcontent = mprop.get("content");
+          if (mcontent) {
+            const f = findId(mcontent, id);
+            if (f) {
+              found = f;
+            }
+          }
+        });
+      }
+    }
+
+    if (found) return found;
+  }
 };
