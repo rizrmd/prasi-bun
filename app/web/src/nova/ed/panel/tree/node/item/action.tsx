@@ -100,7 +100,7 @@ export const EdTreeAction = ({
           )}
           onClick={(e) => {
             if (
-              item.component?.props.child.content?.id &&
+              item.component?.props?.child?.content?.id &&
               child_jsx_has_script
             ) {
               e.stopPropagation();
