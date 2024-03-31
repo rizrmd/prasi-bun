@@ -1,22 +1,21 @@
 import { get } from "idb-keyval";
+import parseUA from "ua-parser-js";
 import init, { decompress } from "wasm-gzip";
 import { useGlobal } from "web-utils";
 import { w } from "../../utils/types/general";
 import { IRoot } from "../../utils/types/root";
+import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
 import { EDGlobal, PG } from "../ed/logic/ed-global";
 import {
   loadPageMetaCache,
   reloadLayout,
-  reloadPage,
-  savePageMetaCache,
+  reloadPage
 } from "../ed/logic/ed-route";
 import { loadSite } from "../ed/logic/ed-site";
-import { treeCacheBuild, treeRebuild } from "../ed/logic/tree/build";
+import { treeCacheBuild } from "../ed/logic/tree/build";
 import { nav } from "./render/script/extract-nav";
 import { Vi } from "./vi";
-import parseUA from "ua-parser-js";
-import { DeadEnd } from "../../utils/ui/deadend";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {

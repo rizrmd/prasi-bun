@@ -1,6 +1,10 @@
+import { set as setkv } from "idb-keyval";
 import { FC, useState } from "react";
 import { validate } from "uuid";
 import { GlobalContext, useLocal } from "web-utils";
+import { IContent } from "../../utils/types/general";
+import { IItem } from "../../utils/types/item";
+import { IRoot } from "../../utils/types/root";
 import { DeadEnd } from "../../utils/ui/deadend";
 import { Loading } from "../../utils/ui/loading";
 import { Vi } from "../vi/vi";
@@ -10,8 +14,6 @@ import { loadPage, loadUrls } from "./base/page";
 import { detectResponsiveMode } from "./base/responsive";
 import { initBaseRoute, rebuildMeta } from "./base/route";
 import { w } from "./w";
-import { IRoot } from "../../utils/types/root";
-import { IContent } from "../../utils/types/general";
 
 export const isPreview = () => {
   return (
@@ -165,6 +167,28 @@ export const Root = () => {
             site_id={base.site.id}
             db={base.site.db}
             api={base.site.api}
+            comp_load={async (comp_id) => {
+              const comp = base.comp;
+              if (comp.list[comp_id]) {
+                return comp.list[comp_id];
+              }
+              try {
+                const res = (await (
+                  await fetch(base.url`_prasi/comp`, {
+                    method: "POST",
+                    body: JSON.stringify({ ids: [comp_id] }),
+                  })
+                ).json()) as Record<string, IItem>;
+                for (const [id, item] of Object.entries(res)) {
+                  comp.pending.delete(id);
+                  comp.list[id] = item;
+
+                  await setkv(`comp-${id}`, item);
+                }
+              } catch (e) {}
+
+              return comp.list[comp_id];
+            }}
             layout={
               base.layout.id && base.layout.root && base.layout.meta
                 ? {

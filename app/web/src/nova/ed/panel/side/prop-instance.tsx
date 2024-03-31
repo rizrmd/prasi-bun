@@ -50,7 +50,14 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
 
   const item = _meta?.item as IItem;
   if (!item) return <>Warning: Item not found</>;
-  if (!_meta.mitem) return <>Warning: MItem Not Found</>;
+  if (!_meta.mitem)
+    return (
+      <div className="p-3 text-sm space-y-1 flex flex-col">
+        <span>Warning: MItem Not Found</span>
+        <hr />
+        <span>This item is created on runtime</span>
+      </div>
+    );
 
   let filtered = [] as { mprop: FMCompDef; cprop: FNCompDef; name: string }[];
   const mprops = _meta.mitem?.get("component")?.get("props");
@@ -76,11 +83,15 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
           const arg: any = { ...active.scope };
           if (meta.item.script?.props) {
             for (const [k, v] of Object.entries(meta.item.script?.props)) {
-              eval(`try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`);
+              eval(
+                `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
+              );
             }
           } else if (meta.item.component) {
             for (const [k, v] of Object.entries(meta.item.component.props)) {
-              eval(`try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`);
+              eval(
+                `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
+              );
             }
           }
 

@@ -1,16 +1,18 @@
 import get from "lodash.get";
-import { ReactNode, isValidElement } from "react";
+import { ReactNode, isValidElement, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
+import { scanComponent } from "../../../prod/base/component";
 
 export const createViPassProp = (
-  vi: { meta: VG["meta"]; render?: () => void },
+  vi: { meta: VG["meta"]; render?: () => void; comp: VG["comp"] },
   is_layout: boolean,
   meta: IMeta,
   passprop: any
 ) => {
   return (arg: Record<string, any> & { children: ReactNode }) => {
+    const [_, render] = useState({});
     if (!meta.item.script) {
       meta.item.script = {};
     }
@@ -91,7 +93,26 @@ export const createViPassProp = (
     ) {
       const child_id = (arg.children as any).id;
       if (child_id) {
-        const meta = vi.meta[child_id];
+        let meta = vi.meta[child_id];
+
+        if (!meta) {
+          vi.meta[child_id] = { item: arg.children as any };
+          meta = vi.meta[child_id];
+
+          const comp_id = meta.item.component?.id;
+          if (comp_id) {
+            vi.comp.load(comp_id).then((comp) => {
+              if (comp) {
+                for (const [k, v] of Object.entries(comp)) {
+                  const item = meta.item as any;
+                  if (!item[k]) item[k] = v;
+                }
+                render({})
+              }
+            });
+          }
+        }
+
         return <ViRender is_layout={is_layout} meta={meta} passprop={_pass} />;
       }
     }

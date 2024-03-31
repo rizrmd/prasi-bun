@@ -7,7 +7,7 @@ import { genMeta } from "../../../vi/meta/meta";
 import { IRoot } from "../../../../utils/types/root";
 import { IContent } from "../../../../utils/types/general";
 import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
-import { loadCompSnapshot } from "../../logic/comp/load";
+import { loadCompSnapshot, loadComponent } from "../../logic/comp/load";
 import { IItem } from "../../../../utils/types/item";
 import { mainStyle } from "./main";
 import { Loading } from "../../../../utils/ui/loading";

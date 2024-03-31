@@ -7,6 +7,7 @@ import { render_stat } from "./render/render";
 import { nav } from "./render/script/extract-nav";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
+import { IItem } from "../../utils/types/item";
 
 type PRELOAD = Exclude<VG["on_preload"], undefined>;
 type PRELOAD_ARGS = Parameters<PRELOAD>[0];
@@ -15,7 +16,7 @@ const w = window as any;
 export const Vi: FC<{
   meta: Record<string, IMeta>;
   mode: "mobile" | "desktop";
-  comp_load?: (comp_id: string) => Promise<void>;
+  comp_load: (comp_id: string) => Promise<IItem>;
   entry: string[];
   api_url: string;
   site_id: string;
@@ -43,16 +44,18 @@ export const Vi: FC<{
   on_status_changed,
   on_preload,
   layout,
+  comp_load,
 }) => {
   const vi = useGlobal(ViGlobal, "VI");
   vi.mode = mode;
   vi.entry = entry;
   vi.on_preload = on_preload;
+  vi.comp.load = comp_load;
 
   w.siteurl = (pathname: string, forceOriginal?: boolean) => {
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;
-    
+
     try {
       if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
         if (vi.site.api_url) {
