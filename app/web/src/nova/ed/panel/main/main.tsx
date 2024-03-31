@@ -1,10 +1,11 @@
-import { useGlobal, useLocal } from "web-utils";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { Vi } from "../../../vi/vi";
 import { isMetaActive } from "../../logic/active/is-meta.active";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { mainPerItemVisit } from "./main-per-item";
 import { w } from "../../../../utils/types/general";
 import parseUA from "ua-parser-js";
+import { loadComponent } from "../../logic/comp/load";
 
 export const EdMain = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -62,6 +63,17 @@ export const EdMain = () => {
           entry={p.page.entry}
           api={p.script.api}
           db={p.script.db}
+          comp_load={async (comp_id) => {
+            let comp = p.comp.loaded[comp_id];
+            if (comp) {
+              return comp;
+            }
+
+            await loadComponent(p, comp_id);
+            comp = p.comp.loaded[comp_id];
+
+            return deepClone(comp);
+          }}
           script={{ init_local_effect: p.script.init_local_effect }}
           visit={(meta, parts) => {
             return mainPerItemVisit(p, meta, parts);

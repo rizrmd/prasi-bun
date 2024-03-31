@@ -1,4 +1,5 @@
 import { IContent } from "../../../utils/types/general";
+import { IItem } from "../../../utils/types/item";
 import { IRoot } from "../../../utils/types/root";
 import { IMeta } from "../../ed/logic/ed-global";
 import { viParts } from "./parts";
@@ -35,6 +36,11 @@ export const ViGlobal = {
   page: {
     cur: { id: "" },
     navs: {} as Record<string, Set<string>>,
+  },
+  comp: {
+    load: (async () => {
+      return null as any;
+    }) as (comp_id: string) => Promise<null | IItem>,
   },
   on_preload: undefined as
     | undefined
