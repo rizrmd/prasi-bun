@@ -109,7 +109,8 @@ if (typeof global.server_hook === "function") {
             }
             ancestors.push(val);
 
-            if (val.constructor && val.constructor.name !== "Object"){
+            if (val.constructor && 
+                !['Object', 'Array'].includes(val.constructor.name)) {
               if (val.constructor.name === 'Error') {
                 return '[Error] ' + val.message;
               }
