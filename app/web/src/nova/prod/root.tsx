@@ -48,7 +48,9 @@ export const Root = () => {
         base.route.router = router;
         base.route.pages = pages;
 
-        const url = `${w._prasi.basepath}_prasi/code/index.js`;
+        let url = `${w._prasi.basepath}_prasi/code/index.js`;
+        if (url.startsWith("//")) url = url.substring(1);
+
         const fn = new Function("callback", `import("${url}").then(callback)`);
         await new Promise<void>((resolve) => {
           fn((exports: any) => {
