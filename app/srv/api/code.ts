@@ -52,24 +52,24 @@ import {
 } from "react";
 import * as prisma from "./prisma";
 ${iftext(
-            apiPath,
-            `\
+  apiPath,
+  `\
 import "./api-types";
 import type * as SRVAPI from "${apiPath}";
   `
-          )}
+)}
 
 declare global {
   const db: prisma.PrismaClient & ${prismaExtendType};
   ${baseTypings}
   ${iftext(
-            apiPath,
-            `\
+    apiPath,
+    `\
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
-  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] };
+  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
   `
-          )}
+  )}
 }
 
 `
