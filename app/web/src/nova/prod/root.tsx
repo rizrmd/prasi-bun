@@ -50,6 +50,10 @@ export const Root = () => {
 
         let url = `${w._prasi.basepath}_prasi/code/index.js`;
         if (url.startsWith("//")) url = url.substring(1);
+        const cur = new URL(location.href);
+        if (url.startsWith("/")) {
+          url = `${cur.protocol}//${cur.host}${url}`;
+        }
 
         const fn = new Function("callback", `import("${url}").then(callback)`);
         await new Promise<void>((resolve) => {
