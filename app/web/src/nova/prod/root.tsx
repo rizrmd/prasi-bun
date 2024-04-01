@@ -48,9 +48,10 @@ export const Root = () => {
         base.route.router = router;
         base.route.pages = pages;
 
-        let url = `${w._prasi.basepath}_prasi/code/index.js`;
-        if (url.startsWith("//")) url = url.substring(1);
-        if (!url.startsWith("/")) url = `/${url}`;
+        const basepath = w._prasi.basepath;
+        let url = `${
+          basepath.endsWith("/") ? basepath : `${basepath}/`
+        }_prasi/code/index.js`;
 
         const cur = new URL(location.href);
         if (url.startsWith("/")) {
