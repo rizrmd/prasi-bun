@@ -107,7 +107,13 @@ export const createViPassProp = (
                   const item = meta.item as any;
                   if (!item[k]) item[k] = v;
                 }
-                render({})
+                const props = meta.item.component?.props as any;
+                for (const [k, v] of Object.entries(
+                  comp.component?.props || {}
+                )) {
+                  if (!props[k]) props[k] = v;
+                }
+                render({});
               }
             });
           }
