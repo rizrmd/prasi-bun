@@ -50,6 +50,8 @@ export const Root = () => {
 
         let url = `${w._prasi.basepath}_prasi/code/index.js`;
         if (url.startsWith("//")) url = url.substring(1);
+        if (!url.startsWith("/")) url = `/${url}`;
+
         const cur = new URL(location.href);
         if (url.startsWith("/")) {
           url = `${cur.protocol}//${cur.host}${url}`;

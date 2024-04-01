@@ -124,7 +124,7 @@ declare global {;
       `
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
-  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] };
+  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
   `
     )}
 }
