@@ -8,12 +8,12 @@ import { gzipAsync } from "../ws/sync/entity/zlib";
 export const _ = {
   url: "/prod/:site_id/**",
   async api() {
-    const { req, res } = apiContext(this);
+    const { req, prasi } = apiContext(this);
 
     const pathname: string = req.params["*"] || "";
     const site_id = req.params.site_id as string;
 
-    const index_html = new Response(prodIndex(site_id).render(), {
+    const index_html = new Response(prodIndex(site_id, prasi).render(), {
       headers: { "content-type": "text/html" },
     });
 

@@ -40,7 +40,7 @@ const serverMain = () => ({
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
 
-        if (svr && typeof svr.server === 'object') {
+        if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           this.handler[site_id].site_id = site_id;
         }
@@ -101,7 +101,7 @@ const serverMain = () => ({
             raw: arg.url,
           },
           mode: "dev",
-          index: prodIndex(site_id),
+          index: prodIndex(site_id, arg.prasi),
         });
       } catch (e: any) {
         _fs.appendFile(
@@ -123,6 +123,7 @@ type PrasiServer = {
     handle: (req: Request) => Promise<undefined | Response>;
     mode: "dev" | "prod";
     index: { head: string[]; body: string[]; render: () => string };
+    prasi: { page_id?: string; params?: Record<string, any> };
   }) => Promise<Response>;
 };
 

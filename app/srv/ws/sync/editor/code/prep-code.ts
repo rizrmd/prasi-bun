@@ -1,5 +1,5 @@
 import { codeBuild } from "./build-code";
-import { CodeMode, code } from "./util-code";
+import { CodeMode, code, codeGlobalTypings } from "./util-code";
 
 export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
   await code
@@ -9,6 +9,7 @@ export const prepCodeSnapshot = async (id_site: string, mode: CodeMode) => {
       "package.json",
       JSON.stringify({ name: `${mode}-${id_site}`, dependencies: {} }, null, 2)
     )
+    .new_file("typings/global.d.ts", codeGlobalTypings)
     .await();
 
   await codeBuild(id_site);

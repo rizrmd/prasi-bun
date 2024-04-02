@@ -35,7 +35,7 @@ glb.server_hook = async (arg) => {
     if (arr.length >= 3 && validate(site_id)) {
       try {
         if (!g.server_runtime[site_id]) {
-          await g.createServerRuntime(site_id)
+          await g.createServerRuntime(site_id);
         }
 
         const res = await server.http(site_id, arg);
@@ -45,7 +45,7 @@ glb.server_hook = async (arg) => {
           return new Response("403: Please see server.log", { status: 403 });
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     }
   }

@@ -19,6 +19,7 @@ export const apiContext = (ctx: any) => {
   return {
     mode: g.mode,
     req: ctx.req as Request & { params: any; query_parameters: any },
+    prasi: ctx.prasi || {},
     res: {
       ...ctx.res,
       send: (body) => {
@@ -70,7 +71,7 @@ export const createResponse = (existingRes: any, body: any) => {
       res.headers.set("content-type", "application/json");
     }
   }
- 
+
   const cur = existingRes as Response;
   for (const [key, value] of cur.headers.entries()) {
     res.headers.set(key, value);

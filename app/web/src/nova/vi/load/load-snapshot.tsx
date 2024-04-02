@@ -16,7 +16,6 @@ export const viLoadSnapshot = async (p: PG) => {
     if (api_url && apiURL.hostname) {
       await loadApiProxyDef(api_url, true);
 
-
       const api = w.prasiApi[api_url];
       if (api && api.apiTypes && api.prismaTypes) {
         const zip = JSON.stringify({

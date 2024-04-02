@@ -59,3 +59,28 @@ export const code = {
     };
   },
 };
+
+export const codeGlobalTypings = `//@ts-ignore 
+import type * as SRVAPI from "gen/srv/api/srv";
+import { Server, WebSocketHandler } from "bun";
+import prisma from "./prisma"; 
+
+declare global {
+  type Api = typeof SRVAPI;
+  type ApiName = keyof Api;
+  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
+
+  type PrasiServer = {
+    ws?: WebSocketHandler<{ url: string }>;
+    http: (arg: {
+      url: { raw: URL; pathname: string };
+      req: Request;
+      server: Server;
+      mode: "dev" | "prod";
+      handle: (req: Request) => Promise<Response>;
+      index: { head: string[]; body: string[]; render: () => string };
+      prasi: { page_id?: string; params?: Record<string, any> };
+    }) => Promise<Response>;
+  };
+}
+`;

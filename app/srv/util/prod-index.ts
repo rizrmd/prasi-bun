@@ -1,4 +1,7 @@
-export const prodIndex = (site_id: string) => {
+export const prodIndex = (
+  site_id: string,
+  prasi: { page_id?: string; params?: any }
+) => {
   return {
     head: [] as string[],
     body: [] as string[],
@@ -19,7 +22,16 @@ export const prodIndex = (site_id: string) => {
   ${this.body.join("\n")}
   <div id="root"></div>
   <script>
-    window._prasi = { basepath: "/prod/${site_id}", site_id: "${site_id}" }
+    window._prasi = { 
+      basepath: "/prod/${site_id}", 
+      site_id: "${site_id}",${
+        prasi.page_id ? `\n      page_id: "${prasi.page_id}",` : ""
+      }${
+        typeof prasi.params === "object"
+          ? `\n      params: ${JSON.stringify(prasi.params)},`
+          : ""
+      }
+    }
   </script>
   <script src="/prod/${site_id}/main.js" type="module"></script>
 </body>

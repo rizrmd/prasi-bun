@@ -14,6 +14,7 @@ import { loadPage, loadUrls } from "./base/page";
 import { detectResponsiveMode } from "./base/responsive";
 import { initBaseRoute, rebuildMeta } from "./base/route";
 import { w } from "./w";
+import { MatchedRoute } from "radix3";
 
 export const isPreview = () => {
   return (
@@ -87,11 +88,40 @@ export const Root = () => {
     }
   }
 
-  let page = router.lookup(base.pathname);
-  if (page_id_from_url) {
-    const found = base.route.pages.find((e) => page_id_from_url === e.id);
-    if (found) {
-      page = found;
+  let page: MatchedRoute<{
+    id: string;
+    url: string;
+  }> | null = null;
+
+  // hydrate page_id from server.ts
+  if (w._prasi.page_id) {
+    router.insert(base.pathname, {
+      id: w._prasi.page_id,
+      url: base.pathname,
+    });
+
+    page = { id: w._prasi.page_id, url: "", params: w._prasi.params };
+    w._prasi.routed = { page_id: w._prasi.page_id, params: w._prasi.params };
+    delete w._prasi.page_id;
+    delete w._prasi.params;
+  }
+  // regular route
+  else {
+    page = router.lookup(base.pathname);
+    if (page_id_from_url) {
+      const found = base.route.pages.find((e) => page_id_from_url === e.id);
+      if (found) {
+        page = found;
+      }
+    }
+
+    if (
+      page &&
+      w._prasi.routed &&
+      w._prasi.routed.page_id === page.id &&
+      w._prasi.routed.params
+    ) {
+      page.params = w._prasi.routed.params;
     }
   }
   if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
