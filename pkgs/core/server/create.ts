@@ -26,7 +26,8 @@ export const createServer = async () => {
     maxRequestBodySize: 1024 * 1024 * 128,
     websocket: await serveWS(wsHandler),
     async fetch(req, server) {
-      const url = new URL(req.url);
+      const url = new URL(req.url) as URL;
+      const prasi = {};
       const handle = async (req: Request) => {
         if (wsHandler[url.pathname]) {
           if (
@@ -45,7 +46,7 @@ export const createServer = async () => {
           return serveStatic.serve(url);
         }
 
-        const api_response = await serveAPI.serve(url, req);
+        const api_response = await serveAPI.serve(url, req, prasi);
         if (api_response) {
           return api_response;
         }
@@ -54,7 +55,14 @@ export const createServer = async () => {
       };
 
       if (g.server_hook) {
-        return await g.server_hook({ url, req, server, handle, wsHandler });
+        return await g.server_hook({
+          url,
+          req,
+          server,
+          handle,
+          wsHandler,
+          prasi,
+        });
       } else {
         return await handle(req);
       }

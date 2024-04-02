@@ -14,7 +14,7 @@ export const serveAPI = {
       g.router.insert(route.url.replace(/\*/gi, "**"), route);
     }
   },
-  serve: async (url: URL, req: Request) => {
+  serve: async (url: URL, req: Request, prasi: { page_id?: string }) => {
     let found = g.router.lookup(url.pathname);
     let found_not_match = false;
     if (!found?.url) {
@@ -89,6 +89,7 @@ export const serveAPI = {
         res: new Response(),
         ...found,
         params,
+        prasi,
       };
 
       const finalResponse = await current.fn(...args);

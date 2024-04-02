@@ -1,7 +1,7 @@
 import { Subprocess, spawn } from "bun";
 import { waitUntil } from "web-utils";
 import { SAction } from "../actions";
-import { code } from "../editor/code/util-code";
+import { code, codeGlobalTypings } from "../editor/code/util-code";
 import { docs } from "../entity/docs";
 import { snapshot } from "../entity/snapshot";
 import { SyncConnection } from "../type";
@@ -105,31 +105,12 @@ export const code_action: SAction["code"]["action"] = async function (
       );
       await Bun.write(
         Bun.file(path.join(dir, "global.d.ts")),
-        `//@ts-ignore 
-import type * as SRVAPI from "gen/srv/api/srv";
-import { Server, WebSocketHandler } from "bun";
-import prisma from "./prisma"; 
-
-declare global {
+        codeGlobalTypings.replace(
+          `declare global {`,
+          `declare global {
   const db: prisma.PrismaClient & ${prismaExtendType};
-
-  type Api = typeof SRVAPI;
-  type ApiName = keyof Api;
-  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
-
-  type PrasiServer = {
-    ws?: WebSocketHandler<{ url: string }>;
-    http: (arg: {
-      url: { raw: URL; pathname: string };
-      req: Request;
-      server: Server;
-      mode: "dev" | "prod";
-      handle: (req: Request) => Promise<Response>;
-      index: { head: string[]; body: string[]; render: () => string };
-    }) => Promise<Response>;
-  };
-}
-`
+  `
+        )
       );
 
       Bun.spawn({

@@ -27,6 +27,7 @@ export const g = global as unknown as {
     server: Server;
     handle: (req: Request) => Promise<Response | undefined>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
+    prasi: { page_id?: string };
   }) => Promise<Response | undefined>;
   server_runtime: Record<
     string,
