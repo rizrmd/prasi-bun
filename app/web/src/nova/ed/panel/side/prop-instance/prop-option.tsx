@@ -76,6 +76,14 @@ export const EdPropInstanceOptions: FC<{
             eval(
               `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
             );
+
+            if (v.content) {
+              eval(
+                `try { arg.__${k} = ${JSON.stringify(
+                  v.content
+                )} } catch(e) { console.error("arg", e); }`
+              );
+            }
           }
         }
 
@@ -83,10 +91,12 @@ export const EdPropInstanceOptions: FC<{
           ...Object.keys(arg),
           "local",
           `
-const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
+try {
+  const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 
-if (typeof resOpt === 'function') local.metaFn = resOpt;
-else local.options = resOpt;`
+  if (typeof resOpt === 'function') local.metaFn = resOpt;
+  else local.options = resOpt;
+} catch(e) { console.error(e); }`
         );
         res(...Object.values(arg), local);
       } catch (e) {
@@ -376,7 +386,7 @@ const SingleCheckbox = ({
       )}
       onClick={() => {
         if (item.checked) return;
-        
+
         if (item.options) {
           let idx = val.findIndex((e) => {
             if (typeof e === "object" && e.value === item.value) {
