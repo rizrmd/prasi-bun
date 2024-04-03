@@ -12,6 +12,7 @@ import { Popover } from "../../../../../utils/ui/popover";
 type MetaOption = {
   label: string;
   value: any;
+  checked?: boolean;
   options?: MetaOption[];
   reload?: string[];
 };
@@ -38,7 +39,7 @@ export const EdPropInstanceOptions: FC<{
     checkbox: {
       width: 0,
     },
-    options: [] as MetaOption[]
+    options: [] as MetaOption[],
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -80,14 +81,14 @@ export const EdPropInstanceOptions: FC<{
 
         const res = new Function(
           ...Object.keys(arg),
-          'local',
+          "local",
           `
 const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
 
 if (typeof resOpt === 'function') local.metaFn = resOpt;
 else local.options = resOpt;`
         );
-        res(...Object.values(arg),local);
+        res(...Object.values(arg), local);
       } catch (e) {
         console.error(e);
       }
@@ -326,11 +327,19 @@ const SingleCheckbox = ({
     }
   });
 
+  useEffect(() => {
+    if (item.checked && !val.find((e) => e === item.value)) {
+      val.push(item.value);
+      onChange(val, item);
+    }
+  }, []);
+
   return (
     <div
       className={cx(
         "flex pl-1 text-xs cursor-pointer select-none space-x-1 items-center",
         idx === 0 && !depth ? "" : "border-t",
+        item.checked && "opacity-50",
         depth &&
           css`
             padding-left: ${depth * 20}px;
