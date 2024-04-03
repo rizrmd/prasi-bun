@@ -71,7 +71,8 @@ export const EdPropInstanceOptions: FC<{
               `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
             );
           }
-        } else if (meta.item.component) {
+        }
+        if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
             eval(
               `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
@@ -103,7 +104,7 @@ try {
         console.error(e);
       }
     } else {
-      local.options = local.loaded; 
+      local.options = local.loaded;
     }
 
     if (local.metaFn && !local.loaded && !local.loading) {
