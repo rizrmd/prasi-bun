@@ -375,6 +375,8 @@ const SingleCheckbox = ({
             `
       )}
       onClick={() => {
+        if (item.checked) return;
+        
         if (item.options) {
           let idx = val.findIndex((e) => {
             if (typeof e === "object" && e.value === item.value) {
