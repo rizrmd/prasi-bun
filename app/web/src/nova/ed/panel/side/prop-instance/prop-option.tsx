@@ -103,19 +103,26 @@ try {
         console.error(e);
       }
     } else {
-      local.options = local.loaded;
+      local.options = local.loaded; 
     }
 
     if (local.metaFn && !local.loaded && !local.loading) {
       local.loading = true;
-      const res = local.metaFn();
-      const callback = (e: any) => {
-        local.loading = false;
-        local.loaded = e;
-        local.render();
-      };
-      if (res instanceof Promise) res.then(callback);
-      else callback(res);
+      try {
+        const res = local.metaFn();
+        const callback = (e: any) => {
+          local.loading = false;
+          local.loaded = e;
+          local.render();
+        };
+        if (res instanceof Promise)
+          res.then(callback).catch((e) => {
+            console.error(e);
+          });
+        else callback(res);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
