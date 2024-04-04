@@ -67,16 +67,20 @@ export const EdPropInstanceOptions: FC<{
 
         if (meta.item.script?.props) {
           for (const [k, v] of Object.entries(meta.item.script?.props)) {
-            eval(
-              `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
-            );
+            if (v.value) {
+              eval(
+                `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
+              );
+            }
           }
         }
         if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
-            eval(
-              `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
-            );
+            if (v.valueBuilt) {
+              eval(
+                `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
+              );
+            }
 
             if (v.content) {
               eval(
