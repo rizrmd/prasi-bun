@@ -33,7 +33,7 @@ export const EdPropInstanceButton: FC<{
       for (const [k, v] of Object.entries(meta.item.script?.props)) {
         if (v.value) {
           eval(
-            `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
+            `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); console.log("${k}", v.value); }`
           );
         }
       }
@@ -41,7 +41,7 @@ export const EdPropInstanceButton: FC<{
       for (const [k, v] of Object.entries(meta.item.component.props)) {
         if (v.valueBuilt) {
           eval(
-            `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
+            `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); console.log("${k}", v.value); }`
           );
         }
       }

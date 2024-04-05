@@ -9,7 +9,12 @@ export const walkProp = (arg: {
   instance: Record<string, string>;
   each: (name: string, prop: FNCompDef) => void;
 }) => {
-  for (const [k, v] of Object.entries(arg.item_comp.component?.props || {})) {
+  const props = Object.entries(arg.item_comp.component?.props || {}).sort(
+    (a, b) => {
+      return a[1].idx - b[1].idx;
+    }
+  );
+  for (const [k, v] of props) {
     let prop = deepClone(v);
     const props = arg.item.component?.props;
     if (props && props[k]) {
