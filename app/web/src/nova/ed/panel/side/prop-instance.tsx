@@ -334,7 +334,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
           )}
 
           {item.component?.useStyle && (
-            <>
+            <div className={cx()}>
               <div
                 className={cx(
                   "flex border-b p-1 h-[28px] items-center bg-slate-50 justify-between select-none",
@@ -360,8 +360,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 </div>
               </div>
 
-              {show_style && <EdStyleAll />}
-            </>
+              {show_style && <EdStyleAll as_child />}
+            </div>
           )}
 
           <div className="p-2 text-gray-300">{comp_id}</div>

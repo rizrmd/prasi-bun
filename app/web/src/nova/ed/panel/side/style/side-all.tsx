@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { FC, useCallback } from "react";
 import { useGlobal } from "web-utils";
 import { IItem } from "../../../../../utils/types/item";
 import { EDGlobal, active } from "../../../logic/ed-global";
@@ -13,7 +13,7 @@ import { PanelPadding } from "./panel/padding";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
 
-export const EdStyleAll = () => {
+export const EdStyleAll: FC<{ as_child?: boolean }> = ({ as_child }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
 
   let meta = active.comp_id
@@ -155,7 +155,7 @@ export const EdStyleAll = () => {
     </>
   );
 
-  if (!is_inherit)
+  if (!is_inherit && !as_child)
     return (
       <div className="flex h-full flex-1 relative overflow-auto">
         <div className="absolute inset-0 flex items-stretch flex-col pt-1">
