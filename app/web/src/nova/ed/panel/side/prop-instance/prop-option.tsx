@@ -92,12 +92,17 @@ export const EdPropInstanceOptions: FC<{
           }
         }
 
+        const src = (
+          cprop.meta.optionsBuilt ||
+          cprop.meta.options ||
+          ""
+        ).trim();
         const res = new Function(
           ...Object.keys(arg),
           "local",
           `
 try {
-  const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
+  const resOpt = ${src.endsWith(";") ? src : `${src};`}
 
   if (typeof resOpt === 'function') local.metaFn = resOpt;
   else local.options = resOpt;
