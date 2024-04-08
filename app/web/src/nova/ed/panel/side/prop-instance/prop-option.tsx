@@ -52,7 +52,7 @@ export const EdPropInstanceOptions: FC<{
 
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded || !local.metaFn) {
-      let fn = '' as any;
+      let fn = "" as any;
       let arg = {};
       try {
         if (p.site.config.api_url) {
@@ -79,9 +79,16 @@ export const EdPropInstanceOptions: FC<{
         if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
             if (v.valueBuilt) {
-              eval(
-                `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); }`
-              );
+              try {
+                const evn = new Function(
+                  "arg",
+                  `arg["${k}"] = ${v.valueBuilt}`
+                );
+                evn(arg);
+              } catch (e) {
+                console.error(e);
+                console.warn(v.valueBuilt);
+              }
             }
 
             if (v.content) {
