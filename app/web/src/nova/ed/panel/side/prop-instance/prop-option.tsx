@@ -53,13 +53,14 @@ export const EdPropInstanceOptions: FC<{
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded || !local.metaFn) {
       let fn = null as any;
+      let arg = {};
       try {
         if (p.site.config.api_url) {
           if (!p.script.db) p.script.db = dbProxy(p.site.config.api_url);
           if (!p.script.api) p.script.api = apiProxy(p.site.config.api_url);
         }
 
-        const arg = {
+        arg = {
           ...window.exports,
           db: p.script.db,
           api: p.script.api,
@@ -109,9 +110,7 @@ export const EdPropInstanceOptions: FC<{
         fn(...Object.values(arg), local);
       } catch (e) {
         console.error(e);
-        if (typeof fn === "function") { 
-          console.warn(fn.toString());
-        }
+        console.warn(fn.toString(), arg);
       }
     } else {
       local.options = local.loaded;
