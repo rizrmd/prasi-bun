@@ -147,6 +147,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-instance":
                   {
                     types._raw = declareScope(p, meta, monaco);
+
                     const nmodel = monaco.editor.createModel(
                       trim(val),
                       "typescript",
@@ -156,7 +157,8 @@ export const EdScriptMonaco: FC<{}> = () => {
 
                     if (component.id) {
                       const prop_name = p.ui.popup.script.prop_name;
-                      const prop = component.props[prop_name];
+                      const prop = meta.item.component?.props[prop_name];
+
                       if (!!prop && typeof prop.typings === "string") {
                         try {
                           const typings_src = prop.typings.substring(
@@ -176,7 +178,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                         } catch (e) {}
                       }
                     }
-
                   }
                   break;
                 case "item":
@@ -193,7 +194,7 @@ export const EdScriptMonaco: FC<{}> = () => {
 
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
-                      const prop = component.props[prop_name];
+                      const prop = meta.item.component?.props[prop_name];
                       if (!!prop && typeof prop.typings === "string") {
                         const typings_src = prop.typings.substring(
                           `const typings = `.length
