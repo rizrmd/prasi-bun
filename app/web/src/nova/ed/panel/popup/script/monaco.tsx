@@ -165,9 +165,10 @@ export const EdScriptMonaco: FC<{}> = () => {
                             `const typings = `.length
                           );
                           const typings_fn = new Function(
+                            "active",
                             `return ${typings_src}`
                           );
-                          const typings = typings_fn();
+                          const typings = typings_fn(active);
                           if (typeof typings === "object") {
                             for (const [k, v] of Object.entries(typings)) {
                               if (typeof v === "string") {
@@ -200,9 +201,10 @@ export const EdScriptMonaco: FC<{}> = () => {
                           `const typings = `.length
                         );
                         const typings_fn = new Function(
+                          "active",
                           `return ${typings_src}`
                         );
-                        const typings = typings_fn();
+                        const typings = typings_fn(active);
                         for (const [k, v] of Object.entries(typings)) {
                           if (typeof v === "string") {
                             types[k] = v;
