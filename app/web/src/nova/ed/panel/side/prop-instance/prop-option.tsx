@@ -78,7 +78,7 @@ export const EdPropInstanceOptions: FC<{
         }
         if (meta.item.component) {
           for (const [k, v] of Object.entries(meta.item.component.props)) {
-            if (v.valueBuilt) {
+            if (v.valueBuilt && v.valueBuilt.length > 3) {
               try {
                 const evn = new Function(
                   "arg",
@@ -87,7 +87,7 @@ export const EdPropInstanceOptions: FC<{
                 evn(arg);
               } catch (e) {
                 console.error(e);
-                console.warn(v.valueBuilt);
+                console.warn(k, v.valueBuilt);
               }
             }
 
