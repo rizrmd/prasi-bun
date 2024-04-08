@@ -52,7 +52,7 @@ export const EdPropInstanceOptions: FC<{
 
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded || !local.metaFn) {
-      let fn = null as any;
+      let fn = '' as any;
       let arg = {};
       try {
         if (p.site.config.api_url) {
