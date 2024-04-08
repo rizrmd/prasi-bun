@@ -52,14 +52,7 @@ export const EdPropInstanceOptions: FC<{
 
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.loaded || !local.metaFn) {
-      const src = (cprop.meta.optionsBuilt || cprop.meta.options || "").trim();
-      const final = `
-      try {
-        const resOpt = ${src.endsWith(";") ? src : `${src};`}
-      
-        if (typeof resOpt === 'function') local.metaFn = resOpt;
-        else local.options = resOpt;
-      } catch(e) { console.error(e); }`;
+      let fn = null as any;
       try {
         if (p.site.config.api_url) {
           if (!p.script.db) p.script.db = dbProxy(p.site.config.api_url);
@@ -100,11 +93,25 @@ export const EdPropInstanceOptions: FC<{
           }
         }
 
-        const res = new Function(...Object.keys(arg), "local", final);
-        res(...Object.values(arg), local);
+        const src = (
+          cprop.meta.optionsBuilt ||
+          cprop.meta.options ||
+          ""
+        ).trim();
+        const final = `
+        try {
+          const resOpt = ${src.endsWith(";") ? src : `${src};`}
+        
+          if (typeof resOpt === 'function') local.metaFn = resOpt;
+          else local.options = resOpt;
+        } catch(e) { console.error(e); }`;
+        fn = new Function(...Object.keys(arg), "local", final);
+        fn(...Object.values(arg), local);
       } catch (e) {
         console.error(e);
-        console.warn(final);
+        if (typeof fn === "function") { 
+          console.warn(fn.toString());
+        }
       }
     } else {
       local.options = local.loaded;
