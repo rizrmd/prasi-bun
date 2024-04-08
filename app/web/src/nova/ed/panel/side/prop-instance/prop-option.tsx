@@ -106,6 +106,13 @@ try {
         res(...Object.values(arg), local);
       } catch (e) {
         console.error(e);
+        console.warn(`
+        try {
+          const resOpt = ${cprop.meta.optionsBuilt || cprop.meta.options};
+        
+          if (typeof resOpt === 'function') local.metaFn = resOpt;
+          else local.options = resOpt;
+        } catch(e) { console.error(e); }`);
       }
     } else {
       local.options = local.loaded;
