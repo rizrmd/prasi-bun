@@ -15,6 +15,7 @@ export const viEvalScript = (
     mode: VG["mode"];
     layout: VG["layout"];
     site: { db: any; api: any };
+    comp: VG["comp"];
     meta: VG["meta"];
     visit?: VG["visit"];
     script?: { init_local_effect: any };
@@ -59,6 +60,7 @@ export const viEvalScript = (
     ...exports,
     ...passprop,
     _meta: vi.meta,
+    _item: meta.item,
   };
 
   if (typeof passprop === "object") {
