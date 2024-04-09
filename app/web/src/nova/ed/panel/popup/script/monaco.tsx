@@ -385,7 +385,8 @@ const propTypings = (prop: FNCompDef | undefined, types: any, meta: any) => {
   if (!!prop && typeof prop.typings === "string") {
     const typings_fn = new Function(
       "active",
-      "_meta"`\
+      "_meta",
+      `\
 ${prop.typings};
 return typings;`
     );
