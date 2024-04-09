@@ -160,14 +160,13 @@ export const EdScriptMonaco: FC<{}> = () => {
                       const prop = meta.item.component?.props[prop_name];
 
                       if (!!prop && typeof prop.typings === "string") {
+                        const typings_fn = new Function(
+                          "active",
+                          `\
+${prop.typings};
+return typings;`
+                        );
                         try {
-                          const typings_src = prop.typings.substring(
-                            `const typings = `.length
-                          );
-                          const typings_fn = new Function(
-                            "active",
-                            `return ${typings_src}`
-                          );
                           const typings = typings_fn(active);
                           if (typeof typings === "object") {
                             for (const [k, v] of Object.entries(typings)) {
@@ -176,7 +175,9 @@ export const EdScriptMonaco: FC<{}> = () => {
                               }
                             }
                           }
-                        } catch (e) {}
+                        } catch (e) {
+                          console.log(typings_fn.toString())
+                        }
                       }
                     }
                   }
