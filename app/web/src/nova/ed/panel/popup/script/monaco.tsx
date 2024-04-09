@@ -157,7 +157,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     if (component.id) {
                       const prop_name = p.ui.popup.script.prop_name;
                       const prop = meta.item.component?.props[prop_name];
-                      propTypings(prop, types);
+                      propTypings(prop, types, p.page.meta);
                     }
                   }
                   break;
@@ -176,7 +176,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
                       const prop = component?.props[prop_name];
-                      propTypings(prop, types);
+                      propTypings(prop, types, p.page.meta);
                     }
                   }
                   break;
@@ -381,16 +381,16 @@ export const EdScriptMonaco: FC<{}> = () => {
   );
 };
 
-const propTypings = (prop: FNCompDef | undefined, types: any) => {
+const propTypings = (prop: FNCompDef | undefined, types: any, meta: any) => {
   if (!!prop && typeof prop.typings === "string") {
     const typings_fn = new Function(
       "active",
-      `\
+      "_meta"`\
 ${prop.typings};
 return typings;`
     );
     try {
-      const typings = typings_fn(active);
+      const typings = typings_fn(active, meta);
       if (typeof typings === "object") {
         for (const [k, v] of Object.entries(typings)) {
           if (typeof v === "string") {
