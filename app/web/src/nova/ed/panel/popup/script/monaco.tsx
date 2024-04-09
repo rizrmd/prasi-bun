@@ -147,7 +147,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "prop-instance":
                   {
                     types._raw = declareScope(p, meta, monaco);
-
                     const nmodel = monaco.editor.createModel(
                       trim(val),
                       "typescript",
@@ -158,27 +157,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                     if (component.id) {
                       const prop_name = p.ui.popup.script.prop_name;
                       const prop = meta.item.component?.props[prop_name];
-
-                      if (!!prop && typeof prop.typings === "string") {
-                        const typings_fn = new Function(
-                          "active",
-                          `\
-${prop.typings};
-return typings;`
-                        );
-                        try {
-                          const typings = typings_fn(active);
-                          if (typeof typings === "object") {
-                            for (const [k, v] of Object.entries(typings)) {
-                              if (typeof v === "string") {
-                                types[k] = v;
-                              }
-                            }
-                          }
-                        } catch (e) {
-                          console.log(typings_fn.toString())
-                        }
-                      }
+                      propTypings(prop, types);
                     }
                   }
                   break;
@@ -197,21 +176,7 @@ return typings;`
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
                       const prop = meta.item.component?.props[prop_name];
-                      if (!!prop && typeof prop.typings === "string") {
-                        const typings_src = prop.typings.substring(
-                          `const typings = `.length
-                        );
-                        const typings_fn = new Function(
-                          "active",
-                          `return ${typings_src}`
-                        );
-                        const typings = typings_fn(active);
-                        for (const [k, v] of Object.entries(typings)) {
-                          if (typeof v === "string") {
-                            types[k] = v;
-                          }
-                        }
-                      }
+                      propTypings(prop, types);
                     }
                   }
                   break;
@@ -414,4 +379,31 @@ return typings;`
       }}
     />
   );
+};
+
+const propTypings = (prop: FNCompDef | undefined, types: any) => {
+  if (!!prop && typeof prop.typings === "string") {
+    const typings_fn = new Function(
+      "active",
+      `\
+${prop.typings};
+return typings;`
+    );
+    try {
+      const typings = typings_fn(active);
+      if (typeof typings === "object") {
+        for (const [k, v] of Object.entries(typings)) {
+          if (typeof v === "string") {
+            if (k === "_raw" && types[k]) {
+              types[k] += "\n" + v;
+            } else {
+              types[k] = v;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.log(typings_fn.toString());
+    }
+  }
 };
