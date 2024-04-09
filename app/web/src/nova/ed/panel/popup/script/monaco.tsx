@@ -175,7 +175,7 @@ export const EdScriptMonaco: FC<{}> = () => {
 
                     if (component.id && meta.jsx_prop?.name) {
                       const prop_name = meta.jsx_prop.name;
-                      const prop = meta.item.component?.props[prop_name];
+                      const prop = component?.props[prop_name];
                       propTypings(prop, types);
                     }
                   }
