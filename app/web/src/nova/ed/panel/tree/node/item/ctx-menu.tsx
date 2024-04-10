@@ -15,7 +15,7 @@ import { edActionNewComp } from "./action/new-comp";
 import { edActionPaste } from "./action/paste";
 import { edActionRename } from "./action/rename";
 import { edActionUnwrap } from "./action/unwrap";
-import { edActionWrap } from "./action/wrap";
+import { edActionWrap, edActionWrapInComp } from "./action/wrap";
 import { IContent } from "../../../../../../utils/types/general";
 
 export const EdTreeCtxMenu = ({
@@ -132,7 +132,16 @@ export const EdTreeCtxMenu = ({
           <MenuItem label="Paste" onClick={() => edActionPaste(p, item)} />
         )}
       {["text", "item"].includes(item.type) && !isJSXProp && (
-        <MenuItem label="Wrap" onClick={() => edActionWrap(p, item as IItem)} />
+        <>
+          <MenuItem
+            label="Wrap"
+            onClick={() => edActionWrap(p, item as IItem)}
+          />
+          <MenuItem
+            label="Wrap in Component"
+            onClick={() => edActionWrapInComp(p, item as IItem)}
+          />
+        </>
       )}
       {["item"].includes(item.type) && !isJSXProp && !isComponent && (
         <MenuItem
