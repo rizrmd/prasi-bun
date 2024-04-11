@@ -1,5 +1,5 @@
 import { createId as cuid } from "@paralleldrive/cuid2";
-import { IContent } from "../../../utils/types/general";
+import type { IContent } from "../../../../../../utils/types/general";
 
 export const fillID = (
   object: IContent,
