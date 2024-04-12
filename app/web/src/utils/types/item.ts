@@ -11,6 +11,7 @@ export type IItem = {
   adv?: FNAdv;
   type: "item";
   component?: FNComponent;
+  tree_hidden?: boolean;
   childs: (IItem | IText)[];
 } & MetaItem &
   BasicItem;
@@ -20,6 +21,7 @@ export type MItem = TypedMap<
     type: "item";
     mobile?: MItem;
     childs?: TypedArray<MItem | MText>;
+    tree_hidden?: boolean;
   } & MBasicItem &
     MetaItem
 > & { parent: TypedArray<MSection | MItem> & { parent: MSection | MItem } };
