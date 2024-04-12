@@ -85,6 +85,10 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     is_active = true;
   }
 
+  if (node.data.item.tree_hidden || node.data.mitem?.get("tree_hidden")) {
+    return <></>;
+  }
+
   return (
     <Tooltip
       placement="right"
