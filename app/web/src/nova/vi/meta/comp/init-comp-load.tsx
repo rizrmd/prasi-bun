@@ -1,4 +1,5 @@
 import { IItem } from "../../../../utils/types/item";
+import { FNComponent } from "../../../../utils/types/meta-fn";
 import { GenMetaP, IMeta } from "../../utils/types";
 import { genMeta } from "../meta";
 
@@ -14,6 +15,7 @@ export const initLoadComp = async (
 ) => {
   const comp_ids = new Set<string>();
   const shared = { root: item } as any;
+  const comps = [] as FNComponent[];
   genMeta(
     {
       ...p,
@@ -26,36 +28,7 @@ export const initLoadComp = async (
                 comp_ids.add(id);
               }
             }
-
-            if (component?.props) {
-              for (const [name, prop] of Object.entries(component.props)) {
-                if (prop.content) {
-                  genMeta(
-                    {
-                      ...p,
-                      on: {
-                        visit_component: ({ component }) => {
-                          if (component) {
-                            const { id } = component;
-                            if (!p.comps[id]) {
-                              if (!_loaded || (_loaded && !_loaded.has(id))) {
-                                comp_ids.add(id);
-                              }
-                            }
-                          }
-                        },
-                        visit(meta, vitem) {
-                          if (opt.visit) opt.visit(meta, vitem, shared);
-                        },
-                      },
-                      set_meta: false,
-                      note: "init-load-comp-prop",
-                    },
-                    { item: prop.content }
-                  );
-                }
-              }
-            }
+            comps.push(component);
           }
         },
         visit(meta, vitem) {
@@ -69,22 +42,29 @@ export const initLoadComp = async (
   );
 
   if (opt.done) opt.done(shared);
+  let loaded = _loaded;
+  if (!loaded) {
+    loaded = new Set<string>();
+  }
   if (comp_ids.size > 0) {
     await opt.load([...comp_ids]);
 
-    let loaded = _loaded;
-    if (!loaded) {
-      loaded = new Set<string>();
-    }
     comp_ids.forEach((id) => {
       if (loaded) loaded.add(id);
     });
 
     for (const id of [...loaded]) {
       const comp = p.comps[id];
-
       if (comp) {
         await initLoadComp(p, comp, opt, loaded);
+      }
+    }
+  }
+
+  for (const component of comps) {
+    for (const prop of Object.values(component.props)) {
+      if (prop.meta?.type === "content-element" && prop.content) {
+        await initLoadComp(p, prop.content, opt, loaded);
       }
     }
   }

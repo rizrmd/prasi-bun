@@ -16,29 +16,29 @@ export const viLoadSnapshot = async (p: PG) => {
     if (api_url && apiURL.hostname) {
       await loadApiProxyDef(api_url, true);
 
-      const api = w.prasiApi[api_url];
-      if (api && api.apiTypes && api.prismaTypes) {
-        const zip = JSON.stringify({
-          api: api.apiTypes,
-          prisma: api.prismaTypes,
-        });
+      // const api = w.prasiApi[api_url];
+      // if (api && api.apiTypes && api.prismaTypes) {
+      //   const zip = JSON.stringify({
+      //     api: api.apiTypes,
+      //     prisma: api.prismaTypes,
+      //   });
 
-        const hash = simpleHash(zip);
-        const res = await p.sync?.code.action({
-          type: "check-typings",
-          site_id: p.site.id,
-          hash,
-        });
-        if (res?.type === "check-typings" && !res.hash) {
-          const body = Buffer.from(compress(encoder.encode(zip)));
-          p.sync?.code.action({
-            type: "push-typings",
-            site_id: p.site.id,
-            body,
-            hash,
-          });
-        }
-      }
+      //   const hash = simpleHash(zip);
+      //   const res = await p.sync?.code.action({
+      //     type: "check-typings",
+      //     site_id: p.site.id,
+      //     hash,
+      //   });
+      //   if (res?.type === "check-typings" && !res.hash) {
+      //     const body = Buffer.from(compress(encoder.encode(zip)));
+      //     p.sync?.code.action({
+      //       type: "push-typings",
+      //       site_id: p.site.id,
+      //       body,
+      //       hash,
+      //     });
+      //   }
+      // }
 
       if (!p.script.db) p.script.db = dbProxy(api_url);
       if (!p.script.api) p.script.api = apiProxy(api_url);

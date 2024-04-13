@@ -58,6 +58,7 @@ export const treeCacheBuild = async (p: PG, page_id: string) => {
         },
       }
     );
+
     for (const item of page_cache.root.childs) {
       meta_cache.entry.push(item.id);
       genMeta(
@@ -111,11 +112,14 @@ export const treeRebuild = async (p: PG, arg?: { note?: string }) => {
     if (item) {
       await initLoadComp({ comps: p.comp.loaded, meta, mode: "page" }, item, {
         async load(comp_ids) {
+          console.log(comp_ids.includes("ca7ac237-8f22-4492-bb9d-4b715b1f5c25"))
           for (const id of comp_ids) {
             await loadComponent(p, id);
           }
         },
       });
+      console.log(p.comp.loaded["ca7ac237-8f22-4492-bb9d-4b715b1f5c25"]);
+
       genMeta(
         {
           note: "tree-rebuild",
