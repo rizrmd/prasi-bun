@@ -61,7 +61,7 @@ export const viEvalScript = (
     ...passprop,
     _meta: vi.meta,
     _item: meta.item,
-    _syncm: syncronize,
+    _syncm: typeof syncronize !== "undefined" ? syncronize : undefined,
   };
 
   if (typeof passprop === "object") {
