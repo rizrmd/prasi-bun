@@ -11,6 +11,7 @@ export const baseTypings = `
 
   const _meta: Record<string, any>;
   const _item: IContent;
+  const _syncm: (mitem:any, item:any) => void;
   const pathname: string;
   const isEditor: boolean;
   const isLayout: boolean;
