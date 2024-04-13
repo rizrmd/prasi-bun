@@ -274,7 +274,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 const labelClick = (e: MouseEvent<HTMLDivElement>) => {
                   e.preventDefault();
                   local.pick = { mprop, name };
-                  local.rightClickEvent = e;
+                  if (local.rightClickEvent) local.rightClickEvent = null;
+                  else local.rightClickEvent = e;
                   local.render();
                 };
 
