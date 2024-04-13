@@ -224,11 +224,13 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
                   className={cx(
                     "font-mono",
                     css`
-                      font-size: 12px;
+                      font-size: 11px;
                       width: 500px;
                       height: 500px;
+                      margin: 5px 0px;
                     `
                   )}
+                  spellCheck={false}
                   onChange={(e) => {
                     local.json = e.currentTarget.value;
                     local.render();
