@@ -77,7 +77,7 @@ export const genComp = (p: GenMetaP, arg: GenMetaArg) => {
               prop.content.name = name;
 
               genMeta(
-                { ...p, mode: "comp" },
+                { ...p },
                 {
                   item: prop.content,
                   root: arg.root || prop.content,

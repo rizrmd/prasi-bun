@@ -110,15 +110,17 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             }
           }
 
-          const visible_fn = new Function(
-            ...Object.keys(arg),
-            `return ${visible}`
-          );
+          let visible_fn = null as any;
+          try {
+            visible_fn = new Function(...Object.keys(arg), `return ${visible}`);
+            const res = visible_fn(...Object.values(arg));
 
-          const res = visible_fn(...Object.values(arg));
-
-          if (!res) {
-            return;
+            if (!res) {
+              return;
+            }
+          } catch (e) {
+            console.log(visible, arg);
+            console.error(e);
           }
         } catch (e) {
           console.error(e);

@@ -16,6 +16,7 @@ import { SyncType } from "../../type";
 import { Packr } from "msgpackr";
 import { ServerWebSocket } from "bun";
 import { WSData } from "../../../../../../pkgs/core/server/create";
+import { g } from "utils/global";
 
 const packr = new Packr({ structuredClone: true });
 
@@ -143,9 +144,16 @@ if (typeof global.server_hook === "function") {
         {
           name: "prasi",
           setup(setup) {
-            setup.onEnd((res) => {
-              server.init(id_site);
-            });
+            const reinit = () => {
+              setup.onEnd((res) => {
+                server.init(id_site);
+              });
+            };
+            if (g.mode === "dev") {
+              setTimeout(reinit, 1000);
+            } else {
+              reinit();
+            }
           },
         },
       ],
