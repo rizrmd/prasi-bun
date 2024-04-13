@@ -69,10 +69,14 @@ export const EdPropInstanceOptions: FC<{
 
         if (meta.item.script?.props) {
           for (const [k, v] of Object.entries(meta.item.script?.props)) {
-            if (v.value) {
-              eval(
-                `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); }`
-              );
+            if (v.value && v.value.length > 3) {
+              try {
+                const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
+                evn(arg);
+              } catch (e) {
+                console.error(e);
+                console.warn(k, v.value);
+              }
             }
           }
         }
