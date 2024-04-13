@@ -31,18 +31,26 @@ export const EdPropInstanceButton: FC<{
     const arg: any = { ...active.scope };
     if (meta.item.script?.props) {
       for (const [k, v] of Object.entries(meta.item.script?.props)) {
-        if (v.value) {
-          eval(
-            `try { arg.${k} = ${v.value} } catch(e) { console.error("arg", e); console.log("${k}", v.value); }`
-          );
+        if (v.value && v.value.length > 3) {
+          try {
+            const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
+            evn(arg);
+          } catch (e) {
+            console.error(e);
+            console.warn(k, v.value);
+          }
         }
       }
     } else if (meta.item.component) {
       for (const [k, v] of Object.entries(meta.item.component.props)) {
-        if (v.valueBuilt) {
-          eval(
-            `try { arg.${k} = ${v.valueBuilt} } catch(e) { console.error("arg", e); console.log("${k}", v.value); }`
-          );
+        if (v.valueBuilt && v.valueBuilt.length > 3) {
+          try {
+            const evn = new Function("arg", `arg["${k}"] = ${v.valueBuilt}`);
+            evn(arg);
+          } catch (e) {
+            console.error(e);
+            console.warn(k, v.valueBuilt);
+          }
         }
       }
     }
