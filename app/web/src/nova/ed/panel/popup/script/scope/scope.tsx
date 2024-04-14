@@ -85,9 +85,20 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
     if (comp && comp.typings) {
       try {
+        const passprop: any = {};
+        const props: any = {};
+        for (const [k, v] of Object.entries(m.item.script?.passprop || {})) {
+          passprop[k] = v.value;
+        }
+
+        for (const [k, v] of Object.entries(m.item.script?.props || {})) {
+          props[k] = v.fn || v.value;
+        }
+
         const arg = {
           ...exports,
-          params,
+          ...passprop,
+          ...props,
           active: active,
           _meta: metas,
           _item: m.item,
