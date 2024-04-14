@@ -85,11 +85,19 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
     if (comp && comp.typings) {
       try {
-        const fn = new Function(`\
+        const arg = {
+          ...exports,
+          params,
+        };
+
+        const fn = new Function(
+          ...Object.keys(arg),
+          `\
 ${comp.typings}; 
 return typings;
-`);
-        const result = fn();
+`
+        );
+        const result = fn(...Object.values(arg));
         if (typeof result === "object" && typeof result._raw === "object") {
           for (const [k, v] of Object.entries(result._raw) as any) {
             comp_types[k] = v;

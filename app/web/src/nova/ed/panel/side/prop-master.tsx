@@ -322,7 +322,6 @@ const treeClasses = {
   placeholder: "placeholder",
   draggingSource: css`
     background: #e4f0ff;
-
     cursor: not-allowed;
   `,
 };
