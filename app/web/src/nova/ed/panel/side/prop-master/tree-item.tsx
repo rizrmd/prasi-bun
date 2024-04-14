@@ -33,10 +33,16 @@ export const EdPropCompTreeItem: FC<{
   const plabel = node.data?.prop.label;
   const label = (
     <div className="flex items-center justify-between flex-1">
-      <div>
-        {node.text} {plabel && <span className="border px-1 ml-2 text-xs">{plabel}</span>}
+      <div className="flex-1">
+        {node.text}{" "}
+        {plabel && <span className="border px-1 ml-2 text-xs">{plabel}</span>}
       </div>
-      <div className="text-[9px] px-1 border border-slate-400 ml-1 text-slate-500">
+      {node.data?.prop.typings && (
+        <div className="text-[7px] h-[14px] px-1 border border-slate-400 ml-1 text-slate-500 flex items-center">
+          Typed
+        </div>
+      )}
+      <div className="text-[9px] h-[14px] px-1 border border-slate-400 ml-1 text-slate-500 flex items-center">
         {type}
       </div>
     </div>
