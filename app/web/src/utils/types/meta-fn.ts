@@ -22,6 +22,7 @@ export type FNComponent = {
   props: Record<string, FNCompDef>;
   instances?: Record<string, Record<string, string>>;
   useStyle?: boolean;
+  typings?: string;
   style?: IItem;
 };
 

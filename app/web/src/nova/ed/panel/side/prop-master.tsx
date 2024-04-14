@@ -15,6 +15,7 @@ import { treeRebuild } from "../../logic/tree/build";
 import { propPopover } from "./prop-master/prop-form";
 import { EdPropCompTreeItem, PropItem } from "./prop-master/tree-item";
 import { Popover } from "../../../../utils/ui/popover";
+import { SimpleMonaco } from "./simple-monaco";
 
 const propRef = {
   el: null as any,
@@ -25,7 +26,9 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
   const item = meta?.item as IItem;
   const local = useLocal({
     json: "",
-    open: false,
+    typings: "",
+    openJSON: false,
+    openTypings: false,
   });
   const [_, set] = useState({});
   const render = () => {
@@ -38,9 +41,9 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
 
   let filtered = [] as NodeModel<PropItem>[];
   let mprops = meta.mitem?.get("component")?.get("props");
+  const mcomp = meta.mitem?.get("component");
 
   if (!mprops) {
-    const mcomp = meta.mitem?.get("component");
     if (mcomp) {
       mcomp.set("props", new Y.Map() as any);
       mprops = mcomp.get("props");
@@ -181,7 +184,7 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
           </DndProvider>
           <div className="flex">
             <div
-              className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex-1"
+              className="m-1 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex-1 h-[22px]"
               onClick={() => {
                 if (mprops) {
                   const indexes: (number | undefined)[] = [];
@@ -217,28 +220,75 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
               }}
             >
               + New Prop
-            </div>
+            </div>{" "}
             <Popover
               content={
-                <textarea
-                  className={cx(
-                    "font-mono",
-                    css`
-                      font-size: 11px;
-                      width: 500px;
-                      height: 500px;
-                      margin: 5px 0px;
-                    `
-                  )}
-                  spellCheck={false}
-                  onChange={(e) => {
-                    local.json = e.currentTarget.value;
-                    local.render();
-                  }}
-                  value={local.json}
-                ></textarea>
+                <div
+                  className={cx(css`
+                    width: 700px;
+                    height: 500px;
+                    margin: 5px 0px;
+                  `)}
+                >
+                  <SimpleMonaco
+                    onChange={(value) => {
+                      local.typings = value;
+                      local.render();
+                    }}
+                    value={local.typings}
+                    lang="typescript"
+                  />
+                </div>
               }
-              open={local.open}
+              open={local.openTypings}
+              onOpenChange={(open) => {
+                try {
+                  if (mcomp) {
+                    if (!open) {
+                      mcomp.set("typings", local.typings);
+                      treeRebuild(p);
+                      p.render();
+                    } else {
+                      local.typings =
+                        mcomp.get("typings") ||
+                        `\
+const typings = {
+  _raw: {
+  }
+}`;
+                    }
+                  }
+                } catch (e) {
+                  console.log(e);
+                }
+                local.openTypings = open;
+                local.render();
+              }}
+            >
+              <div className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1 text-xs h-[22px]">
+                <span>Types</span>
+              </div>
+            </Popover>
+            <Popover
+              content={
+                <div
+                  className={cx(css`
+                    width: 700px;
+                    height: 500px;
+                    margin: 5px 0px;
+                  `)}
+                >
+                  <SimpleMonaco
+                    onChange={(value) => {
+                      local.json = value;
+                      local.render();
+                    }}
+                    value={local.json}
+                    lang="json"
+                  />
+                </div>
+              }
+              open={local.openJSON}
               onOpenChange={(open) => {
                 try {
                   if (!open) {
@@ -251,16 +301,11 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
                 } catch (e) {
                   console.log(e);
                 }
-                local.open = open;
+                local.openJSON = open;
                 local.render();
               }}
             >
-              <div className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1">
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-json"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/></svg>`,
-                  }}
-                ></span>
+              <div className="m-1 ml-0 border border-blue-200 px-2 self-start text-[13px] hover:bg-blue-100 cursor-pointer select-none flex items-center space-x-1 text-xs h-[22px]">
                 <span>JSON</span>
               </div>
             </Popover>
