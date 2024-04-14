@@ -1,6 +1,7 @@
 import type { OnMount } from "@monaco-editor/react";
 import { IContent } from "../../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
+import { TypedArray } from "yjs-types";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -31,12 +32,17 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   const vars: Record<string, { mode: "local" | "prop" | "type"; val: string }> =
     {};
   let m_prev = null;
+
+  const comp_types = {} as Record<string, string>;
+
   for (const m of cur_path) {
     if (m.mitem?.parent && (m.mitem?.parent as any).get("meta")) {
       let prop_name = "";
-      m.mitem?.parent.parent.forEach((c, key) => {
+      const parent = m.mitem?.parent.parent as unknown as TypedArray<any>;
+
+      parent.forEach((c, key) => {
         if (c === m.mitem?.parent) {
-          prop_name = key;
+          prop_name = typeof key === "string" ? key : key.toString();
         }
       });
 
@@ -74,6 +80,24 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         }
       }
     }
+
+    const comp = m.item.component;
+
+    if (comp && comp.typings) {
+      try {
+        const fn = new Function(`\
+${comp.typings}; 
+return typings;
+`);
+        const result = fn();
+        if (typeof result === "object" && typeof result._raw === "object") {
+          for (const [k, v] of Object.entries(result._raw) as any) {
+            comp_types[k] = v;
+          }
+        }
+      } catch (e) {}
+    }
+
     m_prev = m;
   }
 
@@ -93,6 +117,10 @@ const ${k} = null as unknown as typeof \$\$_${k};`);
 const ${k} = null as unknown as ${v.val};
 `);
     }
+  }
+
+  for (const [k, v] of Object.entries(comp_types)) {
+    raw_types.push(v);
   }
 
   return raw_types.join("\n");
