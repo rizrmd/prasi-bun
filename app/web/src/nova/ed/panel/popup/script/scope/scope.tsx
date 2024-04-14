@@ -88,6 +88,10 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         const arg = {
           ...exports,
           params,
+          active: active,
+          _meta: metas,
+          _item: m.item,
+          _syncm: typeof syncronize !== "undefined" ? syncronize : undefined,
         };
 
         const fn = new Function(
