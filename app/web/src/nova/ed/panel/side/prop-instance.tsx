@@ -71,7 +71,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     ?.get("props");
 
   if (mprops && _meta.mitem && mcprops) {
-    mcprops.forEach((m, key) => {
+    mcprops.forEach((m, key): void => {
       let mprop = mprops.get(key);
 
       const cprop = m.toJSON() as any;
@@ -119,7 +119,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               return;
             }
           } catch (e) {
-            console.log(visible, arg);
+            console.log(key, visible, arg);
             console.error(e);
           }
         } catch (e) {
