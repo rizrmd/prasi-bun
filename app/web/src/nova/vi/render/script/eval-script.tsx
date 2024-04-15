@@ -69,11 +69,13 @@ export const viEvalScript = (
                 replace_child = true;
               }
               if (!child.key) {
-                console.warn(
-                  `No key prop in item: ${meta.item.name}`,
-                  `\n\n`,
-                  meta.item.adv?.js
-                );
+                if (replace_child) {
+                  console.warn(
+                    `No key prop in item: ${meta.item.name}`,
+                    `\n\n`,
+                    meta.item.adv?.js
+                  );
+                }
               } else {
                 new_childs.push({
                   ...child,
