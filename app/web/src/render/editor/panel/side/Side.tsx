@@ -100,7 +100,7 @@ export const ESide = () => {
     local.lastActive = null;
   }
   if (compItem && !compItem.props) {
-    const comp = mitem?.get("component");
+    const comp = (mitem as MItem)?.get("component");
     if (comp) {
       comp.set("props", new Y.Map() as any);
     }
@@ -204,7 +204,6 @@ export const ESide = () => {
                     </SideBox>
                     <SideLabel>ADVANCED</SideLabel>
                     <SideBox>
-                      <PanelLink value={active} mode={p.mode} update={update} />
                       <PanelAdv value={active} mode={p.mode} update={update} />
                     </SideBox>
                   </>

@@ -1,26 +1,20 @@
 import { FC } from "react";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../../../utils/types/item";
-import { FNAdv } from "../../../../../../utils/types/meta-fn";
 import { ISection } from "../../../../../../utils/types/section";
 import { IText } from "../../../../../../utils/types/text";
+import { Popover } from "../../../../../../utils/ui/popover";
 import { EDGlobal } from "../../../../logic/ed-global";
+import { SimpleMonaco } from "../../simple-monaco";
 import { Button } from "../ui/Button";
-import { getActiveMeta } from "../../../../logic/active/get-meta";
-
-type AdvUpdate = {
-  adv?: FNAdv;
-};
 
 export const PanelAdv: FC<{
   value: ISection | IItem | IText;
   mode: "desktop" | "mobile";
-  update: <T extends keyof AdvUpdate>(key: T, val: AdvUpdate[T]) => void;
+  update: <T extends "typings">(key: T, val: string) => void;
 }> = ({ value, update }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const meta = getActiveMeta(p);
-  const adv = meta?.mitem?.get("adv")?.toJSON() || ({} as any);
-
+  const local = useLocal({ openTypings: false, typings: "" });
   return (
     <>
       <div
@@ -33,21 +27,52 @@ export const PanelAdv: FC<{
           `
         )}
       >
-        <div
+        <Popover
+          content={
+            <div
+              className={cx(css`
+                width: 700px;
+                height: 500px;
+                margin: 5px 0px;
+              `)}
+            >
+              <SimpleMonaco
+                onChange={(value) => {
+                  local.typings = value;
+                  local.render();
+                }}
+                value={local.typings}
+                lang="typescript"
+              />
+            </div>
+          }
+          open={local.openTypings}
+          onOpenChange={(open) => {
+            try {
+              if (open) {
+                local.typings =
+                  value.typings ||
+                  `\
+const typings = {
+  _raw: {
+  }
+}`;
+              } else {
+                update("typings", local.typings);
+              }
+            } catch (e) {
+              console.log(e);
+            }
+            local.openTypings = open;
+            local.render();
+          }}
           className={cx(
             "bg-white p-[2px] border flex flex-1 border-gray-300",
             css`
               > * {
                 flex: 1;
               }
-            `,
-            !!adv.css &&
-              css`
-                button {
-                  background: #e8ffe8;
-                  border-bottom: solid green !important;
-                }
-              `
+            `
           )}
         >
           <Button
@@ -56,64 +81,9 @@ export const PanelAdv: FC<{
             }}
             appearance="subtle"
           >
-            CSS
+            Typings
           </Button>
-        </div>
-        <div
-          className={cx(
-            "bg-white p-[2px] border flex flex-1 border-gray-300",
-            css`
-              > * {
-                flex: 1;
-              }
-            `,
-            !!adv.html && [
-              css`
-                button {
-                  background: #e8f5ff;
-                  border-bottom: 2px solid blue !important;
-                }
-              `,
-            ]
-          )}
-        >
-          <Button
-            onClick={() => {
-              p.render();
-            }}
-            appearance="subtle"
-          >
-            HTML
-          </Button>
-        </div>
-        <div
-          className={cx(
-            "bg-white p-[2px] border flex flex-1 border-gray-300",
-            css`
-              > * {
-                flex: 1;
-              }
-            `,
-            !!adv.js && [
-              css`
-                button {
-                  background: #fff4e8;
-                  border-bottom: 2px solid orange !important;
-                }
-              `,
-            ]
-          )}
-        >
-          <Button
-            appearance="subtle"
-            className="js"
-            onClick={() => {
-              p.render();
-            }}
-          >
-            JS
-          </Button>
-        </div>
+        </Popover>
       </div>
     </>
   );

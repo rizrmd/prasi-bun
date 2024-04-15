@@ -8,7 +8,6 @@ import { PanelBackground } from "./panel/background";
 import { PanelBorder } from "./panel/border";
 import { PanelDimension } from "./panel/dimension";
 import { PanelFont } from "./panel/font";
-import { PanelLink } from "./panel/link";
 import { PanelPadding } from "./panel/padding";
 import { SideBox } from "./ui/SideBox";
 import { SideLabel } from "./ui/SideLabel";
@@ -86,6 +85,8 @@ export const EdStyleAll: FC<{ as_child?: boolean }> = ({ as_child }) => {
                   } else {
                     nprop = new Y.Map();
                   }
+                } else {
+                  nprop = value;
                 }
                 if (mitem) {
                   mitem.set(key, nprop);
@@ -94,7 +95,11 @@ export const EdStyleAll: FC<{ as_child?: boolean }> = ({ as_child }) => {
               }
 
               if (prop) {
-                syncronize(prop, value);
+                if (typeof value === "object") {
+                  syncronize(prop, value);
+                } else if (mitem) {
+                  mitem.set(key, value);
+                }
               }
             }
           });
@@ -149,7 +154,6 @@ export const EdStyleAll: FC<{ as_child?: boolean }> = ({ as_child }) => {
       </SideBox>
       <SideLabel>ADVANCED</SideLabel>
       <SideBox>
-        <PanelLink value={item} mode={p.mode} update={update} />
         <PanelAdv value={item} mode={p.mode} update={update} />
       </SideBox>
     </>

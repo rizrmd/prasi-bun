@@ -34,6 +34,7 @@ export type BasicItem = {
   border?: FNBorder;
   script?: ReturnType<typeof parseJs>;
   script_keyed?: Record<string, ReturnType<typeof parseJs>>;
+  typings?: string;
 };
 
 export type MBasicItem = {
