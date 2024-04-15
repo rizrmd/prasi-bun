@@ -92,7 +92,7 @@ export const viEvalProps = (
                         mprop.set("jsxCalledBy", [meta.item.id, original_id]);
                       } else {
                         if (
-                          mjby &&
+                          Array.isArray(mjby) &&
                           (!mjby.includes(original_id) ||
                             mjby.length !== 2 ||
                             mjby[0] !== meta.item.id ||
