@@ -83,7 +83,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
 
     const comp = m.item.component;
 
-    if (comp && comp.typings) {
+    const evalTypings = (typings: string) => {
       try {
         const passprop: any = {};
         const props: any = {};
@@ -108,7 +108,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         const fn = new Function(
           ...Object.keys(arg),
           `\
-${comp.typings}; 
+${typings}; 
 return typings;
 `
         );
@@ -119,6 +119,14 @@ return typings;
           }
         }
       } catch (e) {}
+    };
+
+    if (comp && comp.typings) {
+      evalTypings(comp.typings);
+    }
+
+    if (m.item.typings) {
+      evalTypings(m.item.typings);
     }
 
     m_prev = m;
