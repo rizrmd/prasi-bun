@@ -24,13 +24,14 @@ export const createViLocal = (
     value: T;
     hook?: (local: T) => void;
     effect?: (local: T) => void | Promise<void>;
+    parent_key?: any;
   }) => {
     const isEditor =
       ["localhost", "prasi.avolut.com"].includes(location.hostname) &&
       location.pathname.startsWith("/ed/");
     let id = meta.item.id;
 
-    const { children } = arg;
+    const { children, parent_key } = arg;
     const init_local_effect = vi.script?.init_local_effect;
     const metas = is_layout ? vi.layout?.meta : vi.meta;
     const ref = useRef<any>(
@@ -39,7 +40,7 @@ export const createViLocal = (
     const local = ref.current;
     local.render = meta.render;
 
-    updatePropScope(vi, meta, meta.script?.scope);
+    updatePropScope(vi, meta, meta.script?.scope, parent_key);
 
     if (arg.hook) {
       arg.hook(local);

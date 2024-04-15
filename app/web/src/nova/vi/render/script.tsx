@@ -10,7 +10,8 @@ export const ViScript: FC<{
   meta: IMeta;
   is_layout: boolean;
   passprop?: any;
-}> = ({ meta, passprop, is_layout }) => {
+  parent_key?: any;
+}> = ({ meta, passprop, is_layout, parent_key }) => {
   const vi = useGlobal(ViGlobal, "VI");
   const [_, _set] = useState({});
   meta.render = () => {
@@ -20,7 +21,7 @@ export const ViScript: FC<{
   let _pass = passprop;
   if (meta.item.component?.id) {
     if (!_pass) _pass = {};
-    viEvalProps(vi, meta, is_layout, _pass);
+    viEvalProps(vi, meta, is_layout, _pass, parent_key);
   }
 
   if (meta.item.adv?.html) {
@@ -28,7 +29,7 @@ export const ViScript: FC<{
   }
 
   if (meta.item.adv?.js) {
-    viEvalScript(vi, meta, is_layout, _pass);
+    viEvalScript(vi, meta, is_layout, _pass, parent_key);
     if (meta.script) return meta.script.result;
   }
 

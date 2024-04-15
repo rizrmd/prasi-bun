@@ -3,7 +3,6 @@ import { ReactNode, isValidElement, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
-import { scanComponent } from "../../../prod/base/component";
 
 export const createViPassProp = (
   vi: { meta: VG["meta"]; render?: () => void; comp: VG["comp"] },
@@ -11,24 +10,40 @@ export const createViPassProp = (
   meta: IMeta,
   passprop: any
 ) => {
-  return (arg: Record<string, any> & { children: ReactNode }) => {
+  return (
+    arg: Record<string, any> & { children: ReactNode; internal_key: any }
+  ) => {
     const [_, render] = useState({});
+    const internal_key = arg.internal_key;
+
     if (!meta.item.script) {
       meta.item.script = {};
     }
 
-    if (!meta.item.script.passprop) {
-      meta.item.script.passprop = {};
+    let script = meta.item.script;
+    if (internal_key) {
+      if (!meta.item.script_keyed) {
+        meta.item.script_keyed = {};
+      }
+
+      if (!meta.item.script_keyed[internal_key]) {
+        meta.item.script_keyed[internal_key] = {};
+      }
+      script = meta.item.script_keyed[internal_key] as any;
+    }
+
+    if (!script.passprop) {
+      script.passprop = {};
     }
 
     const script_pass: any = {};
-    if (meta.item.script.passprop) {
+    if (script.passprop) {
       let is_changed = false;
       for (const [k, v] of Object.entries(arg)) {
         if (!["children", "key"].includes(k)) {
           is_changed = true;
           script_pass[k] = v;
-          meta.item.script.passprop[k] = { end: 0, start: 0, value: v };
+          script.passprop[k] = { end: 0, start: 0, value: v };
         }
       }
     }
@@ -77,6 +92,7 @@ export const createViPassProp = (
                   is_layout={is_layout}
                   meta={cmeta}
                   passprop={_pass}
+                  parent_key={arg.internal_key}
                 />
               );
             }
@@ -119,17 +135,26 @@ export const createViPassProp = (
           }
         }
 
-        return <ViRender is_layout={is_layout} meta={meta} passprop={_pass} />;
+        return (
+          <ViRender
+            is_layout={is_layout}
+            meta={meta}
+            passprop={_pass}
+            parent_key={arg.internal_key}
+          />
+        );
       }
     }
-
-    const result = modifyChild(arg, meta.script?.scope);
-
+    const result = modifyChild(
+      arg,
+      _pass,
+      internal_key ? { parent_key: internal_key } : undefined
+    );
     return result;
   };
 };
 
-export const modifyChild = (arg: any, passprop?: any) => {
+export const modifyChild = (arg: any, passprop?: any, add_props?: any) => {
   let prop: any = {};
   if (Array.isArray(arg)) {
     prop.children = arg;
@@ -140,22 +165,26 @@ export const modifyChild = (arg: any, passprop?: any) => {
   if (Array.isArray(prop.children)) {
     const childs = [];
     for (const child of prop.children) {
-      childs.push(modify(child, prop, passprop));
+      childs.push(modify(child, prop, passprop, add_props));
     }
     return childs;
   }
 
-  return modify(prop.children, prop, passprop);
+  return modify(prop.children, prop, passprop, add_props);
 };
 
-const modify = (el: ReactNode, arg: any, passprop?: any) => {
+const modify = (el: ReactNode, arg: any, passprop?: any, add_props?: any) => {
   if (isValidElement(el)) {
     const passarg = { ...arg };
     delete passarg.children;
 
     return {
       ...el,
-      props: { ...el.props, passprop: { ...passprop, ...passarg } },
+      props: {
+        ...el.props,
+        ...add_props,
+        passprop: { ...passprop, ...passarg },
+      },
     };
   }
   return el;

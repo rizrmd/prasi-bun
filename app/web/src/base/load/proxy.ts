@@ -52,13 +52,16 @@ export const fetchViaProxy = async (
     const cur_url = new URL(location.href);
     let final_url = "";
 
-    if (to_url.host === cur_url.host ||
-      (!!g && typeof g.server_hook === 'function')) {
+    if (
+      to_url.host === cur_url.host ||
+      (!!g && typeof g.server_hook === "function")
+    ) {
       final_url = to_url.toString();
     } else {
-      final_url = `${cur_url.protocol}//${cur_url.host
-        }/_proxy/${encodeURIComponent(to_url.toString())}`;
-    } 
+      final_url = `${cur_url.protocol}//${
+        cur_url.host
+      }/_proxy/${encodeURIComponent(to_url.toString())}`;
+    }
 
     if (final_url) {
       if (uploadProgress) {
@@ -75,10 +78,10 @@ export const fetchViaProxy = async (
           final_url,
           data
             ? {
-              method: "POST",
-              body,
-              headers,
-            }
+                method: "POST",
+                body,
+                headers,
+              }
             : undefined
         );
         const raw = await res.text();
@@ -90,14 +93,15 @@ export const fetchViaProxy = async (
       }
     }
   }
+
   const res = await fetch(
     to_url,
     data
       ? {
-        method: "POST",
-        body,
-        headers,
-      }
+          method: "POST",
+          body,
+          headers,
+        }
       : undefined
   );
   const raw = await res.text();

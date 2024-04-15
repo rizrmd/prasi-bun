@@ -17,7 +17,8 @@ export const ViRender: FC<{
   children?: ReactNode;
   passprop?: any;
   is_layout: boolean;
-}> = ({ meta, children, passprop, is_layout }) => {
+  parent_key?: any;
+}> = ({ meta, passprop, is_layout, parent_key }) => {
   if (render_stat.enabled) {
     const rstat_meta = render_stat.meta;
 
@@ -64,14 +65,19 @@ export const ViRender: FC<{
           meta={meta}
           is_layout={is_layout}
           passprop={passprop}
+          parent_key={parent_key}
         ></ViScript>
       </ErrorBox>
     );
   }
-
   return (
     <ErrorBox meta={meta}>
-      <ViChild meta={meta} passprop={passprop} is_layout={is_layout}></ViChild>
+      <ViChild
+        meta={meta}
+        passprop={passprop}
+        is_layout={is_layout}
+        parent_key={parent_key}
+      ></ViChild>
     </ErrorBox>
   );
 };
@@ -80,7 +86,8 @@ export const ViChild: FC<{
   meta: IMeta;
   is_layout: boolean;
   passprop?: any;
-}> = ({ meta, passprop, is_layout }) => {
+  parent_key?: any;
+}> = ({ meta, passprop, is_layout, parent_key }) => {
   const vi = useGlobal(ViGlobal, "VI");
 
   if (is_layout && meta.item.name === "children") {
@@ -95,6 +102,7 @@ export const ViChild: FC<{
               meta={meta}
               is_layout={false}
               passprop={passprop}
+              parent_key={parent_key}
             ></ViScript>
           </ErrorBox>
         );

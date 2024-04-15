@@ -23,7 +23,7 @@ export const comp_new: SAction["comp"]["new"] = async function (
 
   const comp = await createComp(item, group_id);
 
-  const walk = (mitem: MItem | MText) => {
+  const walk = (mitem: MItem) => {
     if (mitem.get("id") === item_id) {
       const map = new Y.Map() as FMComponent;
       syncronize(
