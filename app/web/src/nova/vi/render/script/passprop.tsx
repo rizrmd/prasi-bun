@@ -145,6 +145,7 @@ export const createViPassProp = (
         );
       }
     }
+
     const result = modifyChild(
       arg,
       _pass,
