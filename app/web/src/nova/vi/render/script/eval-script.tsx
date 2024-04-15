@@ -62,7 +62,10 @@ export const viEvalScript = (
           if (childs.length > 1) {
             let new_childs = [];
             for (const child of childs) {
-              if (isValid(child) && child.type === meta.script?.PassProp) {
+              if (
+                isValidElement(child) &&
+                child.type === meta.script?.PassProp
+              ) {
                 replace_child = true;
               }
               if (!child.key) {
