@@ -33,6 +33,7 @@ export type BasicItem = {
   dim?: FNDimension;
   border?: FNBorder;
   script?: ReturnType<typeof parseJs>;
+  script_keyed?: Record<string, ReturnType<typeof parseJs>>;
 };
 
 export type MBasicItem = {

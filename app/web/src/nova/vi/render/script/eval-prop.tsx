@@ -7,6 +7,7 @@ import { viScriptArg } from "./arg";
 import { replaceWithObject, replacement } from "./eval-script";
 import { extractNavigate } from "./extract-nav";
 import type { Doc } from "yjs";
+import type { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
 
 export const w = window as any;
 
@@ -21,12 +22,25 @@ export const viEvalProps = (
   },
   meta: IMeta,
   is_layout: boolean,
-  passprop: any
+  passprop: any,
+  parent_key?: any
 ) => {
   if (meta.item.component?.id) {
-    if (!meta.item.script) {
-      meta.item.script = {};
+    let script = meta.item.script;
+
+    if (parent_key) {
+      if (!meta.item.script_keyed) meta.item.script_keyed = {};
+      if (!meta.item.script_keyed[parent_key])
+        meta.item.script_keyed[parent_key] = {};
+      script = meta.item.script_keyed[parent_key];
+    } else {
+      if (!meta.item.script) {
+        meta.item.script = {};
+      }
+      script = meta.item.script;
     }
+
+    if (!script) return;
 
     const exports = (window as any).exports;
     const arg = {
@@ -38,7 +52,7 @@ export const viEvalProps = (
       params,
     };
 
-    meta.item.script.props = {};
+    script.props = {};
     let fails = new Set<string>();
     if (!!meta.item.component.props) {
       const _props: any = {};
@@ -131,13 +145,13 @@ export const viEvalProps = (
     `
           );
 
-          meta.item.script.props[name] = { value: src };
+          script.props[name] = { value: src };
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
-            meta.item.script.props[name].fn = val;
+            script.props[name].fn = val;
             val = (...args: any[]) => {
-              return meta.item.script?.props?.[name].fn(...args);
+              if (script) return script.props?.[name].fn(...args);
             };
           }
 
@@ -209,11 +223,18 @@ const updatePropValueBuilt = (mprop: FMCompDef, src: string) => {
 export const updatePropScope = (
   vi: { site: { db: any; api: any } },
   meta: IMeta,
-  scope: any
+  scope: any,
+  parent_key?: any
 ) => {
-  if (meta.item.script?.props) {
+  const script = parent_key
+    ? meta.item.script_keyed?.[parent_key]
+    : meta.item.script;
+
+  if (!script) return;
+
+  if (script.props) {
     const scopes = { ...scope, api: vi.site.api, db: vi.site.db };
-    for (const [name, prop] of Object.entries(meta.item.script.props)) {
+    for (const [name, prop] of Object.entries(script.props)) {
       if (prop.fn) {
         const fn = new Function(
           ...Object.keys(scopes),

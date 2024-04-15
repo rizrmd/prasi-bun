@@ -1,4 +1,4 @@
-import { FC, ReactNode, Suspense, useEffect } from "react";
+import { FC, ReactNode, Suspense, isValidElement, useEffect } from "react";
 import { w } from "../../../../utils/types/general";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
@@ -23,12 +23,12 @@ export const viEvalScript = (
   },
   meta: IMeta,
   is_layout: boolean,
-  passprop: any
+  passprop: any,
+  parent_key?: any
 ) => {
   const parts = viParts(vi, meta, is_layout, passprop);
 
   if (vi.visit) vi.visit(meta, parts);
-
   if (!meta.script) {
     meta.script = {
       scope: passprop,
@@ -46,14 +46,38 @@ export const viEvalScript = (
     useEffect,
     children: parts.props.children,
     props: parts.props,
-    Local: script.Local,
+    Local: script?.Local,
     db: vi.site.db,
     api: vi.site.api,
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
     render: (jsx: ReactNode) => {
-      script.result = <Suspense>{jsx}</Suspense>;
+      let result = jsx;
+      if (isValidElement(jsx) && jsx.props.children) {
+        if (Array.isArray(jsx.props.children)) {
+          const childs = jsx.props.children.filter((e: any) => e);
+          if (childs.length > 1) {
+            let new_childs = [];
+            for (const child of childs) {
+              if (!child.key) {
+                console.warn(
+                  `No key prop in item: ${meta.item.name}`,
+                  `\n\n`,
+                  meta.item.adv?.js
+                );
+              } else {
+                new_childs.push({
+                  ...child,
+                  props: { ...child.props, internal_key: child.key },
+                });
+              }
+            }
+            result = { ...jsx, props: { ...jsx.props, children: new_childs } };
+          }
+        }
+      }
+      if (script) script.result = <Suspense>{result}</Suspense>;
     },
     params,
     ...viScriptArg(vi),
@@ -90,7 +114,7 @@ ${src}
   );
   fn(...Object.values(arg));
 
-  updatePropScope(vi, meta, passprop);
+  updatePropScope(vi, meta, passprop, parent_key);
 };
 
 const JsxProp: FC<{
