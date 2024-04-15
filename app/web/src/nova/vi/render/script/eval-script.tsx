@@ -1,4 +1,11 @@
-import { FC, ReactNode, Suspense, isValidElement, useEffect } from "react";
+import {
+  FC,
+  ReactElement,
+  ReactNode,
+  Suspense,
+  isValidElement,
+  useEffect,
+} from "react";
 import { w } from "../../../../utils/types/general";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { ErrorBox } from "../../utils/error-box";
@@ -56,40 +63,69 @@ export const viEvalScript = (
     render: (jsx: ReactNode) => {
       let result = jsx;
       if (isValidElement(jsx) && jsx.props.children) {
-        if (Array.isArray(jsx.props.children)) {
-          const childs = jsx.props.children.filter((e: any) => e);
-          let replace_child = false;
-          if (childs.length > 1) {
-            let new_childs = [];
-            for (const child of childs) {
-              if (
-                isValidElement(child) &&
-                child.type === meta.script?.PassProp
-              ) {
-                replace_child = true;
-              }
-              if (!child.key) {
-                if (replace_child) {
-                  console.warn(
-                    `No key prop in item: ${meta.item.name}`,
-                    `\n\n`,
-                    meta.item.adv?.js
-                  );
-                }
-              } else {
-                new_childs.push({
-                  ...child,
-                  props: { ...child.props, internal_key: child.key },
-                });
-              }
-            }
-            if (replace_child) {
-              result = {
-                ...jsx,
-                props: { ...jsx.props, children: new_childs },
+        const override_children = (
+          el: ReactElement<{ children: any }>
+        ): {
+          should_replace: boolean;
+          el: ReactElement;
+        } => {
+          let should_replace = false;
+          const new_childs = [];
+
+          if (isValidElement(el)) {
+            if (el.type === meta.script?.PassProp) {
+              return {
+                should_replace: true,
+                el: {
+                  ...el,
+                  props: { ...el.props, internal_key: el.key },
+                },
               };
             }
+            if (Array.isArray(el.props?.children)) {
+              for (const child of el.props?.children) {
+                if (Array.isArray(child)) {
+                  const sub_child = [];
+                  let sub_replace = false;
+                  for (const c of child) {
+                    let nc = override_children(c);
+                    if (nc.should_replace) {
+                      sub_child.push(nc.el);
+                      sub_replace = true;
+                    } else {
+                      sub_child.push(c);
+                    }
+                  }
+                  if (sub_replace) {
+                    should_replace = true;
+                    new_childs.push(sub_child);
+                  } else {
+                    new_childs.push(child);
+                  }
+                } else if (typeof child === "object") {
+                  if (child.type === meta.script?.PassProp) {
+                    should_replace = true;
+                    new_childs.push({
+                      ...child,
+                      props: { ...child.props, internal_key: child.props.key },
+                    });
+                  }
+                } else {
+                  new_childs.push(child);
+                }
+              }
+            }
           }
+
+          return {
+            should_replace,
+            el: { ...el, props: { ...el.props, children: new_childs } },
+          };
+        };
+        const res = override_children(jsx as any);
+
+        if (res.should_replace) {
+          result = res.el;
         }
       }
       if (script) script.result = <Suspense>{result}</Suspense>;

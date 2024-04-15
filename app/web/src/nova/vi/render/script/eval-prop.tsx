@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import type { Doc } from "yjs";
 import { FMCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta, active } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
@@ -6,8 +7,6 @@ import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
 import { replaceWithObject, replacement } from "./eval-script";
 import { extractNavigate } from "./extract-nav";
-import type { Doc } from "yjs";
-import type { parseJs } from "../../../../../../srv/ws/sync/editor/parser/parse-js";
 
 export const w = window as any;
 
