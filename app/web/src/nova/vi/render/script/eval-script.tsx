@@ -9,6 +9,7 @@ import { updatePropScope } from "./eval-prop";
 import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
+import { isValid } from "date-fns";
 export const viEvalScript = (
   vi: {
     page: VG["page"];
@@ -57,9 +58,13 @@ export const viEvalScript = (
       if (isValidElement(jsx) && jsx.props.children) {
         if (Array.isArray(jsx.props.children)) {
           const childs = jsx.props.children.filter((e: any) => e);
+          let replace_child = false;
           if (childs.length > 1) {
             let new_childs = [];
             for (const child of childs) {
+              if (isValid(child) && child.type === meta.script?.PassProp) {
+                replace_child = true;
+              }
               if (!child.key) {
                 console.warn(
                   `No key prop in item: ${meta.item.name}`,
@@ -73,7 +78,12 @@ export const viEvalScript = (
                 });
               }
             }
-            result = { ...jsx, props: { ...jsx.props, children: new_childs } };
+            if (replace_child) {
+              result = {
+                ...jsx,
+                props: { ...jsx.props, children: new_childs },
+              };
+            }
           }
         }
       }
