@@ -286,20 +286,53 @@ export const EdPropInstanceOptions: FC<{
                             item.options.map((child, idx) => {
                               let checked: any[] = found.checked;
 
+                              const sub_found = checked.find((e) => {
+                                if (!item.options) {
+                                  return e === child.value;
+                                } else {
+                                  if (
+                                    typeof e === "object" &&
+                                    e.value === child.value
+                                  ) {
+                                    return true;
+                                  }
+                                  return false;
+                                }
+                              });
                               return (
-                                <SingleCheckbox
-                                  key={idx}
-                                  item={child}
-                                  idx={idx}
-                                  depth={1}
-                                  val={checked}
-                                  onChange={(newval) => {
-                                    found.checked = newval;
-
-                                    onChange(JSON.stringify(val), child);
-                                    local.render();
-                                  }}
-                                />
+                                <Fragment key={idx}>
+                                  <SingleCheckbox
+                                    key={idx}
+                                    item={child}
+                                    idx={idx}
+                                    depth={1}
+                                    val={checked}
+                                    onChange={(newval) => {
+                                      found.checked = newval;
+                                      onChange(JSON.stringify(val), child);
+                                      local.render();
+                                    }}
+                                  />
+                                  {child.options &&
+                                    sub_found &&
+                                    child.options.map((item, sidx) => {
+                                      const checked: any[] = sub_found.checked;
+                                      return (
+                                        <SingleCheckbox
+                                          item={item}
+                                          idx={idx}
+                                          key={sidx}
+                                          depth={2}
+                                          val={checked}
+                                          onChange={(newval) => {
+                                            sub_found.checked = newval;
+                                            onChange(JSON.stringify(val), item);
+                                            local.render();
+                                          }}
+                                        />
+                                      );
+                                    })}
+                                </Fragment>
                               );
                             })}
                         </Fragment>
