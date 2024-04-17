@@ -48,7 +48,7 @@ export const base = {
   },
   comp: {
     list: {} as Record<string, IItem>,
-    pending: new Set<string>(),
+    pending: {} as Record<string, IItem[]>,
   },
   layout: {
     id: "",
