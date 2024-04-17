@@ -43,6 +43,10 @@ const serverMain = () => ({
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           this.handler[site_id].site_id = site_id;
+
+          if (typeof svr.init === "function") {
+            svr.init();
+          }
         }
 
         Bun.write(
@@ -125,6 +129,7 @@ type PrasiServer = {
     index: { head: string[]; body: string[]; render: () => string };
     prasi: { page_id?: string; params?: Record<string, any> };
   }) => Promise<Response>;
+  init?: () => Promise<void>;
 };
 
 const glb = global as unknown as {
