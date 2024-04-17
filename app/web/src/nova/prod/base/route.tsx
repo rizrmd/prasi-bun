@@ -72,13 +72,18 @@ const injectSiteScript = () => {
       done();
     };
     let base_url = base.site.api_url;
-    try {
-      new URL(base_url);
-    } catch (e) {
-      if (location.hostname === "localhost") {
-        base_url = `http://localhost:4550`;
-      } else {
-        base_url = `https://prasi.avolut.com`;
+    if (base_url === "*") {
+      base_url = `${location.protocol}//${location.host}`;
+      base.site.api_url = base_url;
+    } else {
+      try {
+        new URL(base_url);
+      } catch (e) {
+        if (location.hostname === "localhost") {
+          base_url = `http://localhost:4550`;
+        } else {
+          base_url = `https://prasi.avolut.com`;
+        }
       }
     }
 
