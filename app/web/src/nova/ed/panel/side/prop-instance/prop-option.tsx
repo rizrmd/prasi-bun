@@ -259,7 +259,6 @@ export const EdPropInstanceOptions: FC<{
                   {Array.isArray(local.options) &&
                     local.options.map((item, idx) => {
                       const val: any[] = Array.isArray(evalue) ? evalue : [];
-
                       const found = val.find((e) => {
                         if (!item.options) {
                           return e === item.value;
@@ -276,6 +275,7 @@ export const EdPropInstanceOptions: FC<{
                             item={item}
                             idx={idx}
                             val={val}
+                            depth={0}
                             onChange={(val) => {
                               onChange(JSON.stringify(val), item);
                               local.render();
@@ -284,9 +284,7 @@ export const EdPropInstanceOptions: FC<{
                           {item.options &&
                             found &&
                             item.options.map((child, idx) => {
-                              let checked: any[] = found.checked;
-
-                              const sub_found = checked.find((e) => {
+                              const sub_found = found.checked.find((e: any) => {
                                 if (!item.options) {
                                   return e === child.value;
                                 } else {
@@ -306,9 +304,8 @@ export const EdPropInstanceOptions: FC<{
                                     item={child}
                                     idx={idx}
                                     depth={1}
-                                    val={checked}
+                                    val={found.checked}
                                     onChange={(newval) => {
-                                      found.checked = newval;
                                       onChange(JSON.stringify(val), child);
                                       local.render();
                                     }}
@@ -316,16 +313,14 @@ export const EdPropInstanceOptions: FC<{
                                   {child.options &&
                                     sub_found &&
                                     child.options.map((item, sidx) => {
-                                      const checked: any[] = sub_found.checked;
                                       return (
                                         <SingleCheckbox
                                           item={item}
                                           idx={idx}
                                           key={sidx}
                                           depth={2}
-                                          val={checked}
+                                          val={sub_found.checked}
                                           onChange={(newval) => {
-                                            sub_found.checked = newval;
                                             onChange(JSON.stringify(val), item);
                                             local.render();
                                           }}
@@ -383,7 +378,7 @@ const SingleCheckbox = ({
 }: {
   item: MetaOption;
   idx: number;
-  depth?: number;
+  depth: number;
   val: any[];
   onChange: (val: MetaOption[], item: MetaOption) => void;
 }) => {
@@ -398,10 +393,35 @@ const SingleCheckbox = ({
     }
   });
 
+  const toggleCheck = () => {
+    if (item.options) {
+      let idx = val.findIndex((e) => {
+        if (typeof e === "object" && e.value === item.value) {
+          return true;
+        }
+        return false;
+      });
+
+      if (idx >= 0) {
+        val.splice(idx, 1);
+      } else {
+        val.push({ value: item.value, checked: [] });
+      }
+    } else {
+      let idx = val.findIndex((e) => e === item.value);
+
+      if (idx >= 0) {
+        val.splice(idx, 1);
+      } else {
+        val.push(item.value);
+      }
+    }
+    onChange(val, item);
+  };
+
   useEffect(() => {
-    if (item.checked && !val.find((e) => e === item.value)) {
-      val.push(item.value);
-      onChange(val, item);
+    if (item.checked && !is_check) {
+      toggleCheck();
     }
   }, []);
 
@@ -446,31 +466,7 @@ const SingleCheckbox = ({
             `
       )}
       onClick={() => {
-        if (item.checked) return;
-
-        if (item.options) {
-          let idx = val.findIndex((e) => {
-            if (typeof e === "object" && e.value === item.value) {
-              return true;
-            }
-            return false;
-          });
-
-          if (idx >= 0) {
-            val.splice(idx, 1);
-          } else {
-            val.push({ value: item.value, checked: [] });
-          }
-        } else {
-          let idx = val.findIndex((e) => e === item.value);
-
-          if (idx >= 0) {
-            val.splice(idx, 1);
-          } else {
-            val.push(item.value);
-          }
-        }
-        onChange(val, item);
+        toggleCheck();
       }}
     >
       {!is_check ? unchecked : checked}
