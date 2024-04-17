@@ -1,8 +1,7 @@
+import { g } from "utils/global";
 import { validate } from "uuid";
 import { glb } from "./global";
 import { server } from "./ws/sync/editor/code/server-main";
-import { g } from "utils/global";
-import { waitUntil } from "web-utils";
 glb.npm = { page: {}, site: {} };
 
 glb.ws_hook = {

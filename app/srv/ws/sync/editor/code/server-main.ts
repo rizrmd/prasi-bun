@@ -39,13 +39,12 @@ const serverMain = () => ({
         );
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
-
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           this.handler[site_id].site_id = site_id;
 
-          if (typeof svr.init === "function") {
-            svr.init();
+          if (typeof svr.server.init === "function") {
+            svr.server.init({});
           }
         }
 

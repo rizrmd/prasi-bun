@@ -149,11 +149,7 @@ if (typeof global.server_hook === "function") {
                 server.init(id_site);
               });
             };
-            if (g.mode === "dev") {
-              setTimeout(reinit, 1000);
-            } else {
-              reinit();
-            }
+            reinit();
           },
         },
       ],
