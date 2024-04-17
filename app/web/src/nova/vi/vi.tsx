@@ -81,7 +81,9 @@ export const Vi: FC<{
       if (!path.startsWith("/")) {
         path = "/" + path;
       }
-      return `${u.protocol}//${u.hostname}${path}`;
+      return `${u.protocol}//${u.host}${
+        path.startsWith("/") ? path : `/${path}`
+      }`;
     }
 
     return pathname;
