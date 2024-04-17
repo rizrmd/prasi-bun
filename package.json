@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --hot ./pkgs/core/index.ts dev",
+    "dev": "bun run ./pkgs/core/index.ts dev",
     "clean": "rm -rf data/lmdb && rm -rf app/static && rm -rf app/web/.parcel-cache",
     "build": "bun run --silent ./pkgs/core/build.ts",
     "build-site": "bun run --silent ./pkgs/core/build-site.ts",
