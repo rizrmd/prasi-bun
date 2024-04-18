@@ -5,9 +5,13 @@ import { ErrorBox } from "../utils/error-box";
 import { ViGlobal } from "./global";
 import { viParts } from "./parts";
 import { ViScript } from "./script";
-import get from "lodash.get";
 
 const MAX_RENDER_IN_SECOND = 70;
+
+const JS_CONFIG = {
+  debug: !!localStorage.getItem("prasi-js-debug"),
+};
+
 export const render_stat = {
   enabled: false,
   meta: {} as Record<string, { last_render: number; count: number }>,
@@ -18,7 +22,8 @@ export const ViRender: FC<{
   passprop?: any;
   is_layout: boolean;
   parent_key?: any;
-}> = ({ meta, passprop, is_layout, parent_key }) => {
+  depth: number;
+}> = ({ meta, passprop, is_layout, parent_key, depth }) => {
   if (render_stat.enabled) {
     const rstat_meta = render_stat.meta;
 
@@ -58,13 +63,20 @@ export const ViRender: FC<{
   if (!meta) return null;
   if (meta.item.hidden) return null;
 
+  if (JS_CONFIG.debug) {
+    let spaces = "";
+    for (let i = 0; i < depth; i++) spaces += ".";
+    console.log(spaces + meta.item.id, meta.item.name);
+  }
+
   if (meta.item.adv?.js || meta.item.component?.id) {
     return (
       <ErrorBox meta={meta}>
         <ViScript
           meta={meta}
+          depth={depth}
           is_layout={is_layout}
-          passprop={passprop}
+          passprop={{ ...passprop }}
           parent_key={parent_key}
         ></ViScript>
       </ErrorBox>
@@ -74,7 +86,8 @@ export const ViRender: FC<{
     <ErrorBox meta={meta}>
       <ViChild
         meta={meta}
-        passprop={passprop}
+        passprop={{ ...passprop }}
+        depth={depth}
         is_layout={is_layout}
         parent_key={parent_key}
       ></ViChild>
@@ -87,7 +100,8 @@ export const ViChild: FC<{
   is_layout: boolean;
   passprop?: any;
   parent_key?: any;
-}> = ({ meta, passprop, is_layout, parent_key }) => {
+  depth: number;
+}> = ({ meta, passprop, is_layout, parent_key, depth }) => {
   const vi = useGlobal(ViGlobal, "VI");
 
   if (is_layout && meta.item.name === "children") {
@@ -101,13 +115,14 @@ export const ViChild: FC<{
             <ViScript
               meta={meta}
               is_layout={false}
-              passprop={passprop}
+              passprop={{ ...passprop }}
               parent_key={parent_key}
+              depth={depth + 1}
             ></ViScript>
           </ErrorBox>
         );
       } else {
-        const parts = viParts(vi, meta, false, passprop);
+        const parts = viParts(vi, meta, false, passprop, depth);
         if (vi.visit) vi.visit(meta, parts);
         childs.push(<div {...parts.props} />);
       }
@@ -122,7 +137,7 @@ export const ViChild: FC<{
     );
   }
 
-  const parts = viParts(vi, meta, is_layout, passprop);
+  const parts = viParts(vi, meta, is_layout, passprop, depth);
   if (vi.visit) vi.visit(meta, parts);
 
   return <div {...parts.props} />;

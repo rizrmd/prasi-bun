@@ -22,6 +22,7 @@ export const viEvalProps = (
   meta: IMeta,
   is_layout: boolean,
   passprop: any,
+  depth: number,
   parent_key?: any
 ) => {
   if (meta.item.component?.id) {
@@ -109,6 +110,7 @@ export const viEvalProps = (
                       meta={m}
                       passprop={arg.passprop}
                       is_layout={is_layout}
+                      depth={depth + 1}
                     />
                   );
                 }

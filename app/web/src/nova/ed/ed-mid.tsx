@@ -13,7 +13,7 @@ import { MobileQRButton } from "./panel/side/style/tools/mobile-qr";
 import { EdFileBrowser } from "./panel/file/file-browser";
 
 export const EdMid: FC<{}> = () => {
-  const p = useGlobal(EDGlobal, "EDITORF");
+  const p = useGlobal(EDGlobal, "EDITOR");
   return (
     <div className="flex flex-col">
       <div
@@ -64,7 +64,7 @@ export const EdMid: FC<{}> = () => {
           <div className=" text-slate-400 flex items-center pr-1 ">
             <ResponsiveToggle />
           </div>
-          <a href={`/prod/${params.site_id}/${params.page_id}`} target="_blank">
+          <a href={`/prod/${params.site_id}${p.page.cur.url}`} target="_blank">
             <TopBtn style="slim" className="font-mono text-[9px]">
               PREVIEW
             </TopBtn>

@@ -34,7 +34,7 @@ export const ViRoot: FC<{}> = ({}) => {
             if (Element) {
               return (
                 <ErrorBox key={meta.item.id}>
-                  <ViRender meta={meta} is_layout={is_layout} />
+                  <ViRender meta={meta} is_layout={is_layout} depth={0} />
                 </ErrorBox>
               );
             }

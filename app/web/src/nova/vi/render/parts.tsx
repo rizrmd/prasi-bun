@@ -27,7 +27,8 @@ export const viParts = (
   },
   meta: IMeta,
   is_layout: boolean,
-  passprop: any
+  passprop: any,
+  depth: number
 ) => {
   const item = meta.item;
 
@@ -69,7 +70,8 @@ export const viParts = (
             key={id}
             meta={meta}
             is_layout={is_layout}
-            passprop={passprop}
+            passprop={{ ...passprop }}
+            depth={depth + 1}
           />
         );
       });
