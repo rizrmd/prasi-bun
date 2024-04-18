@@ -67,6 +67,7 @@
     "tinycolor2": "^1.6.0",
     "ua-parser-js": "^1.0.37",
     "uuid": "9.0.1",
+    "pako": "^2.1.0",
     "wasm-gzip": "^2.0.3",
     "web-utils": "workspace:*",
     "y-pojo": "^0.0.8",
@@ -74,6 +75,7 @@
     "yjs-types": "^0.0.1"
   },
   "devDependencies": {
+    "@types/pako": "^2.0.3",
     "@types/lodash.concat": "^4.5.8",
     "@types/lodash.find": "^4.6.8",
     "@types/lodash.findindex": "^4.6.8",
