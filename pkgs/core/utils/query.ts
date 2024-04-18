@@ -1,3 +1,5 @@
+import { Prisma } from "../../../app/db/db";
+import { gunzipAsync } from "./diff/diff";
 
 export type DBArg = {
   db: string;
@@ -14,10 +16,20 @@ export const execQuery = async (args: DBArg, prisma: any) => {
   if (tableInstance) {
     if (action === "query" && table.startsWith("$query")) {
       try {
-        const q = params.shift();
-        q.sql = true;
-        Object.freeze(q);
-        return await tableInstance.bind(prisma)(q, ...params);
+        const gzip = params as unknown as string;
+
+        if (typeof gzip === "string") {
+          const u8 = new Uint8Array(
+            [...atob(gzip)].map((c) => c.charCodeAt(0))
+          );
+          const json = JSON.parse((await gunzipAsync(u8)).toString("utf8"));
+
+          if (Array.isArray(json)) {
+            const q = json.shift();
+            return await tableInstance.bind(prisma)(Prisma.sql(q, ...json));
+          }
+        }
+
       } catch (e) {
         console.log(e);
         return e;
