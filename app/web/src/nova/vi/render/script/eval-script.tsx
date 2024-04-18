@@ -16,7 +16,6 @@ import { updatePropScope } from "./eval-prop";
 import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import { isValid } from "date-fns";
 export const viEvalScript = (
   vi: {
     page: VG["page"];
@@ -32,9 +31,10 @@ export const viEvalScript = (
   meta: IMeta,
   is_layout: boolean,
   passprop: any,
+  depth: number,
   parent_key?: any
 ) => {
-  const parts = viParts(vi, meta, is_layout, passprop);
+  const parts = viParts(vi, meta, is_layout, passprop, depth);
 
   if (vi.visit) vi.visit(meta, parts);
   if (!meta.script) {
@@ -146,7 +146,7 @@ export const viEvalScript = (
           _jsx: true;
           fn: (arg: { passprop: any; meta: IMeta }) => ReactNode;
         };
-        arg[k] = <JsxProp fn={jprop.fn} passprop={passprop} meta={meta} />;
+        arg[k] = <JsxProp fn={jprop.fn} passprop={{ ...passprop }} meta={meta} />;
       }
     }
   }
@@ -157,13 +157,19 @@ export const viEvalScript = (
 
   const js = meta.item.adv?.jsBuilt || "";
   const src = replaceWithObject(js, replacement) || "";
-  const fn = new Function(
-    ...Object.keys(arg),
-    `// ${meta.item.name}: ${meta.item.id} 
+
+  try {
+    const fn = new Function(
+      ...Object.keys(arg),
+      `// ${meta.item.name}: ${meta.item.id} 
 ${src}
   `
-  );
-  fn(...Object.values(arg));
+    );
+    fn(...Object.values(arg));
+  } catch (e) {
+    console.warn(`Error at item ${meta.item.name}:`, meta.item.adv?.js);
+    console.error(e);
+  }
 
   updatePropScope(vi, meta, passprop, parent_key);
 };

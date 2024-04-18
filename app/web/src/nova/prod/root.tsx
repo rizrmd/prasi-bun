@@ -219,7 +219,7 @@ export const Root = () => {
                   })
                 ).json()) as Record<string, IItem>;
                 for (const [id, item] of Object.entries(res)) {
-                  comp.pending.delete(id);
+                  delete comp.pending[id];
                   comp.list[id] = item;
 
                   await setkv(`comp-${id}`, item);

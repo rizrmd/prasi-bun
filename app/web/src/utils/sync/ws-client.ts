@@ -27,6 +27,7 @@ w.debug = new Proxy(
     get(target, p, receiver) {
       if (p === "off") {
         WS_CONFIG.debug = false;
+        localStorage.removeItem("prasi-js-debug");
         localStorage.removeItem("prasi-ws-debug");
         console.clear();
         return ["WS DEBUG: Deactivated"];
@@ -36,6 +37,11 @@ w.debug = new Proxy(
         localStorage.setItem("prasi-ws-debug", "1");
         console.clear();
         return ["WS DEBUG: Activated"];
+      }
+      if (p === "js") {
+        localStorage.setItem("prasi-js-debug", "1");
+        console.clear();
+        return ["JS DEBUG: Activated"];
       }
     },
   }

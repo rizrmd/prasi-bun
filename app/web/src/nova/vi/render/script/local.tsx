@@ -25,6 +25,7 @@ export const createViLocal = (
     hook?: (local: T) => void;
     effect?: (local: T) => void | Promise<void>;
     parent_key?: any;
+    deps?: any[];
   }) => {
     const isEditor =
       ["localhost", "prasi.avolut.com"].includes(location.hostname) &&
@@ -79,7 +80,7 @@ export const createViLocal = (
       }
 
       return () => {};
-    }, [location.pathname]);
+    }, [...(arg.deps || []), location.pathname]);
 
     useEffect(() => {
       if (isEditor) {
