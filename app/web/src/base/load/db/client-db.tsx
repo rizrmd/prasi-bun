@@ -1,5 +1,6 @@
 import hash_sum from "hash-sum";
-import { fetchViaProxy } from "../../../nova/vi/load/proxy";
+import { fetchViaProxy } from "../proxy";
+import pako from "pako";
 
 export const dbClient = (name: string, dburl: string) => {
   return new Proxy(
@@ -36,13 +37,20 @@ export const dbClient = (name: string, dburl: string) => {
 
         if (table.startsWith("$")) {
           return (...params: any[]) => {
+            const bytes = pako.gzip(JSON.stringify(params));
+
             return fetchSendDb(
               name,
               {
                 name,
                 action: "query",
                 table,
-                params,
+                params: btoa(
+                  bytes.reduce(
+                    (acc, current) => acc + String.fromCharCode(current),
+                    ""
+                  )
+                ),
               },
               dburl
             );

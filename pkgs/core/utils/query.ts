@@ -30,6 +30,7 @@ export const execQuery = async (args: DBArg, prisma: any) => {
           }
         }
 
+        return [];
       } catch (e) {
         console.log(e);
         return e;
