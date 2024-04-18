@@ -1,5 +1,6 @@
 import hash_sum from "hash-sum";
 import { fetchViaProxy } from "../proxy";
+import pako from "pako";
 
 export const dbProxy = (dburl: string) => {
   const name = "";
@@ -63,12 +64,19 @@ export const dbProxy = (dburl: string) => {
 
         if (table.startsWith("$")) {
           return (...params: any[]) => {
+            const bytes = pako.gzip(JSON.stringify(params));
+
             return fetchSendDb(
               {
                 name,
                 action: "query",
                 table,
-                params,
+                params: btoa(
+                  bytes.reduce(
+                    (acc, current) => acc + String.fromCharCode(current),
+                    ""
+                  )
+                ),
               },
               dburl
             );
