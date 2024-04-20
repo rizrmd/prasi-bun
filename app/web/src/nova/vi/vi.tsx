@@ -56,7 +56,7 @@ export const Vi: FC<{
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;
 
-    try {
+    try { 
       if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
         if (vi.site.api_url) {
           if (!vi.site_url) {
@@ -81,9 +81,11 @@ export const Vi: FC<{
       if (!path.startsWith("/")) {
         path = "/" + path;
       }
-      return `${u.protocol}//${u.host}${
-        path.startsWith("/") ? path : `/${path}`
-      }`;
+      if (w.prasiContext.siteUrl) {
+        path = w.prasiContext.siteUrl(path);
+      }
+
+      return `${u.protocol}//${u.host}${path}`;
     }
 
     return pathname;
