@@ -13,6 +13,16 @@ type PRELOAD = Exclude<VG["on_preload"], undefined>;
 type PRELOAD_ARGS = Parameters<PRELOAD>[0];
 
 const w = window as any;
+
+if (!w.prasi_error_handler) {
+  w.prasi_error_handler = true;
+  window.addEventListener("error", (errorEvent) => {
+    const { lineno, colno } = errorEvent;
+    console.log(`Error thrown at: ${lineno}:${colno}`);
+    errorEvent.preventDefault();
+  });
+}
+
 export const Vi: FC<{
   meta: Record<string, IMeta>;
   mode: "mobile" | "desktop";
@@ -56,7 +66,7 @@ export const Vi: FC<{
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
       return pathname;
 
-    try { 
+    try {
       if (["prasi.avolut.com", "localhost"].includes(location.hostname)) {
         if (vi.site.api_url) {
           if (!vi.site_url) {

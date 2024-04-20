@@ -167,7 +167,7 @@ export const viEvalScript = (
 try {
 ${src}
 } catch(e) {
-  console.warn("Error at item ${meta.item.name}:", ${meta.item.adv?.js});
+  console.warn("Error at item ${meta.item.name}:", \`${meta.item.adv?.js}\`);
 }
   `
     );
