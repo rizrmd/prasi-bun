@@ -93,17 +93,18 @@ export const defineWindow = async (awaitServerUrl = true) => {
           url: location.href,
         });
       }
+      if (w.prasiContext.popState) {
+        w.prasiContext.popState();
+        return;
+      }
+
       if (w.preventPopRender) {
         w.preventPopRender = false;
         return;
       }
       if (w.prasiContext && w.prasiContext.render) {
         w.pathname = location.pathname;
-        if (w.prasiContext.overrideRender) {
-          w.prasiContext.overrideRender(w.prasiContext.render);
-        } else {
-          w.prasiContext.render();
-        }
+        w.prasiContext.render();
       }
     });
   }
