@@ -146,7 +146,9 @@ export const viEvalScript = (
           _jsx: true;
           fn: (arg: { passprop: any; meta: IMeta }) => ReactNode;
         };
-        arg[k] = <JsxProp fn={jprop.fn} passprop={{ ...passprop }} meta={meta} />;
+        arg[k] = (
+          <JsxProp fn={jprop.fn} passprop={{ ...passprop }} meta={meta} />
+        );
       }
     }
   }
@@ -162,7 +164,11 @@ export const viEvalScript = (
     const fn = new Function(
       ...Object.keys(arg),
       `// ${meta.item.name}: ${meta.item.id} 
+try {
 ${src}
+} catch(e) {
+  console.warn("Error at item ${meta.item.name}:", ${meta.item.adv?.js});
+}
   `
     );
     fn(...Object.values(arg));
