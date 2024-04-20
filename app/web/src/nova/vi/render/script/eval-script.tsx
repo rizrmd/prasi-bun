@@ -163,15 +163,16 @@ export const viEvalScript = (
   try {
     const fn = new Function(
       ...Object.keys(arg),
+      "___js",
       `// ${meta.item.name}: ${meta.item.id} 
 try {
 ${src}
 } catch(e) {
-  console.warn("Error at item ${meta.item.name}:", \`${meta.item.adv?.js}\`);
+  console.warn("Error at item ${meta.item.name}:", ___js);
 }
   `
     );
-    fn(...Object.values(arg));
+    fn(...Object.values(arg), meta.item.adv?.js);
   } catch (e) {
     console.warn(`Error at item ${meta.item.name}:`, meta.item.adv?.js);
     console.error(e);
