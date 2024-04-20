@@ -99,7 +99,11 @@ export const defineWindow = async (awaitServerUrl = true) => {
       }
       if (w.prasiContext && w.prasiContext.render) {
         w.pathname = location.pathname;
-        w.prasiContext.render();
+        if (w.prasiContext.overrideRender) {
+          w.prasiContext.overrideRender(w.prasiContext.render);
+        } else {
+          w.prasiContext.render();
+        }
       }
     });
   }
