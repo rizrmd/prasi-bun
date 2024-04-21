@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { updatePropScope } from "./eval-prop";
 import { modifyChild } from "./passprop";
@@ -38,8 +38,11 @@ export const createViLocal = (
     const ref = useRef<any>(
       editorLocalValue[id] ? editorLocalValue[id] : arg.value
     );
+    const [_, set] = useState({});
     const local = ref.current;
-    local.render = meta.render;
+    local.render = () => {
+      set({});
+    };
 
     updatePropScope(vi, meta, meta.script?.scope, parent_key);
 
