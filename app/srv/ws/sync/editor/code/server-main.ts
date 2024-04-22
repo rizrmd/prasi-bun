@@ -46,16 +46,16 @@ const serverMain = () => ({
           if (typeof svr.server.init === "function") {
             svr.server.init({});
           }
-        }
 
-        Bun.write(
-          Bun.file(code.path(site_id, "site", "src", "server.log")),
-          ""
-        );
+          Bun.write(
+            Bun.file(code.path(site_id, "site", "src", "server.log")),
+            ""
+          );
+        }
       } catch (e) {
         console.log(`Failed to init server ${site_id}`, e);
       }
-    }, 100);
+    }, 10);
   },
   async http(
     site_id: string,
@@ -64,6 +64,7 @@ const serverMain = () => ({
     if (!code.esbuild[site_id]) {
       await codeBuild(site_id);
     }
+
     if (typeof this.handler[site_id] === "undefined") {
       if (
         await existsAsync(code.path(site_id, "server", "build", "index.js"))
@@ -73,6 +74,7 @@ const serverMain = () => ({
       }
     }
     const handler = this.handler[site_id];
+
     if (handler) {
       if (!handler.site_id) handler.site_id = site_id;
 
