@@ -146,6 +146,12 @@ if (typeof global.server_hook === "function") {
           setup(setup) {
             const reinit = () => {
               setup.onEnd((res) => {
+                if (res.errors.length > 0) {
+                  Bun.write(
+                    Bun.file(code.path(id_site, "site", "src", "server.log")),
+                    JSON.stringify(res.errors, null, 2)
+                  );
+                }
                 server.init(id_site);
               });
             };
