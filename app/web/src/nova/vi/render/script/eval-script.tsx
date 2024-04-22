@@ -169,6 +169,7 @@ try {
 ${src}
 } catch(e) {
   console.warn("Error at item ${meta.item.name}:", ___js);
+  console.error(e);
 }
   `
     );
