@@ -67,12 +67,10 @@ export const server: PrasiServer = {
       entryPoints: ["server.ts"],
       bundle: true,
       outfile: build_file,
-      minify: true,
       platform: "node",
       treeShaking: true,
       format: "cjs",
       logLevel: "silent",
-      sourcemap: true,
       banner: {
         js: `\
 const _fs = require('node:fs/promises');
