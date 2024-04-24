@@ -53,7 +53,7 @@ const serverMain = () => ({
           );
         }
       } catch (e) {
-        console.log(`Failed to init server ${site_id}`, e);
+        console.log(`Failed to init server ${site_id}\n`, e);
       }
     }, 10);
   },

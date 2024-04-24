@@ -1,6 +1,5 @@
 import { createRouter } from "radix3";
 import { FC, Suspense, lazy } from "react";
-import { Geiger } from "react-geiger";
 import { GlobalContext, useLocal } from "web-utils";
 import { w } from "../utils/types/general";
 import { Loading } from "../utils/ui/loading";
