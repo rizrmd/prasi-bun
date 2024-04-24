@@ -3,6 +3,7 @@ import { w } from "../types/general";
 import { baseTypings } from "./types/base";
 import { extractProp } from "./types/prop";
 import { prismaExtendType } from "./prisma-extend";
+import { propPopover } from "../../nova/ed/panel/side/prop-master/prop-form";
 export type MonacoEditor = Parameters<OnMount>[0];
 type Monaco = Parameters<OnMount>[1];
 
@@ -52,14 +53,14 @@ declare module "ts:runtime/library" {
           `\
 declare module "ts:prisma" {
   ${prisma["prisma.d.ts"]
-            .replace(
-              `import * as runtime from './runtime/library.js';`,
-              `import * as runtime from 'ts:runtime/library';`
-            )
-            .replace(
-              `import * as runtime from './runtime/library';`,
-              `import * as runtime from 'ts:runtime/library';`
-            )}
+    .replace(
+      `import * as runtime from './runtime/library.js';`,
+      `import * as runtime from 'ts:runtime/library';`
+    )
+    .replace(
+      `import * as runtime from './runtime/library';`,
+      `import * as runtime from 'ts:runtime/library';`
+    )}
 }`,
           `ts:prisma.d.ts`
         );
@@ -114,32 +115,32 @@ import {
 import prisma from 'ts:prisma';
 
 ${iftext(
-      apiTypes,
-      `\
+  apiTypes,
+  `\
 import "./api"
 import type * as SRVAPI from "${apiPath}";`
-    )}
+)}
 
 declare global {
   const db: prisma.PrismaClient & ${prismaExtendType};
   
   ${baseTypings}
 
-  ${propText.join("\n")}
-
   ${iftext(
-      apiTypes,
-      `
+    apiTypes,
+    `
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
   const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
   `
-    )}
+  )}
 }
 
   `,
     "ts:global.d.ts"
   );
+
+  register(monaco, propText.join("\n"), "ts:typings.d.ts");
 };
 
 const loadText = async (url: string) => {

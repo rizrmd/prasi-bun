@@ -103,8 +103,11 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   );
                   evn(arg);
                 } catch (e) {
+                  console.warn(
+                    `Error prop ${k} in item [${meta.item.name}], source:`,
+                    v.valueBuilt
+                  );
                   console.error(e);
-                  console.warn(k, v.valueBuilt);
                 }
               }
             }

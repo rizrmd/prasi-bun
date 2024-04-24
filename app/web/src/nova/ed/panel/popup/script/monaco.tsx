@@ -164,7 +164,6 @@ export const EdScriptMonaco: FC<{}> = () => {
                 case "item":
                   {
                     types._raw = declareScope(p, meta, monaco);
-
                     const model = monaco.editor.createModel(
                       trim(val),
                       "typescript",
@@ -313,7 +312,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             let scope: boolean | ParsedScope = false;
             p.ui.popup.script.typings.status = "ok";
             p.ui.popup.script.typings.err_msg = "";
-            
+
             if (stype === "prop-master") {
               p.sync.code.edit({
                 type: "prop-master",

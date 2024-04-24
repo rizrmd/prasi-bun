@@ -15,7 +15,6 @@ export const useLocal = <T extends object>(
       render: () => void;
     },
     deps: (deps || []) as any[],
-    promisedKeys: new Set<string>(),
     ready: false,
     _loading: {} as any,
   });
@@ -28,22 +27,6 @@ export const useLocal = <T extends object>(
 
   if (local.ready === false) {
     local._loading = {};
-
-    for (const [k, v] of Object.entries(data)) {
-      if (!local.promisedKeys.has(k)) {
-        let val = v;
-        if (typeof val === "object" && val instanceof Promise) {
-          local._loading[k] = true;
-          local.promisedKeys.add(k);
-          (local.data as any)[k] = null;
-          val.then((resolved) => {
-            (local.data as any)[k] = resolved;
-            local._loading[k] = false;
-            local.data.render();
-          });
-        }
-      }
-    }
 
     local.data.render = () => {
       if (local.ready) _render({});
