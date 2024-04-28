@@ -41,7 +41,11 @@ export const createViLocal = (
     const [_, set] = useState({});
     const local = ref.current;
     local.render = () => {
-      set({});
+      if ((window as any).prasiContext?.render) {
+        (window as any).prasiContext?.render();
+      } else {
+        set({});
+      }
     };
 
     updatePropScope(vi, meta, meta.script?.scope, parent_key);
