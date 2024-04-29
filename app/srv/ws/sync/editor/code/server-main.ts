@@ -1,13 +1,12 @@
-import type { Server, WebSocketHandler, ServerWebSocket } from "bun";
+import type { Server, WebSocketHandler } from "bun";
 import { existsAsync } from "fs-jetpack";
 import _fs from "node:fs/promises";
 import { g } from "utils/global";
 import { waitUntil } from "web-utils";
-import { code } from "./util-code";
 import { WSData } from "../../../../../../pkgs/core/server/create";
-import { codeBuild } from "./build-code";
 import { prodIndex } from "../../../../util/prod-index";
 
+import { code } from "../../code/code";
 import "./server-runtime";
 
 const serverMain = () => ({
@@ -61,10 +60,9 @@ const serverMain = () => ({
     site_id: string,
     arg: Parameters<Exclude<(typeof g)["server_hook"], undefined>>[0]
   ) {
-    if (!code.esbuild[site_id]) {
-      await codeBuild(site_id);
+    if (arg.url.pathname.endsWith("main.js")) {
+      code.init(site_id, "init http");
     }
-
     if (typeof this.handler[site_id] === "undefined") {
       if (
         await existsAsync(code.path(site_id, "server", "build", "index.js"))
@@ -130,13 +128,11 @@ type PrasiServer = {
     index: { head: string[]; body: string[]; render: () => string };
     prasi: { page_id?: string; params?: Record<string, any> };
   }) => Promise<Response>;
-  init?: () => Promise<void>;
+  init?: (arg: { port?: number }) => Promise<void>;
 };
 
 const glb = global as unknown as {
   _server: ReturnType<typeof serverMain>;
 };
-if (!glb._server) {
-  glb._server = serverMain();
-}
+glb._server = serverMain();
 export const server = glb._server;

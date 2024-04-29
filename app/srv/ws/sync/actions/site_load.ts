@@ -2,7 +2,7 @@ import { validate } from "uuid";
 import { ESite } from "../../../../web/src/nova/ed/logic/ed-global";
 import { SAction } from "../actions";
 import { SyncConnection } from "../type";
-import { prepCodeSnapshot } from "../editor/code/prep-code";
+import { code } from "../code/code";
 
 export const site_load: SAction["site"]["load"] = async function (
   this: SyncConnection,
@@ -12,6 +12,8 @@ export const site_load: SAction["site"]["load"] = async function (
     const site = await _db.site.findFirst({ where: { id: site_id } });
     if (site) {
       if (this.conf) this.conf.site_id = site.id;
+
+      code.init(site.id, "init site_load");
 
       const config =
         typeof site.config === "object" && site.config
@@ -43,8 +45,6 @@ export const site_load: SAction["site"]["load"] = async function (
         }
       }
 
-      const code = await prepCodeSnapshot(site.id, "site");
-
       return {
         id: site.id,
         name: site.name,
@@ -58,7 +58,6 @@ export const site_load: SAction["site"]["load"] = async function (
           meta: undefined,
           entry: [],
         },
-        code_ts: code.ts,
       };
     }
   }
