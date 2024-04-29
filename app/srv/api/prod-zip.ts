@@ -39,7 +39,14 @@ export const _ = {
         comps: await _db.component.findMany({
           where: {
             component_group: {
-              component_site: { some: { id_site: site_id } },
+              OR: [
+                {
+                  id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
+                },
+                {
+                  component_site: { some: { id_site: site_id } },
+                },
+              ],
             },
           },
           select: { id: true, content_tree: true },
