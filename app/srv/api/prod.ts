@@ -2,8 +2,8 @@ import { dir } from "dir";
 import { apiContext } from "service-srv";
 import { validate } from "uuid";
 import { prodIndex } from "../util/prod-index";
-import { code } from "../ws/sync/editor/code/util-code";
 import { gzipAsync } from "../ws/sync/entity/zlib";
+import { code } from "../ws/sync/code/code";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -19,6 +19,8 @@ export const _ = {
 
     if (!validate(site_id))
       return new Response("site not found", { status: 403 });
+
+    code;
 
     if (pathname.startsWith("_prasi")) {
       const action = pathname.split("/")[1];

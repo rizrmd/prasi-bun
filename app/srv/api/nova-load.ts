@@ -1,5 +1,5 @@
 import { apiContext } from "../../../pkgs/core/server/api/api-ctx";
-import { code } from "../ws/sync/editor/code/util-code";
+import { code } from "../ws/sync/code/code";
 
 export const _ = {
   url: "/nova-load/:mode/:id_site/**",

@@ -3,6 +3,7 @@ import { dir } from "dir";
 import { BuildContext } from "esbuild";
 import { dirAsync, exists, existsAsync, writeAsync } from "fs-jetpack";
 import { dirname } from "path";
+import { prismaExtendType } from "../../../../../web/src/utils/script/prisma-extend";
 
 export type CodeBuild = {
   server: BuildContext | null;
@@ -11,13 +12,13 @@ export type CodeBuild = {
 };
 export type CodeMode = keyof CodeBuild;
 
-export const code = {
+const code = {
   path(
     id_site: string,
     mode: CodeMode,
     type: "src" | "build" | "build_cache",
     path?: string
-  ) {
+  ) { 
     let file_path = "";
     if (path) {
       file_path = path[0] === "/" ? path : `/${path}`;
@@ -69,6 +70,8 @@ declare global {
   type Api = typeof SRVAPI;
   type ApiName = keyof Api;
   const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & { _raw: any };
+  const db: prisma.PrismaClient & ${prismaExtendType};
+
 
   type PrasiServer = {
     ws?: WebSocketHandler<{ url: string }>;
@@ -81,7 +84,7 @@ declare global {
       index: { head: string[]; body: string[]; render: () => string };
       prasi: { page_id?: string; params?: Record<string, any> };
     }) => Promise<Response>;
-    init: () => Promise<void>;
+    init: (arg: { port?: number }) => Promise<void>;
   };
 }
 `;

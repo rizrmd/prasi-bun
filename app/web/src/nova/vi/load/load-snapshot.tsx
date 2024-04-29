@@ -62,9 +62,9 @@ export const applyEnv = async (p: PG) => {
     w.api = apiProxy(p.site.config.api_url);
   }
 
-  const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${p.site.code_ts}`;
+  const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${p.site_tstamp}`;
   const fn = new Function("callback", `import("${url}").then(callback)`);
- 
+
   try {
     await new Promise<void>((resolve) => {
       fn((exports: any) => {

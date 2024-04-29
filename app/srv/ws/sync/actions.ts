@@ -119,7 +119,7 @@ export const SyncActions = {
             | { type: "startup-check" }
             | { type: "startup-run" }
             | { type: "startup-stop" }
-            | { type: "push-typings"; body: Uint8Array; hash: number }
+            // | { type: "push-typings"; body: Uint8Array; hash: number }
             | { type: "check-typings"; hash: number }
           ))
         | { type: "flush-page-cache"; page_id: string }

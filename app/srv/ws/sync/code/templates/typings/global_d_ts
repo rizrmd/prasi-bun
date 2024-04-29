@@ -1,0 +1,68 @@
+//@ts-ignore
+import type * as SRVAPI from "gen/srv/api/srv";
+import { Server, WebSocketHandler } from "bun";
+import prisma from "./prisma";
+
+declare global {
+  type Api = typeof SRVAPI;
+  type ApiName = keyof Api;
+  const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & {
+    _raw: any;
+  };
+  const db: prisma.PrismaClient & {
+    _batch: {
+      update: (
+        batch: {
+          table: string;
+          data: any;
+          where: any;
+        }[]
+      ) => Promise<void>;
+    };
+    _schema: {
+      tables: () => Promise<string[]>;
+      columns: (table: string) => Promise<
+        Record<
+          string,
+          {
+            is_pk: boolean;
+            type: string;
+            optional: boolean;
+            db_type: string;
+            default?: any;
+          }
+        >
+      >;
+      rels: (table: string) => Promise<
+        Record<
+          string,
+          {
+            type: "has-many" | "has-one";
+            to: {
+              table: string;
+              fields: string[];
+            };
+            from: {
+              table: string;
+              fields: string[];
+            };
+          }
+        >
+      >;
+    };
+  };
+
+  type PrasiServer = {
+    ws?: WebSocketHandler<{ url: string }>;
+    http: (arg: {
+      url: { raw: URL; pathname: string };
+      req: Request;
+      server: Server;
+      mode: "dev" | "prod";
+      handle: (req: Request) => Promise<Response>;
+      index: { head: string[]; body: string[]; render: () => string };
+      prasi: { page_id?: string; params?: Record<string, any> };
+    }) => Promise<Response>;
+    init: (arg: { port?: number }) => Promise<void>;
+  };
+}
