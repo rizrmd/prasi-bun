@@ -124,7 +124,7 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     }
     const url = base.toString();
 
-    if (localStorage.mlsid) {
+    if (typeof localStorage !== "undefined" && localStorage.mlsid) {
       params.mlsid = localStorage.mlsid;
     }
 
