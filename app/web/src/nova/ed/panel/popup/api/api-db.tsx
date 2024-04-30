@@ -52,6 +52,7 @@ export const EdApiDB = ({
                 render();
                 alert("DB PULL & GENERATE: OK\nRESTART: OK");
 
+                localStorage.removeItem(`schema-md-${p.site.id}`);
                 localStorage.setItem(
                   "api-ts-" + p.site.config.api_url,
                   Date.now().toString()
