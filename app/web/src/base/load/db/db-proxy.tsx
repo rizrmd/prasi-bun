@@ -124,6 +124,10 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     }
     const url = base.toString();
 
+    if (localStorage.mlsid) {
+      params.mlsid = localStorage.mlsid;
+    }
+
     const hsum = hash_sum(params);
     const cached = cachedQueryResult[hsum];
 
