@@ -18,43 +18,17 @@ export const GlobalContext = createContext({
 export const uState = useState;
 export const useGlobal = <T extends object>(
   defaultValue: T,
-  effectOrID?:
-    | (() => Promise<void | (() => void)> | void | (() => void))
-    | string,
-  id?: string 
+  id: string
 ): T & { render: (reset?: boolean) => void } => {
-  const w = window as unknown as {
-    globalValueID: WeakMap<any, string>;
-  };
-
-  if (!w.globalValueID) w.globalValueID = new WeakMap();
-
-  let _id = (typeof effectOrID === "string" ? effectOrID : id) as string;
-  if (!_id) {
-    if (!w.globalValueID.has(defaultValue)) {
-      w.globalValueID.set(defaultValue, createId());
-    }
-    _id = w.globalValueID.get(defaultValue) || "";
-  }
-  if (!_id) {
-    _id = "GLOBAL_DEFAULT";
-  }
   const ctx = useContext(GlobalContext);
   const { global, render } = ctx;
 
-  if (!global[_id]) {
-    global[_id] = defaultValue;
+  if (!global[id]) {
+    global[id] = defaultValue;
   }
 
   useEffect(() => {
     let res: any = null;
-    if (typeof effectOrID === "function") {
-      try {
-        res = effectOrID();
-      } catch (e) {
-        console.log(e);
-      }
-    }
     return () => {
       if (typeof res === "function") res();
       else if (res instanceof Promise) {
@@ -65,17 +39,15 @@ export const useGlobal = <T extends object>(
     };
   }, []);
 
-  const res = global[_id];
+  const res = global[id];
 
   if (res) {
     res.render = (reset?: boolean) => {
       if (reset) {
-        global[_id] = undefined;
+        global[id] = undefined;
       }
       startTransition(render);
     };
-  } else {
-    console.log(defaultValue, _id);
   }
 
   return res as any;
