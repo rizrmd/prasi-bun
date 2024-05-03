@@ -61,7 +61,7 @@ export type MPage = TypedDoc<{
 }>;
 
 export type IContent = ISection | IItem | IText;
-export type MContent = MSection | MItem | MText;
+export type MContent = MItem;
 
 export type RenderContentProp = Partial<{
   active: IContent | null;
