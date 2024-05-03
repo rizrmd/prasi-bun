@@ -1,4 +1,4 @@
-import { responsiveVal } from "../../render/editor/tools/responsive-val";
+import { responsiveVal } from "../../nova/ed/panel/side/style/tools/responsive-val";
 import { FNPadding } from "../types/meta-fn";
 
 export const cssPadding = (

@@ -63,20 +63,30 @@ export const applyEnv = async (p: PG) => {
   }
 
   const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${p.site_tstamp}`;
-  const fn = new Function("callback", `import("${url}").then(callback)`);
+  const fn = new Function(
+    "callback",
+    `
+try { 
+  return import("${url}")
+} catch(e) { 
+  console.log("Failed to load site code", e); 
+}`
+  );
 
-  try {
-    await new Promise<void>((resolve) => {
-      fn((exports: any) => {
+  await new Promise<void>(async (resolve) => {
+    try {
+      const exports = await fn();
+      if (exports) {
         p.site_exports = {};
         for (const [k, v] of Object.entries(exports)) {
           p.site_exports[k] = v;
           w[k] = v;
         }
-        resolve();
-      });
-    });
-  } catch (e) {
-    console.log("Failed to load site code", e);
-  }
+      }
+      resolve();
+    } catch (e) {
+      console.log("Failed to load site code", e);
+      resolve();
+    }
+  });
 };

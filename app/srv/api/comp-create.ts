@@ -1,5 +1,5 @@
 import { IItem, MItem } from "../../web/src/utils/types/item";
-import { eg } from "../ws/edit/edit-global";
+import { eg } from "../ws/sync/editor/edit-global";
 
 export const _ = {
   url: "/comp-create",
