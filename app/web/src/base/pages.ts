@@ -18,14 +18,6 @@ export const ed = {
   url:  "/ed/:site_id/:page_id",
   page: () => import("./page/ed"),
 };
-export const editor = {
-  url:  "/editor/:site_id/:page_id",
-  page: () => import("./page/editor"),
-};
-export const live = {
-  url:  "/live/:domain/**",
-  page: () => import("./page/live"),
-};
 export const vi = {
   url:  "/vi/:domain/**",
   page: () => import("./page/vi"),

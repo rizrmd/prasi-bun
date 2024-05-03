@@ -16,7 +16,7 @@ export const codeInternal = {
   get frontend() {
     if (!g.prasi_code) g.prasi_code = {};
     if (!g.prasi_code.frontend) g.prasi_code.frontend = {};
-    return g.prasi_code.frontend as Record<SITE_ID, Parcel>;
+    return g.prasi_code.frontend as Record<SITE_ID, BuildContext>;
   },
   get typings() {
     if (!g.prasi_code) g.prasi_code = {};

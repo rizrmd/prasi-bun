@@ -1,5 +1,4 @@
 import { syncronize } from "y-pojo";
-import { fillID } from "../../../../../../../render/editor/tools/fill-id";
 import { IContent } from "../../../../../../../utils/types/general";
 import { IItem, MItem } from "../../../../../../../utils/types/item";
 import { MSection } from "../../../../../../../utils/types/section";
@@ -8,6 +7,7 @@ import { PG, active } from "../../../../../logic/ed-global";
 import { treeRebuild } from "../../../../../logic/tree/build";
 import { TypedArray } from "yjs-types";
 import { loadComponent } from "../../../../../logic/comp/load";
+import { fillID } from "../../../../../logic/tree/fill-id";
 
 export const edActionPaste = async (p: PG, item: IContent) => {
   let mitem = getMetaById(p, item.id)?.mitem;

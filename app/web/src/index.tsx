@@ -5,7 +5,6 @@ import { loadApiProxyDef } from "./base/load/api/api-proxy-def";
 import { dbProxy } from "./base/load/db/db-proxy";
 import { Root } from "./base/root";
 import "./index.css";
-import { registerMobile } from "./render/live/logic/mobile";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
 
@@ -13,7 +12,6 @@ const start = async () => {
   let react = {
     root: null as null | ReactRoot,
   };
-  w.mobile = registerMobile();
 
   const cur = new URL(w.basehost || location.href);
   const base_url = `${cur.protocol}//${cur.host}`;
