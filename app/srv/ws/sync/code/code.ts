@@ -4,13 +4,13 @@ import { initServer } from "./parts/init/server";
 import { initTypings } from "./parts/init/typings";
 import { codeInternal } from "./parts/internal";
 import { ensureLib } from "./utlis/ensure-lib";
-import { ensure } from "./utlis/ensure";
+import { ensureFiles } from "./utlis/ensure-files";
 
 export const code = {
   internal: codeInternal,
   async init(id_site: string, note: string) {
     const { frontend, server, typings } = this.internal;
-    if (!frontend[id_site] || !server[id_site] || !typings[id_site]) {
+    if (true || !frontend[id_site] || !server[id_site] || !typings[id_site]) {
       const root = `/code/${id_site}/site/src`;
 
       if (!frontend[id_site]) await initFrontEnd(root, id_site);
@@ -18,7 +18,7 @@ export const code = {
       if (!typings[id_site]) await initTypings(root, id_site);
 
       await ensureLib(root, id_site);
-      await ensure(`${root}/index.tsx`, ``);
+      await ensureFiles(root, id_site);
     }
   },
   path(

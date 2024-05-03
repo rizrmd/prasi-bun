@@ -41,7 +41,11 @@ glb.server_hook = async (arg) => {
         if (res instanceof Response) {
           return res;
         } else {
-          return new Response("403: Please see server.log", { status: 403 });
+          if (!server.handler[site_id]) {
+            return await arg.handle(arg.req);
+          } else {
+            return new Response("403: Please see server.log", { status: 403 });
+          }
         }
       } catch (e) {
         console.log(e);

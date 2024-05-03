@@ -1,4 +1,4 @@
-import { responsiveVal } from "../../render/editor/tools/responsive-val";
+import { responsiveVal } from "../../nova/ed/panel/side/style/tools/responsive-val";
 import { MetaItem } from "../types/meta";
 import { FNBackground } from "../types/meta-fn";
 
@@ -23,11 +23,6 @@ export const cssBackground = (
     bg.color &&
       `
         background-color: ${bg.color};
-      `,
-    bg.url &&
-      typeof siteApiUrl === "string" &&
-      `
-        background-image: url("${bgurl}");
       `,
     bg.size &&
       `

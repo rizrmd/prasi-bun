@@ -9,7 +9,7 @@ import { stat } from "fs/promises";
 import { g } from "utils/global";
 import { validate } from "uuid";
 import { glb } from "../global";
-import { eg } from "../ws/edit/edit-global";
+import { eg } from "../ws/sync/editor/edit-global";
 
 export type NPMImportAs = {
   main: { mode: "default" | "*"; name: string };

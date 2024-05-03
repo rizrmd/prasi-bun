@@ -38,6 +38,7 @@ const serverMain = () => ({
         );
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
+
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           this.handler[site_id].site_id = site_id;
@@ -50,9 +51,19 @@ const serverMain = () => ({
             Bun.file(code.path(site_id, "site", "src", "server.log")),
             ""
           );
+        } else {
+          const file = await Bun.file(server_src_path).text();
+          if (file.length === 0) {
+            const log_path = code.path(site_id, "site", "src", "server.log");
+            await Bun.write(Bun.file(log_path), "server.ts is empty");
+          } else {
+            throw new Error("server.ts does not return server object");
+          }
         }
-      } catch (e) {
-        console.log(`Failed to init server ${site_id}\n`, e);
+      } catch (e: any) {
+        const log_path = code.path(site_id, "site", "src", "server.log");
+        await Bun.write(Bun.file(log_path), e.message);
+        console.log(`Failed to init server ${site_id}\n`, log_path);
       }
     }, 10);
   },
@@ -107,6 +118,9 @@ const serverMain = () => ({
           index: prodIndex(site_id, arg.prasi),
         });
       } catch (e: any) {
+        if (g.mode === "dev") {
+          console.error(e);
+        }
         _fs.appendFile(
           code.path(site_id, "site", "src", "server.log"),
           e.message + "\n"

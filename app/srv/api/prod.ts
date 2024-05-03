@@ -20,8 +20,6 @@ export const _ = {
     if (!validate(site_id))
       return new Response("site not found", { status: 403 });
 
-    code;
-
     if (pathname.startsWith("_prasi")) {
       const action = pathname.split("/")[1];
 
