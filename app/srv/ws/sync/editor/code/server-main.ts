@@ -53,11 +53,15 @@ const serverMain = () => ({
           );
         } else {
           const file = await Bun.file(server_src_path).text();
+          const log_path = code.path(site_id, "site", "src", "server.log");
+
           if (file.length === 0) {
-            const log_path = code.path(site_id, "site", "src", "server.log");
             await Bun.write(Bun.file(log_path), "server.ts is empty");
           } else {
-            throw new Error("server.ts does not return server object");
+            await Bun.write(
+              Bun.file(log_path),
+              "server.ts does not return server object"
+            );
           }
         }
       } catch (e: any) {
