@@ -14,14 +14,18 @@ export const ensureFiles = async (path: string, id_site: string) => {
     cwd: dir.path(tdir),
   });
 
-  for await (const t of templates) {
-    const f = t.replaceAll("_", ".");
-    const to = dir.data(path + `/${f}`);
-    const file = Bun.file(to);
-    if (!(await file.exists())) {
-      const from = dir.path(`${tdir}/${t}`);
-      await dirAsync(dirname(to));
-      await copyAsync(from, to);
+  try {
+    for await (const t of templates) {
+      const f = t.replaceAll("_", ".");
+      const to = dir.data(path + `/${f}`);
+      const file = Bun.file(to);
+      if (!(await file.exists())) {
+        const from = dir.path(`${tdir}/${t}`);
+        await dirAsync(dirname(to));
+        await copyAsync(from, to);
+      }
     }
+  } catch (e) {
+    console.log("error ensure file", e);
   }
 };

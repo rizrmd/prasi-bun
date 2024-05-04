@@ -26,15 +26,16 @@ export const code_action: SAction["code"]["action"] = async function (
       const cs = code_startup.process[arg.site_id];
 
       if (!cs) {
-        const pkg_file = Bun.file(
-          code.path(arg.site_id, "site", "src", "package.json")
-        );
+        try {
+          const pkg_file = Bun.file(
+            code.path(arg.site_id, "site", "src", "package.json")
+          );
 
-        const pkg_json = await pkg_file.json();
-        if (!pkg_json.scripts || !pkg_json.scripts.startup) {
-          return { type, status: "disabled" };
-        }
-
+          const pkg_json = await pkg_file.json();
+          if (!pkg_json.scripts || !pkg_json.scripts.startup) {
+            return { type, status: "disabled" };
+          }
+        } catch (e) {}
         return { type, status: "stopped" };
       }
 
@@ -84,41 +85,41 @@ export const code_action: SAction["code"]["action"] = async function (
       } catch (e) {}
       return { type: "check-typings", hash: false };
     }
-  //   case "push-typings": {
-  //     const dir = code.path(arg.site_id, "site", "src", "typings");
-  //     await dirAsync(dir);
-  //     await dirAsync(path.join(dir, "runtime"));
-  //     Bun.write(Bun.file(path.join(dir, "hash")), arg.hash.toString());
-  //     const res = JSON.parse(decoder.decode(await gunzipAsync(arg.body)));
-  //     await Bun.write(Bun.file(path.join(dir, "api.d.ts")), res.api);
-  //     await Bun.write(
-  //       Bun.file(path.join(dir, "prisma.d.ts")),
-  //       res.prisma["prisma.d.ts"]
-  //     );
-  //     await Bun.write(
-  //       Bun.file(path.join(dir, "runtime/index.d.ts")),
-  //       res.prisma["runtime/index.d.ts"]
-  //     );
-  //     await Bun.write(
-  //       Bun.file(path.join(dir, "runtime/library.d.ts")),
-  //       res.prisma["runtime/library.d.ts"]
-  //     );
-  //     await Bun.write(
-  //       Bun.file(path.join(dir, "global.d.ts")),
-  //       codeGlobalTypings.replace(
-  //         `declare global {`,
-  //         `declare global {
-  // const db: prisma.PrismaClient & ${prismaExtendType};
-  // `
-  //       )
-  //     );
+    //   case "push-typings": {
+    //     const dir = code.path(arg.site_id, "site", "src", "typings");
+    //     await dirAsync(dir);
+    //     await dirAsync(path.join(dir, "runtime"));
+    //     Bun.write(Bun.file(path.join(dir, "hash")), arg.hash.toString());
+    //     const res = JSON.parse(decoder.decode(await gunzipAsync(arg.body)));
+    //     await Bun.write(Bun.file(path.join(dir, "api.d.ts")), res.api);
+    //     await Bun.write(
+    //       Bun.file(path.join(dir, "prisma.d.ts")),
+    //       res.prisma["prisma.d.ts"]
+    //     );
+    //     await Bun.write(
+    //       Bun.file(path.join(dir, "runtime/index.d.ts")),
+    //       res.prisma["runtime/index.d.ts"]
+    //     );
+    //     await Bun.write(
+    //       Bun.file(path.join(dir, "runtime/library.d.ts")),
+    //       res.prisma["runtime/library.d.ts"]
+    //     );
+    //     await Bun.write(
+    //       Bun.file(path.join(dir, "global.d.ts")),
+    //       codeGlobalTypings.replace(
+    //         `declare global {`,
+    //         `declare global {
+    // const db: prisma.PrismaClient & ${prismaExtendType};
+    // `
+    //       )
+    //     );
 
-  //     Bun.spawn({
-  //       cmd: ["chmod", "-R", "777", "."],
-  //       cwd: code.path(arg.site_id, "site", "src"),
-  //     });
+    //     Bun.spawn({
+    //       cmd: ["chmod", "-R", "777", "."],
+    //       cwd: code.path(arg.site_id, "site", "src"),
+    //     });
 
-  //     break;
-  //   }
+    //     break;
+    //   }
   }
 };
