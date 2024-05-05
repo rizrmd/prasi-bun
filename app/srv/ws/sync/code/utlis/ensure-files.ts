@@ -19,7 +19,8 @@ export const ensureFiles = async (path: string, id_site: string) => {
       const f = t.replaceAll("_", ".");
       const to = dir.data(path + `/${f}`);
       const file = Bun.file(to);
-      if (!(await file.exists())) {
+      const exists = await file.exists();
+      if (!exists) {
         const from = dir.path(`${tdir}/${t}`);
         await dirAsync(dirname(to));
         await copyAsync(from, to);

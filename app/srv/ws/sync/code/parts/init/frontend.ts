@@ -6,9 +6,9 @@ import { removeAsync } from "fs-jetpack";
 import isEqual from "lodash.isequal";
 import { code } from "../../code";
 import { buildTypes } from "./typings";
+import { appendFile } from "node:fs/promises";
 
-const npm_list = {} as Record<string, Set<string>>;
-
+const decoder = new TextDecoder();
 export const initFrontEnd = async (root: string, id_site: string) => {
   let existing = code.internal.frontend[id_site];
 
@@ -50,87 +50,8 @@ export const initFrontEnd = async (root: string, id_site: string) => {
         }),
         {
           name: "prasi",
-          setup(setup) {
+          async setup(setup) {
             try {
-              setup.onEnd(async (res) => {
-                if (!npm_list[id_site]) npm_list[id_site] = new Set<string>();
-                const imports = new Set<string>();
-                if (!(await isInstalling(id_site)))
-                  await codeError(id_site, "");
-
-                if (res.errors.length > 0) {
-                  for (const err of res.errors) {
-                    if (
-                      err.notes?.[0].text.startsWith("You can mark the path ")
-                    ) {
-                      let im = err.notes?.[0].text.split('"')[1];
-
-                      if (!im.startsWith("@")) {
-                        im = im.split("/").shift() || "";
-                      }
-
-                      imports.add(im);
-                    }
-                  }
-                }
-
-                if (res.metafile) {
-                  for (const [_, file] of Object.entries(
-                    res.metafile?.inputs || {}
-                  )) {
-                    for (const im of file.imports) {
-                      if (im.kind === "import-statement" && im.external) {
-                        if (
-                          !im.path.startsWith(".") &&
-                          !im.path.startsWith("@/")
-                        )
-                          imports.add(im.path);
-                      }
-                    }
-                  }
-                }
-
-                if (!isEqual(imports, npm_list[id_site])) {
-                  await codeError(
-                    id_site,
-                    "Installing dependencies:\n " + [...imports].join("\n ")
-                  );
-                  npm_list[id_site] = imports;
-                  let proc = Bun.spawn(
-                    [`npm`, `install`, "--silent", ...imports],
-                    {
-                      stdio: ["inherit", "pipe", "pipe"],
-                      cwd: dir.data(root),
-                    }
-                  );
-
-                  async function print(generator: any, prefix: any) {
-                    for await (let value of generator) {
-                      console.log(`${prefix} ${value}`);
-                      await codeError(id_site, `${prefix} ${value}`);
-                    }
-                  }
-
-                  print(proc.stdout, "stdout:");
-                  print(proc.stderr, "stderr:");
-
-                  await proc.exited;
-                  await codeError(id_site, "");
-                  try {
-                    await code.internal.frontend[id_site].rebuild();
-                  } catch (e) {}
-                  return;
-                }
-
-                if (res.errors.length > 0) {
-                  await codeError(
-                    id_site,
-                    res.errors.map((e) => e.text).join("\n\n")
-                  );
-                } else {
-                  buildTypes(root, id_site);
-                }
-              });
             } catch (e) {
               console.log("ERROR");
             }
@@ -146,8 +67,13 @@ export const initFrontEnd = async (root: string, id_site: string) => {
   }
 };
 
-const codeError = async (id_site: string, error: string) => {
+const codeError = async (id_site: string, error: string, append?: boolean) => {
   const path = code.path(id_site, "site", "src", "index.log");
+
+  if (append) {
+    await appendFile(path, error);
+    return;
+  }
   await Bun.write(path, error);
 };
 
@@ -159,4 +85,24 @@ const isInstalling = async (id_site: string) => {
     if (text.startsWith("Installing dependencies")) return true;
   } catch (e) {}
   return false;
+};
+
+const readPackageJSON = async (id_site: string) => {
+  const file = Bun.file(code.path(id_site, "site", "src", "package.json"));
+  const deps = new Set<string>();
+
+  const json = await file.json();
+
+  if (json.dependencies) {
+    for (const k of Object.keys(json.dependencies)) {
+      deps.add(k);
+    }
+  }
+
+  if (json.devDependencies) {
+    for (const k of Object.keys(json.devDependencies)) {
+      deps.add(k);
+    }
+  }
+  return deps;
 };
