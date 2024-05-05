@@ -4,6 +4,7 @@ import { validate } from "uuid";
 import { prodIndex } from "../util/prod-index";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 import { code } from "../ws/sync/code/code";
+import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -30,8 +31,11 @@ export const _ = {
           const build_path = code.path(site_id, "site", "build", codepath);
           const file = Bun.file(build_path);
 
-          if (!(await file.exists()))
+          if (!(await file.exists())) {
+            const root = `/code/${site_id}/site/src`;
+            await initFrontEnd(root, site_id);
             return new Response("Code file not found", { status: 403 });
+          }
 
           return new Response(file);
         }
