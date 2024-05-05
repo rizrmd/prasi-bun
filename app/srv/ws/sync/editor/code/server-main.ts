@@ -29,13 +29,8 @@ const serverMain = () => ({
   init(site_id: string) {
     clearTimeout(this.init_timeout);
     this.init_timeout = setTimeout(async () => {
+      const server_src_path = code.path(site_id, "server", "build", "index.js");
       try {
-        const server_src_path = code.path(
-          site_id,
-          "server",
-          "build",
-          "index.js"
-        );
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
 
@@ -65,9 +60,14 @@ const serverMain = () => ({
           }
         }
       } catch (e: any) {
+        const file = await Bun.file(server_src_path).text();
         const log_path = code.path(site_id, "site", "src", "server.log");
-        await Bun.write(Bun.file(log_path), e.message);
-        console.log(`Failed to init server ${site_id}\n`, log_path);
+        if (file.length === 0) {
+          await Bun.write(Bun.file(log_path), "server.ts is empty");
+        } else {
+          await Bun.write(Bun.file(log_path), e.message);
+          console.log(`Failed to init server ${site_id}\n`, log_path);
+        }
       }
     }, 10);
   },

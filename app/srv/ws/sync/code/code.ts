@@ -9,14 +9,13 @@ import { ensureFiles } from "./utlis/ensure-files";
 export const code = {
   internal: codeInternal,
   async init(id_site: string, note: string) {
-    const { frontend, server, typings } = this.internal;
     const root = `/code/${id_site}/site/src`;
-
-    await initFrontEnd(root, id_site);
-    await initServer(root, id_site);
 
     await ensureLib(root, id_site);
     await ensureFiles(root, id_site);
+
+    await initFrontEnd(root, id_site);
+    await initServer(root, id_site);
   },
   path(
     id_site: string,
