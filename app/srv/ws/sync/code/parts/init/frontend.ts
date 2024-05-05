@@ -1,12 +1,12 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import style from "@hyrious/esbuild-plugin-style";
 import { dir } from "dir";
-import { context } from "esbuild";
+import { BuildOptions, BuildResult, context } from "esbuild";
 import { removeAsync } from "fs-jetpack";
 import isEqual from "lodash.isequal";
+import { appendFile } from "node:fs/promises";
 import { code } from "../../code";
 import { buildTypes } from "./typings";
-import { appendFile } from "node:fs/promises";
 
 const decoder = new TextDecoder();
 export const initFrontEnd = async (root: string, id_site: string) => {
@@ -21,13 +21,12 @@ export const initFrontEnd = async (root: string, id_site: string) => {
 
   try {
     await isInstalling(id_site);
-
-    const build_path = dir.data(`code/${id_site}/site/build`);
-    await removeAsync(build_path);
+    const out_dir = dir.data(`code/${id_site}/site/build`);
+    await removeAsync(out_dir);
     const existing = await context({
       absWorkingDir: dir.data(root),
       entryPoints: ["index.tsx"],
-      outdir: build_path,
+      outdir: out_dir,
       format: "esm",
       bundle: true,
       minify: true,
@@ -52,6 +51,23 @@ export const initFrontEnd = async (root: string, id_site: string) => {
           name: "prasi",
           async setup(setup) {
             try {
+              await codeError(id_site, "Building...");
+              setup.onStart(async () => {
+                if (!(await isInstalling(id_site)))
+                  await codeError(id_site, "Building...");
+              });
+              setup.onEnd(async (res) => {
+                if (res.errors.length > 0) {
+                  if (!(await installDeps(root, res, id_site))) {
+                    await codeError(
+                      id_site,
+                      res.errors.map((e) => e.text).join("\n\n")
+                    );
+                  }
+                } else {
+                  await buildTypes(root, id_site);
+                }
+              });
             } catch (e) {
               console.log("ERROR");
             }
@@ -61,9 +77,9 @@ export const initFrontEnd = async (root: string, id_site: string) => {
     });
     code.internal.frontend[id_site] = existing;
     await existing.watch();
-  } catch (e) {
+  } catch (e: any) {
+    console.error("Error building front end", id_site);
     delete code.internal.frontend[id_site];
-    console.log("front end error", e);
   }
 };
 
@@ -82,8 +98,10 @@ const isInstalling = async (id_site: string) => {
   const file = Bun.file(path);
   try {
     const text = await file.text();
-    if (text.startsWith("Installing dependencies")) return true;
+    if (typeof text === "string" && text.startsWith("Installing dependencies"))
+      return true;
   } catch (e) {}
+
   return false;
 };
 
@@ -91,18 +109,81 @@ const readPackageJSON = async (id_site: string) => {
   const file = Bun.file(code.path(id_site, "site", "src", "package.json"));
   const deps = new Set<string>();
 
-  const json = await file.json();
+  if (await file.exists()) {
+    const json = await file.json();
 
-  if (json.dependencies) {
-    for (const k of Object.keys(json.dependencies)) {
-      deps.add(k);
+    if (json.dependencies) {
+      for (const k of Object.keys(json.dependencies)) {
+        deps.add(k);
+      }
     }
-  }
 
-  if (json.devDependencies) {
-    for (const k of Object.keys(json.devDependencies)) {
-      deps.add(k);
+    if (json.devDependencies) {
+      for (const k of Object.keys(json.devDependencies)) {
+        deps.add(k);
+      }
     }
   }
   return deps;
+};
+
+const installDeps = async (
+  root: string,
+  res: BuildResult<BuildOptions>,
+  id_site: string
+) => {
+  const pkgjson = await readPackageJSON(id_site);
+  const imports = new Set<string>();
+
+  if (!(await isInstalling(id_site))) await codeError(id_site, "");
+
+  if (res.errors.length > 0) {
+    for (const err of res.errors) {
+      if (err.notes?.[0].text.startsWith("You can mark the path ")) {
+        let im = err.notes?.[0].text.split('"')[1];
+
+        if (!im.startsWith("@")) {
+          im = im.split("/").shift() || "";
+        }
+
+        imports.add(im);
+      }
+    }
+  }
+
+  if (res.metafile) {
+    for (const [_, file] of Object.entries(res.metafile?.inputs || {})) {
+      for (const im of file.imports) {
+        if (im.kind === "import-statement" && im.external) {
+          if (!im.path.startsWith(".") && !im.path.startsWith("@/"))
+            imports.add(im.path);
+        }
+      }
+    }
+  }
+
+  if (!isEqual(imports, pkgjson)) {
+    await codeError(
+      id_site,
+      "Installing dependencies:\n " + [...imports].join("\n ")
+    );
+    let proc = Bun.spawn([`npm`, `install`, ...imports], {
+      stdio: ["inherit", "pipe", "pipe"],
+      cwd: dir.data(root),
+    });
+
+    async function print(generator: ReadableStream<Uint8Array>, prefix: any) {
+      for await (let value of generator) {
+        const str = decoder.decode(value);
+        await codeError(id_site, `${prefix} ${str}`, true);
+      }
+    }
+
+    print(proc.stdout, "stdout:");
+    print(proc.stderr, "stderr:");
+
+    await proc.exited;
+    await codeError(id_site, "");
+    return true;
+  }
 };

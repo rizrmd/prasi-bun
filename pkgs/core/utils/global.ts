@@ -3,6 +3,7 @@ import { Logger } from "pino";
 import { RadixRouter } from "radix3";
 import { syncronize } from "y-pojo";
 import type * as Y from "yjs";
+//@ts-ignore
 import { PrismaClient } from "../../../app/db/db";
 import { WSData } from "../server/create";
 import {
@@ -14,7 +15,6 @@ import { dbProxy } from "../../../app/web/src/base/load/db/db-proxy";
 type SingleRoute = {
   url: string;
   args: string[];
-  raw: boolean;
   fn: (...arg: any[]) => Promise<any>;
   path: string;
 };
