@@ -4,6 +4,7 @@ import { initServer } from "./parts/init/server";
 import { codeInternal } from "./parts/internal";
 import { ensureFiles } from "./utlis/ensure-files";
 import { ensureLib } from "./utlis/ensure-lib";
+import { initTypings } from "./parts/init/typings";
 
 export const code = {
   internal: codeInternal,
@@ -15,6 +16,7 @@ export const code = {
 
     await initFrontEnd(root, id_site);
     await initServer(root, id_site);
+    await initTypings(root, id_site);
   },
   path(
     id_site: string,

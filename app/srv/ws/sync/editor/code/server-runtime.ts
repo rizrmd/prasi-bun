@@ -20,9 +20,11 @@ if (!g.createServerRuntime) {
             db: dbProxy((site.config as any).api_url),
             api: null as any,
           };
-        } catch (e) { }
+        } catch (e) {
+          g.server_runtime[site_id] = null;
+        }
       } else {
-        g.server_runtime[site_id] = { db: null as any, api: null }
+        g.server_runtime[site_id] = { db: null as any, api: null };
       }
     }
   };

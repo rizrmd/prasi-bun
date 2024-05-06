@@ -1,9 +1,8 @@
 import type { OnMount } from "@monaco-editor/react";
 import { w } from "../types/general";
+import { prismaExtendType } from "./prisma-extend";
 import { baseTypings } from "./types/base";
 import { extractProp } from "./types/prop";
-import { prismaExtendType } from "./prisma-extend";
-import { propPopover } from "../../nova/ed/panel/side/prop-master/prop-form";
 export type MonacoEditor = Parameters<OnMount>[0];
 type Monaco = Parameters<OnMount>[1];
 
@@ -13,34 +12,33 @@ export const monacoTypings = async (
   p: {
     site_dts: string;
     site: { api_url: string };
+    site_exports: Record<string, any>;
     script: { siteTypes: Record<string, string> };
   },
   monaco: Monaco,
   prop: { values: Record<string, any>; types: Record<string, string> }
 ) => {
-  register(
-    monaco,
-    `
-declare module "momo" {
-  export type MO = "123";
-  export const MUU = "123";
-}
-  `,
-    "ts: momo.d.ts"
-  );
-
-  register(
-    monaco,
-    `
-declare global {
-  import * as _ from "momo"
-  const MUU = _.MUU;
-}
-export {}
-  `,
-    "ts: coba.d.ts"
-  );
-
+  if (p.site_dts) {
+    register(monaco, p.site_dts, "ts: site.d.ts");
+    register(
+      monaco,
+      `
+  declare global {
+    import * as _ from "index"
+    type MOKA = _.MOKA;
+    
+    ${Object.keys(p.site_exports)
+      .map((v) => {
+        return `
+    const ${v} = _.${v};`;
+      })
+      .join("\n")}
+  }
+  export {}
+    `,
+      "ts: active_global.d.ts"
+    );
+  }
 
   if (!map.has(prop.values)) {
     map.set(prop.values, true);
@@ -106,10 +104,6 @@ declare module "ts:prisma" {
       content: await loadText(
         "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/jsx-runtime.d.ts"
       ),
-    },
-    {
-      filePath: "site.d.ts",
-      content: p.site_dts.replaceAll("export declare const", "declare const"),
     },
   ]);
 

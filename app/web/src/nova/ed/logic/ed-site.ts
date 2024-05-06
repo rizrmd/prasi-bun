@@ -5,6 +5,8 @@ import { ESite, PG } from "./ed-global";
 export const loadSite = async (p: PG, site: ESite, note: string) => {
   p.site = site;
 
+  
+
   if (!p.script.db && !p.script.api) {
     if (!location.pathname.startsWith("/ed/")) {
       await viLoadLegacy({

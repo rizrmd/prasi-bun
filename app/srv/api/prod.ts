@@ -1,10 +1,15 @@
+import { parseFile } from "@swc/core";
 import { dir } from "dir";
 import { apiContext } from "service-srv";
 import { validate } from "uuid";
 import { prodIndex } from "../util/prod-index";
-import { gzipAsync } from "../ws/sync/entity/zlib";
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
+import { gzipAsync } from "../ws/sync/entity/zlib";
+import { visit } from "woodpile";
+import { parseTypeDef } from "../util/parse-type-def";
+import { Glob, build } from "bun";
+import { removeAsync } from "fs-jetpack";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -25,16 +30,85 @@ export const _ = {
       const action = pathname.split("/")[1];
 
       switch (action) {
-        case "code": {
-          const arr = pathname.split("/").slice(2);
-          const codepath = arr.join("/");
-          const build_path = code.path(site_id, "site", "build", codepath);
+        case "type_def": {
+          const path = dir.data(`/code/${site_id}/site/typings.d.ts`);
+          const file = Bun.file(path);
+          if (await file.exists()) {
+            const glob = new Glob("type_def*");
+            for await (const item of glob.scan(
+              dir.data(`/code/${site_id}/site`)
+            )) {
+              const stamp = parseInt(item.split(".")[1]);
+              if (file.lastModified !== stamp) {
+                await removeAsync(dir.data(`/code/${site_id}/site/${item}`));
+              } else {
+                return new Response(
+                  Bun.gzipSync(
+                    await Bun.file(
+                      dir.data(`/code/${site_id}/site/${item}`)
+                    ).arrayBuffer()
+                  ),
+                  {
+                    headers: {
+                      "content-type": "application/json",
+                      "content-encoding": "gzip",
+                    },
+                  }
+                );
+              }
+            }
+
+            const res = JSON.stringify(await parseTypeDef(path));
+            await Bun.write(
+              dir.data(
+                `/code/${site_id}/site/type_def.${file.lastModified}.json`
+              ),
+              res
+            );
+
+            return new Response(Bun.gzipSync(res), {
+              headers: {
+                "content-type": "application/json",
+                "content-encoding": "gzip",
+              },
+            });
+          }
+          return new Response("{}", {
+            headers: { "content-type": "application/json" },
+          });
+        }
+        case "typings.d.ts": {
+          const build_path = dir.data(`/code/${site_id}/site/typings.d.ts`);
           const file = Bun.file(build_path);
 
           if (!(await file.exists())) {
             const root = `/code/${site_id}/site/src`;
             await initFrontEnd(root, site_id);
-            return new Response("", { status: 403 });
+          }
+          const body = Bun.gzipSync(await file.arrayBuffer());
+
+          return new Response(body, {
+            headers: { "content-type": file.type, "content-encoding": "gzip" },
+          });
+        }
+        case "code": {
+          const arr = pathname.split("/").slice(2);
+          const codepath = arr.join("/");
+          const build_path = code.path(site_id, "site", "build", codepath);
+          let file = Bun.file(build_path);
+
+          if (!(await file.exists())) {
+            const root = `/code/${site_id}/site/src`;
+            await initFrontEnd(root, site_id, true);
+            await new Promise<void>((resolve) => {
+              const ival = setInterval(async () => {
+                file = Bun.file(build_path);
+                if (await file.exists()) {
+                  clearInterval(ival);
+                  resolve();
+                }
+              }, 100);
+            });
           }
           const body = Bun.gzipSync(await file.arrayBuffer());
 

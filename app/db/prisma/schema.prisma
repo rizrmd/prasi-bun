@@ -132,15 +132,6 @@ model site {
   page_folder    page_folder[]
   org            org?             @relation(fields: [id_org], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "site_id_organization_fkey")
   user           user             @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  site_query     site_query[]
-}
-
-model site_query {
-  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_site String? @db.Uuid
-  name    String?
-  query   String?
-  site    site?   @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "site")
 }
 
 model site_use_comp {

@@ -14,12 +14,12 @@ if (!g.server_main_handler) {
 }
 
 const serverMain = () => ({
-  handler: g.server_main_handler as Record<string, PrasiServer>,
+  handler: g.server_main_handler as Record<string, null | PrasiServer>,
   init_timeout: null as any,
   ws(action: keyof WebSocketHandler<WSData>, ...arg: any[]) {
     const id = arg[0].data.site_id;
     if (this.handler[id]) {
-      const handler = this.handler[id].ws;
+      const handler = this.handler[id]?.ws;
 
       if (handler) {
         const fn = handler[action] as any;
@@ -30,49 +30,47 @@ const serverMain = () => ({
       }
     }
   },
-  init(site_id: string) {
-    clearTimeout(this.init_timeout);
-    this.init_timeout = setTimeout(async () => {
-      const server_src_path = code.path(site_id, "server", "build", "index.js");
-      const file = Bun.file(server_src_path);
-      if (!this.handler[site_id] && (await file.exists()) && file.length) {
-        try {
-          delete require.cache[server_src_path];
-          const svr = require(server_src_path);
-          if (svr && typeof svr.server === "object") {
-            this.handler[site_id] = svr.server;
-            this.handler[site_id].site_id = site_id;
-            if (typeof svr.server.init === "function") {
-              svr.server.init({});
-            }
-            Bun.write(
-              Bun.file(code.path(site_id, "site", "src", "server.log")),
-              ""
-            );
-          } else {
-            const file = await Bun.file(server_src_path).text();
-            const log_path = code.path(site_id, "site", "src", "server.log");
-            if (file.length === 0) {
-              await Bun.write(Bun.file(log_path), "server.ts is empty");
-            } else {
-              await Bun.write(
-                Bun.file(log_path),
-                "server.ts does not return server object"
-              );
-            }
+  async init(site_id: string) {
+    this.handler[site_id] = null;
+    const server_src_path = code.path(site_id, "server", "build", "index.js");
+    const file = Bun.file(server_src_path);
+    if (!this.handler[site_id] && (await file.exists()) && file.length) {
+      try {
+        delete require.cache[server_src_path];
+        const svr = require(server_src_path);
+        if (svr && typeof svr.server === "object") {
+          this.handler[site_id] = svr.server;
+          svr.server.site_id = site_id;
+          if (typeof svr.server.init === "function") {
+            svr.server.init({});
           }
-        } catch (e: any) {
+          Bun.write(
+            Bun.file(code.path(site_id, "site", "src", "server.log")),
+            ""
+          );
+        } else {
           const file = await Bun.file(server_src_path).text();
           const log_path = code.path(site_id, "site", "src", "server.log");
           if (file.length === 0) {
             await Bun.write(Bun.file(log_path), "server.ts is empty");
           } else {
-            await Bun.write(Bun.file(log_path), e.message);
-            console.log(`Failed to init server ${site_id}\n`, log_path);
+            await Bun.write(
+              Bun.file(log_path),
+              "server.ts does not return server object"
+            );
           }
         }
+      } catch (e: any) {
+        const file = await Bun.file(server_src_path).text();
+        const log_path = code.path(site_id, "site", "src", "server.log");
+        if (file.length === 0) {
+          await Bun.write(Bun.file(log_path), "server.ts is empty");
+        } else {
+          await Bun.write(Bun.file(log_path), e.message);
+          console.log(`Failed to init server ${site_id}\n`, log_path);
+        }
       }
-    }, 10);
+    }
   },
   async http(
     site_id: string,
@@ -81,14 +79,15 @@ const serverMain = () => ({
     if (arg.url.pathname.endsWith("main.js")) {
       code.init(site_id, "init http");
     }
+
     if (typeof this.handler[site_id] === "undefined") {
       if (
         await existsAsync(code.path(site_id, "server", "build", "index.js"))
       ) {
-        this.init(site_id);
-        await waitUntil(200);
+        await this.init(site_id);
       }
     }
+
     const handler = this.handler[site_id];
 
     if (handler) {
