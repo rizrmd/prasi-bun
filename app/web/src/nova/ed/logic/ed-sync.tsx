@@ -184,13 +184,7 @@ export const edInitSync = (p: PG) => {
           p.render();
         },
         async code_changes({ ts }) {
-          const w = window as any;
-
-          const exports = await loadCode(p.site.id, ts);
-          for (const [k, v] of Object.entries(exports)) {
-            w[k] = v;
-            p.site_exports[k] = v;
-          }
+          await loadCode(p, ts);
           await treeRebuild(p);
           p.render();
         },

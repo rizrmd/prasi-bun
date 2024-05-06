@@ -32,7 +32,7 @@ export const g = global as unknown as {
   }) => Promise<Response | undefined>;
   server_runtime: Record<
     string,
-    {
+    null | {
       api: ReturnType<typeof apiProxy>;
       db: ReturnType<typeof dbProxy>;
     }
@@ -56,4 +56,5 @@ export const g = global as unknown as {
   apiPrepared: boolean;
   Y: typeof Y;
   syncronize: typeof syncronize;
+  static_cache: any;
 };

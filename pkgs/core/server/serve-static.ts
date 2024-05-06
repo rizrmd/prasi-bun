@@ -18,15 +18,25 @@ const web = {
     else return "static";
   },
 };
+
+if (!g.static_cache) {
+  g.static_cache = {};
+}
+
 const cache = {
-  static: {} as Record<
+  static: g.static_cache as Record<
     string,
     { type: string; content: any; compression: "" | "br" }
   >,
 };
 
-export const serveStatic: any = {
+export const serveStatic = {
   async init() {
+    if (g.mode === "dev") {
+      for (const k of Object.keys(cache.static)) {
+        delete cache.static[k];
+      }
+    }
     await this.walk();
     if (g.mode === "dev") {
       watch(dir.path(`app/static`), async (_, filename) => {
@@ -42,7 +52,7 @@ export const serveStatic: any = {
               };
             }
           } catch (e: any) {
-            cache.static = {}
+            cache.static = {};
           }
         }
       });
@@ -89,11 +99,12 @@ export const serveStatic: any = {
       });
     }
 
-    if (g.mode === 'dev' && url.pathname.endsWith('.js')) {
+    if (g.mode === "dev" && url.pathname.endsWith(".js")) {
       await this.walk();
     }
 
     file = cache.static["/index.html"];
+
     if (file) {
       return new Response(file.content, {
         headers: {

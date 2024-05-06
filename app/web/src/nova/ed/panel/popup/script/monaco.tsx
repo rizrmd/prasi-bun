@@ -98,7 +98,6 @@ export const EdScriptMonaco: FC<{}> = () => {
           if (p.ui.popup.script.mode === "js") {
             const w = window as any;
             const types: any = {};
-            const values: any = {};
             for (const prop_name of p.global_prop) {
               if (prop_name === "_types") continue;
               types[prop_name] = "any";
@@ -108,10 +107,6 @@ export const EdScriptMonaco: FC<{}> = () => {
               for (const [k, v] of Object.entries(w._types)) {
                 types[k] = v;
               }
-            }
-
-            for (const [k, v] of Object.entries(p.site_exports)) {
-              values[k] = v;
             }
 
             let component = { id: "", props: {} as Record<string, FNCompDef> };
@@ -185,6 +180,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             await monacoTypings(
               {
                 site_dts: p.site_dts,
+                site_exports: p.site_exports,
                 script: {
                   siteTypes: p.script.site_types,
                 },
@@ -193,7 +189,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               monaco,
               {
                 types,
-                values,
+                values: {},
               }
             );
             await jsMount(editor, monaco, p);

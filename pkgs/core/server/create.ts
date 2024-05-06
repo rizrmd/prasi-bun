@@ -16,8 +16,8 @@ export const cache = {
 
 export type WSData = { url: URL };
 
-export const createServer = async () => { 
-  await serveAPI.init(); 
+export const createServer = async () => {
+  await serveAPI.init();
   await serveStatic.init();
   const { wsHandler } = await import("../../../app/srv/ws/handler");
 
@@ -28,6 +28,7 @@ export const createServer = async () => {
     async fetch(req, server) {
       const url = new URL(req.url) as URL;
       const prasi = {};
+
       const handle = async (req: Request) => {
         if (wsHandler[url.pathname]) {
           if (

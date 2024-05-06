@@ -6,7 +6,7 @@ import { cleanPlugin } from "esbuild-clean-plugin";
 import isEqual from "lodash.isequal";
 import { appendFile } from "node:fs/promises";
 import { code } from "../../code";
-import { buildTypes } from "./typings";
+
 const decoder = new TextDecoder();
 export const initFrontEnd = async (
   root: string,
@@ -74,7 +74,6 @@ export const initFrontEnd = async (
                   await installDeps(root, res, id_site);
                 } else {
                   await codeError(id_site, "");
-                  await buildTypes(root, id_site);
                 }
               });
             } catch (e) {

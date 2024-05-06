@@ -34,10 +34,13 @@ glb.server_hook = async (arg) => {
     if (arr.length >= 3 && validate(site_id)) {
       try {
         if (!g.server_runtime[site_id]) {
-          await g.createServerRuntime(site_id);
+          if (g.server_runtime[site_id] !== null) {
+            await g.createServerRuntime(site_id);
+          }
         }
 
         const res = await server.http(site_id, arg);
+
         if (res instanceof Response) {
           return res;
         } else {

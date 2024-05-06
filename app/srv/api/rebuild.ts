@@ -2,6 +2,7 @@ import { apiContext } from "service-srv";
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 import { initServer } from "../ws/sync/code/parts/init/server";
+import { initTypings } from "../ws/sync/code/parts/init/typings";
 
 export const _ = {
   url: "/rebuild/:id_site",
@@ -13,6 +14,7 @@ export const _ = {
     delete server[id_site];
     await initFrontEnd(root, id_site, true);
     await initServer(root, id_site, true);
+    await initTypings(root, id_site, true);
 
     return "ok";
   },
