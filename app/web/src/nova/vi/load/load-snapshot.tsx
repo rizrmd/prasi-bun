@@ -6,6 +6,7 @@ import { w } from "../../../utils/types/general";
 import { PG } from "../../ed/logic/ed-global";
 import { treeRebuild } from "../../ed/logic/tree/build";
 import { simpleHash } from "../utils/simple-hash";
+import { loadCode } from "../../ed/logic/code-loader";
 
 const encoder = new TextEncoder();
 export const viLoadSnapshot = async (p: PG) => {
@@ -62,31 +63,5 @@ export const applyEnv = async (p: PG) => {
     w.api = apiProxy(p.site.config.api_url);
   }
 
-  const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${p.site_tstamp}`;
-  const fn = new Function(
-    "callback",
-    `
-try { 
-  return import("${url}")
-} catch(e) { 
-  console.log("Failed to load site code", e); 
-}`
-  );
-
-  await new Promise<void>(async (resolve) => {
-    try {
-      const exports = await fn();
-      if (exports) {
-        p.site_exports = {};
-        for (const [k, v] of Object.entries(exports)) {
-          p.site_exports[k] = v;
-          w[k] = v;
-        }
-      }
-      resolve();
-    } catch (e) {
-      console.log("Failed to load site code", e);
-      resolve();
-    }
-  });
+  await loadCode(p.site.id, p.site_tstamp);
 };

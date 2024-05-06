@@ -1,28 +1,34 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import style from "@hyrious/esbuild-plugin-style";
 import { dir } from "dir";
-import { BuildOptions, BuildResult, context } from "esbuild";
-import { removeAsync } from "fs-jetpack";
+import { BuildOptions, BuildResult, context, formatMessages } from "esbuild";
+import { cleanPlugin } from "esbuild-clean-plugin";
 import isEqual from "lodash.isequal";
 import { appendFile } from "node:fs/promises";
 import { code } from "../../code";
 import { buildTypes } from "./typings";
-
 const decoder = new TextDecoder();
-export const initFrontEnd = async (root: string, id_site: string) => {
+export const initFrontEnd = async (
+  root: string,
+  id_site: string,
+  force?: boolean
+) => {
   let existing = code.internal.frontend[id_site];
 
   if (existing) {
-    try {
-      await existing.dispose();
-      delete code.internal.frontend[id_site];
-    } catch (e) {}
+    if (force) {
+      try {
+        await existing.dispose();
+        delete code.internal.frontend[id_site];
+      } catch (e) {}
+    } else {
+      return;
+    }
   }
 
   try {
     await isInstalling(id_site);
     const out_dir = dir.data(`code/${id_site}/site/build`);
-    await removeAsync(out_dir);
     const existing = await context({
       absWorkingDir: dir.data(root),
       entryPoints: ["index.tsx"],
@@ -36,6 +42,7 @@ export const initFrontEnd = async (root: string, id_site: string) => {
       sourcemap: true,
       metafile: true,
       plugins: [
+        cleanPlugin(),
         style(),
         globalExternals({
           react: {
@@ -58,13 +65,15 @@ export const initFrontEnd = async (root: string, id_site: string) => {
               });
               setup.onEnd(async (res) => {
                 if (res.errors.length > 0) {
-                  if (!(await installDeps(root, res, id_site))) {
-                    await codeError(
-                      id_site,
-                      res.errors.map((e) => e.text).join("\n\n")
-                    );
-                  }
+                  await codeError(
+                    id_site,
+                    (await formatMessages(res.errors, { kind: "error" })).join(
+                      "\n\n"
+                    )
+                  );
+                  await installDeps(root, res, id_site);
                 } else {
+                  await codeError(id_site, "");
                   await buildTypes(root, id_site);
                 }
               });
@@ -134,8 +143,6 @@ const installDeps = async (
 ) => {
   const pkgjson = await readPackageJSON(id_site);
   const imports = new Set<string>();
-
-  if (!(await isInstalling(id_site))) await codeError(id_site, "");
 
   if (res.errors.length > 0) {
     for (const err of res.errors) {

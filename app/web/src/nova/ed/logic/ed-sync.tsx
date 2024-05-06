@@ -10,6 +10,7 @@ import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 import { updateComponentMeta } from "./comp/load";
 import { createRouter, RadixRouter } from "radix3";
+import { loadCode } from "./code-loader";
 
 const decoder = new TextDecoder();
 
@@ -185,24 +186,10 @@ export const edInitSync = (p: PG) => {
         async code_changes({ ts }) {
           const w = window as any;
 
-          const url = `/prod/${p.site.id}/_prasi/code/index.js?ts=${ts}`;
-          const fn = new Function(
-            "callback",
-            `import("${url}").then(callback)`
-          );
-          try {
-            await new Promise<void>((resolve) => {
-              fn((exports: any) => {
-                p.site_exports = {};
-                for (const [k, v] of Object.entries(exports)) {
-                  p.site_exports[k] = v;
-                  w[k] = v;
-                }
-                resolve();
-              });
-            });
-          } catch (e) {
-            console.log("Failed to load site code", e);
+          const exports = await loadCode(p.site.id, ts);
+          for (const [k, v] of Object.entries(exports)) {
+            w[k] = v;
+            p.site_exports[k] = v;
           }
           await treeRebuild(p);
           p.render();

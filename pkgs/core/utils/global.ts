@@ -21,6 +21,7 @@ type SingleRoute = {
 
 export const g = global as unknown as {
   status: "init" | "ready";
+  server_main_handler: any;
   server_hook?: (arg: {
     url: URL;
     req: Request;
