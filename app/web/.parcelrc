@@ -9,7 +9,6 @@
   "packagers": {
     "*.wasm": "@parcel/packager-wasm"
   },
-
   "transformers": {
     "*.wasm": [
       "...",

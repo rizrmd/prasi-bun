@@ -18,6 +18,30 @@ export const monacoTypings = async (
   monaco: Monaco,
   prop: { values: Record<string, any>; types: Record<string, string> }
 ) => {
+  register(
+    monaco,
+    `
+declare module "momo" {
+  export type MO = "123";
+  export const MUU = "123";
+}
+  `,
+    "ts: momo.d.ts"
+  );
+
+  register(
+    monaco,
+    `
+declare global {
+  import * as _ from "momo"
+  const MUU = _.MUU;
+}
+export {}
+  `,
+    "ts: coba.d.ts"
+  );
+
+
   if (!map.has(prop.values)) {
     map.set(prop.values, true);
   } else {

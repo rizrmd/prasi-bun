@@ -11,8 +11,8 @@ export const _ = {
     const root = `/code/${id_site}/site/src`;
     delete frontend[id_site];
     delete server[id_site];
-    await initFrontEnd(root, id_site);
-    await initServer(root, id_site);
+    await initFrontEnd(root, id_site, true);
+    await initServer(root, id_site, true);
 
     return "ok";
   },

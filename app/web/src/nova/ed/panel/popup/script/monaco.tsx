@@ -338,7 +338,6 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             } else {
               editorLocalValue[active.item_id] = null;
-
               const code_result = await p.sync.code.edit({
                 type: "adv",
                 mode: mode,

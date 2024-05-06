@@ -9,8 +9,12 @@ import { prodIndex } from "../../../../util/prod-index";
 import { code } from "../../code/code";
 import "./server-runtime";
 
+if (!g.server_main_handler) {
+  g.server_main_handler = {};
+}
+
 const serverMain = () => ({
-  handler: {} as Record<string, PrasiServer>,
+  handler: g.server_main_handler as Record<string, PrasiServer>,
   init_timeout: null as any,
   ws(action: keyof WebSocketHandler<WSData>, ...arg: any[]) {
     const id = arg[0].data.site_id;
@@ -29,42 +33,45 @@ const serverMain = () => ({
   init(site_id: string) {
     clearTimeout(this.init_timeout);
     this.init_timeout = setTimeout(async () => {
-      // const server_src_path = code.path(site_id, "server", "build", "index.js");
-      // try {
-      //   delete require.cache[server_src_path];
-      //   const svr = require(server_src_path);
-      //   if (svr && typeof svr.server === "object") {
-      //     this.handler[site_id] = svr.server;
-      //     this.handler[site_id].site_id = site_id;
-      //     if (typeof svr.server.init === "function") {
-      //       svr.server.init({});
-      //     }
-      //     Bun.write(
-      //       Bun.file(code.path(site_id, "site", "src", "server.log")),
-      //       ""
-      //     );
-      //   } else {
-      //     const file = await Bun.file(server_src_path).text();
-      //     const log_path = code.path(site_id, "site", "src", "server.log");
-      //     if (file.length === 0) {
-      //       await Bun.write(Bun.file(log_path), "server.ts is empty");
-      //     } else {
-      //       await Bun.write(
-      //         Bun.file(log_path),
-      //         "server.ts does not return server object"
-      //       );
-      //     }
-      //   }
-      // } catch (e: any) {
-      //   const file = await Bun.file(server_src_path).text();
-      //   const log_path = code.path(site_id, "site", "src", "server.log");
-      //   if (file.length === 0) {
-      //     await Bun.write(Bun.file(log_path), "server.ts is empty");
-      //   } else {
-      //     await Bun.write(Bun.file(log_path), e.message);
-      //     console.log(`Failed to init server ${site_id}\n`, log_path);
-      //   }
-      // }
+      const server_src_path = code.path(site_id, "server", "build", "index.js");
+      const file = Bun.file(server_src_path);
+      if (!this.handler[site_id] && (await file.exists()) && file.length) {
+        try {
+          delete require.cache[server_src_path];
+          const svr = require(server_src_path);
+          if (svr && typeof svr.server === "object") {
+            this.handler[site_id] = svr.server;
+            this.handler[site_id].site_id = site_id;
+            if (typeof svr.server.init === "function") {
+              svr.server.init({});
+            }
+            Bun.write(
+              Bun.file(code.path(site_id, "site", "src", "server.log")),
+              ""
+            );
+          } else {
+            const file = await Bun.file(server_src_path).text();
+            const log_path = code.path(site_id, "site", "src", "server.log");
+            if (file.length === 0) {
+              await Bun.write(Bun.file(log_path), "server.ts is empty");
+            } else {
+              await Bun.write(
+                Bun.file(log_path),
+                "server.ts does not return server object"
+              );
+            }
+          }
+        } catch (e: any) {
+          const file = await Bun.file(server_src_path).text();
+          const log_path = code.path(site_id, "site", "src", "server.log");
+          if (file.length === 0) {
+            await Bun.write(Bun.file(log_path), "server.ts is empty");
+          } else {
+            await Bun.write(Bun.file(log_path), e.message);
+            console.log(`Failed to init server ${site_id}\n`, log_path);
+          }
+        }
+      }
     }, 10);
   },
   async http(

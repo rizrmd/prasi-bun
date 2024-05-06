@@ -3,10 +3,18 @@ import { context } from "esbuild";
 import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { code } from "../../code";
 
-export const initServer = async (root: string, id_site: string) => {
+export const initServer = async (
+  root: string,
+  id_site: string,
+  force?: boolean
+) => {
   const existing = code.internal.server[id_site];
   if (existing) {
-    await existing.dispose();
+    if (force) {
+      await existing.dispose();
+    } else {
+      return;
+    }
   }
 
   const build_path = code.path(id_site, "server", "build");
@@ -84,4 +92,6 @@ export const initServer = async (root: string, id_site: string) => {
       }`,
     },
   });
+
+  await code.internal.server[id_site].watch();
 };

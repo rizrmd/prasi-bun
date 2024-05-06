@@ -34,10 +34,13 @@ export const _ = {
           if (!(await file.exists())) {
             const root = `/code/${site_id}/site/src`;
             await initFrontEnd(root, site_id);
-            return new Response("Code file not found", { status: 403 });
+            return new Response("", { status: 403 });
           }
+          const body = Bun.gzipSync(await file.arrayBuffer());
 
-          return new Response(file);
+          return new Response(body, {
+            headers: { "content-type": file.type, "content-encoding": "gzip" },
+          });
         }
         case "route": {
           const site = await _db.site.findFirst({
