@@ -180,6 +180,7 @@ export const EdScriptMonaco: FC<{}> = () => {
             await monacoTypings(
               {
                 site_dts: p.site_dts,
+                site_dts_entry: p.site_dts_entry,
                 site_exports: p.site_exports,
                 script: {
                   siteTypes: p.script.site_types,

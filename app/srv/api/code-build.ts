@@ -12,6 +12,7 @@ export const _ = {
         const res = await transform(`return ${src}`, {
           jsx: "transform",
           format: "cjs",
+          logLevel: "silent",
           loader: "tsx",
         });
 
