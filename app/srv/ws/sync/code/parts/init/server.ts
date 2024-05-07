@@ -2,6 +2,8 @@ import { dir } from "dir";
 import { context } from "esbuild";
 import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { code } from "../../code";
+import { g } from "utils/global";
+import { server } from "../../../editor/code/server-main";
 
 export const initServer = async (
   root: string,
@@ -35,6 +37,17 @@ export const initServer = async (
     treeShaking: true,
     format: "cjs",
     logLevel: "silent",
+    plugins: [
+      {
+        name: "prasi",
+        setup(build) {
+          build.onEnd(() => {
+            delete server.handler[id_site];
+            server.init(id_site);
+          });
+        },
+      },
+    ],
     banner: {
       js: `\
       const _fs = require('node:fs/promises');
