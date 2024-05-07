@@ -17,7 +17,6 @@ RUN unzip -o dockerzip
 RUN bun install
 
 COPY . .
-RUN bun run build
 
 EXPOSE 4550/tcp
 
