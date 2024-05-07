@@ -8,16 +8,12 @@ type Monaco = Parameters<OnMount>[1];
 
 const map = new WeakMap<any>();
 
-export const monacoTypings = async (
+export const registerSiteTypings = (
+  monaco: Monaco,
   p: {
     site_dts: string;
     site_dts_entry: any;
-    site: { api_url: string };
-    site_exports: Record<string, any>;
-    script: { siteTypes: Record<string, string> };
-  },
-  monaco: Monaco,
-  prop: { values: Record<string, any>; types: Record<string, string> }
+  }
 ) => {
   if (p.site_dts) {
     register(monaco, p.site_dts, "ts:site.d.ts");
@@ -38,7 +34,20 @@ export const monacoTypings = async (
       "ts:active_global.d.ts"
     );
   }
+};
 
+export const monacoTypings = async (
+  p: {
+    site_dts: string;
+    site_dts_entry: any;
+    site: { api_url: string };
+    site_exports: Record<string, any>;
+    script: { siteTypes: Record<string, string> };
+  },
+  monaco: Monaco,
+  prop: { values: Record<string, any>; types: Record<string, string> }
+) => {
+  registerSiteTypings(monaco, p);
   if (!map.has(prop.values)) {
     map.set(prop.values, true);
   } else {
@@ -94,15 +103,19 @@ declare module "ts:prisma" {
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([
     {
       filePath: "react.d.ts",
-      content: await loadText(
-        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/index.d.ts"
-      ),
+      content: `declare module "react" {
+${await loadText("https://cdn.jsdelivr.net/npm/@types/react@18.3.1/index.d.ts")}
+}`,
     },
     {
       filePath: "jsx-runtime.d.ts",
-      content: await loadText(
-        "https://cdn.jsdelivr.net/npm/@types/react@18.2.0/jsx-runtime.d.ts"
-      ),
+      content: `declare module "react/jsx-runtime" {
+${(
+  await loadText(
+    "https://cdn.jsdelivr.net/npm/@types/react@18.3.1/jsx-runtime.d.ts"
+  )
+).replaceAll('from "./"', 'from "react"')}
+}`,
     },
   ]);
 

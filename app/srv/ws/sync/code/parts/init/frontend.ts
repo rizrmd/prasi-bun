@@ -6,6 +6,10 @@ import { cleanPlugin } from "esbuild-clean-plugin";
 import isEqual from "lodash.isequal";
 import { appendFile } from "node:fs/promises";
 import { code } from "../../code";
+import { user } from "../../../entity/user";
+import { conns } from "../../../entity/conn";
+import { SyncType } from "../../../type";
+import { sendWS } from "../../../sync-handler";
 
 const decoder = new TextDecoder();
 export const initFrontEnd = async (
@@ -74,6 +78,22 @@ export const initFrontEnd = async (
                   await installDeps(root, res, id_site);
                 } else {
                   await codeError(id_site, "");
+
+                  const client_ids = new Set<string>();
+                  user.active.findAll({ site_id: id_site }).forEach((e) => {
+                    client_ids.add(e.client_id);
+                  });
+
+                  const now = Date.now();
+                  client_ids.forEach((client_id) => {
+                    const ws = conns.get(client_id)?.ws;
+                    if (ws)
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        event: "code_changes",
+                        data: { ts: now, mode: "frontend" },
+                      });
+                  });
                 }
               });
             } catch (e) {

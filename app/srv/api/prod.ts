@@ -58,20 +58,22 @@ export const _ = {
               }
             }
 
-            const res = JSON.stringify(await parseTypeDef(path));
-            await Bun.write(
-              dir.data(
-                `/code/${site_id}/site/type_def.${file.lastModified}.json`
-              ),
-              res
-            );
+            try {
+              const res = JSON.stringify(await parseTypeDef(path));
+              await Bun.write(
+                dir.data(
+                  `/code/${site_id}/site/type_def.${file.lastModified}.json`
+                ),
+                res
+              );
 
-            return new Response(Bun.gzipSync(res), {
-              headers: {
-                "content-type": "application/json",
-                "content-encoding": "gzip",
-              },
-            });
+              return new Response(Bun.gzipSync(res), {
+                headers: {
+                  "content-type": "application/json",
+                  "content-encoding": "gzip",
+                },
+              });
+            } catch (e) {}
           }
           return new Response("{}", {
             headers: { "content-type": "application/json" },
@@ -79,17 +81,25 @@ export const _ = {
         }
         case "typings.d.ts": {
           const build_path = dir.data(`/code/${site_id}/site/typings.d.ts`);
-          const file = Bun.file(build_path);
+          let file = Bun.file(build_path);
 
           if (!(await file.exists())) {
             const root = `/code/${site_id}/site/src`;
             await initFrontEnd(root, site_id);
+            file = Bun.file(build_path);
           }
-          const body = Bun.gzipSync(await file.arrayBuffer());
 
-          return new Response(body, {
-            headers: { "content-type": file.type, "content-encoding": "gzip" },
-          });
+          if (await file.exists()) {
+            const body = Bun.gzipSync(await file.arrayBuffer());
+
+            return new Response(body, {
+              headers: {
+                "content-type": file.type,
+                "content-encoding": "gzip",
+              },
+            });
+          }
+          return new Response("", { status: 403 });
         }
         case "code": {
           const arr = pathname.split("/").slice(2);

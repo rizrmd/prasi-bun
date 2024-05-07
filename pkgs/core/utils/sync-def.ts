@@ -47,18 +47,24 @@ export const ${name}: SAction${saction} = async function (
     index_js.push(`export * from "./${name}";`);
   }
 
-  await writeAsync(
-    dir.path(`app/srv/ws/sync/actions/index.ts`),
-    index_js.join("\n")
-  );
+  const existing = await Bun.file(
+    dir.path(`app/srv/ws/sync/actions/index.ts`)
+  ).text();
 
-  const content = `\
+  if (existing !== index_js.join("\n")) {
+    await writeAsync(
+      dir.path(`app/srv/ws/sync/actions/index.ts`),
+      index_js.join("\n")
+    );
+
+    const content = `\
 export const SyncActionDefinition = ${JSON.stringify(def, null, 2)};
 export const SyncActionPaths = ${JSON.stringify(paths, null, 2)};
 `;
 
-  const path = dir.path("app/srv/ws/sync/actions-def.ts");
-  if ((await readAsync(path)) !== content) {
-    await writeAsync(path, content);
+    const path = dir.path("app/srv/ws/sync/actions-def.ts");
+    if ((await readAsync(path)) !== content) {
+      await writeAsync(path, content);
+    }
   }
 };

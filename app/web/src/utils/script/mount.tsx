@@ -40,7 +40,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   }
 
   const compilerOptions: CompilerOptions = {
-    jsx: monaco.languages.typescript.JsxEmit.ReactNative,
+    jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
     jsxFactory: "React.createElement",
     jsxFragmentFactory: "React.Fragment",
     target: monaco.languages.typescript.ScriptTarget.ES2015,

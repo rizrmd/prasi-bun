@@ -10,7 +10,6 @@ export const parseTypeDef = async (path: string) => {
   const ast = await parseFile(path, { syntax: "typescript" });
 
   const exports = {} as Record<string, SingleExport[]>;
-
   visit(ast, {
     visitWithPath: {
       visitDecl(node, path) {

@@ -52,9 +52,14 @@ export const EdScriptMonaco: FC<{}> = () => {
   let val = "";
   useEffect(() => {
     return () => {
+      p.ui.monaco = null;
       p.script.do_edit = async () => {};
     };
   }, []);
+
+  if (local.monaco) {
+    p.ui.monaco = local.monaco;
+  }
 
   useEffect(() => {
     clearTimeout(scriptEdit.timeout);
