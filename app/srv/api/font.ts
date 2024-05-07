@@ -31,21 +31,29 @@ export const _ = {
       }
     }
     let f: Response = null as any;
+    let raw = false;
     if (pathname?.startsWith("/s/")) {
       f = await fetch(`https://fonts.gstatic.com${pathname}`);
+      raw = true;
     } else {
       f = await fetch(`https://fonts.googleapis.com${pathname}`);
     }
     if (f) {
-      const body = await f.text();
+      let body = null as any;
+
+      if (!raw) {
+        body = await f.text();
+        body = body.replaceAll("https://fonts.gstatic.com", "/_font");
+      } else {
+        body = await f.arrayBuffer();
+      }
+
       g._font_cache[pathname] = { body, headers: {} };
       f.headers.forEach((v, k) => {
         g._font_cache[pathname].headers[k] = v;
       });
 
-      const res = new Response(
-        body.replaceAll("https://fonts.gstatic.com", "/_font")
-      );
+      const res = new Response(body);
 
       res.headers.set("content-type", f.headers.get("content-type") || "");
       return res;

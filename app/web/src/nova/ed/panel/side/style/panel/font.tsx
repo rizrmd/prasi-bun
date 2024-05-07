@@ -240,7 +240,7 @@ export const PanelFont: FC<{
                 const doc = document;
                 let weight = `:wght@${[300, 400, 500, 600].join(";")}`;
                 let fontName = item.value.replace(/ /g, "+");
-                const _href = `https://api.fonts.coollabs.io/css2?family=${fontName}${weight}`;
+                const _href = `/_font/css2?family=${fontName}${weight}`;
                 if (!doc.querySelector(`link[href="${_href}]`)) {
                   const link = doc.createElement("link");
                   link.type = "text/css";
