@@ -60,6 +60,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
             if (mode === "js") {
               res = await transform(`render(${src})`, {
                 jsx: "transform",
+                logLevel: "silent",
                 format: "cjs",
                 loader: "tsx",
               });

@@ -152,6 +152,7 @@ export const EDGlobal = {
   site_tstamp: Date.now(),
   site_exports: {} as Record<string, any>,
   site_dts: "",
+  site_dts_entry: {} as any,
   script: {
     site_types: {} as Record<string, string>,
     loaded: false,

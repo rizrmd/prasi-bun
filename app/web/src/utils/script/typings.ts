@@ -11,6 +11,7 @@ const map = new WeakMap<any>();
 export const monacoTypings = async (
   p: {
     site_dts: string;
+    site_dts_entry: any;
     site: { api_url: string };
     site_exports: Record<string, any>;
     script: { siteTypes: Record<string, string> };
@@ -19,24 +20,22 @@ export const monacoTypings = async (
   prop: { values: Record<string, any>; types: Record<string, string> }
 ) => {
   if (p.site_dts) {
-    register(monaco, p.site_dts, "ts: site.d.ts");
+    register(monaco, p.site_dts, "ts:site.d.ts");
     register(
       monaco,
       `
   declare global {
     import * as _ from "index"
-    type MOKA = _.MOKA;
-    
-    ${Object.keys(p.site_exports)
-      .map((v) => {
+    ${Object.entries(p.site_dts_entry)
+      .map(([name, type]) => {
         return `
-    const ${v} = _.${v};`;
+    ${type} ${name} = _.${name};`;
       })
       .join("\n")}
   }
   export {}
     `,
-      "ts: active_global.d.ts"
+      "ts:active_global.d.ts"
     );
   }
 
