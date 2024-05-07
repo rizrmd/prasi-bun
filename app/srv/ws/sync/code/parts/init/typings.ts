@@ -4,6 +4,10 @@ import { watch } from "fs";
 import { Glob } from "bun";
 import { removeAsync } from "fs-jetpack";
 import { parseTypeDef } from "../../../../../util/parse-type-def";
+import { user } from "../../../entity/user";
+import { conns } from "../../../entity/conn";
+import { sendWS } from "../../../sync-handler";
+import { SyncType } from "../../../type";
 export const initTypings = async (
   root: string,
   id_site: string,
@@ -21,9 +25,15 @@ export const initTypings = async (
   }
 
   try {
+    const typings_path = dir.data(`/code/${id_site}/site/typings.d.ts`);
+    const typings_file = Bun.file(typings_path);
+
+    if (!(await typings_file.exists())) {
+      return false;
+    }
     code.internal.typings[id_site] = {
       timeout: Date.now(),
-      watch: watch(dir.data(`/code/${id_site}/site/typings.d.ts`)),
+      watch: watch(typings_path),
       spawn: Bun.spawn({
         cmd: [
           ...`tsc --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
@@ -69,6 +79,22 @@ export const initTypings = async (
           dir.data(`/code/${id_site}/site/type_def.${file.lastModified}.json`),
           res
         );
+
+        const client_ids = new Set<string>();
+        user.active.findAll({ site_id: id_site }).forEach((e) => {
+          client_ids.add(e.client_id);
+        });
+
+        const now = Date.now();
+        client_ids.forEach((client_id) => {
+          const ws = conns.get(client_id)?.ws;
+          if (ws)
+            sendWS(ws, {
+              type: SyncType.Event,
+              event: "code_changes",
+              data: { ts: now, mode: "typings" },
+            });
+        });
       }, 180);
     });
   } catch (e) {

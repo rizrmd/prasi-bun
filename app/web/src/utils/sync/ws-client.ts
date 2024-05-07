@@ -97,7 +97,7 @@ export const clientStartSync = async (arg: {
         }
       >
     ) => void;
-    code_changes: (arg: { ts: number }) => void;
+    code_changes: (arg: { ts: number; mode: "frontend" | "typings" }) => void;
     disconnected: () => { reconnect: boolean };
     opened: () => void;
     shakehand: (client_id: string) => void;

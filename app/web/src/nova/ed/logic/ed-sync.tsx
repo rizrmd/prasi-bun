@@ -10,7 +10,8 @@ import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 import { updateComponentMeta } from "./comp/load";
 import { createRouter, RadixRouter } from "radix3";
-import { loadCode } from "./code-loader";
+import { loadCode, loadFrontEnd, loadTypings } from "./code-loader";
+import { registerSiteTypings } from "../../../utils/script/typings";
 
 const decoder = new TextDecoder();
 
@@ -183,8 +184,16 @@ export const edInitSync = (p: PG) => {
           }
           p.render();
         },
-        async code_changes({ ts }) {
-          await loadCode(p, ts);
+        async code_changes({ ts, mode }) {
+          if (mode === "frontend") {
+            await loadFrontEnd(p, ts);
+          } else {
+            console.log("Code updated");
+            await loadTypings(p);
+            if (p.ui.monaco) {
+              registerSiteTypings(p.ui.monaco, p);
+            }
+          }
           await treeRebuild(p);
           p.render();
         },

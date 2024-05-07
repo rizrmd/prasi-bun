@@ -1,18 +1,28 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./lib/*"],
-      "app/*": ["./app/*"],
-      "server/*": ["./server/*"]
+      "lib/*": [
+        "./lib/*"
+      ],
+      "app/*": [
+        "./app/*"
+      ],
+      "server/*": [
+        "./server/*"
+      ],
+      "@/*": [
+        "./lib/*"
+      ]
     },
-    "lib": ["ESNext", "DOM"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "declaration": true,
-    "outFile": "types.d.ts",
-    "emitDeclarationOnly": true,
+    "moduleResolution": "Node",
+    "noEmit": true,
     "composite": true,
     "strict": true,
     "downlevelIteration": true,
@@ -21,6 +31,9 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "typeRoots": ["./node_modules/@types", "./lib/types"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./lib/types"
+    ]
   }
 }

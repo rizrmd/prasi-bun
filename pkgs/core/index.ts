@@ -13,7 +13,6 @@ import { ensureNotRunning } from "./utils/ensure";
 import { g } from "./utils/global";
 import { createLogger } from "./utils/logger";
 import { preparePrisma } from "./utils/prisma";
-// import "../docker-prep";
 
 g.status = "init";
 
