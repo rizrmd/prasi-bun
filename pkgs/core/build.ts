@@ -98,5 +98,3 @@ if (files) {
 		);
 	}
 }
-
-await import("./build-site");
