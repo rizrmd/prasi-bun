@@ -14,15 +14,13 @@ import {
 const brotli = await brotliPromise;
 
 const glob = new Glob("**");
-const swrc = {
-  filesToCache: [] as string[],
-};
+const public_files = [] as string[];
 for await (const file of glob.scan(dir.path("app/web/public"))) {
-  swrc.filesToCache.push(`public/${file}`);
+  public_files.push(file);
 }
 await Bun.write(
-  dir.path("app/web/.service-worker-rc"),
-  JSON.stringify(swrc, null, 2)
+  dir.path("app/web/public_files.ts"),
+  `export const files = ${JSON.stringify(public_files, null, 2)}`
 );
 
 await removeAsync(dir.path("app/web/.parcel-cache"));
