@@ -2,6 +2,10 @@
   "extends": [
     "@parcel/config-default"
   ],
+  "runtimes": [
+    "parcel-runtime-custom-service-worker",
+    "..."
+  ],
   "reporters": [
     "...",
     "@tinijs/parcel-reporter-copy-public"
