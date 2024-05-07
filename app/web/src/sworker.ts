@@ -1,6 +1,7 @@
-import { manifest } from "parcel-plugin-custom-service-worker";
+import { manifest } from "@parcel/service-worker";
 import { RadixRouter, createRouter } from "radix3";
 import { version } from "../timestamp";
+import { files } from "../public_files";
 
 const g = {
   router: null as null | RadixRouter<any>,
@@ -18,7 +19,7 @@ const g = {
 
 async function install() {
   const cache = await caches.open(version);
-  await cache.addAll(manifest);
+  await cache.addAll([...manifest, ...files]);
   g.broadcast({ type: "installed" });
 }
 addEventListener("install", (e) => (e as ExtendableEvent).waitUntil(install()));
