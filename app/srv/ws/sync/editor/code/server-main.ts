@@ -2,7 +2,6 @@ import type { Server, WebSocketHandler } from "bun";
 import { existsAsync } from "fs-jetpack";
 import _fs from "node:fs/promises";
 import { g } from "utils/global";
-import { waitUntil } from "web-utils";
 import { WSData } from "../../../../../../pkgs/core/server/create";
 import { prodIndex } from "../../../../util/prod-index";
 
@@ -11,6 +10,10 @@ import "./server-runtime";
 
 if (!g.server_main_handler) {
   g.server_main_handler = {};
+}
+
+if (!g.server_handle_timeout) {
+  g.server_handle_timeout = {};
 }
 
 const serverMain = () => ({
@@ -34,7 +37,8 @@ const serverMain = () => ({
     this.handler[site_id] = null;
     const server_src_path = code.path(site_id, "server", "build", "index.js");
     const file = Bun.file(server_src_path);
-    if (!this.handler[site_id] && (await file.exists()) && file.length) {
+
+    if (!this.handler[site_id] && (await file.exists()) && file.size) {
       try {
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
@@ -89,6 +93,13 @@ const serverMain = () => ({
     }
 
     const handler = this.handler[site_id];
+
+    if (handler === null) {
+      clearTimeout(g.server_handle_timeout[site_id]);
+      g.server_handle_timeout[site_id] = setTimeout(() => {
+        this.init(site_id);
+      }, 1000);
+    }
 
     if (handler) {
       if (!handler.site_id) handler.site_id = site_id;
