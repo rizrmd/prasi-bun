@@ -144,6 +144,11 @@ declare global {
         where: any 
       }[]
     ) => Promise<void>;
+    upsert: (arg: {
+      table: string;
+      where: any;
+      data: any[];
+    }) => Promise<void>;
   };
   _schema: {
     tables: () => Promise<string[]>;
@@ -318,4 +323,4 @@ ${e}`,c.pop(),`[${t}]`}let I=Object.keys(s),h=I.length;if(0===h)return"{}";if(g<
 ${d}`,p="",f="",u=Math.min(h,l);a(s)&&(p+=B(s,E,l),I=I.slice(s.length),u-=s.length,f=E),r&&(I=n(I)),c.push(s);for(let e=0;e<u;e++){let t=I[e],i=A(t,s[t],c,C,d);void 0!==i&&(p+=`${f}${o(t)}: ${i}`,f=E)}return h>l&&(p+=`${f}"...": "${Q(h-l)} not stringified"`,f=E),""!==f&&(p=`
 ${d}${p}
 ${e}`),c.pop(),`{${p}}`}case"number":return isFinite(s)?String(s):e?e(s):"null";case"boolean":return!0===s?"true":"false";case"undefined":return;case"bigint":if(I)return String(s);default:return e?e(s):void 0}}("",A,[],c,"")}return function A(i,s,c){switch(typeof s){case"string":return o(s);case"object":{if(null===s)return"null";if("function"==typeof s.toJSON){if("object"!=typeof(s=s.toJSON(i)))return A(i,s,c);if(null===s)return"null"}if(-1!==c.indexOf(s))return t;let e="";if(Array.isArray(s)){if(0===s.length)return"[]";if(g<c.length+1)return'"[Array]"';c.push(s);let t=Math.min(s.length,l),i=0;for(;i<t-1;i++){let t=A(String(i),s[i],c);e+=(void 0!==t?t:"null")+","}let I=A(String(i),s[i],c);if(e+=void 0!==I?I:"null",s.length-1>l){let A=s.length-l-1;e+=`,"... ${Q(A)} not stringified"`}return c.pop(),`[${e}]`}let I=Object.keys(s),C=I.length;if(0===C)return"{}";if(g<c.length+1)return'"[Object]"';let d="",h=Math.min(C,l);a(s)&&(e+=B(s,",",l),I=I.slice(s.length),h-=s.length,d=","),r&&(I=n(I)),c.push(s);for(let t=0;t<h;t++){let i=I[t],r=A(i,s[i],c);void 0!==r&&(e+=`${d}${o(i)}:${r}`,d=",")}return C>l&&(e+=`${d}"...":"${Q(C-l)} not stringified"`),c.pop(),`{${e}}`}case"number":return isFinite(s)?String(s):e?e(s):"null";case"boolean":return!0===s?"true":"false";case"undefined":return;case"bigint":if(I)return String(s);default:return e?e(s):void 0}}("",A,[])}}},{}],"6Bu6A":[function(A,e,t){var i=A("@parcel/transformer-js/src/esmodule-helpers.js");i.defineInteropFlag(t),i.export(t,"SyncActionDefinition",()=>I),i.export(t,"SyncActionPaths",()=>r);let I={site:{list:"0",group:"1",load:"2",update:"3"},comp:{new:"4",list:"5",group:"6",load:"7"},page:{list:"8",load:"9",cache:"10"},yjs:{um:"11",sv_local:"12",diff_local:"13",sv_remote:"14"},client:{info:"15"},code:{load:"16",edit:"17",action:"18"}},r={0:"site.list",1:"site.group",2:"site.load",3:"site.update",4:"comp.new",5:"comp.list",6:"comp.group",7:"comp.load",8:"page.list",9:"page.load",10:"page.cache",11:"yjs.um",12:"yjs.sv_local",13:"yjs.diff_local",14:"yjs.sv_remote",15:"client.info",16:"code.load",17:"code.edit",18:"code.action"}},{"@parcel/transformer-js/src/esmodule-helpers.js":"4uUBn"}],eZNf9:[function(A,e,t){var i,I,r=A("@parcel/transformer-js/src/esmodule-helpers.js");r.defineInteropFlag(t),r.export(t,"SyncType",()=>I),(i=I||(I={}))[i.ClientID=0]="ClientID",i[i.UserID=1]="UserID",i[i.Event=2]="Event",i[i.Action=3]="Action",i[i.ActionResult=4]="ActionResult"},{"@parcel/transformer-js/src/esmodule-helpers.js":"4uUBn"}],bZFhN:[function(A,e,t){var i=A("@parcel/transformer-js/src/esmodule-helpers.js");i.defineInteropFlag(t),i.export(t,"initIDB",()=>r);var I=A("idb-keyval");let r=A=>(0,I.createStore)(`prasi-user-${A}`,"default")},{"idb-keyval":"8Atof","@parcel/transformer-js/src/esmodule-helpers.js":"4uUBn"}]},[],0,"parcelRequire2d1f");
-//# sourceMappingURL=ed.55787c67.js.map
+//# sourceMappingURL=ed.22759bde.js.map

@@ -1,6 +1,6 @@
 import hash_sum from "hash-sum";
-import { fetchViaProxy } from "../proxy";
 import pako from "pako";
+import { fetchViaProxy } from "../proxy";
 
 export const dbProxy = (dburl: string) => {
   const name = "";
@@ -10,7 +10,6 @@ export const dbProxy = (dburl: string) => {
       get(_, table: string) {
         if (table === "_batch") {
           return {
-            // pancingan ini table batch
             update: async (batch: any) => {
               return fetchSendDb(
                 {
@@ -18,6 +17,17 @@ export const dbProxy = (dburl: string) => {
                   action: "batch_update",
                   table: "",
                   params: { batch },
+                },
+                dburl
+              );
+            },
+            upsert: async (arg: any) => {
+              return fetchSendDb(
+                {
+                  name,
+                  action: "batch_upsert",
+                  table: "",
+                  params: { arg },
                 },
                 dburl
               );
