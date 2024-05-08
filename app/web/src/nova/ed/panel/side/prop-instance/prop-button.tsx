@@ -71,42 +71,44 @@ export const EdPropInstanceButton: FC<{
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={label || name} />
       <div className={cx("flex-1 flex items-stretch  p-[3px]")}>
-        {local.value.map((e, idx) => {
-          return (
-            <div
-              key={idx}
-              className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer"
-              onClick={() => {
-                e.onClick(async (arg: Record<string, FNCompDef>) => {
-                  const src = {} as Record<string, string>;
-                  Object.entries(arg).map(([k, v]) => {
-                    src[k] = v.value;
-                  });
-                  const result = await _api.code_build(src);
-                  for (const [k, v] of Object.entries(result)) {
-                    arg[k].valueBuilt = v;
-                  }
-                  const parent = mprop.parent as TypedMap<
-                    Record<string, FMCompDef>
-                  >;
-                  mprop.doc?.transact(() => {
-                    for (const [k, v] of Object.entries(arg)) {
-                      const map = new Y.Map();
-                      syncronize(map, v);
-                      parent.set(k, map as any);
+        {Array.isArray(local.value) &&
+          local.value &&
+          local.value.map((e, idx) => {
+            return (
+              <div
+                key={idx}
+                className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer"
+                onClick={() => {
+                  e.onClick(async (arg: Record<string, FNCompDef>) => {
+                    const src = {} as Record<string, string>;
+                    Object.entries(arg).map(([k, v]) => {
+                      src[k] = v.value;
+                    });
+                    const result = await _api.code_build(src);
+                    for (const [k, v] of Object.entries(result)) {
+                      arg[k].valueBuilt = v;
                     }
-                  });
-                  await treeRebuild(p);
-                  p.render();
-                }, props);
-              }}
-            >
-              <div className="flex items-center">
-                <div className="px-1">{e.label}</div>
+                    const parent = mprop.parent as TypedMap<
+                      Record<string, FMCompDef>
+                    >;
+                    mprop.doc?.transact(() => {
+                      for (const [k, v] of Object.entries(arg)) {
+                        const map = new Y.Map();
+                        syncronize(map, v);
+                        parent.set(k, map as any);
+                      }
+                    });
+                    await treeRebuild(p);
+                    p.render();
+                  }, props);
+                }}
+              >
+                <div className="flex items-center">
+                  <div className="px-1">{e.label}</div>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );
