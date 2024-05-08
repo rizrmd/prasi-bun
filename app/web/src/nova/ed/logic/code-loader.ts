@@ -46,6 +46,14 @@ export const loadTypings = async (p: PG) => {
           p.render();
         }
       }),
+    fetch(`/prod/${id_site}/_prasi/prisma.ext`)
+      .catch(() => {})
+      .then(async (res) => {
+        if (res) {
+          p.prisma_ext = (await res.text()).replace("./prisma", "ts:prisma");
+          p.render();
+        }
+      }),
   ]);
 };
 

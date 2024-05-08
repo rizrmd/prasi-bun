@@ -187,6 +187,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 site_dts: p.site_dts,
                 site_dts_entry: p.site_dts_entry,
                 site_exports: p.site_exports,
+                prisma_ext: p.prisma_ext,
                 script: {
                   siteTypes: p.script.site_types,
                 },

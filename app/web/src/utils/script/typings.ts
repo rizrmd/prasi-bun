@@ -1,6 +1,5 @@
 import type { OnMount } from "@monaco-editor/react";
 import { w } from "../types/general";
-import { prismaExtendType } from "./prisma-extend";
 import { baseTypings } from "./types/base";
 import { extractProp } from "./types/prop";
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -39,6 +38,7 @@ export const registerSiteTypings = (
 export const monacoTypings = async (
   p: {
     site_dts: string;
+    prisma_ext: string;
     site_dts_entry: any;
     site: { api_url: string };
     site_exports: Record<string, any>;
@@ -133,6 +133,8 @@ ${(
     apiPath = "gen/srv/api/srv";
   }
 
+  register(monaco, p.prisma_ext, "ts:prisma.ext");
+
   register(
     monaco,
     `\
@@ -151,8 +153,10 @@ import "./api"
 import type * as SRVAPI from "${apiPath}";`
 )}
 
+import { PrismaExtend } from "ts:prisma.ext"
+
 declare global {
-  const db: prisma.PrismaClient & ${prismaExtendType};
+  const db: prisma.PrismaClient & PrismaExtend;
   
   ${baseTypings}
 
