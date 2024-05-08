@@ -8,6 +8,11 @@ export const prismaExtendType = `\
         where: any 
       }[]
     ) => Promise<void>;
+    upsert: (arg: {
+      table: string;
+      where: any;
+      data: any[];
+    }) => Promise<void>;
   };
   _schema: {
     tables: () => Promise<string[]>;
@@ -35,9 +40,4 @@ export const prismaExtendType = `\
       }
     }>>;
   }
-}`;
-
-const rel_types = `\
-{
-  
 }`;
