@@ -30,6 +30,13 @@ export const _ = {
       const action = pathname.split("/")[1];
 
       switch (action) {
+        case "prisma.ext.d.ts": {
+          const path = dir.path(
+            `app/srv/ws/sync/code/templates/typings/prisma_ext_d_ts`
+          );
+          const file = Bun.file(path);
+          return new Response(file);
+        }
         case "type_def": {
           const path = dir.data(`/code/${site_id}/site/typings.d.ts`);
           const file = Bun.file(path);

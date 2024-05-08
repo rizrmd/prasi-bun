@@ -153,6 +153,7 @@ export const EDGlobal = {
   site_exports: {} as Record<string, any>,
   site_dts: "",
   site_dts_entry: {} as any,
+  prisma_ext: "",
   script: {
     site_types: {} as Record<string, string>,
     loaded: false,
