@@ -49,7 +49,7 @@ export const baseTypings = `
       className: string
     }
   };
-  const children: RNode;
+  const children: RElement;
 
   const PassProp: FC<Record<string, any> & { children: React.ReactNode }>;
   const Preload: FC<{ url: string[] }>;
@@ -119,5 +119,5 @@ export const baseTypings = `
       local: T & { render: () => void }
     ) => void | (() => void) | Promise<void | (() => void)>;
     cache?: boolean;
-  }) => RNode
+  }) => RElement
 `;
