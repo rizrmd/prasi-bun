@@ -16,6 +16,7 @@ import { updatePropScope } from "./eval-prop";
 import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
+import { devItem } from "./dev-item";
 export const viEvalScript = (
   vi: {
     page: VG["page"];
@@ -60,6 +61,7 @@ export const viEvalScript = (
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
+    _item: meta.mitem ? devItem(meta) : undefined,
     render: (jsx: ReactNode) => {
       let result = jsx;
       if (isValidElement(jsx) && jsx.props.children) {
@@ -134,9 +136,6 @@ export const viEvalScript = (
     ...viScriptArg(vi),
     ...exports,
     ...passprop,
-    _meta: vi.meta,
-    _item: meta.item,
-    _syncm: typeof syncronize !== "undefined" ? syncronize : undefined,
   };
 
   if (typeof passprop === "object") {

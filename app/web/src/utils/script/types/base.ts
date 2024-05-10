@@ -9,9 +9,6 @@ export const baseTypings = `
   const useEffect: typeof React.useEffect;
   const useState: typeof React.useState;
 
-  const _meta: Record<string, any>;
-  const _item: IContent;
-  const _syncm: (mitem:any, item:any) => void;
   const pathname: string;
   const isEditor: boolean;
   const isLayout: boolean;
@@ -30,7 +27,6 @@ export const baseTypings = `
         visit: (item: IContent) => void | Promise<void>
       ) => void
     ) => void;}) => ReactNode;
-  const apiHeaders: Record<string, any>;
   const navigate: (url: string) => void;
   const params: any;
   const cx: (...classNames: any[]) => string;
@@ -51,11 +47,7 @@ export const baseTypings = `
   };
   const children: RElement;
 
-  const PassProp: FC<Record<string, any> & { children: React.ReactNode }>;
-  const Preload: FC<{ url: string[] }>;
-  const apiurl: string;
-  const pageid: string;
-  type ITEM = {
+  type PrasiItemSingle = {
     id: string;
     name: string;
     type: "item" | "text";
@@ -65,22 +57,24 @@ export const baseTypings = `
       css?: string;
       html?: string;
     };
-    text: string;
-    html: string;
+    text?: string;
+    html?: string;
     component?: {
       id: string;
       props: Record<
         string,
-        {
-          value: string;
-          valueBuilt: string;
-          meta: { type: string };
-        }
+        { type: "string" | "raw"; value: string; valueBuilt?: string }
       >;
     };
-    childs: ITEM[];
+    childs: PrasiItemSingle[];
   };
-  const newElement: (gen?: (item: ITEM) => ITEM | ITEM[]) => React.ReactNode;
+  type PrasiItem = PrasiItemSingle & {
+    update: (fn: () => Promise<void> | void) => void;
+  };
+
+  const _item: undefined | PrasiItem;
+  
+  const PassProp: FC<Record<string, any> & { children: React.ReactNode }>;
   const mobile: {
     notif: {
       register: (user_id: string) => void;
