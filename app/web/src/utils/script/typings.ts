@@ -60,7 +60,6 @@ export const monacoTypings = async (
       const prisma = prasi_api.prismaTypes;
 
       if (prisma) {
-        console.log(prisma);
         register(
           monaco,
           `\
