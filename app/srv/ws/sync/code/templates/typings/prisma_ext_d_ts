@@ -6,11 +6,11 @@ export type PrismaExtend = {
       batch: {
         table: T;
         data: Exclude<
-          Parameters<PrismaClient["location"]["update"]>[0],
+          Parameters<PrismaClient[T]["update"]>[0],
           undefined
         >["data"];
         where: Exclude<
-          Parameters<PrismaClient["location"]["findMany"]>[0],
+          Parameters<PrismaClient[T]["findMany"]>[0],
           undefined
         >["where"];
       }[]
@@ -18,11 +18,11 @@ export type PrismaExtend = {
     upsert: <T extends Prisma.ModelName>(arg: {
       table: T;
       where: Exclude<
-        Parameters<PrismaClient["location"]["findMany"]>[0],
+        Parameters<PrismaClient[T]["findMany"]>[0],
         undefined
       >["where"];
       data: Exclude<
-        Parameters<PrismaClient["location"]["create"]>[0],
+        Parameters<PrismaClient[T]["create"]>[0],
         undefined
       >["data"][];
     }) => Promise<void>;
