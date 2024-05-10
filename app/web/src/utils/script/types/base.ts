@@ -74,7 +74,7 @@ export const baseTypings = `
 
   const _item: undefined | PrasiItem;
   
-  const PassProp: FC<Record<string, any> & { children: React.ReactNode }>;
+  const PassProp: FC<Record<string, any> & { children: RElement }>;
   const mobile: {
     notif: {
       register: (user_id: string) => void;

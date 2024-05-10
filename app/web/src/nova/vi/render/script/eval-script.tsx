@@ -61,7 +61,7 @@ export const viEvalScript = (
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
-    _item: meta.mitem ? devItem(meta) : undefined,
+    _item: meta.mitem ? devItem(meta) : meta.item,
     render: (jsx: ReactNode) => {
       let result = jsx;
       if (isValidElement(jsx) && jsx.props.children) {
