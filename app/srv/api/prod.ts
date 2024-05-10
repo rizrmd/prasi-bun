@@ -30,7 +30,7 @@ export const _ = {
       const action = pathname.split("/")[1];
 
       switch (action) {
-        case "prisma.ext.d.ts": {
+        case "prisma.ext": {
           const path = dir.path(
             `app/srv/ws/sync/code/templates/typings/prisma_ext_d_ts`
           );

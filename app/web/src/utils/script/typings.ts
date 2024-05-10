@@ -60,6 +60,7 @@ export const monacoTypings = async (
       const prisma = prasi_api.prismaTypes;
 
       if (prisma) {
+        console.log(prisma);
         register(
           monaco,
           `\
@@ -93,6 +94,15 @@ declare module "ts:prisma" {
     )}
 }`,
           `ts:prisma.d.ts`
+        );
+
+        register(
+          monaco,
+          `\
+declare module "ts:prisma_ext" { 
+  ${p.prisma_ext} 
+}`,
+          "ts:prisma_ext"
         );
       }
       const api_types = prasi_api.apiTypes;
@@ -133,8 +143,6 @@ ${(
     apiPath = "gen/srv/api/srv";
   }
 
-  register(monaco, p.prisma_ext, "ts:prisma.ext");
-
   register(
     monaco,
     `\
@@ -145,6 +153,7 @@ import {
   ReactElement as RElement,
 } from "react";
 import prisma from 'ts:prisma';
+import { PrismaExtend } from "ts:prisma_ext"
 
 ${iftext(
   apiTypes,
@@ -153,7 +162,6 @@ import "./api"
 import type * as SRVAPI from "${apiPath}";`
 )}
 
-import { PrismaExtend } from "ts:prisma.ext"
 
 declare global {
   const db: prisma.PrismaClient & PrismaExtend;
