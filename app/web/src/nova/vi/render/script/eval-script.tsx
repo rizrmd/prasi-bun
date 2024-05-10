@@ -43,7 +43,7 @@ export const viEvalScript = (
       scope: passprop,
       result: null,
       Local: createViLocal(vi, is_layout, meta),
-      PassProp: createViPassProp(vi, is_layout, meta, passprop),
+      PassProp: createViPassProp(vi, is_layout, meta, passprop, depth),
     };
   } else {
     meta.script.scope = passprop;
@@ -104,7 +104,7 @@ export const viEvalScript = (
                   } else {
                     new_childs.push(child);
                   }
-                } else if (typeof child === "object") {
+                } else if (typeof child === "object" && child) {
                   if (child.type === meta.script?.PassProp) {
                     should_replace = true;
                     new_childs.push({

@@ -8,7 +8,8 @@ export const createViPassProp = (
   vi: { meta: VG["meta"]; render?: () => void; comp: VG["comp"] },
   is_layout: boolean,
   meta: IMeta,
-  passprop: any
+  passprop: any,
+  depth: number
 ) => {
   return (
     arg: Record<string, any> & { children: ReactNode; internal_key: any }
@@ -93,6 +94,7 @@ export const createViPassProp = (
                   meta={cmeta}
                   passprop={_pass}
                   parent_key={arg.internal_key}
+                  depth={depth}
                 />
               );
             }
@@ -141,6 +143,7 @@ export const createViPassProp = (
             meta={meta}
             passprop={_pass}
             parent_key={arg.internal_key}
+            depth={depth}
           />
         );
       }

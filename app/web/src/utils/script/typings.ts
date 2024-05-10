@@ -111,19 +111,51 @@ declare module "ts:prisma_ext" {
 
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([
     {
+      filePath: "jsx-runtime.d.ts",
+      content: `declare module "react/jsx-runtime" {
+import * as React from "react";
+export { Fragment } from "react";
+
+export namespace JSX {
+    type ElementType = React.JSX.ElementType;
+    interface Element extends React.JSX.Element {}
+    interface ElementClass extends React.JSX.ElementClass {}
+    interface ElementAttributesProperty extends React.JSX.ElementAttributesProperty {}
+    interface ElementChildrenAttribute extends React.JSX.ElementChildrenAttribute {}
+    type LibraryManagedAttributes<C, P> = React.JSX.LibraryManagedAttributes<C, P>;
+    interface IntrinsicAttributes extends React.JSX.IntrinsicAttributes {}
+    interface IntrinsicClassAttributes<T> extends React.JSX.IntrinsicClassAttributes<T> {}
+    interface IntrinsicElements extends React.JSX.IntrinsicElements {}
+}
+
+/**
+ * Create a React element.
+ *
+ * You should not use this function directly. Use JSX and a transpiler instead.
+ */
+export function jsx(
+    type: React.ElementType,
+    props: unknown,
+    key?: React.Key,
+): React.ReactElement;
+
+/**
+ * Create a React element.
+ *
+ * You should not use this function directly. Use JSX and a transpiler instead.
+ */
+export function jsxs(
+    type: React.ElementType,
+    props: unknown,
+    key?: React.Key,
+): React.ReactElement;
+}
+`,
+    },
+    {
       filePath: "react.d.ts",
       content: `declare module "react" {
 ${await loadText("https://cdn.jsdelivr.net/npm/@types/react@18.3.1/index.d.ts")}
-}`,
-    },
-    {
-      filePath: "jsx-runtime.d.ts",
-      content: `declare module "react/jsx-runtime" {
-${(
-  await loadText(
-    "https://cdn.jsdelivr.net/npm/@types/react@18.3.1/jsx-runtime.d.ts"
-  )
-).replaceAll('from "./"', 'from "react"')}
 }`,
     },
   ]);
