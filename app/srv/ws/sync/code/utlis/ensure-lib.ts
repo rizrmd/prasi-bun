@@ -41,7 +41,7 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
         }
       }
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
 };
