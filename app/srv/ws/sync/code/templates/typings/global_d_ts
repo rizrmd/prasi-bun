@@ -11,6 +11,30 @@ declare global {
     _raw: any;
   };
   const db: prisma.PrismaClient & PrismaExtend;
+  interface PushNotificationSchema {
+    title?: string;
+    subtitle?: string;
+    body?: string;
+    id: string;
+    tag?: string;
+    badge?: number;
+    notification?: any;
+    data: any;
+    click_action?: string;
+    link?: string;
+    group?: string;
+    groupSummary?: boolean;
+  }
+  interface ActionPerformed {
+    actionId: string;
+    inputValue?: string;
+    notification: PushNotificationSchema;
+  }
+  const notif: {
+    loaded: (send: (data: any) => void) => void;
+    onReceive: (notif: PushNotificationSchema) => void | Promise<void>;
+    onTap: (notif: null | ActionPerformed) => void | Promise<void>;
+  };
 
   type PrasiServer = {
     ws?: WebSocketHandler<{ url: string }>;
