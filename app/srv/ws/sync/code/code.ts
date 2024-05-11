@@ -6,7 +6,7 @@ import { ensureFiles } from "./utlis/ensure-files";
 import { ensureLib } from "./utlis/ensure-lib";
 import { initTypings } from "./parts/init/typings";
 import { $ } from "bun";
-
+import { exists } from "fs-jetpack";
 export const code = {
   internal: codeInternal,
   async init(id_site: string, note: string) {
@@ -18,7 +18,9 @@ export const code = {
     await initFrontEnd(root, id_site);
     await initServer(root, id_site);
     await initTypings(root, id_site);
-    await $`chmod -R 777 ${root}/typings`;
+    if (exists(dir.data(`${root}/typings`))) {
+      await $`chmod -R 777 ${dir.data(`${root}/typings`)}`;
+    }
   },
   path(
     id_site: string,
