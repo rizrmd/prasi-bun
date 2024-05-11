@@ -5,6 +5,7 @@ import { codeInternal } from "./parts/internal";
 import { ensureFiles } from "./utlis/ensure-files";
 import { ensureLib } from "./utlis/ensure-lib";
 import { initTypings } from "./parts/init/typings";
+import { $ } from "bun";
 
 export const code = {
   internal: codeInternal,
@@ -17,6 +18,7 @@ export const code = {
     await initFrontEnd(root, id_site);
     await initServer(root, id_site);
     await initTypings(root, id_site);
+    await $`chmod -R 777 ${root}/typings`;
   },
   path(
     id_site: string,
