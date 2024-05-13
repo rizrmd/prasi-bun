@@ -41,29 +41,29 @@ export const _ = {
           const path = dir.data(`/code/${site_id}/site/typings.d.ts`);
           const file = Bun.file(path);
           if (await file.exists()) {
-            const glob = new Glob("type_def*");
-            for await (const item of glob.scan(
-              dir.data(`/code/${site_id}/site`)
-            )) {
-              const stamp = parseInt(item.split(".")[1]);
-              if (file.lastModified !== stamp) {
-                await removeAsync(dir.data(`/code/${site_id}/site/${item}`));
-              } else {
-                return new Response(
-                  Bun.gzipSync(
-                    await Bun.file(
-                      dir.data(`/code/${site_id}/site/${item}`)
-                    ).arrayBuffer()
-                  ),
-                  {
-                    headers: {
-                      "content-type": "application/json",
-                      "content-encoding": "gzip",
-                    },
-                  }
-                );
-              }
-            }
+            // const glob = new Glob("type_def*");
+            // for await (const item of glob.scan(
+            //   dir.data(`/code/${site_id}/site`)
+            // )) {
+            //   const stamp = parseInt(item.split(".")[1]);
+            //   if (file.lastModified !== stamp) {
+            //     await removeAsync(dir.data(`/code/${site_id}/site/${item}`));
+            //   } else {
+            //     return new Response(
+            //       Bun.gzipSync(
+            //         await Bun.file(
+            //           dir.data(`/code/${site_id}/site/${item}`)
+            //         ).arrayBuffer()
+            //       ),
+            //       {
+            //         headers: {
+            //           "content-type": "application/json",
+            //           "content-encoding": "gzip",
+            //         },
+            //       }
+            //     );
+            //   }
+            // }
 
             try {
               const res = JSON.stringify(await parseTypeDef(path));
