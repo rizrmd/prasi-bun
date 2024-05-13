@@ -30,11 +30,13 @@ declare global {
     inputValue?: string;
     notification: PushNotificationSchema;
   }
-  const notif: {
-    loaded: (send: (data: any) => void) => void;
-    onReceive: (notif: PushNotificationSchema) => void | Promise<void>;
-    onTap: (notif: null | ActionPerformed) => void | Promise<void>;
-  };
+  const notif:
+    | {
+        loaded: (send: (data: any) => void) => void;
+        onReceive: (notif: PushNotificationSchema) => void | Promise<void>;
+        onTap: (notif: null | ActionPerformed) => void | Promise<void>;
+      }
+    | undefined;
 
   type PrasiServer = {
     ws?: WebSocketHandler<{ url: string }>;

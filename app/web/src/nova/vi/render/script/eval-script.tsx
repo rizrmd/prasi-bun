@@ -62,6 +62,7 @@ export const viEvalScript = (
     ErrorBox: ErrorBox,
     newElement: () => {},
     _item: meta.mitem ? devItem(meta) : meta.item,
+    _meta: vi.meta,
     render: (jsx: ReactNode) => {
       let result = jsx;
       if (isValidElement(jsx) && jsx.props.children) {
