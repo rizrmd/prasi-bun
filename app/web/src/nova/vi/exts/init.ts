@@ -15,13 +15,13 @@ export const initExts = async (vi: VG) => {
   if (pe.status === "init") {
     pe.status = "loading";
 
-    if (window.parent) {
+    if (window.parent !== window) {
       const send = (msg: { type: "ready" }) => {
         window.parent.postMessage({ mobile: true, ...msg }, "*");
       };
       window.addEventListener("message", async ({ data: raw }) => {
+        console.log(raw);
         if (typeof raw === "object" && raw.mobile) {
-          console.log(raw);
         }
       });
       send({ type: "ready" });

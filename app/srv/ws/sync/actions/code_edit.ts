@@ -114,7 +114,6 @@ export const code_edit: SAction["code"]["edit"] = async function (
 
             return jscript;
           } catch (e: any) {
-            console.log("e", e);
             return e.message.toString();
           }
         } else {
@@ -152,6 +151,7 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 });
               }
             } catch (e: any) {
+              console.log(e);
               return e.message.toString();
             }
           }

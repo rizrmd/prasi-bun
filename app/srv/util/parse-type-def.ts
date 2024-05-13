@@ -58,20 +58,45 @@ export const parseTypeDef = async (path: string) => {
                     }
                   }
                 } else if (body.type === "ExportNamedDeclaration") {
-                  for (const s of body.specifiers) {
-                    if (s.type === "ExportSpecifier") {
-                      if (s.exported) {
-                        exports[t.id.value].push({
-                          type: "named",
-                          kind: "const",
-                          val: s.exported.value,
-                        });
-                      } else if (s.orig) {
-                        exports[t.id.value].push({
-                          type: "named",
-                          kind: "const",
-                          val: s.orig.value,
-                        });
+                  if (body.source?.type === "StringLiteral") {
+                    const ex = exports[body.source.value];
+                    if (ex) {
+                      for (const s of body.specifiers) {
+                        if (s.type === "ExportSpecifier") {
+                          if (s.exported) {
+                            const found = ex.find(
+                              (e) => e.val === s.exported?.value
+                            );
+                            if (found) {
+                              exports[t.id.value].push(found);
+                            }
+                          } else if (s.orig) {
+                            const found = ex.find(
+                              (e) => e.val === s.orig?.value
+                            );
+                            if (found) {
+                              exports[t.id.value].push(found);
+                            }
+                          }
+                        }
+                      }
+                    }
+                  } else {
+                    for (const s of body.specifiers) {
+                      if (s.type === "ExportSpecifier") {
+                        if (s.exported) {
+                          exports[t.id.value].push({
+                            type: "named",
+                            kind: "const",
+                            val: s.exported.value,
+                          });
+                        } else if (s.orig) {
+                          exports[t.id.value].push({
+                            type: "named",
+                            kind: "const",
+                            val: s.orig.value,
+                          });
+                        }
                       }
                     }
                   }
