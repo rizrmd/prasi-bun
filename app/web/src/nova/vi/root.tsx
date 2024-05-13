@@ -4,12 +4,14 @@ import { Loading } from "../../utils/ui/loading";
 import { ViGlobal } from "./render/global";
 import { ViRender } from "./render/render";
 import { ErrorBox } from "./utils/error-box";
+import { initExts } from "./exts/init";
 
 export const ViRoot: FC<{}> = ({}) => {
   const vi = useGlobal(ViGlobal, "VI");
   const local = useLocal({ tick: Date.now() });
 
   vi.tick = local.tick;
+  initExts(vi);
 
   if (vi.status !== "ready") {
     return (
