@@ -26,7 +26,7 @@ export const initExts = async (vi: VG) => {
       });
       send({ type: "ready" });
     }
-    // await initExtNotif(vi, pe);
+    await initExtNotif(vi, pe);
     pe.status = "ready";
   }
 };
