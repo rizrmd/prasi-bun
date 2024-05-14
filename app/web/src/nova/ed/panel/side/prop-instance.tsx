@@ -1,17 +1,19 @@
-import { FC, MouseEvent, useEffect } from "react";
+import { FC, Fragment, MouseEvent } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { createEditScript } from "./prop-instance/edit-script";
+import { EdPropInstanceButton } from "./prop-instance/prop-button";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
 import { EdPropInstanceFile } from "./prop-instance/prop-file";
 import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 import { EdStyleAll } from "./style/side-all";
-import { EdPropInstanceButton } from "./prop-instance/prop-button";
+import { ChevronDown, ChevronRight } from "../tree/node/item/indent";
+import { ChevronLeft } from "../popup/script/workbench";
 
 const w = window as any;
 
@@ -59,7 +61,9 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
       </div>
     );
 
-  let filtered = [] as { mprop: FMCompDef; cprop: FNCompDef; name: string }[];
+  type SingleProp = { mprop: FMCompDef; cprop: FNCompDef; name: string };
+  let filtered = [] as SingleProp[];
+
   const mprops = _meta.mitem?.get("component")?.get("props");
   const comp_id = _meta.mitem?.get("component")?.get("id") || "";
 
@@ -153,9 +157,28 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
     });
   }
 
+  const grouped: Record<string, (SingleProp & { label: string })[]> = {};
+  for (const item of filtered) {
+    let [group, ...names] = item.name.split("__");
+    let name = names.join("_");
+
+    if (!name && !item.name.endsWith("__")) {
+      name = group;
+      group = "_";
+    }
+
+    if (!grouped[group]) {
+      grouped[group] = [];
+    }
+
+    grouped[group].push({ ...item, label: name });
+  }
+
   const expandable = item.component?.useStyle;
   const show_prop = !expandable || (expandable && local.expand.prop);
   const show_style = !expandable || (expandable && local.expand.style);
+
+  let hide = localStorage.getItem("prasi-prop-hide")?.split(",") || [];
 
   return (
     <div className="flex flex-1 flex-col text-[12px]">
@@ -246,105 +269,166 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   No Prop Available
                 </div>
               )}
-              {filtered.map(({ name, mprop, cprop }) => {
-                const type = cprop.meta?.type || "text";
-                let hasCode = false;
-
-                const value = mprop.get("value") || "";
-                if (
-                  !!value &&
-                  (![`"`, "'", "`"].includes(value[0]) ||
-                    ![`"`, "'", "`"].includes(value[value.length - 1]))
-                ) {
-                  hasCode = true;
-                }
-
-                if (value.length > 100) {
-                  hasCode = true;
-                }
-                if (type === "file") {
-                  if (!!value && !value.startsWith("siteurl(")) hasCode = true;
-                  else hasCode = false;
-                }
-
-                if (type === "button") hasCode = false;
-
-                if (
-                  type === "option" &&
-                  cprop.meta?.option_mode === "checkbox"
-                ) {
-                  hasCode = false;
-                }
-
-                const labelClick = (e: MouseEvent<HTMLDivElement>) => {
-                  e.preventDefault();
-                  local.pick = { mprop, name };
-                  if (local.rightClickEvent) local.rightClickEvent = null;
-                  else local.rightClickEvent = e;
-                  local.render();
-                };
-
+              {Object.entries(grouped).map(([group, filtered]) => {
                 return (
-                  <div
-                    key={name}
-                    className="border-b text-[13px] relative hover:bg-orange-100 cursor-default"
-                    onContextMenu={labelClick}
-                  >
-                    {hasCode ? (
-                      <>
-                        <EdPropInstanceCode
-                          mprop={mprop}
-                          name={name}
-                          comp_id={comp_id}
-                          label={cprop.label}
-                          labelClick={labelClick}
-                          onEditCode={createEditScript(p, "value", mprop, name)}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        {type === "button" && (
-                          <EdPropInstanceButton
-                            meta={meta}
-                            cprop={cprop}
-                            mprop={mprop}
-                            label={cprop.label}
-                            name={name}
-                          />
+                  <Fragment key={group}>
+                    {group !== "_" && (
+                      <div
+                        className={cx(
+                          "border-b px-1 cursor-pointer hover:bg-blue-100 select-none flex items-center",
+                          hide.includes(group) && "py-1"
                         )}
-                        {type === "file" && (
-                          <EdPropInstanceFile
-                            mprop={mprop}
-                            label={cprop.label}
-                            name={name}
-                            labelClick={labelClick}
-                          />
-                        )}
-                        {type === "text" && (
-                          <EdPropInstanceText
-                            mprop={mprop}
-                            label={cprop.label}
-                            name={name}
-                            labelClick={labelClick}
-                          />
-                        )}
-                        {type === "option" && (
-                          <EdPropInstanceOptions
-                            mprop={mprop}
-                            meta={meta}
-                            cprop={cprop}
-                            name={name}
-                            labelClick={labelClick}
-                          />
-                        )}
-                        {type === "content-element" && (
-                          <div className="min-h-[28px] px-1 flex items-center">
-                            {name}
-                          </div>
-                        )}
-                      </>
+                        onClick={() => {
+                          if (hide.includes(group)) {
+                            hide = hide.filter((e) => e !== group);
+                          } else {
+                            hide.push(group);
+                          }
+
+                          localStorage.setItem(
+                            "prasi-prop-hide",
+                            hide?.join(",")
+                          );
+                          local.render();
+                        }}
+                      >
+                        <div className="">{group}</div>
+                        <div className="flex-1 pl-1">
+                          {!hide.includes(group) ? (
+                            <ChevronDown />
+                          ) : (
+                            <ChevronRight />
+                          )}
+                        </div>
+                      </div>
                     )}
-                  </div>
+                    <div className={cx(hide.includes(group) && "hidden")}>
+                      {filtered.map(
+                        ({ label: label_raw, name, mprop, cprop }) => {
+                          if (name.endsWith("__")) return null;
+
+                          const type = cprop.meta?.type || "text";
+                          let hasCode = false;
+
+                          const value = mprop.get("value") || "";
+                          if (
+                            !!value &&
+                            (![`"`, "'", "`"].includes(value[0]) ||
+                              ![`"`, "'", "`"].includes(
+                                value[value.length - 1]
+                              ))
+                          ) {
+                            hasCode = true;
+                          }
+
+                          if (value.length > 100) {
+                            hasCode = true;
+                          }
+                          if (type === "file") {
+                            if (!!value && !value.startsWith("siteurl("))
+                              hasCode = true;
+                            else hasCode = false;
+                          }
+
+                          if (type === "button") hasCode = false;
+
+                          if (
+                            type === "option" &&
+                            cprop.meta?.option_mode === "checkbox"
+                          ) {
+                            hasCode = false;
+                          }
+
+                          const labelClick = (
+                            e: MouseEvent<HTMLDivElement>
+                          ) => {
+                            e.preventDefault();
+                            local.pick = { mprop, name };
+                            if (local.rightClickEvent)
+                              local.rightClickEvent = null;
+                            else local.rightClickEvent = e;
+                            local.render();
+                          };
+
+                          const label = cprop.label || label_raw;
+
+                          return (
+                            <div
+                              key={name}
+                              className="border-b text-[13px] relative hover:bg-orange-100 cursor-default flex items-stretch"
+                              onContextMenu={labelClick}
+                            >
+                              {group !== "_" && (
+                                <div className="pl-2 bg-slate-50 border-r"></div>
+                              )}
+                              <div className="flex-1">
+                                {hasCode ? (
+                                  <>
+                                    <EdPropInstanceCode
+                                      mprop={mprop}
+                                      name={name}
+                                      comp_id={comp_id}
+                                      label={cprop.label}
+                                      labelClick={labelClick}
+                                      onEditCode={createEditScript(
+                                        p,
+                                        "value",
+                                        mprop,
+                                        name
+                                      )}
+                                    />
+                                  </>
+                                ) : (
+                                  <>
+                                    {type === "button" && (
+                                      <EdPropInstanceButton
+                                        meta={meta}
+                                        cprop={cprop}
+                                        mprop={mprop}
+                                        label={label}
+                                        name={name}
+                                      />
+                                    )}
+                                    {type === "file" && (
+                                      <EdPropInstanceFile
+                                        mprop={mprop}
+                                        label={label}
+                                        name={name}
+                                        labelClick={labelClick}
+                                      />
+                                    )}
+                                    {type === "text" && (
+                                      <EdPropInstanceText
+                                        mprop={mprop}
+                                        label={label}
+                                        name={name}
+                                        labelClick={labelClick}
+                                      />
+                                    )}
+                                    {type === "option" && (
+                                      <EdPropInstanceOptions
+                                        mprop={mprop}
+                                        meta={meta}
+                                        cprop={cprop}
+                                        label={label}
+                                        name={name}
+                                        labelClick={labelClick}
+                                      />
+                                    )}
+                                    {type === "content-element" && (
+                                      <div className="min-h-[28px] px-1 flex items-center">
+                                        {name}
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </Fragment>
                 );
               })}
             </>

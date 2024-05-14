@@ -26,8 +26,9 @@ export const EdPropInstanceOptions: FC<{
   name: string;
   mprop: FMCompDef;
   cprop: FNCompDef;
+  label: string;
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
-}> = ({ name, mprop, cprop, labelClick, meta }) => {
+}> = ({ name, mprop, cprop, label, labelClick, meta }) => {
   const prop = mprop.toJSON() as FNCompDef;
   const local = useLocal({
     codeEditing: false,
@@ -192,7 +193,7 @@ export const EdPropInstanceOptions: FC<{
 
   return (
     <div className="flex items-stretch min-h-[28px]">
-      <EdPropLabel name={cprop.label || name} labelClick={labelClick} />
+      <EdPropLabel name={label || name} labelClick={labelClick} />
       <div className="flex flex-1 justify-end items-stretch">
         {mode === "dropdown" && (
           <select
