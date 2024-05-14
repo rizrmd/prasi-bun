@@ -4,7 +4,7 @@ import path from "path";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 import { validate } from "uuid";
 import { dir } from "dir";
-import { existsAsync, readAsync } from "fs-jetpack";
+import { existsAsync, readAsync, exists } from "fs-jetpack";
 import { code } from "../ws/sync/code/code";
 
 export const _ = {
@@ -51,6 +51,9 @@ export const _ = {
           },
           select: { id: true, content_tree: true },
         }),
+        public: readDirectoryRecursively(
+          code.path(site_id, "site", "src", "public")
+        ),
         site: await _db.site.findFirst({
           where: { id: site_id },
           select: {
@@ -87,6 +90,7 @@ export function readDirectoryRecursively(
 ): Record<string, string> {
   const result: Record<string, string> = {};
 
+  if (!exists(dirPath)) return result;
   const contents = fs.readdirSync(dirPath);
 
   for (const item of contents) {
