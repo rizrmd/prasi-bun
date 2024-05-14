@@ -30,9 +30,16 @@ declare global {
     inputValue?: string;
     notification: PushNotificationSchema;
   }
+  interface NOTIF_ARG {
+    user_id: any;
+    body: string;
+    title: string;
+    data?: any;
+  }
   const notif:
     | {
-        loaded: (send: (data: any) => void) => void;
+        send: (data: NOTIF_ARG) => Promise<void>;
+        register: (user_id: string) => void;
         onReceive: (notif: PushNotificationSchema) => void | Promise<void>;
         onTap: (notif: null | ActionPerformed) => void | Promise<void>;
       }
