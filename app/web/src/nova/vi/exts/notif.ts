@@ -75,6 +75,37 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
         switch (data.type) {
           case "notification-token":
             prasi_ext.notif = { token: data.token };
+            w.notif = {
+              async send(data: NOTIF_ARG) {
+                if (vi && vi.site.api) {
+                  return await vi.site.api._notif("send", {
+                    type: "send",
+                    id:
+                      typeof data.user_id === "string"
+                        ? data.user_id
+                        : data.user_id.toString(),
+                    body: data.body,
+                    title: data.title,
+                    data: data.data,
+                  });
+                }
+              },
+              async register(user_id: any) {
+                if (vi && vi.site.api && prasi_ext.notif?.token) {
+                  return await vi.site.api._notif("register", {
+                    type: "register",
+                    id:
+                      typeof user_id === "string"
+                        ? user_id
+                        : user_id.toString(),
+                    token: prasi_ext.notif.token,
+                  });
+                }
+              },
+              onReceive(notif) {},
+              onTap(notif) {},
+            };
+
             break;
           case "notification-tap":
             if (!w.notif?.onTap) {
@@ -111,38 +142,5 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
     });
 
     window.parent.postMessage({ mobile: true, type: "ready" }, "*");
-    w.notif = {
-      async send() {},
-      register() {},
-      onReceive(notif) {},
-      onTap(notif) {},
-    };
-    w.notif.register = async (user_id: any) => {
-      await waitUntil(() => prasi_ext.notif?.token);
-      if (vi && vi.site.api && prasi_ext.notif?.token) {
-        return await vi.site.api._notif("register", {
-          type: "register",
-          id: typeof user_id === "string" ? user_id : user_id.toString(),
-          token: prasi_ext.notif.token,
-        });
-      }
-    };
-  }
-
-  if (w.notif) {
-    w.notif.send = async (data: NOTIF_ARG) => {
-      if (vi && vi.site.api) {
-        return await vi.site.api._notif("send", {
-          type: "send",
-          id:
-            typeof data.user_id === "string"
-              ? data.user_id
-              : data.user_id.toString(),
-          body: data.body,
-          title: data.title,
-          data: data.data,
-        });
-      }
-    };
   }
 };
