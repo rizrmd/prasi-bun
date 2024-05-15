@@ -168,7 +168,13 @@ const installDeps = async (
       if (err.notes?.[0].text.startsWith("You can mark the path ")) {
         let im = err.notes?.[0].text.split('"')[1];
 
-        if (!im.startsWith("@")) {
+        if (
+          !im.startsWith(".") &&
+          !im.startsWith("@/") &&
+          !im.startsWith("app") &&
+          !im.startsWith("lib") &&
+          !im.startsWith("server")
+        ) {
           im = im.split("/").shift() || "";
         }
 
