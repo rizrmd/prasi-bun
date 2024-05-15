@@ -91,7 +91,18 @@ export default page({
         return <Loading note="connecting-ws" />;
       }
     } else {
-      navSitePage(p);
+      if (!validate(params.site_id)) {
+        const last_open_str = localStorage.getItem("prasi-last-open");
+
+        try {
+          const last_open = JSON.parse(last_open_str || "");
+          if (last_open.site_id && last_open.page_id) {
+            navigate(`/ed/${last_open.site_id}/${last_open.page_id}`);
+          }
+        } catch (e) {}
+      } else {
+        navSitePage(p);
+      }
       return <Loading note="finding-page" />;
     }
 
@@ -100,16 +111,6 @@ export default page({
 });
 
 const navSitePage = async (p: PG) => {
-  const last_open_str = localStorage.getItem("prasi-last-open");
-
-  try {
-    const last_open = JSON.parse(last_open_str || "");
-    if (last_open.site_id && last_open.page_id) {
-      navigate(`/ed/${last_open.site_id}/${last_open.page_id}`);
-      return;
-    }
-  } catch (e) {}
-
   loadSession(p);
   const e = await _db.page.findFirst({
     where: {
