@@ -42,7 +42,6 @@ const w = window as unknown as {
 };
 
 export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
-  const config = prasi_ext.notif;
   w.notif = {
     async send() {},
     register() {},
@@ -50,7 +49,7 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
     onTap(notif) {},
   };
 
-  if (window.parent && config) {
+  if (window.parent) {
     window.addEventListener("message", async ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
         const data = raw as unknown as
@@ -82,7 +81,7 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
 
         switch (data.type) {
           case "notification-token":
-            config.token = data.token;
+            prasi_ext.notif = { token: data.token };
             break;
           case "notification-tap":
             if (!w.notif?.onTap) {
@@ -120,12 +119,12 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
 
     window.parent.postMessage({ mobile: true, type: "ready" }, "*");
     w.notif.register = async (user_id: any) => {
-      await waitUntil(() => config.token);
-      if (vi && vi.site.api) {
+      await waitUntil(() => prasi_ext.notif?.token);
+      if (vi && vi.site.api && prasi_ext.notif?.token) {
         return await vi.site.api._notif("register", {
           type: "register",
           id: typeof user_id === "string" ? user_id : user_id.toString(),
-          token: config.token,
+          token: prasi_ext.notif.token,
         });
       }
     };
