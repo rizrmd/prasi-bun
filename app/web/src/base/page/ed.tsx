@@ -82,6 +82,11 @@ export default page({
     }
 
     if (validate(params.page_id) && validate(params.site_id)) {
+      localStorage.setItem(
+        "prasi-last-open",
+        JSON.stringify({ page_id: params.page_id, site_id: params.site_id })
+      );
+
       if (!edInitSync(p) && !p.sync) {
         return <Loading note="connecting-ws" />;
       }
@@ -95,6 +100,16 @@ export default page({
 });
 
 const navSitePage = async (p: PG) => {
+  const last_open_str = localStorage.getItem("prasi-last-open");
+
+  try {
+    const last_open = JSON.parse(last_open_str || "");
+    if (last_open.site_id && last_open.page_id) {
+      navigate(`/ed/${last_open.site_id}/${last_open.page_id}`);
+      return;
+    }
+  } catch (e) {}
+
   loadSession(p);
   const e = await _db.page.findFirst({
     where: {
