@@ -43,6 +43,7 @@ export const _ = {
                 {
                   id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
                 },
+                { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
                 {
                   component_site: { some: { id_site: site_id } },
                 },

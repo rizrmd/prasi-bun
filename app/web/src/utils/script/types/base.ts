@@ -68,9 +68,10 @@ export const baseTypings = `
     };
     childs: PrasiItemSingle[];
   };
-  type PrasiItem = PrasiItemSingle & {
+  type PrasiEdit = {
     update: (fn: () => Promise<void> | void) => void;
-  };
+  }
+  type PrasiItem = PrasiItemSingle & PrasiEdit;
 
   const _item: undefined | PrasiItem;
   
