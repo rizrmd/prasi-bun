@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import brotliPromise from "brotli-wasm";
 import { Glob, spawn } from "bun";
 import { dir } from "dir";
+import { build, context } from "esbuild";
 import { fdir } from "fdir";
 import { statSync } from "fs";
 import {
@@ -12,6 +13,22 @@ import {
   writeAsync,
 } from "fs-jetpack";
 const brotli = await brotliPromise;
+
+await build({
+  bundle: true,
+  absWorkingDir: dir.path(""),
+  entryPoints: [dir.path("app/web/src/nova/prod/main.tsx")],
+  outdir: dir.path(`/app/srv/core`),
+  splitting: true,
+  format: "esm",
+  jsx: "transform",
+  minify: true,
+  sourcemap: true,
+  logLevel: "error",
+  define: {
+    "process.env.NODE_ENV": `"production"`,
+  },
+});
 
 const glob = new Glob("**");
 const public_files = [] as string[];
