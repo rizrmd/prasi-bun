@@ -42,13 +42,6 @@ const w = window as unknown as {
 };
 
 export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
-  w.notif = {
-    async send() {},
-    register() {},
-    onReceive(notif) {},
-    onTap(notif) {},
-  };
-
   if (window.parent) {
     window.addEventListener("message", async ({ data: raw }) => {
       if (typeof raw === "object" && raw.mobile) {
@@ -118,6 +111,12 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
     });
 
     window.parent.postMessage({ mobile: true, type: "ready" }, "*");
+    w.notif = {
+      async send() {},
+      register() {},
+      onReceive(notif) {},
+      onTap(notif) {},
+    };
     w.notif.register = async (user_id: any) => {
       await waitUntil(() => prasi_ext.notif?.token);
       if (vi && vi.site.api && prasi_ext.notif?.token) {
@@ -130,18 +129,20 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
     };
   }
 
-  w.notif.send = async (data: NOTIF_ARG) => {
-    if (vi && vi.site.api) {
-      return await vi.site.api._notif("send", {
-        type: "send",
-        id:
-          typeof data.user_id === "string"
-            ? data.user_id
-            : data.user_id.toString(),
-        body: data.body,
-        title: data.title,
-        data: data.data,
-      });
-    }
-  };
+  if (w.notif) {
+    w.notif.send = async (data: NOTIF_ARG) => {
+      if (vi && vi.site.api) {
+        return await vi.site.api._notif("send", {
+          type: "send",
+          id:
+            typeof data.user_id === "string"
+              ? data.user_id
+              : data.user_id.toString(),
+          body: data.body,
+          title: data.title,
+          data: data.data,
+        });
+      }
+    };
+  }
 };
