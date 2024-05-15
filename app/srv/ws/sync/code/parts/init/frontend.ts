@@ -181,7 +181,13 @@ const installDeps = async (
     for (const [_, file] of Object.entries(res.metafile?.inputs || {})) {
       for (const im of file.imports) {
         if (im.kind === "import-statement" && im.external) {
-          if (!im.path.startsWith(".") && !im.path.startsWith("@/"))
+          if (
+            !im.path.startsWith(".") &&
+            !im.path.startsWith("@/") &&
+            !im.path.startsWith("app") &&
+            !im.path.startsWith("lib") &&
+            !im.path.startsWith("server")
+          )
             imports.add(im.path);
         }
       }
