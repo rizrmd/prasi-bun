@@ -221,7 +221,7 @@ const installDeps = async (
     print(proc.stderr, "stderr:");
 
     await proc.exited;
-    await codeError(id_site, "");
+    // await codeError(id_site, "");
     return true;
   }
 };
