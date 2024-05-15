@@ -45,7 +45,7 @@ export const _ = {
                 },
                 { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
                 {
-                  component_site: { some: { id_site: site_id } },
+                  component_site: { every: { id_site: site_id } },
                 },
               ],
             },
