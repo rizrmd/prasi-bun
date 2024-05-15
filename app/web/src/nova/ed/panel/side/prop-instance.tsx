@@ -270,6 +270,11 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 </div>
               )}
               {Object.entries(grouped).map(([group, filtered]) => {
+                const header = filtered.find((e) => e.name.endsWith("__"));
+                if (group !== "_" && !header) {
+                  return null;
+                }
+
                 return (
                   <Fragment key={group}>
                     {group !== "_" && (
@@ -292,7 +297,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                           local.render();
                         }}
                       >
-                        <div className="">{group}</div>
+                        <div className="">{header?.cprop?.label || group}</div>
                         <div className="flex-1 pl-1">
                           {!hide.includes(group) ? (
                             <ChevronDown />
