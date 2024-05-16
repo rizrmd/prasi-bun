@@ -1,2 +1,0 @@
-.ContextMenu{background:#fff;border:1px solid #ccc;outline:0}.MenuItem{text-align:left;background:#fff;border-bottom:1px solid #ececeb;outline:0;justify-content:space-between;width:100%;margin:0;padding:3px 5px 3px 10px;font-size:14px;line-height:1.5;display:flex}.MenuItem:hover .hot-key{border-color:#fff!important}.MenuItem:last-child{border-bottom:0}.MenuItem.open{background:#ddd}.MenuItem:disabled{color:#ccc}.MenuItem:focus,.MenuItem:not([disabled]):active{color:#fff;background:#527dff}
-/*# sourceMappingURL=ed.d8d7276f.css.map */
