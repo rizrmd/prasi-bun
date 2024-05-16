@@ -84,7 +84,7 @@ const CodeBody = () => {
   });
 
   const vscode_url = isLocalhost()
-    ? "http://localhost:3000?"
+    ? "http://localhost:8443?"
     : "https://prasi-vsc.avolut.com/?tkn=prasi&";
 
   return (

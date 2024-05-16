@@ -223,7 +223,10 @@ const installDeps = async (
     const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
     if (!(await pkgjson.exists())) {
       await Bun.write(pkgjson, JSON.stringify({
-        name: id_site
+        name: id_site,
+        scripts: {
+          "startup": "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify"
+        }
       }));
     }
 
