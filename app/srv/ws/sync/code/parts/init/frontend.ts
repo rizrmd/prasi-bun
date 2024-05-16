@@ -24,7 +24,7 @@ export const initFrontEnd = async (
       try {
         await existing.dispose();
         delete code.internal.frontend[id_site];
-      } catch (e) {}
+      } catch (e) { }
     } else {
       return;
     }
@@ -61,6 +61,7 @@ export const initFrontEnd = async (
         {
           name: "prasi",
           async setup(setup) {
+
             try {
               await codeError(id_site, "Building...");
               setup.onStart(async () => {
@@ -114,6 +115,8 @@ export const initFrontEnd = async (
 const codeError = async (id_site: string, error: string, append?: boolean) => {
   const path = code.path(id_site, "site", "src", "index.log");
 
+  if (error)
+    console.log(error)
   if (append) {
     await appendFile(path, error);
     return;
@@ -128,7 +131,7 @@ const isInstalling = async (id_site: string) => {
     const text = await file.text();
     if (typeof text === "string" && text.startsWith("Installing dependencies"))
       return true;
-  } catch (e) {}
+  } catch (e) { }
 
   return false;
 };
@@ -175,10 +178,15 @@ const installDeps = async (
           !im.startsWith("lib") &&
           !im.startsWith("server")
         ) {
-          im = im.split("/").shift() || "";
+          const parts = im.split("/");
+          if (im.startsWith('@')) {
+            im = `${parts[0]}/${parts[1]}`
+          } else {
+            im = parts[0];
+          }
+          imports.add(im);
         }
 
-        imports.add(im);
       }
     }
   }
@@ -193,14 +201,32 @@ const installDeps = async (
             !im.path.startsWith("app") &&
             !im.path.startsWith("lib") &&
             !im.path.startsWith("server")
-          )
-            imports.add(im.path);
+          ) {
+
+            const parts = im.path.split("/");
+            let src = im.path;
+            if (src.startsWith('@')) {
+              src = `${parts[0]}/${parts[1]}`
+            } else {
+              src = parts[0];
+            }
+
+            imports.add(src);
+          }
         }
       }
     }
   }
 
   if (!isEqual(imports, pkgjson)) {
+
+    const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
+    if (!(await pkgjson.exists())) {
+      await Bun.write(pkgjson, JSON.stringify({
+        name: id_site
+      }));
+    }
+
     await codeError(
       id_site,
       "Installing dependencies:\n " + [...imports].join("\n ")

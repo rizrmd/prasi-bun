@@ -6,6 +6,8 @@ import { prodIndex } from "../util/prod-index";
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 import { gzipAsync } from "../ws/sync/entity/zlib";
+import { ensureLib } from "../ws/sync/code/utlis/ensure-lib";
+import { ensureFiles } from "../ws/sync/code/utlis/ensure-files";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -76,7 +78,7 @@ export const _ = {
                   "content-encoding": "gzip",
                 },
               });
-            } catch (e) {}
+            } catch (e) { }
           }
           return new Response("{}", {
             headers: { "content-type": "application/json" },
@@ -102,7 +104,7 @@ export const _ = {
               },
             });
           }
-          return new Response("", { status: 403 });
+          return new Response("");
         }
         case "code": {
           const arr = pathname.split("/").slice(2);
@@ -112,11 +114,14 @@ export const _ = {
 
           if (!(await file.exists())) {
             const root = `/code/${site_id}/site/src`;
+            await ensureLib(root, site_id);
+            await ensureFiles(root, site_id);
             await initFrontEnd(root, site_id, true);
             await new Promise<void>((resolve) => {
               const ival = setInterval(async () => {
                 file = Bun.file(build_path);
-                if (await file.exists()) {
+                const exists = await file.exists()
+                if (exists) {
                   clearInterval(ival);
                   resolve();
                 }
