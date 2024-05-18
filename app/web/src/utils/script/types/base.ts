@@ -47,7 +47,7 @@ export const baseTypings = `
   };
   const children: RElement;
 
-  type PrasiItemSingle = {
+  type IItem = {
     id: string;
     name: string;
     type: "item" | "text";
@@ -66,12 +66,42 @@ export const baseTypings = `
         { type: "string" | "raw"; value: string; valueBuilt?: string }
       >;
     };
-    childs: PrasiItemSingle[];
+    childs: IItem[];
   };
+  
+
+  type SingleChange = { type: "set" | "prop"; name: string; value: any };
+  type PropVal = string | { type: "raw"; value: string; valueBuilt?: string };
+  type ChildArg = {
+    name: string;
+  } & (
+    | {
+        type?: "text";
+        item?: Partial<IItem>;
+      }
+    | ItemArg
+  );
+
+  type ItemArg = {
+    type?: "item";
+    component?: { id: string; prop?: Record<string, PropVal> };
+    item?: Partial<IItem>;
+    childs?: ChildArg[];
+  };
+  type ParentArg = ItemArg & { parent?: ItemArg & PrasiEdit } & PrasiEdit;
   type PrasiEdit = {
-    update: (fn: () => Promise<void> | void) => void;
-  }
-  type PrasiItem = PrasiItemSingle & PrasiEdit;
+    edit: {
+      setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
+      setProp: (name: string, value: PropVal) => void;
+      pending: SingleChange[];
+      childs: ChildArg[];
+      parent: ParentArg;
+      commit: () => Promise<void>;
+    };
+  };
+
+
+  type PrasiItem = IItem & PrasiEdit;
 
   const _item: undefined | PrasiItem;
   

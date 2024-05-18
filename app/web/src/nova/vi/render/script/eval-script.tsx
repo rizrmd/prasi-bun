@@ -61,7 +61,9 @@ export const viEvalScript = (
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
-    _item: meta.mitem ? devItem(meta) : meta.item,
+    _item: meta.mitem
+      ? devItem(vi.meta, meta.mitem, vi.page.cur.id)
+      : meta.item,
     _meta: vi.meta,
     render: (jsx: ReactNode) => {
       let result = jsx;

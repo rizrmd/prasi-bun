@@ -29,9 +29,9 @@ export const edUndoManager = async (p: PG) => {
           !evt.shiftKey
         ) {
           if (active.comp_id) {
-            p.sync.yjs.um("comp", "redo", active.comp_id);
+            p.sync?.yjs.um("comp", "redo", active.comp_id);
           } else {
-            p.sync.yjs.um("page", "redo", p.page.cur.id);
+            p.sync?.yjs.um("page", "redo", p.page.cur.id);
           }
           return;
         }
@@ -42,9 +42,9 @@ export const edUndoManager = async (p: PG) => {
           evt.shiftKey
         ) {
           if (active.comp_id) {
-            p.sync.yjs.um("comp", "redo", active.comp_id);
+            p.sync?.yjs.um("comp", "redo", active.comp_id);
           } else {
-            p.sync.yjs.um("page", "redo", p.page.cur.id);
+            p.sync?.yjs.um("page", "redo", p.page.cur.id);
           }
           return;
         }
@@ -55,13 +55,13 @@ export const edUndoManager = async (p: PG) => {
           !evt.shiftKey
         ) {
           if (active.comp_id) {
-            p.sync.yjs.um("comp", "undo", active.comp_id);
+            p.sync?.yjs.um("comp", "undo", active.comp_id);
           } else {
-            p.sync.yjs.um("page", "undo", p.page.cur.id);
+            p.sync?.yjs.um("page", "undo", p.page.cur.id);
           }
         }
       }
-      
+
       if (
         (evt.key === "r" || evt.key === "R" || evt.key === "®") &&
         evt.altKey

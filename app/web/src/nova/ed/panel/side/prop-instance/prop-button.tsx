@@ -5,6 +5,7 @@ import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
+import { devItem } from "../../../../vi/render/script/dev-item";
 
 export const w = window as any;
 
@@ -55,6 +56,7 @@ export const EdPropInstanceButton: FC<{
       }
     }
 
+    if (meta.mitem) arg._item = devItem(p.page.meta, meta.mitem, p.page.cur.id);
     const btn_fn = new Function(
       ...Object.keys(arg),
       `return ${cprop.valueBuilt}`
@@ -79,28 +81,7 @@ export const EdPropInstanceButton: FC<{
                 key={idx}
                 className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer"
                 onClick={() => {
-                  e.onClick(async (arg: Record<string, FNCompDef>) => {
-                    const src = {} as Record<string, string>;
-                    Object.entries(arg).map(([k, v]) => {
-                      src[k] = v.value;
-                    });
-                    const result = await _api.code_build(src);
-                    for (const [k, v] of Object.entries(result)) {
-                      arg[k].valueBuilt = v;
-                    }
-                    const parent = mprop.parent as TypedMap<
-                      Record<string, FMCompDef>
-                    >;
-                    mprop.doc?.transact(() => {
-                      for (const [k, v] of Object.entries(arg)) {
-                        const map = new Y.Map();
-                        syncronize(map, v);
-                        parent.set(k, map as any);
-                      }
-                    });
-                    await treeRebuild(p);
-                    p.render();
-                  }, props);
+                  e.onClick(async () => {}, props);
                 }}
               >
                 <div className="flex items-center">
