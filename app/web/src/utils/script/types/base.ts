@@ -70,33 +70,30 @@ export const baseTypings = `
   };
   
 
-  type SingleChange = { type: "set" | "prop"; name: string; value: any };
-  type PropVal = string | { type: "raw"; value: string; valueBuilt?: string };
-  type ChildArg = {
-    name: string;
-  } & (
-    | {
-        type?: "text";
-        item?: Partial<IItem>;
-      }
-    | ItemArg
-  );
+  type SingleChange =
+  | { type: "set"; name: string; value: any }
+  | ({ type: "prop"; name: string } & PropVal);
 
-  type ItemArg = {
-    type?: "item";
-    component?: { id: string; prop?: Record<string, PropVal> };
-    item?: Partial<IItem>;
-    childs?: ChildArg[];
+  type PropVal =
+    | { mode: "string"; value: string }
+    | { mode: "raw"; value: string; valueBuilt?: string }
+    | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+
+  type ParentArg = {
+    item: IItem & PrasiEdit;
+    child_type: "jsx" | "child";
+    child_idx: number;
   };
-  type ParentArg = ItemArg & { parent?: ItemArg & PrasiEdit } & PrasiEdit;
+
   type PrasiEdit = {
     edit: {
       setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
-      setProp: (name: string, value: PropVal) => void;
+      setProp: (name: string, value: PropVal | string) => void;
       pending: SingleChange[];
-      childs: ChildArg[];
-      parent: ParentArg;
+      readonly childs: (IItem & PrasiEdit)[];
+      readonly parent: null | ParentArg;
       commit: () => Promise<void>;
+      readonly props?: Record<string, PropVal>;
     };
   };
 
