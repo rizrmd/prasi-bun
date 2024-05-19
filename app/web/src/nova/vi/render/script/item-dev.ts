@@ -10,7 +10,7 @@ type SingleChange =
   | { type: "set"; name: string; value: any }
   | ({ type: "prop"; name: string } & PropVal);
 
-type PropVal =
+export type PropVal =
   | { mode: "string"; value: string }
   | { mode: "raw"; value: string; valueBuilt?: string }
   | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
@@ -21,7 +21,7 @@ type ParentArg = {
   child_idx: number;
 };
 
-type PrasiEdit = {
+export type PrasiEdit = {
   edit: {
     setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
     setProp: (name: string, value: PropVal | string) => void;
