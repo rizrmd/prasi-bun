@@ -66,9 +66,7 @@ export const devItem = (
         if (item.component?.props) {
           const result: Record<string, PropVal> = {};
           for (const [k, v] of Object.entries(item.component.props)) {
-            if (v.value === v.valueBuilt) {
-              result[k] = JSON.parse(v.value);
-            } else if (v.meta?.type === "content-element") {
+            if (v.content) {
               const content = mitem
                 .get("component")
                 ?.get("props")
@@ -86,6 +84,8 @@ export const devItem = (
                   value: null as any,
                 };
               }
+            } else if (v.value === v.valueBuilt) {
+              result[k] = JSON.parse(v.value);
             } else {
               result[k] = {
                 mode: "raw",
