@@ -218,13 +218,30 @@ export const devItem = (
       get childs() {
         const item = mitem?.toJSON() as IItem;
 
-        if (item.childs) {
-          return item.childs.map((e) => {
-            if (e) {
-              const m = metas[e.id];
-              if (m && m.mitem) return devItem(metas, m.mitem, page_id);
+        if (item.component?.id) {
+          const child = item.component?.props.child;
+          if (child.content) {
+            const m = mitem
+              .get("component")
+              ?.get("props")
+              ?.get("child")
+              ?.get("content");
+            if (m) {
+              return [devItem(metas, m, page_id)];
             }
-          });
+          }
+          return [];
+        }
+
+        if (item.childs) {
+          return item.childs
+            .map((e) => {
+              if (e) {
+                const m = metas[e.id];
+                if (m && m.mitem) return devItem(metas, m.mitem, page_id);
+              }
+            })
+            .filter((e) => e);
         }
 
         return [];
