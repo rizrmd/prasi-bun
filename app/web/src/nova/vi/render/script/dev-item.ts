@@ -220,8 +220,10 @@ export const devItem = (
 
         if (item.childs) {
           return item.childs.map((e) => {
-            const mitem = metas[e.id].mitem;
-            if (mitem) return devItem(metas, mitem, page_id);
+            if (e) {
+              const mitem = metas[e.id]?.mitem;
+              if (mitem) return devItem(metas, mitem, page_id);
+            }
           });
         }
 
