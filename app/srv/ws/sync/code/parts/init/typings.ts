@@ -36,7 +36,9 @@ export const initTypings = async (
       watch: watch(typings_path),
       spawn: Bun.spawn({
         cmd: [
-          ...`tsc --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
+          ...`${dir.path(
+            "node_modules/tsc"
+          )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
             " "
           ),
         ],
