@@ -243,6 +243,19 @@ const formatChilds = (childs: (IItem & PrasiEdit)[]) => {
   const result = childs.map((e) => {
     const item: any = { ...e };
     delete item.edit;
+
+    if (item.component?.props) {
+      for (const [k, v] of Object.entries(item.component.props) as any) {
+        if (v.content) {
+          v.content = formatChilds([v.content]);
+        }
+      }
+    }
+
+    if (item.childs) {
+      item.childs = formatChilds(item.childs);
+    }
+
     return item;
   });
   return result;
