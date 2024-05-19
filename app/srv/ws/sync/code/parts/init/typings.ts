@@ -29,21 +29,26 @@ export const initTypings = async (
     const typings_file = Bun.file(typings_path);
 
     if (!(await typings_file.exists())) {
-      return false;
+      await Bun.write(typings_file, "");
     }
+
+    const typings_log = Bun.file(
+      dir.data(`/code/${id_site}/site/src/typings.log`)
+    );
+    await Bun.write(typings_log, "");
     code.internal.typings[id_site] = {
       timeout: Date.now(),
       watch: watch(typings_path),
       spawn: Bun.spawn({
         cmd: [
           ...`${dir.path(
-            "node_modules/tsc"
+            "node_modules/.bin/tsc"
           )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
             " "
           ),
         ],
         cwd: dir.data(`/code/${id_site}/site/src`),
-        stdio: ["ignore", "ignore", "ignore"],
+        stdio: [typings_log, typings_log, "ignore"],
       }),
     };
     let timeout = null as any;

@@ -1,10 +1,10 @@
 export const baseTypings = `
-  type FC<T> = ReactFC<T>;
+  type FC<T> = React.FC<T>;
   const Fragment: typeof React.Fragment;
-  const ReactNode: RNode;
+  const ReactNode: typeo React.ReactNode;
   const useCallback: typeof React.useCallback;
   const useMemo: typeof React.useMemo;
-  const ReactElement: RElement;
+  const ReactElement: typeof React.ReactElement;
   const isValidElement: typeof React.isValidElement;
   const useEffect: typeof React.useEffect;
   const useState: typeof React.useState;
@@ -45,7 +45,7 @@ export const baseTypings = `
       className: string
     }
   };
-  const children: RElement;
+  const children: ReactElement;
 
   type IItem = {
     id: string;
@@ -101,7 +101,7 @@ export const baseTypings = `
 
   const _item: undefined | PrasiItem;
   
-  const PassProp: (arg:Record<string, any> & { children: RNode }>) => RElement;
+  const PassProp: (arg:Record<string, any> & { children: ReactNode }>) => ReactElement;
   const mobile: {
     notif: {
       register: (user_id: string) => void;
@@ -140,5 +140,5 @@ export const baseTypings = `
       local: T & { render: () => void }
     ) => void | (() => void) | Promise<void | (() => void)>;
     cache?: boolean;
-  }) => RElement
+  }) => ReactElement
 `;

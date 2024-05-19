@@ -46,9 +46,8 @@ export const _ = {
           `\
 import React from "react";
 import {
-  FC as ReactFC,
-  ReactNode as RNode,
-  ReactElement as RElement,
+  ReactNode,
+  ReactElement,
 } from "react";
 import * as prisma from "./prisma";
 ${iftext(
