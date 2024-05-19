@@ -1,9 +1,9 @@
 import type { OnMount } from "@monaco-editor/react";
 import trim from "lodash.trim";
-// import {
-//   MonacoJsxSyntaxHighlight,
-//   getWorker,
-// } from "monaco-jsx-syntax-highlight-v2";
+import {
+  MonacoJsxSyntaxHighlight,
+  getWorker,
+} from "monaco-jsx-syntax-highlight-v2";
 import { PG, active } from "../../nova/ed/logic/ed-global";
 import { jscript } from "./jscript";
 
@@ -16,28 +16,28 @@ type CompilerOptions = Parameters<
 export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   const m = monaco as any;
 
-  // if (editor.getModel()) {
-  //   const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
-  //   const { highlighter } = jsxHgController.highlighterBuilder({
-  //     editor: editor,
-  //   });
+  if (editor.getModel()) {
+    const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
+    const { highlighter } = jsxHgController.highlighterBuilder({
+      editor: editor,
+    });
 
-  //   if (typeof editor.getModel === "function") {
-  //     highlighter();
-  //   }
-  //   editor.onDidChangeModelContent(() => {
-  //     if (typeof editor.getModel === "function") {
-  //       try {
-  //         highlighter();
-  //       } catch (e) {}
-  //     }
-  //   });
-  // }
-  // if (!m.customJSMounted) {
-  //   m.customJSMounted = true;
-  // } else {
-  //   return;
-  // }
+    if (typeof editor.getModel === "function") {
+      highlighter();
+    }
+    editor.onDidChangeModelContent(() => {
+      if (typeof editor.getModel === "function") {
+        try {
+          highlighter();
+        } catch (e) {}
+      }
+    });
+  }
+  if (!m.customJSMounted) {
+    m.customJSMounted = true;
+  } else {
+    return;
+  }
 
   const compilerOptions: CompilerOptions = {
     jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
