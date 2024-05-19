@@ -55,6 +55,16 @@ export const initTypings = async (
     code.internal.typings[id_site].watch.on("change", (e, path) => {
       clearTimeout(timeout);
       timeout = setTimeout(async () => {
+        try {
+          const logs = (await typings_log.text()).split("\n");
+          const idx = logs.findLastIndex((e) =>
+            e.includes("Watching for file changes.")
+          );
+          if (idx > 0) {
+            Bun.write(typings_log, logs.slice(idx - 1).join("\n"));
+          }
+        } catch (e) {}
+
         clearTimeout(timeout);
         const glob = new Glob("type_def*");
         const path = dir.data(`/code/${id_site}/site/typings.d.ts`);
