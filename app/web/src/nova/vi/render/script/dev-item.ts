@@ -93,7 +93,8 @@ export const devItem = (
                 vbuilt = vbuilt.substring(0, vbuilt.length - ";\n".length);
               }
               if (vbuilt && vbuilt === v.value.trim()) {
-                result[k] = { mode: "string", value: JSON.parse(v.value) };
+                const fn = new Function(`return ${v.value}`);
+                result[k] = { mode: "string", value: fn() };
               } else {
                 result[k] = {
                   mode: "raw",
