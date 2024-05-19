@@ -19,8 +19,8 @@ export const code = {
     await initFrontEnd(root, id_site);
     await initServer(root, id_site);
     await initTypings(root, id_site);
-    if (exists(dir.data(`${root}/typings`))) {
-      await $`chmod -R 777 ${dir.data(`${root}/typings`)}`;
+    if (exists(dir.data(`${root}`))) {
+      await $`chmod -R 777 ${dir.data(`${root}`)}`;
     }
   },
   path(
