@@ -16,7 +16,8 @@ import { updatePropScope } from "./eval-prop";
 import { extractNavigate } from "./extract-nav";
 import { createViLocal } from "./local";
 import { createViPassProp } from "./passprop";
-import { devItem } from "./dev-item";
+import { devItem } from "./item-dev";
+import { prodItem } from "./item-prod";
 export const viEvalScript = (
   vi: {
     page: VG["page"];
@@ -63,7 +64,7 @@ export const viEvalScript = (
     newElement: () => {},
     _item: meta.mitem
       ? devItem(vi.meta, meta.mitem, vi.page.cur.id)
-      : meta.item,
+      : prodItem(vi.meta, meta.item, vi.page.cur.id),
     _meta: vi.meta,
     render: (jsx: ReactNode) => {
       let result = jsx;

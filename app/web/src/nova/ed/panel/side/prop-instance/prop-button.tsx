@@ -5,7 +5,7 @@ import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
-import { devItem } from "../../../../vi/render/script/dev-item";
+import { devItem } from "../../../../vi/render/script/item-dev";
 
 export const w = window as any;
 
