@@ -97,7 +97,6 @@ export const baseTypings = `
     };
   };
 
-
   type PrasiItem = IItem & PrasiEdit;
 
   const _item: undefined | PrasiItem;

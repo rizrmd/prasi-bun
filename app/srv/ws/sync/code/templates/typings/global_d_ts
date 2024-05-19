@@ -58,4 +58,55 @@ declare global {
     }) => Promise<Response>;
     init: (arg: { port?: number }) => Promise<void>;
   };
+
+  type IItem = {
+    id: string;
+    name: string;
+    type: "item" | "text";
+    adv?: {
+      js?: string;
+      jsBuilt?: string;
+      css?: string;
+      html?: string;
+    };
+    text?: string;
+    html?: string;
+    component?: {
+      id: string;
+      props: Record<
+        string,
+        { type: "string" | "raw"; value: string; valueBuilt?: string }
+      >;
+    };
+    childs: IItem[];
+  };
+
+  type SingleChange =
+    | { type: "set"; name: string; value: any }
+    | ({ type: "prop"; name: string } & PropVal);
+
+  type PropVal =
+    | { mode: "string"; value: string }
+    | { mode: "raw"; value: string; valueBuilt?: string }
+    | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+
+  type ParentArg = {
+    item: IItem & PrasiEdit;
+    child_type: "jsx" | "child";
+    child_idx: number;
+  };
+
+  type PrasiEdit = {
+    edit: {
+      setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
+      setProp: (name: string, value: PropVal | string) => void;
+      pending: SingleChange[];
+      readonly childs: (IItem & PrasiEdit)[];
+      readonly parent: null | ParentArg;
+      commit: () => Promise<void>;
+      readonly props?: Record<string, PropVal>;
+    };
+  };
+
+  type PrasiItem = IItem & PrasiEdit;
 }
