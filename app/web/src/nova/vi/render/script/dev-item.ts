@@ -84,14 +84,23 @@ export const devItem = (
                   value: null as any,
                 };
               }
-            } else if (v.value === v.valueBuilt) {
-              result[k] = JSON.parse(v.value);
             } else {
-              result[k] = {
-                mode: "raw",
-                value: v.value,
-                valueBuilt: v.valueBuilt,
-              };
+              let vbuilt =
+                typeof v.valueBuilt === "string"
+                  ? (v.valueBuilt.trim() as string)
+                  : "";
+              if (vbuilt.endsWith(";\n")) {
+                vbuilt = vbuilt.substring(0, vbuilt.length - ";\n".length);
+              }
+              if (vbuilt && vbuilt === v.value.trim()) {
+                result[k] = { mode: "string", value: JSON.parse(v.value) };
+              } else {
+                result[k] = {
+                  mode: "raw",
+                  value: v.value,
+                  valueBuilt: v.valueBuilt,
+                };
+              }
             }
           }
           return result;
