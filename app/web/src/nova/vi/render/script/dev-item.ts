@@ -221,8 +221,8 @@ export const devItem = (
         if (item.childs) {
           return item.childs.map((e) => {
             if (e) {
-              const mitem = metas[e.id]?.mitem;
-              if (mitem) return devItem(metas, mitem, page_id);
+              const m = metas[e.id];
+              if (m && m.mitem) return devItem(metas, m.mitem, page_id);
             }
           });
         }
