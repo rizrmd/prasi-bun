@@ -27,12 +27,12 @@ export type FNComponent = {
 };
 
 export type FNCompDef = {
-  idx: number;
-  typings: string;
-  type: string;
+  idx?: number;
+  typings?: string;
+  type?: string;
   label?: string;
   value: any;
-  valueBuilt: any;
+  valueBuilt?: any;
   gen?: string;
   genBuilt?: string;
   is_name?: boolean;
