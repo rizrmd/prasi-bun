@@ -167,6 +167,9 @@ export const modifyChild = (arg: any, passprop?: any, add_props?: any) => {
   }
 
   if (Array.isArray(prop.children)) {
+    if (prop.children.length === 1) {
+      return modify(prop.children[0], prop, passprop, add_props);
+    }
     const childs = [];
     for (const child of prop.children) {
       childs.push(modify(child, prop, passprop, add_props));
