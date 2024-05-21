@@ -124,69 +124,76 @@ export const devItem = (
           { value: string; valueBuilt?: string }
         >;
 
-        for (const [item_id, changes] of Object.entries(pedit)) {
-          if (mitem) {
-            const item = mitem.toJSON();
-            const props = item?.component?.props as Record<string, FNCompDef>;
-            const src = {} as Record<string, string>;
-            for (const c of changes) {
-              if (c.type === "prop" && props) {
-                if (props[c.name]) {
-                  if (c.mode === "string") {
-                    props[c.name].value = JSON.stringify(c.value);
-                    props[c.name].valueBuilt = JSON.stringify(c.value);
-                  } else if (c.mode === "raw") {
-                    props[c.name].value = c.value;
-                    if (c.valueBuilt) {
-                      props[c.name].valueBuilt = c.valueBuilt;
-                    } else {
-                      src[c.name] = c.value;
-                    }
-                  } else if (c.mode === "jsx") {
-                    if (!props[c.name]) {
-                      props[c.name] = {
-                        meta: { type: "content-element" },
-                      } as any;
-                    }
-                    if (c.value) {
-                      props[c.name].content = removeEditFromChilds(
-                        [c.value],
-                        compile
-                      )[0];
-                    }
-                  }
-                }
-              } else {
-                if (c.type === "set" && typeof c.value === "object") {
-                  for (const [k, v] of Object.entries(c.value) as any) {
-                    item[k] = v;
-                  }
-                } else if (c.type === "child" && Array.isArray(c.childs)) {
-                  const childs = removeEditFromChilds(
-                    c.childs.filter((e) => e),
-                    compile
-                  );
-                }
-              }
-            }
-
-            for (const [k, v] of Object.entries(compile)) {
-              src[k] = v.value;
-            }
-
-            const result = await _api.code_build(src);
-            for (const [k, v] of Object.entries(result) as any) {
-              if (props[k]) {
-                props[k].valueBuilt = v;
-              } else if (compile[k]) {
-                compile[k].valueBuilt = v;
-              }
-            }
-            result[item_id] = item;
-          }
-        }
-
         if (mitem) {
+          for (const [item_id, changes] of Object.entries(pedit)) {
+            const meta = metas[item_id];
+            if (!meta) continue;
+            if (!meta.mitem) continue;
+
+            const mitem = meta.mitem;
+            const item = mitem.toJSON();
+            if (item) {
+              const props = item?.component?.props as Record<string, FNCompDef>;
+              const src = {} as Record<string, string>;
+              for (const c of changes) {
+                if (c.type === "prop" && props) {
+                  if (props[c.name]) {
+                    if (c.mode === "string") {
+                      props[c.name].value = JSON.stringify(c.value);
+                      props[c.name].valueBuilt = JSON.stringify(c.value);
+                    } else if (c.mode === "raw") {
+                      props[c.name].value = c.value;
+                      if (c.valueBuilt) {
+                        props[c.name].valueBuilt = c.valueBuilt;
+                      } else {
+                        src[c.name] = c.value;
+                      }
+                    } else if (c.mode === "jsx") {
+                      if (!props[c.name]) {
+                        props[c.name] = {
+                          meta: { type: "content-element" },
+                        } as any;
+                      }
+                      if (c.value) {
+                        props[c.name].content = removeEditFromChilds(
+                          [c.value],
+                          compile
+                        )[0];
+                      }
+                    }
+                  }
+                } else {
+                  if (c.type === "set" && typeof c.value === "object") {
+                    for (const [k, v] of Object.entries(c.value) as any) {
+                      item[k] = v;
+                    }
+                  } else if (c.type === "child" && Array.isArray(c.childs)) {
+                    const childs = removeEditFromChilds(
+                      c.childs.filter((e) => e),
+                      compile
+                    );
+                    item.childs = childs;
+                  }
+                }
+              }
+
+              for (const [k, v] of Object.entries(compile)) {
+                src[k] = v.value;
+              }
+
+              const code_result = await _api.code_build(src);
+              for (const [k, v] of Object.entries(code_result) as any) {
+                if (props[k]) {
+                  props[k].valueBuilt = v;
+                } else if (compile[k]) {
+                  compile[k].valueBuilt = v;
+                }
+              }
+
+              result[item_id] = item;
+            }
+          }
+
           mitem.doc?.transact(() => {
             for (const [k, v] of Object.entries(result)) {
               const m = metas[k];
