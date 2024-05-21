@@ -68,33 +68,38 @@ export const baseTypings = `
     };
     childs: IItem[];
   };
-  
-
+ 
   type SingleChange =
   | { type: "set"; name: string; value: any }
-  | ({ type: "prop"; name: string } & PropVal);
+  | ({ type: "prop"; name: string } & PropVal)
+  | { type: "child"; childs: SimpleItem[] };
 
-  type PropVal =
-    | { mode: "string"; value: string }
-    | { mode: "raw"; value: string; valueBuilt?: string }
-    | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+  export type PropVal =
+  | { mode: "string"; value: string }
+  | { mode: "raw"; value: string; valueBuilt?: string }
+  | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
 
   type ParentArg = {
-    item: IItem & PrasiEdit;
-    child_type: "jsx" | "child";
-    child_idx: number;
+  item: IItem & PrasiEdit;
+  child_type: "jsx" | "child";
+  child_idx: number;
   };
 
-  type PrasiEdit = {
-    edit: {
-      setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
-      setProp: (name: string, value: PropVal | string) => void;
-      pending: SingleChange[];
-      readonly childs: (IItem & PrasiEdit)[];
-      readonly parent: null | ParentArg;
-      commit: () => Promise<void>;
-      readonly props?: Record<string, PropVal>;
-    };
+  type SimpleItem = Partial<Omit<IItem, "component">> & {
+  component?: { id: string; props: Record<string, PropVal> };
+  };
+
+  export type PrasiEdit = {
+  edit: {
+    setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
+    setProp: (name: string, value: PropVal | string) => void;
+    pending: SingleChange[];
+    childs: (IItem & PrasiEdit)[];
+    setChilds: (childs: SimpleItem[]) => void;
+    readonly parent: null | ParentArg;
+    commit: () => Promise<void>;
+    readonly props?: Record<string, PropVal>;
+  };
   };
 
   type PrasiItem = IItem & PrasiEdit;

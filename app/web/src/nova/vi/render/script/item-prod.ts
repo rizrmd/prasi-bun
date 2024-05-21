@@ -10,6 +10,7 @@ export const prodItem = (
   return {
     ...item,
     edit: {
+      setChilds(childs) {},
       get childs() {
         if (item.component?.id) {
           const child = item.component?.props.child;
