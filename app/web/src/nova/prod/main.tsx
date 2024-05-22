@@ -1,15 +1,19 @@
-import { createRoot } from "react-dom/client";
+import { Root as ReactRoot, createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { Root, isPreview } from "./root";
 import { initBaseConfig } from "./base/base";
 import { w } from "./w";
+import { sworkerRegister } from "../../sworker-boot";
 
 (async () => {
   initBaseConfig();
   const div = document.getElementById("root");
   if (div) {
-    const root = createRoot(div);
     await defineWindow(false);
+
+    let react = {
+      root: createRoot(div),
+    };
     defineReact();
 
     w.navigateOverride = (_href: string) => {
@@ -27,7 +31,7 @@ import { w } from "./w";
       return _href;
     };
 
-    root.render(<Root />);
+    react.root.render(<Root />);
     if (document.body.classList.contains("opacity-0")) {
       document.body.classList.remove("opacity-0");
     }

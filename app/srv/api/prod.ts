@@ -78,7 +78,7 @@ export const _ = {
                   "content-encoding": "gzip",
                 },
               });
-            } catch (e) { }
+            } catch (e) {}
           }
           return new Response("{}", {
             headers: { "content-type": "application/json" },
@@ -120,7 +120,7 @@ export const _ = {
             await new Promise<void>((resolve) => {
               const ival = setInterval(async () => {
                 file = Bun.file(build_path);
-                const exists = await file.exists()
+                const exists = await file.exists();
                 if (exists) {
                   clearInterval(ival);
                   resolve();
