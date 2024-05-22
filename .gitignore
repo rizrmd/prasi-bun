@@ -183,3 +183,4 @@ app/srv/exports.d.ts
 app/srv/site
 app/srv/site/*
 app/srv/site.zip
+app/static
