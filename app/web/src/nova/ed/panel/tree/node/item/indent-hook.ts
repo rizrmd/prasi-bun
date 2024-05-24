@@ -30,11 +30,14 @@ export const expandTreeHook = (
         let meta: IMeta | undefined = getMetaById(p, id);
         while (meta) {
           const id = meta.parent?.id;
-          if (id && !shouldOpen.has(id)) {
-            shouldOpen.add(id);
+          if (id) {
             meta = getMetaById(p, id);
-          } else {
-            break;
+
+            if (!shouldOpen.has(id)) {
+              shouldOpen.add(id);
+            } else if ((meta && !meta.parent) || !meta) {
+              break;
+            }
           }
         }
       }
