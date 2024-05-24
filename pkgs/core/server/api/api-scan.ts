@@ -16,7 +16,7 @@ export const prepareApiRoutes = async () => {
             const api = await import(importPath);
             let args: string[] = await parseArgs(importPath);
             const route = {
-              url: api._.url,
+              url: api._.url, 
               args,
               raw: !!api._.raw,
               fn: api._.api,

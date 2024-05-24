@@ -9,7 +9,7 @@ const w = window as unknown as {
 type SingleChange =
   | { type: "set"; name: string; value: any }
   | ({ type: "prop"; name: string } & PropVal)
-  | { type: "child"; childs: SimpleItem[] };
+  | { type: "child"; childs: ((IItem & PrasiEdit) | SimpleItem)[] };
 
 export type PropVal =
   | { mode: "string"; value: string }
@@ -32,7 +32,7 @@ export type PrasiEdit = {
     setProp: (name: string, value: PropVal | string) => void;
     pending: SingleChange[];
     childs: (IItem & PrasiEdit)[];
-    setChilds: (childs: SimpleItem[]) => void;
+    setChilds: (childs: ((IItem & PrasiEdit) | SimpleItem)[]) => void;
     readonly parent: null | ParentArg;
     commit: () => Promise<void>;
     readonly props?: Record<string, PropVal>;
@@ -197,8 +197,9 @@ export const devItem = (
           mitem.doc?.transact(() => {
             for (const [k, v] of Object.entries(result)) {
               const m = metas[k];
+
               if (m.mitem) {
-                syncronize(m.mitem as any, v);
+                console.log(syncronize(m.mitem as any, v));
               }
             }
           });
@@ -306,7 +307,7 @@ export const devItem = (
   } as IItem & PrasiEdit;
 };
 
-const complexifyProps = async (
+const complexifyProps = (
   props: Record<string, PropVal>,
   compileValueBuilt: Record<string, { value: string; valueBuilt?: string }>
 ) => {

@@ -62,9 +62,11 @@ export const initLoadComp = async (
   }
 
   for (const component of comps) {
-    for (const prop of Object.values(component.props)) {
-      if (prop.meta?.type === "content-element" && prop.content) {
-        await initLoadComp(p, prop.content, opt, loaded);
+    if (component.props) {
+      for (const prop of Object.values(component.props)) {
+        if (prop.meta?.type === "content-element" && prop.content) {
+          await initLoadComp(p, prop.content, opt, loaded);
+        }
       }
     }
   }
