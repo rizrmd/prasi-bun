@@ -28,7 +28,15 @@ export const expandTreeHook = (
         shouldOpen.add(id);
 
         let meta: IMeta | undefined = getMetaById(p, id);
+        let i = 0;
         while (meta) {
+          i++;
+          if (i > 5000) {
+            console.warn(
+              "WARNING: Prasi expand item parent tree exceed 5000 loop, maybe infinite loop?"
+            );
+            break;
+          }
           const id = meta.parent?.id;
           if (id) {
             meta = getMetaById(p, id);
