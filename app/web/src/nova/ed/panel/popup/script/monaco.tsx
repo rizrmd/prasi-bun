@@ -389,8 +389,15 @@ const propTypings = (prop: FNCompDef | undefined, types: any, meta: any) => {
       "active",
       "_meta",
       `\
+${
+  prop.typings
+    ? `
 ${prop.typings};
-return typings;`
+return typings;
+`
+    : ""
+}
+`
     );
     try {
       const typings = typings_fn(active, meta);
@@ -406,7 +413,7 @@ return typings;`
         }
       }
     } catch (e) {
-      console.log(typings_fn.toString());
+      console.log('WARNING: typings prasi error, bilang mas rizky plis...');
     }
   }
 };
