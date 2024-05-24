@@ -1,17 +1,17 @@
-import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal } from "../../logic/ed-global";
 import { FC, useEffect } from "react";
 import { decompress } from "wasm-gzip";
-import { Vi } from "../../../vi/vi";
-import { genMeta } from "../../../vi/meta/meta";
-import { IRoot } from "../../../../utils/types/root";
+import { deepClone, useGlobal, useLocal } from "web-utils";
 import { IContent } from "../../../../utils/types/general";
-import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
-import { loadCompSnapshot, loadComponent } from "../../logic/comp/load";
 import { IItem } from "../../../../utils/types/item";
-import { mainStyle } from "./main";
+import { IRoot } from "../../../../utils/types/root";
 import { Loading } from "../../../../utils/ui/loading";
+import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
+import { genMeta } from "../../../vi/meta/meta";
+import { Vi } from "../../../vi/vi";
+import { loadCompSnapshot, loadComponent } from "../../logic/comp/load";
+import { EDGlobal } from "../../logic/ed-global";
 import { treeRebuild } from "../../logic/tree/build";
+import { mainStyle } from "./main";
 
 const decoder = new TextDecoder();
 export const EdPageHistoryMain: FC<{}> = ({}) => {
@@ -92,7 +92,7 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
     <div className="flex flex-1 flex-col items-stretch">
       <div className="border-b p-1 text-sm flex">
         <div
-          className="border px-2 cursor-pointer hover:bg-blue-200 border border-blue-700 hover:bg-blue-700 hover:text-white transition-all "
+          className="border px-2 cursor-pointer border-blue-700 hover:bg-blue-700 hover:text-white transition-all"
           onClick={async () => {
             if (confirm("Are you sure ?") && local.root) {
               p.page.history.id = "";
@@ -140,6 +140,17 @@ export const EdPageHistoryMain: FC<{}> = ({}) => {
               page_id={p.page.cur.id}
               entry={local.entry}
               api={p.script.api}
+              comp_load={async (comp_id) => {
+                let comp = p.comp.loaded[comp_id];
+                if (comp) {
+                  return comp;
+                }
+
+                await loadComponent(p, comp_id);
+                comp = p.comp.loaded[comp_id];
+
+                return deepClone(comp);
+              }}
               db={p.script.db}
               script={{ init_local_effect: p.script.init_local_effect }}
             />
