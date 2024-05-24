@@ -1,4 +1,4 @@
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { AutoHeightTextarea } from "../../../../../utils/ui/auto-textarea";
 import { EDGlobal } from "../../../logic/ed-global";
 import { apiRef, apiUrl, server } from "./api-utils";
@@ -13,15 +13,18 @@ export const EdApiDB = ({
   update: () => void;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({ url: db.url });
   const api = apiRef[apiUrl(p)];
+
   return (
-    <div className="flex border-b py-2 px-2 border-slate-300 boxed  flex flex-col items-stretch">
+    <div className="flex border-b py-2 px-2 border-slate-300 boxed flex-col items-stretch">
       <AutoHeightTextarea
-        value={db.url}
+        value={local.url}
         className="text-[13px] border p-2 mb-2 "
         onChange={(e) => {
-          db.url = e.currentTarget.value;
-          p.render();
+          local.url = e.currentTarget.value;
+          db.url = local.url;
+          local.render();
         }}
         onBlur={async () => {
           update();
@@ -57,6 +60,7 @@ export const EdApiDB = ({
                   "api-ts-" + p.site.config.api_url,
                   Date.now().toString()
                 );
+                location.reload();
               }}
             >
               DB Pull
@@ -74,6 +78,7 @@ export const EdApiDB = ({
                 server.status = "ready";
                 render();
                 alert("RESTART: OK");
+                location.reload();
               }}
             >
               Restart Server

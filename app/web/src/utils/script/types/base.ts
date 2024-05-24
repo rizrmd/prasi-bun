@@ -68,41 +68,39 @@ export const baseTypings = `
     };
     childs: IItem[];
   };
- 
+  
   type SingleChange =
-  | { type: "set"; name: string; value: any }
-  | ({ type: "prop"; name: string } & PropVal)
-  | { type: "child"; childs: SimpleItem[] };
+    | { type: "set"; name: string; value: any }
+    | ({ type: "prop"; name: string } & PropVal)
+    | { type: "child"; childs: SimpleItem[] };
 
   export type PropVal =
-  | { mode: "string"; value: string }
-  | { mode: "raw"; value: string; valueBuilt?: string }
-  | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+    | { mode: "string"; value: string }
+    | { mode: "raw"; value: string; valueBuilt?: string }
+    | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
 
   type ParentArg = {
-  item: IItem & PrasiEdit;
-  child_type: "jsx" | "child";
-  child_idx: number;
+    item: IItem & PrasiEdit;
+    child_type: "jsx" | "child";
+    child_idx: number;
   };
 
   type SimpleItem = Partial<Omit<IItem, "component">> & {
-  component?: { id: string; props: Record<string, PropVal> };
+   component?: { id: string; props: Record<string, PropVal> };
   };
 
   export type PrasiEdit = {
-  edit: {
-    setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
-    setProp: (name: string, value: PropVal | string) => void;
-    pending: SingleChange[];
-    childs: (IItem & PrasiEdit)[];
-    setChilds: (childs: SimpleItem[]) => void;
-    readonly parent: null | ParentArg;
-    commit: () => Promise<void>;
-    readonly props?: Record<string, PropVal>;
+    edit: {
+      setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
+      setProp: (name: string, value: PropVal | string) => void;
+      pending: SingleChange[];
+      childs: (IItem & PrasiEdit)[];
+      setChilds: (childs: ((IItem & PrasiEdit) | SimpleItem)[]) => void;
+      readonly parent: null | ParentArg; 
+      commit: () => Promise<void>;
+      readonly props?: Record<string, PropVal>;
+    };
   };
-  };
-
-  type PrasiItem = IItem & PrasiEdit;
 
   const _item: undefined | PrasiItem;
   
