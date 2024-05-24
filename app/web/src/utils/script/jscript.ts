@@ -57,7 +57,7 @@ export const jscript = {
 
         const e = await import("@monaco-editor/react");
         jscript.editor = e.Editor;
-        e.loader.config({ paths: { vs: "/min/vs" } });
+        e.loader.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs" } });
         this.events.editorLoaded();
 
         if (enabled?.esbuild !== false) {
