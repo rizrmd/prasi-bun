@@ -26,6 +26,7 @@ export const cssFont = (
         const link = doc.createElement("link");
         link.type = "text/css";
         link.rel = "stylesheet";
+        link.crossOrigin = "anonymous";
         link.href = _href;
         doc.head.appendChild(link);
       }

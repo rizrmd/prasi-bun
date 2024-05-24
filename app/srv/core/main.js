@@ -56,7 +56,7 @@ Error generating stack: `+o.message+`
         > img {
           opacity: 0.6;
         }
-      `);var qr=window,xg=(e,t)=>{let n=He(e,"font",t,{});if(n.family){qr.loadedFonts||(qr.loadedFonts=[]);let i=`:wght@${[300,400,500,600].join(";")}`,o=n.family.replace(/ /g,"+");if(qr.loadedFonts.indexOf(n.family)<0){qr.loadedFonts.push(n.family);let l=document,s=`/_font/css2?family=${o}${i}`;if(!l.querySelector(`link[href="${s}]`)){let a=l.createElement("link");a.type="text/css",a.rel="stylesheet",a.href=s,l.head.appendChild(a)}}}return!n.family&&qr.defaultFont&&(n.family=qr.defaultFont),cx(n.color&&`
+      `);var qr=window,xg=(e,t)=>{let n=He(e,"font",t,{});if(n.family){qr.loadedFonts||(qr.loadedFonts=[]);let i=`:wght@${[300,400,500,600].join(";")}`,o=n.family.replace(/ /g,"+");if(qr.loadedFonts.indexOf(n.family)<0){qr.loadedFonts.push(n.family);let l=document,s=`/_font/css2?family=${o}${i}`;if(!l.querySelector(`link[href="${s}]`)){let a=l.createElement("link");a.type="text/css",a.rel="stylesheet",a.crossOrigin="anonymous",a.href=s,l.head.appendChild(a)}}}return!n.family&&qr.defaultFont&&(n.family=qr.defaultFont),cx(n.color&&`
         color: ${n.color};
       `,n.whitespace==="whitespace-normal"&&`
       word-break: break-word;
