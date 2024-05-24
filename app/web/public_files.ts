@@ -107,6 +107,7 @@ export const files = [
   "min/vs/basic-languages/go/go.js",
   "min/vs/basic-languages/apex/apex.js",
   "min/vs/basic-languages/powerquery/powerquery.js",
+  "min/vs/basic-languages/typespec/typespec.js",
   "min/vs/basic-languages/razor/razor.js",
   "min/vs/basic-languages/cameligo/cameligo.js",
   "min/vs/basic-languages/pascal/pascal.js",
