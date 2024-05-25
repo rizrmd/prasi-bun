@@ -12,6 +12,7 @@ export const _ = {
   url: "/_font/**",
   async api() {
     const { req } = apiContext(this);
+    return new Response("");
     const pathname = req.url.split("/_font").pop() || "";
     const cache = g._font_cache[pathname];
     if (cache) {
