@@ -1,4 +1,3 @@
 import "@/utils/init";
 import "app/css/build.css";
-export * from "@/data";
 export * from "@/exports";
