@@ -60,10 +60,6 @@ export const pushTreeNode = (
         data: meta,
       });
     } else {
-      if (meta.item.component?.id === "567d5362-2cc8-4ca5-a531-f771a5c866c2") {
-        console.log(meta);
-      }
-
       if (meta.jsx_prop) {
         if (meta.jsx_prop.is_root) {
           if (meta.jsx_prop.name !== "child") {
