@@ -2,6 +2,7 @@ import { spawn } from "bun";
 import { existsAsync, readAsync } from "fs-jetpack";
 import { dir } from "../../utils/dir";
 import { g } from "../../utils/global";
+import { platform } from "os";
 
 export const prepareAPITypes = async () => {
   const out: string[] = [];
@@ -36,7 +37,11 @@ export const ${name} = {
 
   const args = [
     process.execPath,
-    dir.path("node_modules/.bin/tsc"),
+    dir.path(
+      platform() === "win32"
+        ? "node_modules/.bin/tsc.exe"
+        : "node_modules/.bin/tsc"
+    ),
     dir.path("app/srv/exports.ts"),
     "--declaration",
     "--emitDeclarationOnly",

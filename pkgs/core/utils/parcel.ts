@@ -2,6 +2,7 @@ import { spawn } from "bun";
 import { dirAsync } from "fs-jetpack";
 import { dir } from "./dir";
 import { g } from "./global";
+import { platform } from "os";
 
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
@@ -9,7 +10,11 @@ export const parcelBuild = async () => {
 
   const args = [
     "node",
-    dir.path("node_modules/.bin/parcel"),
+    dir.path(
+      platform() === "win32"
+        ? "node_modules/.bin/parcel.exe"
+        : "node_modules/.bin/parcel"
+    ),
     g.mode === "dev" ? "watch" : "build",
     "./src/index.tsx",
     g.mode === "dev" ? "--no-hmr" : "--no-optimize",

@@ -8,6 +8,7 @@ import { user } from "../../../entity/user";
 import { conns } from "../../../entity/conn";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
+import { platform } from "os";
 export const initTypings = async (
   root: string,
   id_site: string,
@@ -42,7 +43,9 @@ export const initTypings = async (
       spawn: Bun.spawn({
         cmd: [
           ...`${dir.path(
-            "node_modules/.bin/tsc"
+            platform() === "win32"
+              ? "node_modules/.bin/tsc.exe"
+              : "node_modules/.bin/tsc"
           )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
             " "
           ),

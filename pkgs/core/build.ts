@@ -2,9 +2,10 @@ import { createId } from "@paralleldrive/cuid2";
 import brotliPromise from "brotli-wasm";
 import { Glob, spawn } from "bun";
 import { dir } from "dir";
-import { build, context } from "esbuild";
+import { build } from "esbuild";
 import { fdir } from "fdir";
 import { statSync } from "fs";
+import { platform } from "os";
 import {
   copyAsync,
   existsAsync,
@@ -53,7 +54,11 @@ if (build_all) {
 
   const args = [
     "node",
-    dir.path("node_modules/.bin/parcel"),
+    dir.path(
+      platform() === "win32"
+        ? "node_modules/.bin/parcel.exe"
+        : "node_modules/.bin/parcel"
+    ),
     "build",
     "./src/index.tsx",
     // "--no-optimize",
