@@ -77,7 +77,7 @@ export const baseTypings = `
   export type PropVal =
     | { mode: "string"; value: string }
     | { mode: "raw"; value: string; valueBuilt?: string }
-    | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+    | { mode: "jsx"; value: null | (IItem & PrasiEdit) | SimpleItem };
 
   type ParentArg = {
     item: IItem & PrasiEdit;

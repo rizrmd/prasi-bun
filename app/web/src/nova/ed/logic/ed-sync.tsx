@@ -132,6 +132,7 @@ export const edInitSync = (p: PG) => {
   }
   if (!p.sync && !p.sync_assigned) {
     p.sync_assigned = true;
+    p.site = deepClone(EmptySite);
     clientStartSync({
       user_id: p.user.id,
       site_id: params.site_id,

@@ -15,14 +15,16 @@ export const prepareApiRoutes = async () => {
           try {
             const api = await import(importPath);
             let args: string[] = await parseArgs(importPath);
-            const route = {
-              url: api._.url, 
-              args,
-              raw: !!api._.raw,
-              fn: api._.api,
-              path: importPath.substring((root || path).length + 1),
-            };
-            g._api[filename] = route;
+            if (api) {
+              const route = {
+                url: api._.url,
+                args,
+                raw: !!api._.raw,
+                fn: api._.api,
+                path: importPath.substring((root || path).length + 1),
+              };
+              g._api[filename] = route;
+            }
           } catch (e) {
             g.log.warn(
               `Failed to import app/srv/api${importPath.substring(

@@ -44,13 +44,12 @@ export const createViPassProp = (
         if (!["children", "key"].includes(k)) {
           is_changed = true;
           script_pass[k] = v;
-          script.passprop[k] = { end: 0, start: 0, value: v };
         }
       }
     }
 
     const _pass = { ...passprop, ...script_pass };
-
+    
     if (
       !Array.isArray(arg.children) &&
       isValidElement(arg.children) &&
