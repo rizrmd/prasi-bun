@@ -111,12 +111,14 @@ export const parseTypeDef = async (path: string) => {
 
   const result = {} as Record<string, "const" | "type">;
   const traverse = (items: SingleExport[]) => {
-    for (const item of items) {
-      if (item.type === "all") {
-        const found = exports[item.val];
-        traverse(found);
-      } else {
-        result[item.val] = item.kind;
+    if (typeof items === "object") {
+      for (const item of items) {
+        if (item.type === "all") {
+          const found = exports[item.val];
+          traverse(found);
+        } else {
+          result[item.val] = item.kind;
+        }
       }
     }
   };

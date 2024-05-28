@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta } from "../../utils/types";
@@ -14,7 +15,7 @@ type SingleChange =
 export type PropVal =
   | { mode: "string"; value: string }
   | { mode: "raw"; value: string; valueBuilt?: string }
-  | { mode: "jsx"; value: null | (IItem & PrasiEdit) };
+  | { mode: "jsx"; value: null | (IItem & PrasiEdit) | SimpleItem };
 
 type ParentArg = {
   item: IItem & PrasiEdit;
@@ -132,8 +133,13 @@ export const devItem = (
 
             const mitem = meta.mitem;
             const item = mitem.toJSON();
-            if (item) {
+            if (item && item.component) {
               const props = item?.component?.props as Record<string, FNCompDef>;
+
+              if (!props) {
+                console.log(item, props);
+                return;
+              }
               const src = {} as Record<string, string>;
               for (const c of changes) {
                 if (c.type === "prop" && props) {
@@ -155,10 +161,23 @@ export const devItem = (
                         } as any;
                       }
                       if (c.value) {
-                        props[c.name].content = removeEditFromChilds(
-                          [c.value],
-                          compile
-                        )[0];
+                        if (props[c.name]?.content) {
+                          props[c.name].content = {
+                            ...(props[c.name].content as any),
+                            childs: [
+                              removeEditFromChilds([c.value], compile)[0],
+                            ],
+                          };
+                        } else {
+                          props[c.name].content = {
+                            type: "item",
+                            id: createId(),
+                            name: c.name,
+                            childs: [
+                              removeEditFromChilds([c.value], compile)[0],
+                            ],
+                          };
+                        }
                       }
                     }
                   }
@@ -168,11 +187,32 @@ export const devItem = (
                       item[k] = v;
                     }
                   } else if (c.type === "child" && Array.isArray(c.childs)) {
-                    const childs = removeEditFromChilds(
-                      c.childs.filter((e) => e),
-                      compile
-                    );
-                    item.childs = childs;
+                    if (item.component?.id) {
+                      if (!item.component.props) {
+                        item.component.props = {};
+                      }
+
+                      item.component.props.child = {
+                        meta: { type: "content-element" },
+                        content: {
+                          type: "item",
+                          id: createId(),
+                          name: "child",
+                          childs: [
+                            removeEditFromChilds(
+                              c.childs.filter((e) => e),
+                              compile
+                            )[0],
+                          ],
+                        },
+                      };
+                    } else {
+                      const childs = removeEditFromChilds(
+                        c.childs.filter((e) => e),
+                        compile
+                      );
+                      item.childs = childs;
+                    }
                   }
                 }
               }
@@ -182,11 +222,14 @@ export const devItem = (
               }
 
               const code_result = await _api.code_build(src);
-              for (const [k, v] of Object.entries(code_result) as any) {
-                if (props[k]) {
-                  props[k].valueBuilt = v;
-                } else if (compile[k]) {
-                  compile[k].valueBuilt = v;
+
+              if (props) {
+                for (const [k, v] of Object.entries(code_result) as any) {
+                  if (props[k]) {
+                    props[k].valueBuilt = v;
+                  } else if (compile[k]) {
+                    compile[k].valueBuilt = v;
+                  }
                 }
               }
 
@@ -199,7 +242,7 @@ export const devItem = (
               const m = metas[k];
 
               if (m.mitem) {
-                console.log(syncronize(m.mitem as any, v));
+                syncronize(m.mitem as any, v);
               }
             }
           });
@@ -350,18 +393,33 @@ const removeEditFromChilds = (
     const item: any = { ...e };
     delete item.edit;
 
-    if (item.component?.props) {
-      item.component.props = complexifyProps(item.component.props, compile);
+    if (!item.id) {
+      item.id = createId();
+    }
 
-      for (const [k, v] of Object.entries(item.component.props) as any) {
-        if (!v.valueBuilt && v.value) {
-          compile[item.id + "|||" + k] = v;
+    if (item.component) {
+      if (!item.component.instances) {
+        item.component.instances = {};
+      }
+      if (!item.component.ref_ids) {
+        item.component.ref_ids = {};
+      }
+
+      if (item.component?.props) {
+        item.component.props = complexifyProps(item.component.props, compile);
+
+        for (const [k, v] of Object.entries(item.component.props) as any) {
+          if (!v.valueBuilt && v.value) {
+            compile[item.id + "|||" + k] = v;
+          }
         }
       }
     }
 
     if (item.childs) {
       item.childs = removeEditFromChilds(item.childs, compile);
+    } else {
+      item.childs = [];
     }
 
     return item;

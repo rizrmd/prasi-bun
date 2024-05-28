@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { EDGlobal, IMeta, active } from "../../logic/ed-global";
-import { useGlobal } from "web-utils";
+import { useGlobal, useLocal } from "web-utils";
 import { IItem } from "../../../../utils/types/item";
 import { EdSidePropComp } from "./prop-master";
 import { EdStyleAll } from "./style/side-all";
@@ -8,6 +8,7 @@ import { Popover } from "../../../../utils/ui/popover";
 
 export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
+  const local = useLocal({ value: "" });
 
   const item = meta?.item as IItem;
   if (!item) return null;
@@ -36,7 +37,7 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
                 `
               )}
               spellCheck={false}
-              value={JSON.stringify(meta.item, null, 2)}
+              value={local.value}
             ></textarea>
           }
         >
@@ -67,6 +68,7 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
             className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
             onClick={() => {
               p.ui.side.prop = true;
+              local.value = JSON.stringify(meta.item, null, 2);
               p.render();
             }}
           >

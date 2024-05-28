@@ -1,5 +1,6 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { IMeta, PG } from "../../ed-global";
+import { MItem } from "../../../../../utils/types/item";
 
 export const pushTreeNode = (
   p: PG,
@@ -26,6 +27,20 @@ export const pushTreeNode = (
           meta.mitem = mitem;
         }
       });
+
+      parent.mitem
+        .get("component")
+        ?.get("props")
+        ?.forEach((v, k) => {
+          if (typeof v === "object") {
+            if ((v as any)?.get("meta")?.get("type") === "content-element") {
+              const mitem = (v as any).get("content") as MItem;
+              if (meta.item.id === mitem.get("id")) {
+                meta.mitem = mitem;
+              }
+            }
+          }
+        });
     }
   }
 
@@ -45,6 +60,10 @@ export const pushTreeNode = (
         data: meta,
       });
     } else {
+      if (meta.item.component?.id === "567d5362-2cc8-4ca5-a531-f771a5c866c2") {
+        console.log(meta);
+      }
+
       if (meta.jsx_prop) {
         if (meta.jsx_prop.is_root) {
           if (meta.jsx_prop.name !== "child") {
@@ -58,7 +77,8 @@ export const pushTreeNode = (
         } else {
           if (meta.jsx_prop.name === "child" && meta.parent.instance_id) {
             const comp_meta = metas[meta.parent.instance_id] as IMeta;
-            const child_id = comp_meta.item.component?.props?.child?.content?.id;
+            const child_id =
+              comp_meta.item.component?.props?.child?.content?.id;
             if (child_id && comp_meta.mitem) {
               const child_meta = metas[child_id];
               if (child_meta.item.childs.find((e) => meta.item.id === e.id)) {
