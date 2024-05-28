@@ -1,4 +1,4 @@
-FROM oven/bun:latest as base
+FROM oven/bun:1.1.10 as base
 WORKDIR /app/prasi/repo
 
 RUN apt-get update
