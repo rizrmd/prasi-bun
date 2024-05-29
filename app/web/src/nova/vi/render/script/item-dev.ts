@@ -187,8 +187,6 @@ export const devItem = (
                       item[k] = v;
                     }
                   } else if (c.type === "child" && Array.isArray(c.childs)) {
-                    console.log("faisol", c.childs);
-
                     if (item.component?.id) {
                       if (!item.component.props) {
                         item.component.props = {};
