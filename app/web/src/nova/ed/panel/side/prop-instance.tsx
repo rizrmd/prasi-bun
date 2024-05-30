@@ -126,7 +126,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               return;
             }
           } catch (e) {
-            console.log(key, visible, arg);
+            console.warn("Failed to parse visible on prop: ", key);
             console.error(e);
           }
         } catch (e) {
