@@ -22,9 +22,9 @@ export const initFrontEnd = async (
   if (existing) {
     if (force) {
       try {
-        await existing.dispose();
+        await existing.ctx.dispose();
         delete code.internal.frontend[id_site];
-      } catch (e) { }
+      } catch (e) {}
     } else {
       return;
     }
@@ -33,7 +33,7 @@ export const initFrontEnd = async (
   try {
     await isInstalling(id_site);
     const out_dir = dir.data(`code/${id_site}/site/build`);
-    const existing = await context({
+    const build_ctx = await context({
       absWorkingDir: dir.data(root),
       entryPoints: ["index.tsx"],
       outdir: out_dir,
@@ -61,14 +61,29 @@ export const initFrontEnd = async (
         {
           name: "prasi",
           async setup(setup) {
-
             try {
               await codeError(id_site, "Building...");
               setup.onStart(async () => {
                 if (!(await isInstalling(id_site)))
                   await codeError(id_site, "Building...");
+
+                const cur = code.internal.frontend[id_site];
+                if (cur) {
+                  if (!cur.timeout) {
+                    cur.timeout = setTimeout(async () => {
+                      if (cur.ctx) {
+                        cur.timeout = null;
+                        initFrontEnd(root, id_site, true);
+                      }
+                    }, 5000);
+                  }
+                }
               });
               setup.onEnd(async (res) => {
+                const cur = code.internal.frontend[id_site];
+                if (cur) {
+                  clearTimeout(cur.timeout);
+                }
                 if (res.errors.length > 0) {
                   await codeError(
                     id_site,
@@ -104,8 +119,8 @@ export const initFrontEnd = async (
         },
       ],
     });
-    code.internal.frontend[id_site] = existing;
-    await existing.watch();
+    code.internal.frontend[id_site] = { ctx: build_ctx, timeout: null };
+    await build_ctx.watch();
   } catch (e: any) {
     console.error("Error building front end", id_site);
     delete code.internal.frontend[id_site];
@@ -115,8 +130,7 @@ export const initFrontEnd = async (
 const codeError = async (id_site: string, error: string, append?: boolean) => {
   const path = code.path(id_site, "site", "src", "index.log");
 
-  if (error)
-    console.log(error)
+  if (error) console.log(error);
   if (append) {
     await appendFile(path, error);
     return;
@@ -131,7 +145,7 @@ const isInstalling = async (id_site: string) => {
     const text = await file.text();
     if (typeof text === "string" && text.startsWith("Installing dependencies"))
       return true;
-  } catch (e) { }
+  } catch (e) {}
 
   return false;
 };
@@ -179,14 +193,13 @@ const installDeps = async (
           !im.startsWith("server")
         ) {
           const parts = im.split("/");
-          if (im.startsWith('@')) {
-            im = `${parts[0]}/${parts[1]}`
+          if (im.startsWith("@")) {
+            im = `${parts[0]}/${parts[1]}`;
           } else {
             im = parts[0];
           }
           imports.add(im);
         }
-
       }
     }
   }
@@ -202,11 +215,10 @@ const installDeps = async (
             !im.path.startsWith("lib") &&
             !im.path.startsWith("server")
           ) {
-
             const parts = im.path.split("/");
             let src = im.path;
-            if (src.startsWith('@')) {
-              src = `${parts[0]}/${parts[1]}`
+            if (src.startsWith("@")) {
+              src = `${parts[0]}/${parts[1]}`;
             } else {
               src = parts[0];
             }
@@ -219,15 +231,18 @@ const installDeps = async (
   }
 
   if (!isEqual(imports, pkgjson)) {
-
     const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
     if (!(await pkgjson.exists())) {
-      await Bun.write(pkgjson, JSON.stringify({
-        name: id_site,
-        scripts: {
-          "startup": "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify"
-        }
-      }));
+      await Bun.write(
+        pkgjson,
+        JSON.stringify({
+          name: id_site,
+          scripts: {
+            startup:
+              "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify",
+          },
+        })
+      );
     }
 
     await codeError(
