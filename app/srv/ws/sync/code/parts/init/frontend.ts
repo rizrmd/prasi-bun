@@ -10,6 +10,7 @@ import { user } from "../../../entity/user";
 import { conns } from "../../../entity/conn";
 import { SyncType } from "../../../type";
 import { sendWS } from "../../../sync-handler";
+import { removeAsync } from "fs-jetpack";
 
 const decoder = new TextDecoder();
 export const initFrontEnd = async (
@@ -73,6 +74,9 @@ export const initFrontEnd = async (
                     cur.timeout = setTimeout(async () => {
                       if (cur.ctx) {
                         cur.timeout = null;
+                        await removeAsync(
+                          code.path(id_site, "site", "src", "node_modules")
+                        );
                         initFrontEnd(root, id_site, true);
                       }
                     }, 5000);
