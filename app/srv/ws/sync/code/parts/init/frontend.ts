@@ -79,7 +79,7 @@ export const initFrontEnd = async (
                         );
                         initFrontEnd(root, id_site, true);
                       }
-                    }, 5000);
+                    }, 20000);
                   }
                 }
               });
