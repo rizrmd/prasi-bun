@@ -70,6 +70,7 @@ export const initFrontEnd = async (
 
                 const cur = code.internal.frontend[id_site];
                 if (cur) {
+                  clearTimeout(cur.timeout);
                   if (!cur.timeout) {
                     cur.timeout = setTimeout(async () => {
                       if (cur.ctx) {
