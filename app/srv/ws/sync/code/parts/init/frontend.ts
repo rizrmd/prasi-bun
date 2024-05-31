@@ -67,28 +67,8 @@ export const initFrontEnd = async (
               setup.onStart(async () => {
                 if (!(await isInstalling(id_site)))
                   await codeError(id_site, "Building...");
-
-                const cur = code.internal.frontend[id_site];
-                if (cur) {
-                  clearTimeout(cur.timeout);
-                  if (!cur.timeout) {
-                    cur.timeout = setTimeout(async () => {
-                      if (cur.ctx) {
-                        cur.timeout = null;
-                        await removeAsync(
-                          code.path(id_site, "site", "src", "node_modules")
-                        );
-                        initFrontEnd(root, id_site, true);
-                      }
-                    }, 20000);
-                  }
-                }
               });
               setup.onEnd(async (res) => {
-                const cur = code.internal.frontend[id_site];
-                if (cur) {
-                  clearTimeout(cur.timeout);
-                }
                 if (res.errors.length > 0) {
                   await codeError(
                     id_site,
@@ -96,7 +76,6 @@ export const initFrontEnd = async (
                       "\n\n"
                     )
                   );
-                  await installDeps(root, res, id_site);
                 } else {
                   await codeError(id_site, "");
 
