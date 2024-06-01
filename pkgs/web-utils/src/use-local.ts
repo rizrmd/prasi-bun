@@ -17,6 +17,8 @@ export const useLocal = <T extends object>(
     deps: (deps || []) as any[],
     ready: false,
     _loading: {} as any,
+    lastRender: 0,
+    lastRenderCount: 0,
   });
   const local = _.current;
 
@@ -29,7 +31,20 @@ export const useLocal = <T extends object>(
     local._loading = {};
 
     local.data.render = () => {
-      if (local.ready) _render({});
+      if (local.ready) {
+        if (Date.now() - local.lastRender < 200) {
+          local.lastRenderCount++;
+        } else {
+          local.lastRenderCount = 0;
+        }
+
+        if (local.lastRenderCount > 20) {
+          throw new Error("local.render more than 20 times in less than 200ms");
+        }
+
+        local.lastRender = Date.now();
+        _render({});
+      }
     };
   } else {
     if (local.deps.length > 0 && deps) {
