@@ -280,8 +280,8 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                     {group !== "_" && (
                       <div
                         className={cx(
-                          "border-b px-1 cursor-pointer hover:bg-blue-100 select-none flex items-center",
-                          hide.includes(group) && "py-1"
+                          "border-b px-1 cursor-pointer py-1 hover:bg-blue-100 select-none flex items-center",
+                          !hide.includes(group) && "bg-slate-50"
                         )}
                         onClick={() => {
                           if (hide.includes(group)) {
