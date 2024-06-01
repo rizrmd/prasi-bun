@@ -346,7 +346,7 @@ export const EdPropInstanceOptions: FC<{
                 if (!local.checkbox.width && el) {
                   const bound = el.getBoundingClientRect();
                   local.checkbox.width = bound.width;
-                  local.render();
+                  setTimeout(local.render, 500);
                 }
               }}
             >
