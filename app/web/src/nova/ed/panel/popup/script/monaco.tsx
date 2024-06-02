@@ -22,6 +22,10 @@ const scriptEdit = {
   timeout: null as any,
 };
 
+const w = window as unknown as {
+  monaco_loaded: boolean;
+};
+
 const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
 export const EdScriptMonaco: FC<{}> = () => {
@@ -51,6 +55,11 @@ export const EdScriptMonaco: FC<{}> = () => {
 
   let val = "";
   useEffect(() => {
+    if (!w.monaco_loaded) {
+      w.monaco_loaded = true;
+      console.clear();
+    }
+
     return () => {
       p.ui.monaco = null;
       p.script.do_edit = async () => {};
@@ -413,7 +422,7 @@ return typings;
         }
       }
     } catch (e) {
-      console.log('WARNING: typings prasi error, bilang mas rizky plis...');
+      console.log("WARNING: typings prasi error, bilang mas rizky plis...");
     }
   }
 };
