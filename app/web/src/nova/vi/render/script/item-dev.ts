@@ -161,23 +161,11 @@ export const devItem = (
                         } as any;
                       }
                       if (c.value) {
-                        if (props[c.name]?.content) {
-                          props[c.name].content = {
-                            ...(props[c.name].content as any),
-                            childs: [
-                              removeEditFromChilds([c.value], compile)[0],
-                            ],
-                          };
-                        } else {
-                          props[c.name].content = {
-                            type: "item",
-                            id: createId(),
-                            name: c.name,
-                            childs: [
-                              removeEditFromChilds([c.value], compile)[0],
-                            ],
-                          };
-                        }
+                        props[c.name].content = removeEditFromChilds(
+                          [c.value],
+                          compile
+                        )[0];
+                        console.log(props[c.name].content);
                       }
                     }
                   }

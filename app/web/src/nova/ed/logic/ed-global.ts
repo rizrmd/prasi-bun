@@ -273,6 +273,7 @@ export const EDGlobal = {
         name: "site",
         log: "",
         loading: false,
+        rebuilding: false,
         startup_status: "init" as
           | "init"
           | "loading"
