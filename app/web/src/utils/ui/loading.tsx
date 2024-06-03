@@ -8,9 +8,10 @@ export const Loading: FC<{
   className?: string;
   show?: boolean;
   backdrop?: boolean;
-  note?: string;
+  note?: ReactNode;
   alt?: ReactElement;
-}> = ({ children, className, show, backdrop, note, alt }) => {
+  pointer?: boolean;
+}> = ({ children, className, show, backdrop, note, alt, pointer }) => {
   const local = useLocal(
     {
       icon: <div className="px-4 py-1">Loading...</div>,
@@ -73,8 +74,8 @@ export const Loading: FC<{
             className
               ? className
               : backdrop !== false
-              ? "w-full h-full fixed"
-              : "",
+                ? "w-full h-full fixed"
+                : "",
             typeof show !== "undefined" ? (show ? "" : "hidden") : ""
           )}
         >
@@ -85,12 +86,13 @@ export const Loading: FC<{
       ) : (
         <div
           className={cx(
-            "flex flex-1 items-center justify-center z-40 pointer-events-none transition-all",
+            "flex flex-1 items-center justify-center z-40  transition-all",
+            pointer !== true && "pointer-events-none",
             className
               ? className
               : backdrop !== false
-              ? "w-full h-full fixed"
-              : "",
+                ? "w-full h-full fixed"
+                : "",
             typeof show !== "undefined" ? (show ? "" : "hidden") : ""
           )}
         >
