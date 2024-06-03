@@ -18,6 +18,7 @@ import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
+import { iconVSCode } from "./panel/popup/code/icons";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -31,7 +32,35 @@ export const EdBase = () => {
   edRoute(p);
 
   if (p.status === "load-site") {
-    return <Loading note={`page-${p.status}`} />;
+    return (
+      <Loading
+        note={
+          <div className="flex flex-col items-center space-y-1 relative">
+            <div>{p.site.name || p.site.id}</div>
+            <div className="pb-2">{`page-${p.status}`}</div>
+            {p.site.id && (
+              <div className="absolute top-[50px]">
+                <a
+                  href={`https://prasi-vsc.avolut.com/?tkn=prasi&folder=/site/${p.site.id}/site/src`}
+                  target="_blank"
+                  className={cx(
+                    "flex space-x-1 border items-center rounded-md px-2 cursor-pointer pointer-events-auto",
+                    css`
+                      svg {
+                        width: 11px;
+                      }
+                    `
+                  )}
+                >
+                  <div dangerouslySetInnerHTML={{ __html: iconVSCode }} />
+                  <div>Open VSCode</div>
+                </a>
+              </div>
+            )}
+          </div>
+        }
+      />
+    );
   }
   if (p.status === "site-not-found" || p.status === "page-not-found") {
     return (
