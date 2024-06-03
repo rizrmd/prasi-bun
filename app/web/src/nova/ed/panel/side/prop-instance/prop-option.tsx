@@ -41,6 +41,7 @@ export const EdPropInstanceOptions: FC<{
       width: 0,
     },
     options: [] as MetaOption[],
+    optDeps: [] as any[],
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -116,7 +117,14 @@ export const EdPropInstanceOptions: FC<{
           const resOpt = ${src.endsWith(";") ? src : `${src};`}
         
           if (typeof resOpt === 'function') local.metaFn = resOpt;
-          else local.options = resOpt;
+          else {
+            if (typeof resOpt === 'object' && Array.isArray(resOpt.deps) && typeof resOpt.fn === 'function') {
+              local.metaFn = resOpt.fn;
+              local.optDeps = resOpt.deps;
+            } else {
+              local.options = resOpt;
+            }
+          }
         } catch(e) { console.error(e); }`;
         fn = new Function(...Object.keys(arg), "local", final);
         fn(...Object.values(arg), local);
@@ -127,26 +135,30 @@ export const EdPropInstanceOptions: FC<{
     } else {
       local.options = local.loaded;
     }
+  }
 
-    if (local.metaFn && !local.loaded && !local.loading) {
-      local.loading = true;
-      try {
-        const res = local.metaFn();
-        const callback = (e: any) => {
-          local.loading = false;
-          local.loaded = e;
-          local.render();
-        };
-        if (res instanceof Promise)
-          res.then(callback).catch((e) => {
-            console.error(e);
-          });
-        else callback(res);
-      } catch (e) {
-        console.error(e);
+  useEffect(() => {
+    if (local.metaFn) {
+      if (local.metaFn && !local.loaded && !local.loading) {
+        local.loading = true;
+        try {
+          const res = local.metaFn();
+          const callback = (e: any) => {
+            local.loading = false;
+            local.loaded = e;
+            local.render();
+          };
+          if (res instanceof Promise)
+            res.then(callback).catch((e) => {
+              console.error(e);
+            });
+          else callback(res);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
-  }
+  }, local.optDeps);
 
   let evalue: any = null;
   try {
