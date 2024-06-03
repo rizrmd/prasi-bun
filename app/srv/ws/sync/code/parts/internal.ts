@@ -18,7 +18,7 @@ export const codeInternal = {
     if (!g.prasi_code.frontend) g.prasi_code.frontend = {};
     return g.prasi_code.frontend as Record<
       SITE_ID,
-      { ctx: BuildContext; timeout: any }
+      { ctx: BuildContext; timeout: any, watch: FSWatcher, rebuilding: boolean }
     >;
   },
   get typings() {

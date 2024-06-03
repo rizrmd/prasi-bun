@@ -34,8 +34,8 @@ export const pushTreeNode = (
         ?.forEach((v, k) => {
           if (typeof v === "object") {
             if ((v as any)?.get("meta")?.get("type") === "content-element") {
-              const mitem = (v as any).get("content") as MItem;
-              if (meta.item.id === mitem.get("id")) {
+              const mitem = (v as any)?.get("content") as MItem;
+              if (mitem && meta.item.id === mitem.get("id")) {
                 meta.mitem = mitem;
               }
             }

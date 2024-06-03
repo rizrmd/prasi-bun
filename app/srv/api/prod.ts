@@ -116,7 +116,7 @@ export const _ = {
             const root = `/code/${site_id}/site/src`;
             await ensureLib(root, site_id);
             await ensureFiles(root, site_id);
-            await initFrontEnd(root, site_id, true);
+            await initFrontEnd(root, site_id);
             await new Promise<void>((resolve) => {
               const ival = setInterval(async () => {
                 file = Bun.file(build_path);

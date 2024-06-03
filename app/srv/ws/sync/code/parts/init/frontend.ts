@@ -11,7 +11,7 @@ import { conns } from "../../../entity/conn";
 import { SyncType } from "../../../type";
 import { sendWS } from "../../../sync-handler";
 import { removeAsync } from "fs-jetpack";
-
+import { watch } from "fs";
 const decoder = new TextDecoder();
 export const initFrontEnd = async (
   root: string,
@@ -23,6 +23,7 @@ export const initFrontEnd = async (
   if (existing) {
     if (force) {
       try {
+        existing.watch.close();
         await existing.ctx.dispose();
         delete code.internal.frontend[id_site];
       } catch (e) {}
@@ -103,8 +104,27 @@ export const initFrontEnd = async (
         },
       ],
     });
-    code.internal.frontend[id_site] = { ctx: build_ctx, timeout: null };
-    await build_ctx.watch();
+    code.internal.frontend[id_site] = {
+      ctx: build_ctx,
+      timeout: null,
+      rebuilding: false,
+      watch: watch(dir.data(root), async (event, filename) => {
+        const ctx = code.internal.frontend[id_site];
+        if (
+          ctx &&
+          (filename?.endsWith(".tsx") ||
+            filename?.endsWith(".ts") ||
+            filename?.endsWith(".css") ||
+            filename?.endsWith(".html"))
+        ) {
+          if (!ctx.rebuilding) {
+            ctx.rebuilding = true;
+            await ctx.ctx.rebuild();
+            ctx.rebuilding = false;
+          }
+        }
+      }),
+    };
   } catch (e: any) {
     console.error("Error building front end", id_site);
     delete code.internal.frontend[id_site];
