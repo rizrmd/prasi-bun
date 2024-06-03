@@ -108,22 +108,29 @@ export const initFrontEnd = async (
       ctx: build_ctx,
       timeout: null,
       rebuilding: false,
-      watch: watch(dir.data(root), async (event, filename) => {
-        const fe = code.internal.frontend[id_site];
-        if (
-          fe &&
-          (filename?.endsWith(".tsx") ||
-            filename?.endsWith(".ts") ||
-            filename?.endsWith(".css") ||
-            filename?.endsWith(".html"))
-        ) {
-          if (!fe.rebuilding) {
-            fe.rebuilding = true;
-            await fe.ctx.rebuild();
-            fe.rebuilding = false;
+      watch: watch(
+        dir.data(root),
+        {
+          recursive: true,
+        },
+        async (event, filename) => {
+          const fe = code.internal.frontend[id_site];
+          if (filename?.startsWith("node_modules")) return;
+          if (
+            fe &&
+            (filename?.endsWith(".tsx") ||
+              filename?.endsWith(".ts") ||
+              filename?.endsWith(".css") ||
+              filename?.endsWith(".html"))
+          ) {
+            if (!fe.rebuilding) {
+              fe.rebuilding = true;
+              await fe.ctx.rebuild();
+              fe.rebuilding = false;
+            }
           }
         }
-      }),
+      ),
     };
     const fe = code.internal.frontend[id_site];
     fe.rebuilding = true;
