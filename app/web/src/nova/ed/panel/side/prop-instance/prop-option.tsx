@@ -32,8 +32,7 @@ export const EdPropInstanceOptions: FC<{
   const prop = mprop.toJSON() as FNCompDef;
   const local = useLocal({
     codeEditing: false,
-    loading: false,
-    loaded: false as any,
+    loading: true,
     isOpen: false,
     val: "",
     metaFn: null as null | (() => Promise<MetaOption[]>),
@@ -47,13 +46,12 @@ export const EdPropInstanceOptions: FC<{
 
   config.opt[name] = () => {
     local.metaFn = null;
-    local.loaded = null;
     local.loading = false;
     local.render();
   };
 
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
-    if (!local.loaded || !local.metaFn) {
+    if (!local.metaFn || local.optDeps.length > 0) {
       let fn = "" as any;
       let arg = {};
       try {
@@ -132,8 +130,6 @@ export const EdPropInstanceOptions: FC<{
         console.error(e);
         console.warn(fn.toString(), arg);
       }
-    } else {
-      local.options = local.loaded;
     }
   }
 
@@ -144,7 +140,7 @@ export const EdPropInstanceOptions: FC<{
         const res = local.metaFn();
         const callback = (e: any) => {
           local.loading = false;
-          local.loaded = e;
+          local.options = e;
           local.render();
         };
         if (res instanceof Promise) {
@@ -155,6 +151,9 @@ export const EdPropInstanceOptions: FC<{
       } catch (e) {
         console.error(e);
       }
+    } else {
+      local.loading = false;
+      local.render();
     }
   }, local.optDeps);
 
@@ -205,175 +204,195 @@ export const EdPropInstanceOptions: FC<{
     <div className="flex items-stretch min-h-[28px]">
       <EdPropLabel name={label || name} labelClick={labelClick} />
       <div className="flex flex-1 justify-end items-stretch">
-        {mode === "dropdown" && (
-          <select
-            value={evalue}
-            className="flex-1 border-l outline-none"
-            onChange={(ev) => {
-              onChange(
-                `"${ev.currentTarget.value}"`,
-                local.options.find((e) => e.value === ev.currentTarget.value)
-              );
-            }}
-          >
-            {Array.isArray(local.options) &&
-              local.options.map((item, idx) => {
-                return (
-                  <option key={idx} value={item.value}>
-                    {item.label}
-                  </option>
-                );
-              })}
-          </select>
-        )}
-
-        {mode === "button" && (
-          <div className="flex-1 pt-1 px-1 flex flex-wrap justify-end space-x-1">
-            {Array.isArray(local.options) &&
-              local.options.map((item, idx) => {
-                return (
-                  <div
-                    key={idx}
-                    className={cx(
-                      "flex px-2 text-xs mb-1 border rounded-sm cursor-pointer  justify-center select-none items-center",
-                      item.value !== evalue
-                        ? "bg-white  text-blue-700 hover:bg-blue-50 hover:border-blue-500"
-                        : "bg-blue-700 text-white border-blue-700"
-                    )}
-                    onClick={() => {
-                      onChange(`"${item.value}"`, item);
-                    }}
-                  >
-                    {item.label}
-                  </div>
-                );
-              })}
+        {local.loading ? (
+          <div className="flex flex-1 justify-center items-center">
+            Loading...
           </div>
-        )}
-
-        {mode === "checkbox" && (
-          <Popover
-            placement="top"
-            content={
-              <div
-                className={cx(
-                  "relative max-h-[400px] min-w-[200px] overflow-y-auto overflow-x-hidden",
-                  css`
-                    margin: 0px -8px -6px -8px;
-                    background: white;
-                    padding: 5px 0px 0px 0px;
-                    width: ${local.checkbox.width}px;
-                  `
-                )}
+        ) : (
+          <>
+            {mode === "dropdown" && (
+              <select
+                value={evalue}
+                className="flex-1 border-l outline-none"
+                onChange={(ev) => {
+                  onChange(
+                    `"${ev.currentTarget.value}"`,
+                    local.options.find(
+                      (e) => e.value === ev.currentTarget.value
+                    )
+                  );
+                }}
               >
-                <div className={cx("flex flex-col bg-white")}>
-                  {Array.isArray(local.options) &&
-                    local.options.map((item, idx) => {
-                      const val: any[] = Array.isArray(evalue) ? evalue : [];
-                      const found = val.find((e) => {
-                        if (!item.options) {
-                          return e === item.value;
-                        } else {
-                          if (typeof e === "object" && e.value === item.value) {
-                            return true;
-                          }
-                          return false;
-                        }
-                      });
-                      return (
-                        <Fragment key={idx}>
-                          <SingleCheckbox
-                            item={item}
-                            idx={idx}
-                            val={val}
-                            depth={0}
-                            onChange={(val) => {
-                              onChange(JSON.stringify(val), item);
-                              local.render();
-                            }}
-                          />
-                          {item.options &&
-                            found &&
-                            item.options.map((child, idx) => {
-                              const sub_found = found.checked.find((e: any) => {
-                                if (!item.options) {
-                                  return e === child.value;
-                                } else {
-                                  if (
-                                    typeof e === "object" &&
-                                    e.value === child.value
-                                  ) {
-                                    return true;
-                                  }
-                                  return false;
-                                }
-                              });
-                              return (
-                                <Fragment key={idx}>
-                                  <SingleCheckbox
-                                    key={idx}
-                                    item={child}
-                                    idx={idx}
-                                    depth={1}
-                                    val={found.checked}
-                                    onChange={(newval) => {
-                                      onChange(JSON.stringify(val), child);
-                                      local.render();
-                                    }}
-                                  />
-                                  {child.options &&
-                                    sub_found &&
-                                    child.options.map((item, sidx) => {
-                                      return (
-                                        <SingleCheckbox
-                                          item={item}
-                                          idx={idx}
-                                          key={sidx}
-                                          depth={2}
-                                          val={sub_found.checked}
-                                          onChange={(newval) => {
-                                            onChange(JSON.stringify(val), item);
-                                            local.render();
-                                          }}
-                                        />
-                                      );
-                                    })}
-                                </Fragment>
-                              );
-                            })}
-                        </Fragment>
-                      );
-                    })}
-                </div>
+                {Array.isArray(local.options) &&
+                  local.options.map((item, idx) => {
+                    return (
+                      <option key={idx} value={item.value}>
+                        {item.label}
+                      </option>
+                    );
+                  })}
+              </select>
+            )}
+
+            {mode === "button" && (
+              <div className="flex-1 pt-1 px-1 flex flex-wrap justify-end space-x-1">
+                {Array.isArray(local.options) &&
+                  local.options.map((item, idx) => {
+                    return (
+                      <div
+                        key={idx}
+                        className={cx(
+                          "flex px-2 text-xs mb-1 border rounded-sm cursor-pointer  justify-center select-none items-center",
+                          item.value !== evalue
+                            ? "bg-white  text-blue-700 hover:bg-blue-50 hover:border-blue-500"
+                            : "bg-blue-700 text-white border-blue-700"
+                        )}
+                        onClick={() => {
+                          onChange(`"${item.value}"`, item);
+                        }}
+                      >
+                        {item.label}
+                      </div>
+                    );
+                  })}
               </div>
-            }
-            asChild
-          >
-            <div
-              className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer m-[3px]"
-              onClick={() => {}}
-              ref={(el) => {
-                if (!local.checkbox.width && el) {
-                  const bound = el.getBoundingClientRect();
-                  local.checkbox.width = bound.width;
-                  setTimeout(local.render, 500);
+            )}
+
+            {mode === "checkbox" && (
+              <Popover
+                placement="top"
+                content={
+                  <div
+                    className={cx(
+                      "relative max-h-[400px] min-w-[200px] overflow-y-auto overflow-x-hidden",
+                      css`
+                        margin: 0px -8px -6px -8px;
+                        background: white;
+                        padding: 5px 0px 0px 0px;
+                        width: ${local.checkbox.width}px;
+                      `
+                    )}
+                  >
+                    <div className={cx("flex flex-col bg-white")}>
+                      {Array.isArray(local.options) &&
+                        local.options.map((item, idx) => {
+                          const val: any[] = Array.isArray(evalue)
+                            ? evalue
+                            : [];
+                          const found = val.find((e) => {
+                            if (!item.options) {
+                              return e === item.value;
+                            } else {
+                              if (
+                                typeof e === "object" &&
+                                e.value === item.value
+                              ) {
+                                return true;
+                              }
+                              return false;
+                            }
+                          });
+                          return (
+                            <Fragment key={idx}>
+                              <SingleCheckbox
+                                item={item}
+                                idx={idx}
+                                val={val}
+                                depth={0}
+                                onChange={(val) => {
+                                  onChange(JSON.stringify(val), item);
+                                  local.render();
+                                }}
+                              />
+                              {item.options &&
+                                found &&
+                                item.options.map((child, idx) => {
+                                  const sub_found = found.checked.find(
+                                    (e: any) => {
+                                      if (!item.options) {
+                                        return e === child.value;
+                                      } else {
+                                        if (
+                                          typeof e === "object" &&
+                                          e.value === child.value
+                                        ) {
+                                          return true;
+                                        }
+                                        return false;
+                                      }
+                                    }
+                                  );
+                                  return (
+                                    <Fragment key={idx}>
+                                      <SingleCheckbox
+                                        key={idx}
+                                        item={child}
+                                        idx={idx}
+                                        depth={1}
+                                        val={found.checked}
+                                        onChange={(newval) => {
+                                          onChange(JSON.stringify(val), child);
+                                          local.render();
+                                        }}
+                                      />
+                                      {child.options &&
+                                        sub_found &&
+                                        child.options.map((item, sidx) => {
+                                          return (
+                                            <SingleCheckbox
+                                              item={item}
+                                              idx={idx}
+                                              key={sidx}
+                                              depth={2}
+                                              val={sub_found.checked}
+                                              onChange={(newval) => {
+                                                onChange(
+                                                  JSON.stringify(val),
+                                                  item
+                                                );
+                                                local.render();
+                                              }}
+                                            />
+                                          );
+                                        })}
+                                    </Fragment>
+                                  );
+                                })}
+                            </Fragment>
+                          );
+                        })}
+                    </div>
+                  </div>
                 }
-              }}
-            >
-              <div className="flex-1 flex items-center">
-                <div className="px-1">
-                  {Array.isArray(evalue)
-                    ? evalue.length === 0
-                      ? "Select Item"
-                      : `${evalue.length} selected`
-                    : `Select Item`}
+                asChild
+              >
+                <div
+                  className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer m-[3px]"
+                  onClick={() => {}}
+                  ref={(el) => {
+                    if (!local.checkbox.width && el) {
+                      const bound = el.getBoundingClientRect();
+                      local.checkbox.width = bound.width;
+                      setTimeout(local.render, 500);
+                    }
+                  }}
+                >
+                  <div className="flex-1 flex items-center">
+                    <div className="px-1">
+                      {Array.isArray(evalue)
+                        ? evalue.length === 0
+                          ? "Select Item"
+                          : `${evalue.length} selected`
+                        : `Select Item`}
+                    </div>
+                  </div>
+                  <div className="pr-1 pt-[2px]">
+                    <ChevronDown />
+                  </div>
                 </div>
-              </div>
-              <div className="pr-1 pt-[2px]">
-                <ChevronDown />
-              </div>
-            </div>
-          </Popover>
+              </Popover>
+            )}
+          </>
         )}
       </div>
     </div>
