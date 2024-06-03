@@ -123,7 +123,13 @@ export const EdTreeName = ({
         />
       ) : (
         <div className="flex flex-col">
-          <Name name={name} is_jsx_prop={is_jsx_prop} meta={node.data} />
+          <Name
+            name={name}
+            is_jsx_prop={is_jsx_prop}
+            meta={node.data}
+            metas={p.page.meta}
+            comps={p.comp.list}
+          />
           {/* <div className={"text-[9px] text-gray-500 -mt-1"}>
             {node.id} - {item.originalId}
           </div> */}
@@ -133,11 +139,13 @@ export const EdTreeName = ({
   );
 };
 
-const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
-  name,
-  is_jsx_prop,
-  meta,
-}) => {
+const Name: FC<{
+  name: string;
+  is_jsx_prop: boolean;
+  meta?: IMeta;
+  metas: Record<string, IMeta>;
+  comps: Record<string, { meta: Record<string, IMeta> }>;
+}> = ({ name, is_jsx_prop, meta, comps }) => {
   let comp_label = "";
   if (meta?.item.component?.id) {
     for (const prop of Object.values(meta?.item.component?.props || {})) {
@@ -153,7 +161,29 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
   }
 
   if (is_jsx_prop) {
+    let gen_jsx = false;
     const comp_id = meta?.item.component?.id;
+    let comp = null as null | IMeta;
+    if (comp_id && comps[comp_id] && comps[comp_id].meta) {
+      const key = Object.keys(comps[comp_id].meta).shift();
+      if (key) {
+        comp = comps[comp_id].meta[key];
+      }
+    }
+
+    if (
+      comp &&
+      (comp.item.component?.props[name] || comp.item.component?.props.child)
+    ) {
+      for (const child of comp.item.childs) {
+        if (child.name.startsWith("jsx:")) {
+          if ([name, "child"].includes(child.name.substring(4).trim())) {
+            gen_jsx = true;
+          }
+        }
+      }
+    }
+    if (!comp_id) gen_jsx = true;
 
     return (
       <div className={cx("flex items-center space-x-1 pr-1")}>
@@ -170,7 +200,7 @@ const Name: FC<{ name: string; is_jsx_prop: boolean; meta?: IMeta }> = ({
             </div>
           </div>
         </div>
-        {meta && meta.mitem && active.comp_id !== comp_id && (
+        {gen_jsx && meta && meta.mitem && active.comp_id !== comp_id && (
           <GenerateJSX meta={meta} />
         )}
         {meta && !meta.mitem && (

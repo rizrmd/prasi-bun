@@ -32,14 +32,14 @@ export const useLocal = <T extends object>(
 
     local.data.render = () => {
       if (local.ready) {
-        if (Date.now() - local.lastRender < 200) {
+        if (Date.now() - local.lastRender < 300) {
           local.lastRenderCount++;
         } else {
           local.lastRenderCount = 0;
         }
 
-        if (local.lastRenderCount > 20) {
-          throw new Error("local.render more than 20 times in less than 200ms");
+        if (local.lastRenderCount > 50) {
+          throw new Error("local.render more than 50 times in less than 300ms");
         }
 
         local.lastRender = Date.now();
