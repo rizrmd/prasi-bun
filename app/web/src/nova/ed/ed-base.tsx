@@ -19,6 +19,7 @@ import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
 import { iconVSCode } from "./panel/popup/code/icons";
+import { isLocalhost } from "../../utils/ui/is-localhost";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -31,6 +32,10 @@ export const EdBase = () => {
 
   edRoute(p);
 
+  const vscode_url = isLocalhost()
+    ? "http://localhost:8443?"
+    : "https://prasi-vsc.avolut.com/?tkn=prasi&";
+    
   if (p.status === "load-site") {
     return (
       <Loading
@@ -41,7 +46,7 @@ export const EdBase = () => {
             {p.site.id && (
               <div className="absolute top-[50px]">
                 <a
-                  href={`https://prasi-vsc.avolut.com/?tkn=prasi&folder=/site/${p.site.id}/site/src`}
+                  href={`${vscode_url}folder=/site/${p.site.id}/site/src`}
                   target="_blank"
                   className={cx(
                     "flex space-x-1 border items-center rounded-md px-2 cursor-pointer pointer-events-auto",

@@ -2,6 +2,7 @@ import type { OnMount } from "@monaco-editor/react";
 import { IContent } from "../../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { TypedArray } from "yjs-types";
+import { register } from "../../../../../../utils/script/typings";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -144,29 +145,42 @@ return typings;
     m_prev = m;
   }
 
-  const raw_types: string[] = [];
+  const tree_types: string[] = [];
+  const tree_usage: string[] = [];
   for (const [k, v] of Object.entries(vars)) {
     if (v.mode === "local") {
-      raw_types.push(`\
-const \$\$_${k} = ${v.val};
-const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });
+      const im = tree_types.length;
+      tree_types.push(`\
+declare module "item-${im}" {
+  export const \$\$_${k} = ${v.val};
+}
+`);
+      tree_usage.push(`
+import { \$\$_${k} } from "item-${im}";
+const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });  
 `);
     } else if (v.mode === "prop") {
-      raw_types.push(`\
-const \$\$_${k} = ${v.val};
-const ${k} = null as unknown as typeof \$\$_${k};`);
+      const im = tree_types.length;
+      tree_types.push(`\
+
+declare module "item-${im}" {
+  export const \$\$_${k} = ${v.val};
+}
+`);
+      tree_usage.push(`
+import { \$\$_${k} } from "item-${im}";
+const ${k} = null as unknown as typeof \$\$_${k};
+`);
     } else if (v.mode === "type") {
-      raw_types.push(`
-const ${k} = null as unknown as ${v.val};
+      tree_types.push(`
+export const ${k} = null as unknown as ${v.val};
 `);
     }
   }
 
-  for (const [k, v] of Object.entries(comp_types)) {
-    raw_types.push(v);
-  }
-
-  return raw_types.join("\n");
+  register(monaco, tree_usage.join("\n"), "ts:tree_usage.d.ts");
+  register(monaco, tree_types.join("\n"), "ts:tree_types.d.ts");
+  register(monaco, Object.values(comp_types).join("\n"), "ts:comp_types.d.ts");
 };
 
 const map_childs = (
