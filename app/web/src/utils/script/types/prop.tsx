@@ -47,7 +47,7 @@ export const extractProp = (prop: {
 
   for (const [k, v] of Object.entries(props)) {
     if (v.type) {
-      if (k === "_raw") {
+      if (k.startsWith("_raw")) {
         propTypes.push(v.type);
       } else {
         let const_or_type = "const";
