@@ -109,22 +109,26 @@ export const initFrontEnd = async (
       timeout: null,
       rebuilding: false,
       watch: watch(dir.data(root), async (event, filename) => {
-        const ctx = code.internal.frontend[id_site];
+        const fe = code.internal.frontend[id_site];
         if (
-          ctx &&
+          fe &&
           (filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
             filename?.endsWith(".css") ||
             filename?.endsWith(".html"))
         ) {
-          if (!ctx.rebuilding) {
-            ctx.rebuilding = true;
-            await ctx.ctx.rebuild();
-            ctx.rebuilding = false;
+          if (!fe.rebuilding) {
+            fe.rebuilding = true;
+            await fe.ctx.rebuild();
+            fe.rebuilding = false;
           }
         }
       }),
     };
+    const fe = code.internal.frontend[id_site];
+    fe.rebuilding = true;
+    await fe.ctx.rebuild();
+    fe.rebuilding = false;
   } catch (e: any) {
     console.error("Error building front end", id_site);
     delete code.internal.frontend[id_site];
