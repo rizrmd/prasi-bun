@@ -1,6 +1,4 @@
 import { dir } from "dir";
-import { RootDatabase, open } from "lmdb";
-import { g } from "utils/global";
 import { IndexedMap } from "../../../../web/src/utils/sync/idx-map";
 
 const defaultConf = {
@@ -21,32 +19,21 @@ export const user = {
     "client_id"
   >("client_id"),
   conf: {
-    _db: null as null | RootDatabase<UserConf>,
+    _db: {} as any,
     init() {
-      this._db = open<UserConf, string>({
-        name: "user-conf",
-        path: dir.data(`/lmdb/user-conf.lmdb`),
-      });
       return this._db;
     },
-    get db() {
-      if (!this._db) {
-        this._db = this.init();
-      }
-      return this._db;
-    },
-    async getOrCreate(user_id: string) {
-      let res = this.db.get(user_id);
+    async getOrCreate(id: string) {
+      let res = this._db[id];
 
-      if (!res) {
-        await this.db.put(user_id, structuredClone(defaultConf));
-        res = this.db.get(user_id);
+      if (!res || !res.id) {
+        this._db[id] = structuredClone(defaultConf);
+        res = this._db[id];
       }
-
       return res as UserConf;
     },
     get(user_id: string) {
-      return this.db.get(user_id);
+      return this._db[user_id];
     },
     async set<T extends keyof UserConf>(
       user_id: string,
@@ -55,12 +42,12 @@ export const user = {
     ) {
       let current = this.get(user_id);
       if (!current) {
-        this.db.put(user_id, structuredClone(defaultConf));
+        this._db[user_id] = structuredClone(defaultConf)
         current = this.get(user_id);
       }
 
       if (current) {
-        await this.db.put(user_id, { ...current, [key]: value });
+        this._db[user_id] = { ...current, [key]: value }
       }
     },
   },
