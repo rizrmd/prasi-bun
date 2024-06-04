@@ -41,6 +41,7 @@ export const EdPropInstanceOptions: FC<{
     },
     options: [] as MetaOption[],
     optDeps: [] as any[],
+    resetOnDeps: false,
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -119,6 +120,7 @@ export const EdPropInstanceOptions: FC<{
             if (typeof resOpt === 'object' && Array.isArray(resOpt.deps) && typeof resOpt.fn === 'function') {
               local.metaFn = resOpt.fn;
               local.optDeps = resOpt.deps;
+              local.optResetOnDeps = resOpt.reset;
             } else {
               local.options = resOpt;
             }
@@ -141,6 +143,16 @@ export const EdPropInstanceOptions: FC<{
         const callback = (e: any) => {
           local.loading = false;
           local.options = e;
+
+          if (local.resetOnDeps) {
+            mprop.doc?.transact(() => {
+              mprop.set("value", "null");
+              mprop.set("valueBuilt", "null");
+            });
+
+            treeRebuild(p);
+            p.render();
+          }
           local.render();
         };
         if (res instanceof Promise) {
