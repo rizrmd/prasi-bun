@@ -25,6 +25,7 @@ export type PrismaExtend = {
         Parameters<PrismaClient[T]["create"]>[0],
         undefined
       >["data"][];
+      mode?: "field" | "relation";
     }) => Promise<void>;
   };
   _schema: {

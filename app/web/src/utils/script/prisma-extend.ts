@@ -12,6 +12,7 @@ export const prismaExtendType = `\
       table: string;
       where: any;
       data: any[];
+      mode?: "field" | "relation";
     }) => Promise<void>;
   };
   _schema: {
