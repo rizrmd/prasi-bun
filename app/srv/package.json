@@ -10,7 +10,6 @@
     "@types/mime-types": "^2.1.4",
     "esbuild": "^0.20.2",
     "esbuild-clean-plugin": "^1.0.0",
-    "lmdb": "^2.9.2",
     "lodash.isequal": "^4.5.0",
     "mime-types": "^2.1.35",
     "msgpackr": "^1.10.0",

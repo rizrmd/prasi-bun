@@ -17,6 +17,7 @@ type SingleRoute = {
   args: string[];
   fn: (...arg: any[]) => Promise<any>;
   path: string;
+  raw: any
 };
 
 export const g = global as unknown as {

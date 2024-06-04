@@ -1,6 +1,4 @@
 import { dir } from "dir";
-import { RootDatabase, open } from "lmdb";
-import { g } from "utils/global";
 
 type EmptySnapshot = {
   type: "";
@@ -65,45 +63,33 @@ const emptySnapshot: DocSnapshot = {
 };
 
 export const snapshot = {
-  _db: null as null | RootDatabase<DocSnapshot>,
+  _db: {} as any,
   init() {
-    this._db = open<DocSnapshot, string>({
-      name: "doc-snapshot",
-      path: dir.data(`/lmdb/doc-snapshot.lmdb`),
-      compression: true,
-    });
     return this._db;
   },
-
-  get db() {
-    if (!this._db) {
-      this._db = this.init();
-    }
-    return this._db;
-  },
-
   async getOrCreate(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
-    let res = this.db.get(id);
+
+    let res = this._db[id];
 
     if (!res || !res.id) {
-      await this.db.put(id, structuredClone(data as DocSnapshot));
-      res = this.db.get(id);
+      this._db[id] = structuredClone(data);
+      res = this._db[id];
     }
     return res as DocSnapshot;
   },
 
   async del<K extends DocSnapshot["type"]>(type: K, id: string) {
-    await this.db.remove(`${type}-${id}`);
+    delete this._db[`${type}-${id}`];
   },
 
   get<K extends DocSnapshot["type"]>(type: K, id: string) {
-    return this.db.get(`${type}-${id}`) as DocSnapshotMap[K] | null;
+    return this._db[`${type}-${id}`] as DocSnapshotMap[K] | null;
   },
 
   async update(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
-    await this.db.put(id, data);
+    this, _db[id] = data;
     return true;
   },
 
