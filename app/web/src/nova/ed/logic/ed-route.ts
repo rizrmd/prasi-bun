@@ -140,7 +140,6 @@ export const reloadPage = async (
   p.status = "reload";
   const remotePage = await p.sync.page.load(page_id);
 
-  console.log(remotePage)
   if (!remotePage) {
     p.status = "page-not-found";
     p.render();

@@ -38,8 +38,8 @@ export const useLocal = <T extends object>(
           local.lastRenderCount = 0;
         }
 
-        if (local.lastRenderCount > 50) {
-          throw new Error("local.render more than 50 times in less than 300ms");
+        if (local.lastRenderCount > 300) {
+          throw new Error("local.render more than 300 times in less than 300ms");
         }
 
         local.lastRender = Date.now();
