@@ -1,7 +1,7 @@
 import { get } from "idb-keyval";
 import parseUA from "ua-parser-js";
 import init, { decompress } from "wasm-gzip";
-import { useGlobal } from "web-utils";
+import { deepClone, useGlobal } from "web-utils";
 import { w } from "../../utils/types/general";
 import { IRoot } from "../../utils/types/root";
 import { DeadEnd } from "../../utils/ui/deadend";
@@ -16,6 +16,7 @@ import { loadSite } from "../ed/logic/ed-site";
 import { treeCacheBuild } from "../ed/logic/tree/build";
 import { nav } from "./render/script/extract-nav";
 import { Vi } from "./vi";
+import { loadComponent } from "../ed/logic/comp/load";
 
 const decoder = new TextDecoder();
 export const ViPreview = (arg: { pathname: string }) => {
@@ -123,13 +124,24 @@ export const ViPreview = (arg: { pathname: string }) => {
           entry={p.page.entry}
           api={p.script.api}
           db={p.script.db}
+          comp_load={async (comp_id) => {
+            let comp = p.comp.loaded[comp_id];
+            if (comp) {
+              return comp;
+            }
+
+            await loadComponent(p, comp_id);
+            comp = p.comp.loaded[comp_id];
+
+            return deepClone(comp);
+          }}
           layout={
             p.site.layout.id && p.site.layout.meta
               ? {
-                  id: p.site.layout.id,
-                  meta: p.site.layout.meta,
-                  entry: p.site.layout.entry,
-                }
+                id: p.site.layout.id,
+                meta: p.site.layout.meta,
+                entry: p.site.layout.entry,
+              }
               : undefined
           }
           render_stat="disabled"

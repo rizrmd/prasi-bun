@@ -89,7 +89,7 @@ export const snapshot = {
 
   async update(data: DocSnapshot) {
     const id = `${data.type}-${data.id}`;
-    this, _db[id] = data;
+    this._db[id] = data;
     return true;
   },
 
