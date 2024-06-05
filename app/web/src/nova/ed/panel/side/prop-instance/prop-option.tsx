@@ -111,6 +111,7 @@ export const EdPropInstanceOptions: FC<{
           cprop.meta.options ||
           ""
         ).trim();
+
         const final = `
         try {
           const resOpt = ${src.endsWith(";") ? src : `${src};`}
@@ -145,13 +146,18 @@ export const EdPropInstanceOptions: FC<{
           local.options = e;
 
           if (local.resetOnDeps) {
-            mprop.doc?.transact(() => {
-              mprop.set("value", "null");
-              mprop.set("valueBuilt", "null");
-            });
+            const val = meta.item.component?.props?.[name]?.value;
+            const valBuilt = meta.item.component?.props?.[name]?.valueBuilt;
+            if (val && valBuilt) {
+              mprop.doc?.transact(() => {
+                mprop.set("value", val);
+                mprop.set("valueBuilt", valBuilt);
+              });
 
-            treeRebuild(p);
-            p.render();
+              treeRebuild(p);
+              p.render();
+            }
+
           }
           local.render();
         };
@@ -172,7 +178,7 @@ export const EdPropInstanceOptions: FC<{
   let evalue: any = null;
   try {
     eval(`evalue = ${prop.value}`);
-  } catch (e) {}
+  } catch (e) { }
 
   useEffect(() => {
     if (Array.isArray(local.options) && !Array.isArray(evalue)) {
@@ -380,7 +386,7 @@ export const EdPropInstanceOptions: FC<{
               >
                 <div
                   className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer m-[3px]"
-                  onClick={() => {}}
+                  onClick={() => { }}
                   ref={(el) => {
                     if (!local.checkbox.width && el) {
                       const bound = el.getBoundingClientRect();
@@ -474,7 +480,7 @@ const SingleCheckbox = ({
         idx === 0 && !depth ? "" : "border-t",
         item.checked && "opacity-50",
         depth &&
-          css`
+        css`
             padding-left: ${depth * 20}px;
           `,
         is_check

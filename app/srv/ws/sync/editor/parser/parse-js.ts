@@ -13,7 +13,7 @@ export const parseJs = (code?: string, show_error?: boolean) => {
   const result = {} as {
     local?: typeof local | undefined;
     passprop?: typeof passprop | undefined;
-    props?: Record<string, { value: string; fn?: any; visible?: boolean }>;
+    props?: Record<string, { value: string; valueBuilt: string; fn?: any; visible?: boolean }>;
   };
 
   try {
