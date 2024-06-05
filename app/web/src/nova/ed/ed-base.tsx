@@ -35,7 +35,7 @@ export const EdBase = () => {
   const vscode_url = isLocalhost()
     ? "http://localhost:8443?"
     : "https://prasi-vsc.avolut.com/?tkn=prasi&";
-    
+
   if (p.status === "load-site") {
     return (
       <Loading
