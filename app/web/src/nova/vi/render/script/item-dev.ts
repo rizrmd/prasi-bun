@@ -165,7 +165,6 @@ export const devItem = (
                           [c.value],
                           compile
                         )[0];
-                        console.log(props[c.name].content);
                       }
                     }
                   }
@@ -397,6 +396,10 @@ const removeEditFromChilds = (
         for (const [k, v] of Object.entries(item.component.props) as any) {
           if (!v.valueBuilt && v.value) {
             compile[item.id + "|||" + k] = v;
+          }
+
+          if (v.content) {
+            v.content = removeEditFromChilds([v.content], compile)[0];
           }
         }
       }
