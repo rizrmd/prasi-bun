@@ -5,8 +5,11 @@ import { g } from "utils/global";
 import { WSData } from "../../../../../../pkgs/core/server/create";
 import { prodIndex } from "../../../../util/prod-index";
 
+import { realpathSync } from 'fs'
 import { code } from "../../code/code";
 import "./server-runtime";
+import { initServer } from "../../code/parts/init/server";
+import { waitUntil } from "web-utils";
 
 if (!g.server_main_handler) {
   g.server_main_handler = {};
@@ -34,19 +37,27 @@ const serverMain = () => ({
     }
   },
   async init(site_id: string) {
-    this.handler[site_id] = null;
-    const server_src_path = code.path(site_id, "server", "build", "index.js");
+    const server_src_path = realpathSync(code.path(site_id, "server", "build", "index.js"));
     const file = Bun.file(server_src_path);
 
-    if (!this.handler[site_id] && (await file.exists()) && file.size) {
+    if (!code.internal.server[site_id]) {
+      const root = `/code/${site_id}/site/src`;
+      await initServer(root, site_id);
+    }
+
+    const c = code.internal.server[site_id];
+
+    if ((await file.exists()) && file.size && c.ts !== file.lastModified) {
+      c.ts = file.lastModified;
       try {
-        delete require.cache[server_src_path];
+        delete require.cache[server_src_path]
         const svr = require(server_src_path);
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           svr.server.site_id = site_id;
+
           if (typeof svr.server.init === "function") {
-            svr.server.init({});
+            await svr.server.init({});
           }
           Bun.write(
             Bun.file(code.path(site_id, "site", "src", "server.log")),

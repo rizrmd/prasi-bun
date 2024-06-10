@@ -11,7 +11,7 @@ export const codeInternal = {
   get server() {
     if (!g.prasi_code) g.prasi_code = {};
     if (!g.prasi_code.server) g.prasi_code.server = {};
-    return g.prasi_code.server as Record<SITE_ID, BuildContext>;
+    return g.prasi_code.server as Record<SITE_ID, { rebuilding: boolean; ts: number; ctx: BuildContext }>;
   },
   get frontend() {
     if (!g.prasi_code) g.prasi_code = {};

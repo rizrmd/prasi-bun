@@ -12,6 +12,7 @@ import { SyncType } from "../../../type";
 import { sendWS } from "../../../sync-handler";
 import { removeAsync } from "fs-jetpack";
 import { watch } from "fs";
+import { server } from "../../../editor/code/server-main";
 const decoder = new TextDecoder();
 export const initFrontEnd = async (
   root: string,
@@ -26,7 +27,7 @@ export const initFrontEnd = async (
         existing.watch.close();
         await existing.ctx.dispose();
         delete code.internal.frontend[id_site];
-      } catch (e) {}
+      } catch (e) { }
     } else {
       return;
     }
@@ -64,11 +65,6 @@ export const initFrontEnd = async (
           name: "prasi",
           async setup(setup) {
             try {
-              await codeError(id_site, "Building...");
-              setup.onStart(async () => {
-                if (!(await isInstalling(id_site)))
-                  await codeError(id_site, "Building...");
-              });
               setup.onEnd(async (res) => {
                 if (res.errors.length > 0) {
                   await codeError(
@@ -115,9 +111,9 @@ export const initFrontEnd = async (
         },
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
+          const srv = code.internal.server[id_site];
           if (filename?.startsWith("node_modules")) return;
           if (
-            fe &&
             (filename?.endsWith(".tsx") ||
               filename?.endsWith(".ts") ||
               filename?.endsWith(".css") ||
@@ -127,6 +123,13 @@ export const initFrontEnd = async (
               fe.rebuilding = true;
               await fe.ctx.rebuild();
               fe.rebuilding = false;
+            }
+
+            if (!srv.rebuilding && srv.ctx) {
+              srv.rebuilding = true;
+              await srv.ctx.rebuild();
+              await server.init(id_site);
+              srv.rebuilding = false;
             }
           }
         }
@@ -160,7 +163,7 @@ const isInstalling = async (id_site: string) => {
     const text = await file.text();
     if (typeof text === "string" && text.startsWith("Installing dependencies"))
       return true;
-  } catch (e) {}
+  } catch (e) { }
 
   return false;
 };

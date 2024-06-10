@@ -1,9 +1,8 @@
 import { dir } from "dir";
 import { context } from "esbuild";
 import { dirAsync, existsAsync, removeAsync, writeAsync } from "fs-jetpack";
-import { code } from "../../code";
-import { g } from "utils/global";
 import { server } from "../../../editor/code/server-main";
+import { code } from "../../code";
 
 export const initServer = async (
   root: string,
@@ -13,7 +12,8 @@ export const initServer = async (
   const existing = code.internal.server[id_site];
   if (existing) {
     if (force) {
-      await existing.dispose();
+      existing.rebuilding = false;
+      await existing.ctx.dispose();
     } else {
       return;
     }
@@ -28,28 +28,28 @@ export const initServer = async (
     await writeAsync(build_file, "");
   }
 
-  code.internal.server[id_site] = await context({
-    absWorkingDir: dir.data(root),
-    entryPoints: ["server.ts"],
-    bundle: true,
-    outfile: build_file,
-    platform: "node",
-    treeShaking: true,
-    format: "cjs",
-    logLevel: "silent",
-    plugins: [
-      {
-        name: "prasi",
-        setup(build) {
-          build.onEnd(() => {
-            delete server.handler[id_site];
-            server.init(id_site);
-          });
-        },
-      },
-    ],
-    banner: {
-      js: `\
+  code.internal.server[id_site] = {
+    rebuilding: false, ts: 0,
+    ctx: await context({
+      absWorkingDir: dir.data(root),
+      entryPoints: ["server.ts"],
+      bundle: true,
+      outfile: build_file,
+      platform: "node",
+      treeShaking: true,
+      format: "cjs",
+      logLevel: "silent",
+      // plugins: [
+      //   {
+      //     name: "prasi",
+      //     setup(build) {
+      //       build.onEnd(() => {
+      //       });
+      //     },
+      //   },
+      // ],
+      banner: {
+        js: `\
       const _fs = require('node:fs/promises');
       const console =
       typeof global.server_hook === "function"
@@ -103,8 +103,12 @@ export const initServer = async (
         db = global.db;
         api = global.api;
       }`,
-    },
-  });
+      },
+    })
+  };
 
-  await code.internal.server[id_site].watch();
+  code.internal.server[id_site].rebuilding = true;
+  await code.internal.server[id_site].ctx.rebuild();
+  await server.init(id_site);
+  code.internal.server[id_site].rebuilding = false;
 };
