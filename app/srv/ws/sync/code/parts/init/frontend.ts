@@ -119,13 +119,13 @@ export const initFrontEnd = async (
               filename?.endsWith(".css") ||
               filename?.endsWith(".html"))
           ) {
-            if (!fe.rebuilding) {
+            if (typeof fe !== 'undefined' && !fe.rebuilding) {
               fe.rebuilding = true;
               await fe.ctx.rebuild();
               fe.rebuilding = false;
             }
 
-            if (!srv.rebuilding && srv.ctx) {
+            if (typeof srv !== 'undefined' && !srv.rebuilding && srv.ctx) {
               srv.rebuilding = true;
               await srv.ctx.rebuild();
               await server.init(id_site);
