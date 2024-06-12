@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { fuzzy } from "../../../../utils/ui/fuzzy";
+import { IItem } from "../../../../utils/types/item";
 
 export const EdTreeSearch = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -11,6 +12,7 @@ export const EdTreeSearch = () => {
     focus: false,
     hover: false,
     cursor: null as number | null,
+    search_timeout: null as any
   });
 
   p.ui.tree.search_ref = local.sref;
@@ -55,7 +57,12 @@ export const EdTreeSearch = () => {
           onInput={(e) => {
             local.cursor = e.currentTarget.selectionStart;
             p.ui.tree.search = e.currentTarget.value;
-            p.render();
+            local.render();
+
+            clearTimeout(local.search_timeout);
+            local.search_timeout = setTimeout(() => {
+              p.render();
+            }, 300);
           }}
           onFocus={() => {
             local.focus = true;
@@ -107,18 +114,6 @@ export const EdTreeSearch = () => {
 
 export const doTreeSearch = (p: PG) => {
   let tree: Record<string, { idx: number; node: NodeModel<IMeta> }> = {};
-
-  if (p.ui.tree.search_mode.Name) {
-    const found = fuzzy(p.page.tree, "text", p.ui.tree.search);
-
-    let i = 0;
-    for (const row of found) {
-      if (row.data) {
-        tree[row.id] = { idx: i++, node: { ...row, parent: "root" } };
-      }
-    }
-  }
-
   const search = p.ui.tree.search.toLowerCase();
   let i = 0;
 
@@ -127,36 +122,70 @@ export const doTreeSearch = (p: PG) => {
     ptree = p.comp.list[active.comp_id].tree;
   }
 
-  for (const row of ptree) {
-    const item = row.data?.item;
-    if (item) {
-      const js = item.adv?.js;
-      if (js) {
-        if (p.ui.tree.search_mode.JS) {
-          if ((js as string).toLowerCase().includes(search)) {
-            tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
-          }
-        }
-      }
-      const css = item.adv?.css;
-      if (css) {
-        if (p.ui.tree.search_mode.CSS) {
-          if (css.toString().toLowerCase().includes(search)) {
-            tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
-          }
-        }
-      }
+  const comp_searched = new Set<string>()
 
-      const html = item.adv?.html;
-      if (html) {
-        if (p.ui.tree.search_mode.HTML) {
-          if (html.toString().toLowerCase().includes(search)) {
-            tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
+  const searchInPTree = (ptree: NodeModel<IMeta>[], id_component?: string) => {
+    if (p.ui.tree.search_mode.Name) {
+      const found = fuzzy(ptree, "text", search);
+
+      let i = 0;
+      for (const row of found) {
+        if (row.data) {
+          if (id_component && row.data.parent)
+            row.data.parent.comp_id = id_component;
+          tree[row.id] = { idx: i++, node: { ...row, parent: "root" } };
+        }
+      }
+    }
+
+    for (const row of ptree) {
+      const item = row.data?.item;
+
+      if (item) {
+        if (item.component?.id && !comp_searched.has(item.component.id)) {
+          comp_searched.add(item.component.id);
+          const tree = p.comp.list[item.component.id].tree;
+          if (tree) {
+            searchInPTree(tree, item.component.id);
+          }
+        }
+
+        const js = item.adv?.js;
+        if (js) {
+          if (p.ui.tree.search_mode.JS) {
+            if ((js as string).toLowerCase().includes(search)) {
+              if (id_component && row.data?.parent)
+                row.data.parent.comp_id = id_component;
+              tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
+            }
+          }
+        }
+        const css = item.adv?.css;
+        if (css) {
+          if (p.ui.tree.search_mode.CSS) {
+            if (css.toString().toLowerCase().includes(search)) {
+              if (id_component && row.data?.parent)
+                row.data.parent.comp_id = id_component;
+              tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
+            }
+          }
+        }
+
+        const html = item.adv?.html;
+        if (html) {
+          if (p.ui.tree.search_mode.HTML) {
+            if (html.toString().toLowerCase().includes(search)) {
+              if (id_component && row.data?.parent)
+                row.data.parent.comp_id = id_component;
+              tree[item.id] = { idx: i++, node: { ...row, parent: "root" } };
+            }
           }
         }
       }
     }
   }
+
+  searchInPTree(ptree);
 
   return Object.values(tree)
     .sort((a, b) => a.idx - b.idx)
