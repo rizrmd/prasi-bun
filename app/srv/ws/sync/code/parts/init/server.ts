@@ -108,7 +108,9 @@ export const initServer = async (
   };
 
   code.internal.server[id_site].rebuilding = true;
-  await code.internal.server[id_site].ctx.rebuild();
-  await server.init(id_site);
+  try {
+    await code.internal.server[id_site].ctx.rebuild();
+    await server.init(id_site);
+  } catch (e) { }
   code.internal.server[id_site].rebuilding = false;
 };

@@ -121,14 +121,18 @@ export const initFrontEnd = async (
           ) {
             if (typeof fe !== 'undefined' && !fe.rebuilding) {
               fe.rebuilding = true;
-              await fe.ctx.rebuild();
+              try {
+                await fe.ctx.rebuild();
+              } catch (e) { }
               fe.rebuilding = false;
             }
 
             if (typeof srv !== 'undefined' && !srv.rebuilding && srv.ctx) {
               srv.rebuilding = true;
-              await srv.ctx.rebuild();
-              await server.init(id_site);
+              try {
+                await srv.ctx.rebuild();
+                await server.init(id_site);
+              } catch (e) { }
               srv.rebuilding = false;
             }
           }
@@ -137,7 +141,9 @@ export const initFrontEnd = async (
     };
     const fe = code.internal.frontend[id_site];
     fe.rebuilding = true;
-    await fe.ctx.rebuild();
+    try {
+      await fe.ctx.rebuild();
+    } catch (e) { }
     fe.rebuilding = false;
   } catch (e: any) {
     console.error("Error building front end", id_site);
