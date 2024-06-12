@@ -175,6 +175,13 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
             text_edit.del_key_id = item.id;
           }
           active.item_id = item.id;
+
+          if (p.ui.tree.search) {
+            if (node.data?.parent?.comp_id) {
+              active.comp_id = node.data?.parent?.comp_id;
+            }
+          }
+
           p.ui.tree.search = "";
           p.render();
 
