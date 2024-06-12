@@ -39,6 +39,7 @@ export const w = window as unknown as {
   _api: any;
   _db: any;
   offline: boolean;
+  editorRender?: () => void;
   debug: {
     on: any;
     off: any;

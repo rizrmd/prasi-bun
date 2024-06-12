@@ -166,11 +166,17 @@ const connect = (
           );
 
           ws.onopen = () => {
+            w.offline = false;
+            w.editorRender?.();
+
             sendWs(ws, { type: SyncType.UserID, user_id, site_id, page_id });
             conf.ws = ws;
             event.opened();
           };
           ws.onclose = async () => {
+            w.offline = true;
+            w.editorRender?.();
+
             const res = event.disconnected();
             if (res.reconnect) {
               setTimeout(async () => {

@@ -157,7 +157,7 @@ export const EDGlobal = {
   script: {
     site_types: {} as Record<string, string>,
     loaded: false,
-    do_edit: async (newval: string, all?: boolean) => {},
+    do_edit: async (newval: string, all?: boolean) => { },
     db: null as any,
     api: null as any,
     init_local_effect: {} as Record<string, boolean>,
@@ -182,7 +182,7 @@ export const EDGlobal = {
     meta: {} as Record<string, IMeta>,
     entry: [] as string[],
     tree: [] as NodeModel<IMeta>[],
-    render: () => {},
+    render: () => { },
   },
   comp: {
     doc: null as null | DComp,
@@ -295,9 +295,9 @@ export const EDGlobal = {
         type: "item" as "item" | "prop-master" | "prop-instance" | "comp-types",
         prop_kind: "" as PropFieldKind,
         prop_name: "",
-        on_close: () => {},
+        on_close: () => { },
         typings: { status: "ok" as "ok" | "loading" | "error", err_msg: "" },
-        wb_render: () => {},
+        wb_render: () => { },
       },
       site: null as null | ((site_id: string) => void | Promise<void>),
       site_form: null as null | {
