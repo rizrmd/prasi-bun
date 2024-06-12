@@ -2,6 +2,12 @@ import hash_sum from "hash-sum";
 import pako from "pako";
 import { fetchViaProxy } from "../proxy";
 
+const schema_promise = {
+  tables: {} as Record<string, any>,
+  columns: {} as Record<string, any>,
+  rels: {} as Record<string, any>,
+}
+
 export const dbProxy = (dburl: string) => {
   const name = "";
   return new Proxy(
@@ -37,37 +43,49 @@ export const dbProxy = (dburl: string) => {
         if (table === "_schema") {
           return {
             tables: async () => {
-              return fetchSendDb(
-                {
-                  name,
-                  action: "schema_tables",
-                  table: "",
-                  params: [],
-                },
-                dburl
-              );
+              if (!schema_promise.tables[dburl]) {
+                schema_promise.tables[dburl] = fetchSendDb(
+                  {
+                    name,
+                    action: "schema_tables",
+                    table: "",
+                    params: [],
+                  },
+                  dburl
+                );
+              }
+
+              return await schema_promise.tables[dburl]
             },
             columns: async (table: string) => {
-              return fetchSendDb(
-                {
-                  name,
-                  action: "schema_columns",
-                  table,
-                  params: [],
-                },
-                dburl
-              );
+              if (!schema_promise.columns[dburl + '_' + table]) {
+                schema_promise.columns[dburl + '_' + table] = fetchSendDb(
+                  {
+                    name,
+                    action: "schema_columns",
+                    table,
+                    params: [],
+                  },
+                  dburl
+                );
+              }
+
+              return await schema_promise.columns[dburl + '_' + table]
             },
             rels: async (table: string) => {
-              return fetchSendDb(
-                {
-                  name,
-                  action: "schema_rels",
-                  table,
-                  params: [],
-                },
-                dburl
-              );
+              if (!schema_promise.rels[dburl + '_' + table]) {
+                schema_promise.rels[dburl + '_' + table] = fetchSendDb(
+                  {
+                    name,
+                    action: "schema_rels",
+                    table,
+                    params: [],
+                  },
+                  dburl
+                );
+              }
+
+              return await schema_promise.rels[dburl + '_' + table]
             },
           };
         }
@@ -156,5 +174,5 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     }
 
     return await cached.promise;
-  } catch (e) {}
+  } catch (e) { }
 };
