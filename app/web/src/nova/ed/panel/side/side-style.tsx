@@ -30,7 +30,7 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
               className={cx(
                 "font-mono",
                 css`
-                  font-size: 11px;
+                  font-size: 9px;
                   width: 500px;
                   height: 500px;
                   margin: 5px 0px;
@@ -43,7 +43,10 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
         >
           <div
             className="border px-1 py-[2px] cursor-pointer bg-white hover:bg-blue-100"
-            onClick={() => {}}
+            onClick={() => {
+              local.value = JSON.stringify(meta.item, null, 2);
+              p.render();
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +71,6 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
             className="border px-1 cursor-pointer bg-white hover:bg-blue-100"
             onClick={() => {
               p.ui.side.prop = true;
-              local.value = JSON.stringify(meta.item, null, 2);
               p.render();
             }}
           >
