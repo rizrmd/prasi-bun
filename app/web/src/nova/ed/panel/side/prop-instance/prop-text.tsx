@@ -44,26 +44,26 @@ export const EdPropInstanceText: FC<{
         dragnum={
           typeof valnum === "number" && !isNaN(valnum)
             ? {
-                value: valnum,
-                onChange(value) {
-                  local.value = Math.round(value) + "";
-                  local.render();
-                },
-                onChanged(value) {
-                  local.value = Math.round(value) + "";
-                  local.render();
+              value: valnum,
+              onChange(value) {
+                local.value = Math.round(value) + "";
+                local.render();
+              },
+              onChanged(value) {
+                local.value = Math.round(value) + "";
+                local.render();
 
-                  clearTimeout(local.timeout);
-                  local.timeout = setTimeout(() => {
-                    mprop.doc?.transact(() => {
-                      mprop.set("value", `\`${local.value}\``);
-                      mprop.set("valueBuilt", `\`${local.value}\``);
-                    });
-                    treeRebuild(p);
-                    p.render();
-                  }, 200);
-                },
-              }
+                clearTimeout(local.timeout);
+                local.timeout = setTimeout(() => {
+                  mprop.doc?.transact(() => {
+                    mprop.set("value", `\`${local.value}\``);
+                    mprop.set("valueBuilt", `\`${local.value}\``);
+                  });
+                  treeRebuild(p);
+                  p.render();
+                }, 1000);
+              },
+            }
             : undefined
         }
       />
