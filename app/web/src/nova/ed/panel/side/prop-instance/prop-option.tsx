@@ -35,13 +35,14 @@ export const EdPropInstanceOptions: FC<{
     loading: true,
     isOpen: false,
     val: "",
+    metaFnInit: false,
     metaFn: null as null | (() => Promise<MetaOption[]>),
     checkbox: {
       width: 0,
     },
     options: [] as MetaOption[],
     optDeps: [] as any[],
-    resetOnDeps: false,
+    resetOnDeps: false as boolean | (() => any[]),
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -112,7 +113,7 @@ export const EdPropInstanceOptions: FC<{
           ""
         ).trim();
 
-        const final = `
+        const final_src = `
         try {
           const resOpt = ${src.endsWith(";") ? src : `${src};`}
         
@@ -121,13 +122,13 @@ export const EdPropInstanceOptions: FC<{
             if (typeof resOpt === 'object' && Array.isArray(resOpt.deps) && typeof resOpt.fn === 'function') {
               local.metaFn = resOpt.fn;
               local.optDeps = resOpt.deps;
-              local.optResetOnDeps = resOpt.reset;
+              local.resetOnDeps = resOpt.reset;
             } else {
               local.options = resOpt;
             }
           }
         } catch(e) { console.error(e); }`;
-        fn = new Function(...Object.keys(arg), "local", final);
+        fn = new Function(...Object.keys(arg), "local", final_src);
         fn(...Object.values(arg), local);
       } catch (e) {
         console.error(e);
@@ -135,6 +136,7 @@ export const EdPropInstanceOptions: FC<{
       }
     }
   }
+
 
   useEffect(() => {
     if (local.metaFn) {
@@ -146,18 +148,22 @@ export const EdPropInstanceOptions: FC<{
           local.options = e;
 
           if (local.resetOnDeps) {
-            const val = meta.item.component?.props?.[name]?.value;
-            const valBuilt = meta.item.component?.props?.[name]?.valueBuilt;
-            if (val && valBuilt) {
+            if (!local.metaFnInit) {
+              local.metaFnInit = true;
+            } else {
+
+              let reset = '[]';
+              if (typeof local.resetOnDeps === 'function') {
+                reset = JSON.stringify(local.resetOnDeps());
+              }
               mprop.doc?.transact(() => {
-                mprop.set("value", val);
-                mprop.set("valueBuilt", valBuilt);
+                mprop.set("value", reset);
+                mprop.set("valueBuilt", reset);
               });
 
               treeRebuild(p);
               p.render();
             }
-
           }
           local.render();
         };
