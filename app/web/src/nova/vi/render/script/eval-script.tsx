@@ -62,6 +62,7 @@ export const viEvalScript = (
     PassProp: script?.PassProp,
     ErrorBox: ErrorBox,
     newElement: () => {},
+    __props: passprop,
     _item: meta.mitem
       ? devItem(vi.meta, meta.mitem, vi.page.cur.id)
       : prodItem(vi.meta, meta.item, vi.page.cur.id),
