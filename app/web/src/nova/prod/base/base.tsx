@@ -1,8 +1,8 @@
-import { RadixRouter, createRouter } from "radix3";
+import { RadixRouter } from "radix3";
+import { IItem } from "../../../utils/types/item";
 import { IRoot } from "../../../utils/types/root";
 import { PG } from "../../ed/logic/ed-global";
 import { IMeta } from "../../vi/utils/types";
-import { IItem } from "../../../utils/types/item";
 
 const w = window as any;
 
