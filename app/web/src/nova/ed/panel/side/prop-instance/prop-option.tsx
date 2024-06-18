@@ -295,95 +295,13 @@ export const EdPropInstanceOptions: FC<{
                       `
                     )}
                   >
-                    <div className={cx("flex flex-col bg-white")}>
-                      {Array.isArray(local.options) &&
-                        local.options.map((item, idx) => {
-                          const val: any[] = Array.isArray(evalue)
-                            ? evalue
-                            : [];
-                          const found = val.find((e) => {
-                            if (!item.options) {
-                              return e === item.value;
-                            } else {
-                              if (
-                                typeof e === "object" &&
-                                e.value === item.value
-                              ) {
-                                return true;
-                              }
-                              return false;
-                            }
-                          });
-                          return (
-                            <Fragment key={idx}>
-                              <SingleCheckbox
-                                item={item}
-                                idx={idx}
-                                val={val}
-                                depth={0}
-                                onChange={(val) => {
-                                  onChange(JSON.stringify(val), item);
-                                  local.render();
-                                }}
-                              />
-                              {item.options &&
-                                found &&
-                                item.options.map((child, idx) => {
-                                  const sub_found = found.checked.find(
-                                    (e: any) => {
-                                      if (!item.options) {
-                                        return e === child.value;
-                                      } else {
-                                        if (
-                                          typeof e === "object" &&
-                                          e.value === child.value
-                                        ) {
-                                          return true;
-                                        }
-                                        return false;
-                                      }
-                                    }
-                                  );
-                                  return (
-                                    <Fragment key={idx}>
-                                      <SingleCheckbox
-                                        key={idx}
-                                        item={child}
-                                        idx={idx}
-                                        depth={1}
-                                        val={found.checked}
-                                        onChange={(newval) => {
-                                          onChange(JSON.stringify(val), child);
-                                          local.render();
-                                        }}
-                                      />
-                                      {child.options &&
-                                        sub_found &&
-                                        child.options.map((item, sidx) => {
-                                          return (
-                                            <SingleCheckbox
-                                              item={item}
-                                              idx={idx}
-                                              key={sidx}
-                                              depth={2}
-                                              val={sub_found.checked}
-                                              onChange={(newval) => {
-                                                onChange(
-                                                  JSON.stringify(val),
-                                                  item
-                                                );
-                                                local.render();
-                                              }}
-                                            />
-                                          );
-                                        })}
-                                    </Fragment>
-                                  );
-                                })}
-                            </Fragment>
-                          );
-                        })}
-                    </div>
+                    <CheckboxLayer
+                      value={local.options}
+                      render={local.render}
+                      evalue={evalue}
+                      onChange={onChange}
+                      depth={0}
+                    />
                   </div>
                 }
                 asChild
@@ -426,14 +344,25 @@ const CheckboxLayer = ({
   render,
   evalue,
   onChange,
+  depth,
 }: {
   value: MetaOption[];
   render: () => void;
   onChange: (val: string, item: MetaOption | undefined) => void;
   evalue: Array<any>;
+  depth: number;
 }) => {
   return (
-    <div className={cx("flex flex-col bg-white")}>
+    <div
+      className={cx(
+        "flex flex-col bg-white",
+        !depth ? "" : "border-t",
+        depth &&
+          css`
+            padding-left: ${depth * 20}px;
+          `
+      )}
+    >
       {Array.isArray(value) &&
         value.map((item, idx) => {
           const val: any[] = Array.isArray(evalue) ? evalue : [];
@@ -453,7 +382,7 @@ const CheckboxLayer = ({
                 item={item}
                 idx={idx}
                 val={val}
-                depth={0}
+                depth={depth}
                 onChange={(val) => {
                   onChange(JSON.stringify(val), item);
                   render();
@@ -465,6 +394,7 @@ const CheckboxLayer = ({
                   render={render}
                   evalue={found.checked}
                   onChange={onChange}
+                  depth={depth + 1}
                 />
               )}
             </Fragment>
