@@ -7,6 +7,7 @@ type SingleExport = {
   val: string;
 };
 export const parseTypeDef = async (path: string) => {
+  console.log("parsing", path);
   const ast = await parseFile(path, { syntax: "typescript" });
 
   const exports = {} as Record<string, SingleExport[]>;
