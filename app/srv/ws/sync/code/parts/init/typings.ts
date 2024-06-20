@@ -94,27 +94,31 @@ export const initTypings = async (
           }
         }
 
-        const res = JSON.stringify(await parseTypeDef(path));
-        await Bun.write(
-          dir.data(`/code/${id_site}/site/type_def.${file.lastModified}.json`),
-          res
-        );
+        try {
+          const res = JSON.stringify(await parseTypeDef(path));
+          await Bun.write(
+            dir.data(
+              `/code/${id_site}/site/type_def.${file.lastModified}.json`
+            ),
+            res
+          );
 
-        const client_ids = new Set<string>();
-        user.active.findAll({ site_id: id_site }).forEach((e) => {
-          client_ids.add(e.client_id);
-        });
+          const client_ids = new Set<string>();
+          user.active.findAll({ site_id: id_site }).forEach((e) => {
+            client_ids.add(e.client_id);
+          });
 
-        const now = Date.now();
-        client_ids.forEach((client_id) => {
-          const ws = conns.get(client_id)?.ws;
-          if (ws)
-            sendWS(ws, {
-              type: SyncType.Event,
-              event: "code_changes",
-              data: { ts: now, mode: "typings" },
-            });
-        });
+          const now = Date.now();
+          client_ids.forEach((client_id) => {
+            const ws = conns.get(client_id)?.ws;
+            if (ws)
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "code_changes",
+                data: { ts: now, mode: "typings" },
+              });
+          });
+        } catch (e) {}
       }, 180);
     });
   } catch (e) {
