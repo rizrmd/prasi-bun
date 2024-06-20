@@ -53,7 +53,7 @@ export const fetchViaProxy = async (
     let final_url = "";
 
     if (
-      to_url.hostname === 'localhost' ||
+      // to_url.hostname === 'localhost' ||
       to_url.host === cur_url.host ||
       (!!g && typeof g.server_hook === "function")
     ) {

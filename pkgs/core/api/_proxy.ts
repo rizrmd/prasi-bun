@@ -43,7 +43,6 @@ export const _ = {
       }
       return new Response(res_body, { headers: res_headers });
     } catch (e: any) {
-      console.error(e);
       new Response(
         JSON.stringify({
           status: "failed",

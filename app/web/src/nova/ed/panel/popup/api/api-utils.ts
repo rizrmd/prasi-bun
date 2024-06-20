@@ -16,6 +16,7 @@ export const server = {
     | "deploying"
     | "saving"
     | "pulling"
+    | "syncing"
     | "restarting",
 };
 
