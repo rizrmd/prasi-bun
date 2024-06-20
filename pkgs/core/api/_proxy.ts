@@ -38,8 +38,6 @@ export const _ = {
       res_body = await res.arrayBuffer();
       if (res_headers["content-encoding"] === "gzip") {
         res_body = await gzipAsync(new Uint8Array(res_body));
-      } if (res_headers["content-encoding"] === "br") {
-        res_body = brotli.decompress(new Uint8Array(res_body));
       } else {
         delete res_headers["content-encoding"];
       }
