@@ -49,6 +49,8 @@ addEventListener("fetch", async (evt) => {
 
   const url = new URL(e.request.url);
 
+  if (url.pathname.startsWith("_proxy")) return;
+
   if (g.router) {
     const found = g.router.lookup(url.pathname);
     if (found) {
