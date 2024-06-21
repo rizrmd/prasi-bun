@@ -12,7 +12,6 @@ import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
 import { existsAsync } from "fs-jetpack";
-const decoder = new TextDecoder();
 const pending = {} as any;
 
 export const initFrontEnd = async (
