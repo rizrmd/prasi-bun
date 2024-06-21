@@ -37,9 +37,7 @@ export const _ = {
       });
       res_body = await res.arrayBuffer();
 
-      let enc = res_headers["content-encoding"];
       if (res_headers["content-encoding"] === "gzip") {
-        res_body = Bun.gunzipSync(res_body);
         delete res_headers["content-encoding"];
       } else if (res_headers["content-encoding"] === "zstd") {
         res_body = await decompress(res_body);
