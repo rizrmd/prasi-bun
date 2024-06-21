@@ -1,4 +1,4 @@
-FROM oven/bun:1.1.15-debian as base
+FROM oven/bun:1.1.13 as base
 WORKDIR /app/prasi/repo
 
 ENV DEBIAN_FRONTEND noninteractive
