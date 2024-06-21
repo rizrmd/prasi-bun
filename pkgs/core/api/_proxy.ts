@@ -37,14 +37,21 @@ export const _ = {
       });
       res_body = await res.arrayBuffer();
 
+      console.log(
+        url,
+        res_headers["content-encoding"],
+        new TextDecoder().decode(res_body)
+      );
+
       if (res_headers["content-encoding"] === "gzip") {
         delete res_headers["content-encoding"];
-      } 
+      } else if (res_headers["content-encoding"] === "br") {
+        res_body = brotli.decompress(res_body);
+        delete res_headers["content-encoding"];
+      }
+
       // else if (res_headers["content-encoding"] === "zstd") {
       //   res_body = await decompress(res_body);
-      //   delete res_headers["content-encoding"];
-      // } else if (res_headers["content-encoding"] === "br") {
-      //   res_body = brotli.decompress(res_body);
       //   delete res_headers["content-encoding"];
       // }
 
