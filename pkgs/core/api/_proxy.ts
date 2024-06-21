@@ -17,10 +17,10 @@ export const _ = {
       const body = await req.arrayBuffer();
       const headers = {} as Record<string, string>;
       req.headers.forEach((v, k) => {
-        // if (k.startsWith("sec-")) return;
-        // if (k.startsWith("connection")) return;
-        // if (k.startsWith("dnt")) return;
-        // if (k.startsWith("host")) return;
+        if (k.startsWith("sec-")) return;
+        if (k.startsWith("connection")) return;
+        if (k.startsWith("dnt")) return;
+        if (k.startsWith("host")) return;
         headers[k] = v;
       });
 
@@ -46,6 +46,8 @@ export const _ = {
         res_body = await brotli.decompress(res_body);
         delete res_headers["content-encoding"];
       }
+
+      console.log(url, res_headers);
 
       return new Response(res_body, { headers: res_headers });
     } catch (e: any) {
