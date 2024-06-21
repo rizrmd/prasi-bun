@@ -40,20 +40,19 @@ export const initTypings = async (
     code.internal.typings[id_site] = {
       timeout: Date.now(),
       watch: watch(typings_path),
-      spawn: null as any
-      // spawn: Bun.spawn({
-      //   cmd: [
-      //     ...`${dir.path(
-      //       platform() === "win32"
-      //         ? "node_modules/.bin/tsc.exe"
-      //         : "node_modules/.bin/tsc"
-      //     )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
-      //       " "
-      //     ),
-      //   ],
-      //   cwd: dir.data(`/code/${id_site}/site/src`),
-      //   stdio: [typings_log, typings_log, "ignore"],
-      // }),
+      spawn: Bun.spawn({
+        cmd: [
+          ...`${dir.path(
+            platform() === "win32"
+              ? "node_modules/.bin/tsc.exe"
+              : "node_modules/.bin/tsc"
+          )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
+            " "
+          ),
+        ],
+        cwd: dir.data(`/code/${id_site}/site/src`),
+        stdio: [typings_log, typings_log, "ignore"],
+      }),
     };
     let timeout = null as any;
     code.internal.typings[id_site].watch.on("change", (e, path) => {

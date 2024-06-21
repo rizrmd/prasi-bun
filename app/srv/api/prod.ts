@@ -223,7 +223,7 @@ export const _ = {
               return await responseCompressed(
                 req,
                 JSON.stringify(
-                  pages.map((e) => ({
+                  pages.map((e: any) => ({
                     id: e.id,
                     url: e.url,
                     root: e.content_tree,
