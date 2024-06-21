@@ -1,7 +1,7 @@
 import brotliPromise from "brotli-wasm";
 import { apiContext } from "service-srv";
 import { gzipAsync } from "utils/diff/diff";
-
+import { decompress } from "@cloudpss/zstd";
 const brotli = await brotliPromise;
 
 export const _ = {
@@ -38,9 +38,9 @@ export const _ = {
       res_body = await res.arrayBuffer();
       if (res_headers["content-encoding"] === "gzip") {
         res_body = await gzipAsync(new Uint8Array(res_body));
-      } else {
         delete res_headers["content-encoding"];
       }
+
       return new Response(res_body, { headers: res_headers });
     } catch (e: any) {
       new Response(
