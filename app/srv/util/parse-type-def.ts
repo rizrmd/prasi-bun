@@ -1,104 +1,111 @@
-import { parseFile, TsModuleDeclaration } from "@swc/core";
-import { visit } from "woodpile";
+import { parseFile } from "@swc/core";
+import BaseVisitor from "./base-visitor";
+import { Node, SimpleVisitors } from "./types";
+import { simple as acornSimpleWalk } from "acorn-walk";
 
 type SingleExport = {
   type: "all" | "named" | "default";
   kind: "const" | "type";
   val: string;
 };
+
+function simple<T = unknown>(
+  ast: Node,
+  visitors: SimpleVisitors<T>,
+  baseVisitor = new BaseVisitor(),
+  state?: T
+) {
+  try {
+    // @ts-expect-error (acorn-walk ast nodes have start/end instead of span)
+    acornSimpleWalk<T>(ast, visitors, baseVisitor, state);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export const parseTypeDef = async (path: string) => {
-  console.log("parsing", path);
   const ast = await parseFile(path, { syntax: "typescript" });
-
-  console.log(ast)
   const exports = {} as Record<string, SingleExport[]>;
-  visit(ast, {
-    visitWithPath: {
-      visitDecl(node, path) {
-        const t = node as TsModuleDeclaration;
-        if (t.type === "TsModuleDeclaration") {
-          if (t.body) {
-            exports[t.id.value] = [];
 
-            if (Array.isArray(t.body.body)) {
-              for (const body of t.body.body) {
-                if (body.type === "ExportAllDeclaration") {
+  simple(
+    ast,
+    {
+      TsModuleDeclaration(t) {
+        if (t.body) {
+          exports[t.id.value] = [];
+          if (Array.isArray(t.body.body)) {
+            for (const body of t.body.body) {
+              if (body.type === "ExportAllDeclaration") {
+                exports[t.id.value].push({
+                  type: "all",
+                  kind: "const",
+                  val: body.source.value,
+                });
+              } else if (body.type === "ExportDeclaration") {
+                if (body.declaration.type === "FunctionDeclaration") {
                   exports[t.id.value].push({
-                    type: "all",
+                    type: "named",
                     kind: "const",
-                    val: body.source.value,
+                    val: body.declaration.identifier.value,
                   });
-                } else if (body.type === "ExportDeclaration") {
-                  if (body.declaration.type === "FunctionDeclaration") {
-                    exports[t.id.value].push({
-                      type: "named",
-                      kind: "const",
-                      val: body.declaration.identifier.value,
-                    });
-                  } else if (body.declaration.type === "VariableDeclaration") {
-                    for (const dec of body.declaration.declarations) {
-                      if (dec.type === "VariableDeclarator") {
-                        const id = dec.id as unknown as Map<string, any>;
-                        if (id.get("type") === "Identifier") {
-                          exports[t.id.value].push({
-                            type: "named",
-                            kind: "const",
-                            val: id.get("value"),
-                          });
-                        }
+                } else if (body.declaration.type === "VariableDeclaration") {
+                  for (const dec of body.declaration.declarations) {
+                    if (dec.type === "VariableDeclarator") {
+                      if (dec.id.type === "Identifier") {
+                        exports[t.id.value].push({
+                          type: "named",
+                          kind: "const",
+                          val: dec.id.value,
+                        });
                       }
                     }
-                  } else if (
-                    body.declaration.type === "TsTypeAliasDeclaration"
-                  ) {
-                    if (body.declaration.id.type === "Identifier") {
-                      exports[t.id.value].push({
-                        type: "named",
-                        kind: "type",
-                        val: body.declaration.id.value,
-                      });
-                    }
                   }
-                } else if (body.type === "ExportNamedDeclaration") {
-                  if (body.source?.type === "StringLiteral") {
-                    const ex = exports[body.source.value];
-                    if (ex) {
-                      for (const s of body.specifiers) {
-                        if (s.type === "ExportSpecifier") {
-                          if (s.exported) {
-                            const found = ex.find(
-                              (e) => e.val === s.exported?.value
-                            );
-                            if (found) {
-                              exports[t.id.value].push(found);
-                            }
-                          } else if (s.orig) {
-                            const found = ex.find(
-                              (e) => e.val === s.orig?.value
-                            );
-                            if (found) {
-                              exports[t.id.value].push(found);
-                            }
+                } else if (body.declaration.type === "TsTypeAliasDeclaration") {
+                  if (body.declaration.id.type === "Identifier") {
+                    exports[t.id.value].push({
+                      type: "named",
+                      kind: "type",
+                      val: body.declaration.id.value,
+                    });
+                  }
+                }
+              } else if (body.type === "ExportNamedDeclaration") {
+                if (body.source?.type === "StringLiteral") {
+                  const ex = exports[body.source.value];
+                  if (ex) {
+                    for (const s of body.specifiers) {
+                      if (s.type === "ExportSpecifier") {
+                        if (s.exported) {
+                          const found = ex.find(
+                            (e) => e.val === s.exported?.value
+                          );
+                          if (found) {
+                            exports[t.id.value].push(found);
+                          }
+                        } else if (s.orig) {
+                          const found = ex.find((e) => e.val === s.orig?.value);
+                          if (found) {
+                            exports[t.id.value].push(found);
                           }
                         }
                       }
                     }
-                  } else {
-                    for (const s of body.specifiers) {
-                      if (s.type === "ExportSpecifier") {
-                        if (s.exported) {
-                          exports[t.id.value].push({
-                            type: "named",
-                            kind: "const",
-                            val: s.exported.value,
-                          });
-                        } else if (s.orig) {
-                          exports[t.id.value].push({
-                            type: "named",
-                            kind: "const",
-                            val: s.orig.value,
-                          });
-                        }
+                  }
+                } else {
+                  for (const s of body.specifiers) {
+                    if (s.type === "ExportSpecifier") {
+                      if (s.exported) {
+                        exports[t.id.value].push({
+                          type: "named",
+                          kind: "const",
+                          val: s.exported.value,
+                        });
+                      } else if (s.orig) {
+                        exports[t.id.value].push({
+                          type: "named",
+                          kind: "const",
+                          val: s.orig.value,
+                        });
                       }
                     }
                   }
@@ -109,7 +116,8 @@ export const parseTypeDef = async (path: string) => {
         }
       },
     },
-  });
+    undefined
+  );
 
   const result = {} as Record<string, "const" | "type">;
   const traverse = (items: SingleExport[]) => {
