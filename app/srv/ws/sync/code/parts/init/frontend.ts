@@ -1,19 +1,20 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import style from "@hyrious/esbuild-plugin-style";
 import { dir } from "dir";
-import { BuildOptions, BuildResult, context, formatMessages } from "esbuild";
+import { context, formatMessages } from "esbuild";
 import { cleanPlugin } from "esbuild-clean-plugin";
-import isEqual from "lodash.isequal";
-import { appendFile } from "node:fs/promises";
-import { code } from "../../code";
-import { user } from "../../../entity/user";
-import { conns } from "../../../entity/conn";
-import { SyncType } from "../../../type";
-import { sendWS } from "../../../sync-handler";
-import { removeAsync } from "fs-jetpack";
 import { watch } from "fs";
+import { appendFile } from "node:fs/promises";
 import { server } from "../../../editor/code/server-main";
+import { conns } from "../../../entity/conn";
+import { user } from "../../../entity/user";
+import { sendWS } from "../../../sync-handler";
+import { SyncType } from "../../../type";
+import { code } from "../../code";
+import { existsAsync } from "fs-jetpack";
 const decoder = new TextDecoder();
+const pending = {} as any;
+
 export const initFrontEnd = async (
   root: string,
   id_site: string,
@@ -22,13 +23,27 @@ export const initFrontEnd = async (
   let existing = code.internal.frontend[id_site];
 
   if (existing) {
-    if (force) {
-      try {
-        existing.watch.close();
-        await existing.ctx.dispose();
-        delete code.internal.frontend[id_site];
-      } catch (e) { }
+    if (existing.npm) {
+      if (pending[id_site]) return;
+      pending[id_site] = true;
+      await existing.npm;
+      delete pending[id_site];
+      delete existing.npm;
     } else {
+      if (force) {
+        try {
+          existing.watch.close();
+          await existing.ctx.dispose();
+          delete code.internal.frontend[id_site];
+        } catch (e) {}
+      } else {
+        return;
+      }
+    }
+  } else {
+    if (
+      !(await existsAsync(code.path(id_site, "site", "src", "node_modules")))
+    ) {
       return;
     }
   }
@@ -114,25 +129,25 @@ export const initFrontEnd = async (
           const srv = code.internal.server[id_site];
           if (filename?.startsWith("node_modules")) return;
           if (
-            (filename?.endsWith(".tsx") ||
-              filename?.endsWith(".ts") ||
-              filename?.endsWith(".css") ||
-              filename?.endsWith(".html"))
+            filename?.endsWith(".tsx") ||
+            filename?.endsWith(".ts") ||
+            filename?.endsWith(".css") ||
+            filename?.endsWith(".html")
           ) {
-            if (typeof fe !== 'undefined' && !fe.rebuilding) {
+            if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               try {
                 await fe.ctx.rebuild();
-              } catch (e) { }
+              } catch (e) {}
               fe.rebuilding = false;
             }
 
-            if (typeof srv !== 'undefined' && !srv.rebuilding && srv.ctx) {
+            if (typeof srv !== "undefined" && !srv.rebuilding && srv.ctx) {
               srv.rebuilding = true;
               try {
                 await srv.ctx.rebuild();
                 await server.init(id_site);
-              } catch (e) { }
+              } catch (e) {}
               srv.rebuilding = false;
             }
           }
@@ -143,7 +158,7 @@ export const initFrontEnd = async (
     fe.rebuilding = true;
     try {
       await fe.ctx.rebuild();
-    } catch (e) { }
+    } catch (e) {}
     fe.rebuilding = false;
   } catch (e: any) {
     console.error("Error building front end", id_site);
@@ -169,127 +184,127 @@ const isInstalling = async (id_site: string) => {
     const text = await file.text();
     if (typeof text === "string" && text.startsWith("Installing dependencies"))
       return true;
-  } catch (e) { }
+  } catch (e) {}
 
   return false;
 };
 
-const readPackageJSON = async (id_site: string) => {
-  const file = Bun.file(code.path(id_site, "site", "src", "package.json"));
-  const deps = new Set<string>();
+// const readPackageJSON = async (id_site: string) => {
+//   const file = Bun.file(code.path(id_site, "site", "src", "package.json"));
+//   const deps = new Set<string>();
 
-  if (await file.exists()) {
-    const json = await file.json();
+//   if (await file.exists()) {
+//     const json = await file.json();
 
-    if (json.dependencies) {
-      for (const k of Object.keys(json.dependencies)) {
-        deps.add(k);
-      }
-    }
+//     if (json.dependencies) {
+//       for (const k of Object.keys(json.dependencies)) {
+//         deps.add(k);
+//       }
+//     }
 
-    if (json.devDependencies) {
-      for (const k of Object.keys(json.devDependencies)) {
-        deps.add(k);
-      }
-    }
-  }
-  return deps;
-};
+//     if (json.devDependencies) {
+//       for (const k of Object.keys(json.devDependencies)) {
+//         deps.add(k);
+//       }
+//     }
+//   }
+//   return deps;
+// };
 
-const installDeps = async (
-  root: string,
-  res: BuildResult<BuildOptions>,
-  id_site: string
-) => {
-  const pkgjson = await readPackageJSON(id_site);
-  const imports = new Set<string>();
+// const installDeps = async (
+//   root: string,
+//   res: BuildResult<BuildOptions>,
+//   id_site: string
+// ) => {
+//   const pkgjson = await readPackageJSON(id_site);
+//   const imports = new Set<string>();
 
-  if (res.errors.length > 0) {
-    for (const err of res.errors) {
-      if (err.notes?.[0].text.startsWith("You can mark the path ")) {
-        let im = err.notes?.[0].text.split('"')[1];
+//   if (res.errors.length > 0) {
+//     for (const err of res.errors) {
+//       if (err.notes?.[0].text.startsWith("You can mark the path ")) {
+//         let im = err.notes?.[0].text.split('"')[1];
 
-        if (
-          !im.startsWith(".") &&
-          !im.startsWith("@/") &&
-          !im.startsWith("app") &&
-          !im.startsWith("lib") &&
-          !im.startsWith("server")
-        ) {
-          const parts = im.split("/");
-          if (im.startsWith("@")) {
-            im = `${parts[0]}/${parts[1]}`;
-          } else {
-            im = parts[0];
-          }
-          imports.add(im);
-        }
-      }
-    }
-  }
+//         if (
+//           !im.startsWith(".") &&
+//           !im.startsWith("@/") &&
+//           !im.startsWith("app") &&
+//           !im.startsWith("lib") &&
+//           !im.startsWith("server")
+//         ) {
+//           const parts = im.split("/");
+//           if (im.startsWith("@")) {
+//             im = `${parts[0]}/${parts[1]}`;
+//           } else {
+//             im = parts[0];
+//           }
+//           imports.add(im);
+//         }
+//       }
+//     }
+//   }
 
-  if (res.metafile) {
-    for (const [_, file] of Object.entries(res.metafile?.inputs || {})) {
-      for (const im of file.imports) {
-        if (im.kind === "import-statement" && im.external) {
-          if (
-            !im.path.startsWith(".") &&
-            !im.path.startsWith("@/") &&
-            !im.path.startsWith("app") &&
-            !im.path.startsWith("lib") &&
-            !im.path.startsWith("server")
-          ) {
-            const parts = im.path.split("/");
-            let src = im.path;
-            if (src.startsWith("@")) {
-              src = `${parts[0]}/${parts[1]}`;
-            } else {
-              src = parts[0];
-            }
+//   if (res.metafile) {
+//     for (const [_, file] of Object.entries(res.metafile?.inputs || {})) {
+//       for (const im of file.imports) {
+//         if (im.kind === "import-statement" && im.external) {
+//           if (
+//             !im.path.startsWith(".") &&
+//             !im.path.startsWith("@/") &&
+//             !im.path.startsWith("app") &&
+//             !im.path.startsWith("lib") &&
+//             !im.path.startsWith("server")
+//           ) {
+//             const parts = im.path.split("/");
+//             let src = im.path;
+//             if (src.startsWith("@")) {
+//               src = `${parts[0]}/${parts[1]}`;
+//             } else {
+//               src = parts[0];
+//             }
 
-            imports.add(src);
-          }
-        }
-      }
-    }
-  }
+//             imports.add(src);
+//           }
+//         }
+//       }
+//     }
+//   }
 
-  if (!isEqual(imports, pkgjson)) {
-    const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
-    if (!(await pkgjson.exists())) {
-      await Bun.write(
-        pkgjson,
-        JSON.stringify({
-          name: id_site,
-          scripts: {
-            startup:
-              "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify",
-          },
-        })
-      );
-    }
+//   if (!isEqual(imports, pkgjson)) {
+//     const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
+//     if (!(await pkgjson.exists())) {
+//       await Bun.write(
+//         pkgjson,
+//         JSON.stringify({
+//           name: id_site,
+//           scripts: {
+//             startup:
+//               "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify",
+//           },
+//         })
+//       );
+//     }
 
-    await codeError(
-      id_site,
-      "Installing dependencies:\n " + [...imports].join("\n ")
-    );
-    let proc = Bun.spawn([`npm`, `install`, ...imports], {
-      stdio: ["inherit", "pipe", "pipe"],
-      cwd: dir.data(root),
-    });
+//     await codeError(
+//       id_site,
+//       "Installing dependencies:\n " + [...imports].join("\n ")
+//     );
+//     let proc = Bun.spawn([`npm`, `install`, ...imports], {
+//       stdio: ["inherit", "pipe", "pipe"],
+//       cwd: dir.data(root),
+//     });
 
-    async function print(generator: ReadableStream<Uint8Array>, prefix: any) {
-      for await (let value of generator) {
-        const str = decoder.decode(value);
-        await codeError(id_site, `${prefix} ${str}`, true);
-      }
-    }
+//     async function print(generator: ReadableStream<Uint8Array>, prefix: any) {
+//       for await (let value of generator) {
+//         const str = decoder.decode(value);
+//         await codeError(id_site, `${prefix} ${str}`, true);
+//       }
+//     }
 
-    print(proc.stdout, "stdout:");
-    print(proc.stderr, "stderr:");
+//     print(proc.stdout, "stdout:");
+//     print(proc.stderr, "stderr:");
 
-    await proc.exited;
-    // await codeError(id_site, "");
-    return true;
-  }
-};
+//     await proc.exited;
+//     // await codeError(id_site, "");
+//     return true;
+//   }
+// };
