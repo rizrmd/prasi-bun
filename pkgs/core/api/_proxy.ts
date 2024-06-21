@@ -24,24 +24,11 @@ export const _ = {
         headers[k] = v;
       });
 
-      const res = await fetch(url as any, {
+      return await fetch(url as any, {
         method: req.method || "POST",
         headers,
         body,
       });
-
-      let res_body: any = null;
-      const res_headers: any = {};
-      res.headers.forEach((v, k) => {
-        res_headers[k] = v;
-      });
-      res_body = await res.arrayBuffer();
-      if (res_headers["content-encoding"] === "gzip") {
-        res_body = await gzipAsync(new Uint8Array(res_body));
-        delete res_headers["content-encoding"];
-      }
-
-      return new Response(res_body, { headers: res_headers });
     } catch (e: any) {
       new Response(
         JSON.stringify({
