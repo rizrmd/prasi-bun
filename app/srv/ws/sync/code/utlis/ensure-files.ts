@@ -87,7 +87,8 @@ export const ensureFiles = async (path: string, id_site: string) => {
               "tailwind-merge": "^2.3.0",
               xlsx: "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz",
             },
-          })
+          }),
+          { mode: 777 }
         );
         let proc = Bun.spawn([`npm`, `install`], {
           stdio: ["inherit", "inherit", "inherit"],
