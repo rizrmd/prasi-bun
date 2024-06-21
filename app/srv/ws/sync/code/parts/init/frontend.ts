@@ -37,7 +37,9 @@ export const initFrontEnd = async (
           delete code.internal.frontend[id_site];
         } catch (e) {}
       } else {
-        return;
+        if (existing.ctx) {
+          return;
+        }
       }
     }
   } else {
