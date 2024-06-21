@@ -36,6 +36,7 @@ export const _ = {
         res_headers[k] = v;
       });
       res_body = await res.arrayBuffer();
+
       if (res_headers["content-encoding"] === "gzip") {
         res_body = await gzipAsync(new Uint8Array(res_body));
         delete res_headers["content-encoding"];
@@ -46,8 +47,7 @@ export const _ = {
         res_body = await brotli.decompress(res_body);
         delete res_headers["content-encoding"];
       }
-
-      console.log(url, res_headers);
+      console.log(url.toString(), new TextDecoder().decode(res_body));
 
       return new Response(res_body, { headers: res_headers });
     } catch (e: any) {
