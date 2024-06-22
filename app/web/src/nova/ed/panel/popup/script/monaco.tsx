@@ -57,7 +57,7 @@ export const EdScriptMonaco: FC<{}> = () => {
   useEffect(() => {
     if (!w.monaco_loaded) {
       w.monaco_loaded = true;
-      setTimeout(console.clear, 500);
+      // setTimeout(console.clear, 500);
     }
 
     return () => {

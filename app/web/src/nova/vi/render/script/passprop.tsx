@@ -49,7 +49,8 @@ export const createViPassProp = (
     }
 
     const _pass = { ...passprop, ...script_pass };
-    
+    meta.editor_props = _pass;
+
     if (
       !Array.isArray(arg.children) &&
       isValidElement(arg.children) &&
