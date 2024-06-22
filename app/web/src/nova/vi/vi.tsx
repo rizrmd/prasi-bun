@@ -99,19 +99,22 @@ export const Vi: FC<{
     for (const url of urls) {
       vi.page.navs[page_id].add(url);
     }
-    clearTimeout(nav.timeout);
-    nav.timeout = setTimeout(() => {
-      if (vi.on_preload) {
-        vi.on_preload({
-          urls: Array.from(vi.page.navs[page_id]),
-          opt: {
-            on_load: opt?.on_load,
-          },
-        });
-      }
-    }, 100);
-
-    return "";
+    return new Promise<void>((done) => {
+      clearTimeout(nav.timeout);
+      nav.timeout = setTimeout(() => {
+        if (vi.on_preload) {
+          vi.on_preload({
+            urls: Array.from(vi.page.navs[page_id]),
+            opt: {
+              on_load: (...arg) => {
+                opt?.on_load?.(...arg);
+                done();
+              },
+            },
+          });
+        }
+      }, 100);
+    });
   };
 
   vi.layout = layout;
