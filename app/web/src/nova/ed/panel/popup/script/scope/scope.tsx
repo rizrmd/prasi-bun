@@ -48,7 +48,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
     if (m.editor_props) {
       for (const [k, v] of Object.entries(m.editor_props) as any) {
-        vars[k] = { mode: "prop", val: v };
+        vars[k] = { mode: "prop", val: typeof v === "object" ? v : typeof v };
       }
     }
 
