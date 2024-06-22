@@ -241,7 +241,6 @@ export const Root = () => {
             script={{ init_local_effect: base.init_local_effect }}
             on_preload={async ({ urls, opt }) => {
               const load_urls: string[] = [];
-              const loaded = {} as Record<string, any>;
               if (base.cache.urls) {
                 for (const url of urls) {
                   if (!base.cache.urls.has(url)) {

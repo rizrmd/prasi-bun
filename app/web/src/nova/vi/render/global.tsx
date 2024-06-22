@@ -36,6 +36,7 @@ export const ViGlobal = {
   page: {
     cur: { id: "" },
     navs: {} as Record<string, Set<string>>,
+    preload: [] as (() => void)[],
   },
   comp: {
     load: (async () => {
@@ -46,7 +47,7 @@ export const ViGlobal = {
     | undefined
     | ((arg: {
         urls: string[];
-        opt: {
+        opt?: {
           on_load?: (
             pages: {
               id: string;

@@ -94,27 +94,38 @@ export const Vi: FC<{
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
   w.preload = (_urls: PRELOAD_ARGS["urls"], opt: PRELOAD_ARGS["opt"]) => {
-    if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
-    const urls = typeof _urls === "string" ? [_urls] : _urls;
-    for (const url of urls) {
-      vi.page.navs[page_id].add(url);
-    }
-    return new Promise<void>((done) => {
-      clearTimeout(nav.timeout);
-      nav.timeout = setTimeout(() => {
-        if (vi.on_preload) {
-          vi.on_preload({
+    if (vi.on_preload) {
+      return new Promise<void>((done) => {
+        if (!vi.page.navs[page_id]) vi.page.navs[page_id] = new Set();
+        const navs = vi.page.navs[page_id];
+        const urls = typeof _urls === "string" ? [_urls] : _urls;
+        let all_done = true;
+        for (const url of urls) {
+          if (!navs.has(url)) {
+            navs.add(url);
+            all_done = false;
+          }
+        }
+        if (!all_done) {
+          vi.page.preload.push(done);
+          vi.on_preload?.({
             urls: Array.from(vi.page.navs[page_id]),
             opt: {
               on_load: (...arg) => {
                 opt?.on_load?.(...arg);
-                done();
+                for (const done of vi.page.preload) {
+                  done();
+                }
+                vi.page.preload = [];
+                vi.render();
               },
             },
           });
+        } else {
+          done();
         }
-      }, 100);
-    });
+      });
+    }
   };
 
   vi.layout = layout;
