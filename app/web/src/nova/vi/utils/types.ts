@@ -61,6 +61,7 @@ export type IMeta = {
       comp_id: string;
     };
   };
+  editor_props?: any;
   script?: {
     scope?: any;
     result: ReactNode;

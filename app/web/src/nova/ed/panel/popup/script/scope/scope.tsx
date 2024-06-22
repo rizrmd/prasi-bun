@@ -30,14 +30,11 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
-
-
   const vars: Record<string, { mode: "local" | "prop" | "type"; val: string }> =
     {};
   let m_prev = null;
 
   const comp_types = {} as Record<string, string>;
-
 
   for (const m of cur_path) {
     if (m.item.component?.props) {
@@ -47,6 +44,11 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         } else {
           vars[name] = { mode: "prop", val: prop.value };
         }
+      }
+    }
+    if (m.editor_props) {
+      for (const [k, v] of Object.entries(m.editor_props) as any) {
+        vars[k] = { mode: "prop", val: v };
       }
     }
 
@@ -75,7 +77,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
               }
             }
           }
-        } catch (e) { }
+        } catch (e) {}
       }
     }
 
@@ -134,7 +136,7 @@ return typings;
             comp_types[k] = v;
           }
         }
-      } catch (e) { }
+      } catch (e) {}
     };
 
     if (comp && comp.typings) {
@@ -149,7 +151,7 @@ return typings;
   }
 
   const tree_types: string[] = [];
-  const tree_usage: { import: string, usage: string }[] = [];
+  const tree_usage: { import: string; usage: string }[] = [];
   let i = 0;
   for (const [k, v] of Object.entries(vars)) {
     i++;
@@ -162,7 +164,7 @@ declare module "item-${im}" {
 `);
       tree_usage.push({
         import: `import { \$\$_${k} } from "item-${im}";`,
-        usage: `const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });  `
+        usage: `const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });  `,
       });
     } else if (v.mode === "prop") {
       const im = tree_types.length;
@@ -174,7 +176,7 @@ declare module "item-${im}" {
 `);
       tree_usage.push({
         import: `import { \$\$_${k} } from "item-${im}";`,
-        usage: `const ${k} = \$\$_${k};`
+        usage: `const ${k} = \$\$_${k};`,
       });
     } else if (v.mode === "type") {
       tree_types.push(`
@@ -184,12 +186,16 @@ export const ${k} = null as unknown as ${v.val};
   }
 
   register(monaco, tree_types.join("\n"), "ts:tree_types.d.ts");
-  register(monaco, `\
-${tree_usage.map(e => e.import).join("\n")}
+  register(
+    monaco,
+    `\
+${tree_usage.map((e) => e.import).join("\n")}
 
 declare global { 
-${tree_usage.map(e => e.usage).join("\n")} 
-}`, "tree_usage.ts");
+${tree_usage.map((e) => e.usage).join("\n")} 
+}`,
+    "tree_usage.ts"
+  );
   register(monaco, Object.values(comp_types).join("\n"), "ts:comp_types.d.ts");
 };
 

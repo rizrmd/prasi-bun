@@ -59,7 +59,7 @@ export const jscript = {
         jscript.editor = e.Editor;
         e.loader.config({
           paths: {
-            vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs",
+            vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs",
           },
         });
         this.events.editorLoaded();
