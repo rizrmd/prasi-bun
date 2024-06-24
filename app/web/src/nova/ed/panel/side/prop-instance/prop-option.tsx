@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect } from "react";
+import { FC, Fragment, useCallback, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
 import { apiProxy } from "../../../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../../../base/load/db/db-proxy";
@@ -43,6 +43,8 @@ export const EdPropInstanceOptions: FC<{
     options: [] as MetaOption[],
     optDeps: [] as any[],
     resetOnDeps: false as boolean | (() => any[]),
+    open: false,
+    pendingVal: null as any,
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -184,32 +186,49 @@ export const EdPropInstanceOptions: FC<{
     eval(`evalue = ${prop.value}`);
   } catch (e) {}
 
+  if (local.open) {
+    evalue = local.pendingVal;
+  } else {
+    local.pendingVal = evalue;
+  }
+
   useEffect(() => {
     if (Array.isArray(local.options) && !Array.isArray(evalue)) {
-      local.val = evalue;
-      local.render();
+      if (mode !== "checkbox") {
+        local.val = evalue;
+        local.render();
+      }
     }
   }, [evalue]);
 
-  const onChange = (val: string, item: MetaOption | undefined) => {
-    mprop.doc?.transact(() => {
-      mprop.set("value", val);
-      mprop.set("valueBuilt", val);
-    });
+  const onChange = useCallback(
+    (val: string, item: MetaOption | undefined) => {
+      if (local.open) {
+        eval(`local.pendingVal = ${val}`);
+        local.render();
+        return;
+      }
 
-    treeRebuild(p);
-    p.render();
+      mprop.doc?.transact(() => {
+        mprop.set("value", val);
+        mprop.set("valueBuilt", val);
+      });
 
-    setTimeout(() => {
-      if (item?.reload) {
-        for (const name of item.reload) {
-          if (config.opt[name]) {
-            config.opt[name]();
+      treeRebuild(p);
+      p.render();
+
+      setTimeout(() => {
+        if (item?.reload) {
+          for (const name of item.reload) {
+            if (config.opt[name]) {
+              config.opt[name]();
+            }
           }
         }
-      }
-    });
-  };
+      });
+    },
+    [local.open]
+  );
 
   let mode = cprop.meta?.option_mode;
   if (!mode) mode = "button";
@@ -283,6 +302,18 @@ export const EdPropInstanceOptions: FC<{
             {mode === "checkbox" && (
               <Popover
                 placement="top"
+                onOpenChange={(open) => {
+                  local.open = open;
+                  local.render();
+
+                  if (!open) {
+                    onChange(JSON.stringify(local.pendingVal), null as any);
+                  } else {
+                    local.pendingVal = null;
+                    local.render();
+                  }
+                }}
+                open={local.open}
                 content={
                   <div
                     className={cx(
@@ -315,72 +346,19 @@ export const EdPropInstanceOptions: FC<{
                             }
                           });
                           return (
-                            <Fragment key={idx}>
-                              <SingleCheckbox
-                                item={item}
-                                idx={idx}
-                                val={val}
-                                depth={0}
-                                onChange={(val) => {
-                                  onChange(JSON.stringify(val), item);
-                                  local.render();
-                                }}
-                              />
-                              {item.options &&
-                                found &&
-                                item.options.map((child, idx) => {
-                                  const sub_found = found.checked.find(
-                                    (e: any) => {
-                                      if (!item.options) {
-                                        return e === child.value;
-                                      } else {
-                                        if (
-                                          typeof e === "object" &&
-                                          e.value === child.value
-                                        ) {
-                                          return true;
-                                        }
-                                        return false;
-                                      }
-                                    }
-                                  );
-                                  return (
-                                    <Fragment key={idx}>
-                                      <SingleCheckbox
-                                        key={idx}
-                                        item={child}
-                                        idx={idx}
-                                        depth={1}
-                                        val={found.checked}
-                                        onChange={(newval) => {
-                                          onChange(JSON.stringify(val), child);
-                                          local.render();
-                                        }}
-                                      />
-                                      {child.options &&
-                                        sub_found &&
-                                        child.options.map((item, sidx) => {
-                                          return (
-                                            <SingleCheckbox
-                                              item={item}
-                                              idx={idx}
-                                              key={sidx}
-                                              depth={2}
-                                              val={sub_found.checked}
-                                              onChange={(newval) => {
-                                                onChange(
-                                                  JSON.stringify(val),
-                                                  item
-                                                );
-                                                local.render();
-                                              }}
-                                            />
-                                          );
-                                        })}
-                                    </Fragment>
-                                  );
-                                })}
-                            </Fragment>
+                            <SingleCheckbox
+                              item={item}
+                              idx={idx}
+                              val={val}
+                              key={idx}
+                              depth={0}
+                              onChange={(val) => {
+                                onChange(JSON.stringify(val), item);
+                                local.render();
+                              }}
+                              found={found}
+                              render={local.render}
+                            />
                           );
                         })}
                     </div>
@@ -390,7 +368,10 @@ export const EdPropInstanceOptions: FC<{
               >
                 <div
                   className="flex flex-1 items-stretch bg-white border hover:border-blue-500 hover:bg-blue-50 rounded-sm select-none cursor-pointer m-[3px]"
-                  onClick={() => {}}
+                  onClick={() => {
+                    local.open = true;
+                    local.render();
+                  }}
                   ref={(el) => {
                     if (!local.checkbox.width && el) {
                       const bound = el.getBoundingClientRect();
@@ -421,70 +402,22 @@ export const EdPropInstanceOptions: FC<{
   );
 };
 
-const CheckboxLayer = ({
-  value,
-  render,
-  evalue,
-  onChange,
-}: {
-  value: MetaOption[];
-  render: () => void;
-  onChange: (val: string, item: MetaOption | undefined) => void;
-  evalue: Array<any>;
-}) => {
-  return (
-    <div className={cx("flex flex-col bg-white")}>
-      {Array.isArray(value) &&
-        value.map((item, idx) => {
-          const val: any[] = Array.isArray(evalue) ? evalue : [];
-          const found = val.find((e) => {
-            if (!item.options) {
-              return e === item.value;
-            } else {
-              if (typeof e === "object" && e.value === item.value) {
-                return true;
-              }
-              return false;
-            }
-          });
-          return (
-            <Fragment key={idx}>
-              <SingleCheckbox
-                item={item}
-                idx={idx}
-                val={val}
-                depth={0}
-                onChange={(val) => {
-                  onChange(JSON.stringify(val), item);
-                  render();
-                }}
-              />
-              {item.options && found && (
-                <CheckboxLayer
-                  value={item.options}
-                  render={render}
-                  evalue={found.checked}
-                  onChange={onChange}
-                />
-              )}
-            </Fragment>
-          );
-        })}
-    </div>
-  );
-};
 const SingleCheckbox = ({
   val,
   item,
   idx,
   onChange,
   depth,
+  found,
+  render,
 }: {
   item: MetaOption;
   idx: number;
   depth: number;
   val: any[];
+  found: any;
   onChange: (val: MetaOption[], item: MetaOption) => void;
+  render: () => void;
 }) => {
   const is_check = !!val.find((e) => {
     if (!item.options) {
@@ -530,52 +463,85 @@ const SingleCheckbox = ({
   }, []);
 
   return (
-    <div
-      className={cx(
-        "flex pl-1 text-xs cursor-pointer select-none space-x-1 items-center",
-        idx === 0 && !depth ? "" : "border-t",
-        item.checked && "opacity-50",
-        depth &&
-          css`
-            padding-left: ${depth * 20}px;
-          `,
-        is_check
-          ? css`
-              color: green;
-              border-left: 3px solid green;
+    <>
+      <div
+        className={cx(
+          "flex pl-1 text-xs cursor-pointer select-none space-x-1 items-center",
+          idx === 0 && !depth ? "" : "border-t",
+          item.checked && "opacity-50",
+          depth &&
+            css`
+              padding-left: ${depth * 20}px;
+            `,
+          is_check
+            ? css`
+                color: green;
+                border-left: 3px solid green;
 
-              &:hover {
-                border-left: 3px solid #a8d4a8;
-              }
-
-              svg {
-                width: 14px;
-              }
-            `
-          : css`
-              border-left: 3px solid transparent;
-
-              svg {
-                color: gray;
-                width: 14px;
-              }
-              &:hover {
-                border-left: 3px solid #0084ff;
-                color: #0084ff;
+                &:hover {
+                  border-left: 3px solid #a8d4a8;
+                }
 
                 svg {
-                  color: #0084ff;
+                  width: 14px;
                 }
+              `
+            : css`
+                border-left: 3px solid transparent;
+
+                svg {
+                  color: gray;
+                  width: 14px;
+                }
+                &:hover {
+                  border-left: 3px solid #0084ff;
+                  color: #0084ff;
+
+                  svg {
+                    color: #0084ff;
+                  }
+                }
+              `
+        )}
+        onClick={() => {
+          toggleCheck();
+        }}
+      >
+        {!is_check ? unchecked : checked}
+        <div>{item.label}</div>
+      </div>
+
+      {item.options &&
+        found &&
+        item.options.map((child, idx) => {
+          const sub_found = found.checked.find((e: any) => {
+            if (!item.options) {
+              return e === child.value;
+            } else {
+              if (typeof e === "object" && e.value === child.value) {
+                return true;
               }
-            `
-      )}
-      onClick={() => {
-        toggleCheck();
-      }}
-    >
-      {!is_check ? unchecked : checked}
-      <div>{item.label}</div>
-    </div>
+              return false;
+            }
+          });
+
+          return (
+            <SingleCheckbox
+              key={idx}
+              item={child}
+              idx={idx}
+              depth={depth + 1}
+              val={found.checked}
+              found={sub_found}
+              onChange={(newval) => {
+                onChange(val, child);
+                render();
+              }}
+              render={render}
+            />
+          );
+        })}
+    </>
   );
 };
 
