@@ -7,6 +7,7 @@ import { treeCacheBuild, treeRebuild } from "./tree/build";
 import { get, set } from "idb-keyval";
 import { nav } from "../../vi/render/script/extract-nav";
 
+const UPDATE_TIMEOUT = 200;
 export const edRoute = async (p: PG) => {
   if (p.sync && (p.status === "ready" || p.status === "init")) {
     if (!p.site.domain && !p.site.name) {
@@ -67,45 +68,48 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
       }
 
       page.on_update = async (bin: Uint8Array, origin: any) => {
-        if (origin === "local" || !p.sync) return;
+        clearTimeout(page.update_timeout);
+        page.update_timeout = setTimeout(async () => {
+          if (origin === "local" || !p.sync) return;
 
-        const res = await p.sync.yjs.sv_local(
-          "page",
-          layout_id,
-          Buffer.from(compress(bin))
-        );
-
-        if (res) {
-          const diff_local = Y.encodeStateAsUpdate(
-            doc as any,
-            decompress(res.sv)
-          );
-          Y.applyUpdate(doc as any, decompress(res.diff), "local");
-
-          if (!isTextEditing()) {
-            await treeRebuild(p, { note: note + " page-on-update" });
-          }
-
-          await p.sync.yjs.diff_local(
+          const res = await p.sync.yjs.sv_local(
             "page",
-            p.page.cur.id,
-            Buffer.from(compress(diff_local))
+            layout_id,
+            Buffer.from(compress(bin))
           );
 
-          p.preview.page_cache[layout_id] = {
-            root,
-            url: "~~@$#%^#@~LAYOUT~~@$#%^#@~",
-          };
-          await treeCacheBuild(p, layout_id);
-          p.render();
+          if (res) {
+            const diff_local = Y.encodeStateAsUpdate(
+              doc as any,
+              decompress(res.sv)
+            );
+            Y.applyUpdate(doc as any, decompress(res.diff), "local");
 
-          const meta_cache = p.preview.meta_cache[layout_id];
-          if (meta_cache) {
-            p.site.layout.meta = meta_cache.meta;
-            p.site.layout.entry = meta_cache.entry;
-            savePageMetaCache(p, meta_cache.meta);
+            if (!isTextEditing()) {
+              await treeRebuild(p, { note: note + " page-on-update" });
+            }
+
+            await p.sync.yjs.diff_local(
+              "page",
+              p.page.cur.id,
+              Buffer.from(compress(diff_local))
+            );
+
+            p.preview.page_cache[layout_id] = {
+              root,
+              url: "~~@$#%^#@~LAYOUT~~@$#%^#@~",
+            };
+            await treeCacheBuild(p, layout_id);
+            p.render();
+
+            const meta_cache = p.preview.meta_cache[layout_id];
+            if (meta_cache) {
+              p.site.layout.meta = meta_cache.meta;
+              p.site.layout.entry = meta_cache.entry;
+              savePageMetaCache(p, meta_cache.meta);
+            }
           }
-        }
+        }, UPDATE_TIMEOUT);
       };
 
       const root = (doc.getMap("map").get("root") as any)?.toJSON();
@@ -170,46 +174,49 @@ export const reloadPage = async (
     }
 
     page.on_update = async (bin: Uint8Array, origin: any) => {
-      if (origin === "local" || !p.sync) return;
+      clearTimeout(page.update_timeout);
+      page.update_timeout = setTimeout(async () => {
+        if (origin === "local" || !p.sync) return;
 
-      if (page.page.id !== remotePage.id) {
-        alert("Page ID Mismatch!\n Refreshing to preventing data loss...");
-        location.reload();
-        return;
-      }
-
-      const res = await p.sync.yjs.sv_local(
-        "page",
-        p.page.cur.id,
-        Buffer.from(compress(bin))
-      );
-
-      if (res) {
-        const diff_local = Y.encodeStateAsUpdate(
-          doc as any,
-          decompress(res.sv)
-        );
-        Y.applyUpdate(doc as any, decompress(res.diff), "local");
-
-        if (!isTextEditing()) {
-          await treeRebuild(p, { note: note + " page-on-update" });
+        if (page.page.id !== remotePage.id) {
+          alert("Page ID Mismatch!\n Refreshing to preventing data loss...");
+          location.reload();
+          return;
         }
 
-        await p.sync.yjs.diff_local(
+        const res = await p.sync.yjs.sv_local(
           "page",
           p.page.cur.id,
-          Buffer.from(compress(diff_local))
+          Buffer.from(compress(bin))
         );
-        p.ui.syncing = false;
 
-        p.page.entry = (doc as any)
-          .getMap("map")
-          .get("root")
-          ?.get("childs")
-          ?.map((e: any) => e.get("id")) as string[];
+        if (res) {
+          const diff_local = Y.encodeStateAsUpdate(
+            doc as any,
+            decompress(res.sv)
+          );
+          Y.applyUpdate(doc as any, decompress(res.diff), "local");
 
-        if (active.should_render_main) p.render();
-      }
+          if (!isTextEditing()) {
+            await treeRebuild(p, { note: note + " page-on-update" });
+          }
+
+          await p.sync.yjs.diff_local(
+            "page",
+            p.page.cur.id,
+            Buffer.from(compress(diff_local))
+          );
+          p.ui.syncing = false;
+
+          p.page.entry = (doc as any)
+            .getMap("map")
+            .get("root")
+            ?.get("childs")
+            ?.map((e: any) => e.get("id")) as string[];
+
+          if (active.should_render_main) p.render();
+        }
+      }, UPDATE_TIMEOUT);
     };
 
     doc.on("update", page.on_update);
