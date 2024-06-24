@@ -125,6 +125,7 @@ export const devItem = (
           { value: string; valueBuilt?: string }
         >;
 
+        console.log("committing", pedit);
         if (mitem) {
           for (const [item_id, changes] of Object.entries(pedit)) {
             const meta = metas[item_id];
