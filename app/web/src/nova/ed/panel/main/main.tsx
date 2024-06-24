@@ -100,6 +100,7 @@ export const EdMain = () => {
         />
       );
       active.should_render_main = false;
+      if (w.prasiContext.afterEditorRender) w.prasiContext.afterEditorRender();
     }
 
     return (
