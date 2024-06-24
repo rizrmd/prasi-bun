@@ -30,8 +30,13 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
   }
 
-  const vars: Record<string, { mode: "local" | "prop" | "type"; val: string }> =
-    {};
+  const vars: Record<
+    string,
+    {
+      mode: "local" | "prop" | "type";
+      val: string;
+    }
+  > = {};
   let m_prev = null;
 
   const comp_types = {} as Record<string, string>;
