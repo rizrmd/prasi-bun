@@ -28,6 +28,7 @@ export const w = window as unknown as {
   navigateOverride: (s: string) => string;
   isDesktop: boolean;
   prasiApi: Record<string, PrasiAPI>;
+  prasiContext: { render: () => void; renderEditor: () => void };
   loadedFonts: string[];
   prasiApiDbPull: boolean;
   mobile?: any;

@@ -21,6 +21,13 @@ export const EdMain = () => {
     return "";
   };
 
+  if (w.prasiContext) {
+    w.prasiContext.renderEditor = () => {
+      active.should_render_main = true;
+      p.render();
+    };
+  }
+
   let meta: undefined | IMeta = undefined;
 
   if (active.comp_id) {
