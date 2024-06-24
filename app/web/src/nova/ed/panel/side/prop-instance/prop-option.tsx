@@ -445,12 +445,14 @@ const SingleCheckbox = ({
         val.push({ value: item.value, checked: [] });
       }
     } else {
-      let idx = val.findIndex((e) => e === item.value);
+      if (item.value) {
+        let idx = val.findIndex((e) => e === item.value);
 
-      if (idx >= 0) {
-        val.splice(idx, 1);
-      } else {
-        val.push(item.value);
+        if (idx >= 0) {
+          val.splice(idx, 1);
+        } else {
+          val.push(item.value);
+        }
       }
     }
     onChange(val, item);
