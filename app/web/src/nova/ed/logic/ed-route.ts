@@ -7,7 +7,7 @@ import { treeCacheBuild, treeRebuild } from "./tree/build";
 import { get, set } from "idb-keyval";
 import { nav } from "../../vi/render/script/extract-nav";
 
-const UPDATE_TIMEOUT = 200;
+const UPDATE_TIMEOUT = 0;
 export const edRoute = async (p: PG) => {
   if (p.sync && (p.status === "ready" || p.status === "init")) {
     if (!p.site.domain && !p.site.name) {
@@ -71,6 +71,7 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
         clearTimeout(page.update_timeout);
         page.update_timeout = setTimeout(async () => {
           if (origin === "local" || !p.sync) return;
+          console.log("page on update snap")
 
           const res = await p.sync.yjs.sv_local(
             "page",
@@ -184,6 +185,7 @@ export const reloadPage = async (
           return;
         }
 
+        console.log("page on update", origin)
         const res = await p.sync.yjs.sv_local(
           "page",
           p.page.cur.id,
