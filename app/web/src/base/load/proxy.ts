@@ -9,7 +9,8 @@ let g = (typeof global !== "undefined" ? global : undefined) as any;
 export const fetchViaProxy = async (
   target_url: string,
   data?: any,
-  _headers?: any
+  _headers?: any,
+  parse_json?: boolean
 ) => {
   const headers = { ..._headers };
 
@@ -59,8 +60,9 @@ export const fetchViaProxy = async (
     ) {
       final_url = to_url.toString();
     } else {
-      final_url = `${cur_url.protocol}//${cur_url.host
-        }/_proxy/${encodeURIComponent(to_url.toString())}`;
+      final_url = `${cur_url.protocol}//${
+        cur_url.host
+      }/_proxy/${encodeURIComponent(to_url.toString())}`;
     }
 
     if (final_url) {
@@ -78,13 +80,14 @@ export const fetchViaProxy = async (
           final_url,
           data
             ? {
-              method: "POST",
-              body,
-              headers,
-            }
+                method: "POST",
+                body,
+                headers,
+              }
             : undefined
         );
         const raw = await res.text();
+        if (parse_json === false) return raw;
         try {
           return JSON.parse(raw, replacer);
         } catch (e) {
@@ -98,10 +101,10 @@ export const fetchViaProxy = async (
     to_url,
     data
       ? {
-        method: "POST",
-        body,
-        headers,
-      }
+          method: "POST",
+          body,
+          headers,
+        }
       : undefined
   );
   const raw = await res.text();

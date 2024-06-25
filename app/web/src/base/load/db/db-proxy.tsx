@@ -6,7 +6,7 @@ const schema_promise = {
   tables: {} as Record<string, any>,
   columns: {} as Record<string, any>,
   rels: {} as Record<string, any>,
-}
+};
 
 export const dbProxy = (dburl: string) => {
   const name = "";
@@ -55,11 +55,11 @@ export const dbProxy = (dburl: string) => {
                 );
               }
 
-              return await schema_promise.tables[dburl]
+              return await schema_promise.tables[dburl];
             },
             columns: async (table: string) => {
-              if (!schema_promise.columns[dburl + '_' + table]) {
-                schema_promise.columns[dburl + '_' + table] = fetchSendDb(
+              if (!schema_promise.columns[dburl + "_" + table]) {
+                schema_promise.columns[dburl + "_" + table] = fetchSendDb(
                   {
                     name,
                     action: "schema_columns",
@@ -70,11 +70,11 @@ export const dbProxy = (dburl: string) => {
                 );
               }
 
-              return await schema_promise.columns[dburl + '_' + table]
+              return await schema_promise.columns[dburl + "_" + table];
             },
             rels: async (table: string) => {
-              if (!schema_promise.rels[dburl + '_' + table]) {
-                schema_promise.rels[dburl + '_' + table] = fetchSendDb(
+              if (!schema_promise.rels[dburl + "_" + table]) {
+                schema_promise.rels[dburl + "_" + table] = fetchSendDb(
                   {
                     name,
                     action: "schema_rels",
@@ -85,7 +85,7 @@ export const dbProxy = (dburl: string) => {
                 );
               }
 
-              return await schema_promise.rels[dburl + '_' + table]
+              return await schema_promise.rels[dburl + "_" + table];
             },
           };
         }
@@ -144,35 +144,44 @@ const cachedQueryResult: Record<
 > = {};
 
 export const fetchSendDb = async (params: any, dburl: string) => {
-  try {
-    const base = new URL(dburl);
-    base.pathname = `/_dbs`;
-    if (params.table) {
-      base.pathname += `/${params.table}`;
-    }
-    const url = base.toString();
+  const base = new URL(dburl);
+  base.pathname = `/_dbs`;
+  if (params.table) {
+    base.pathname += `/${params.table}`;
+  }
+  const url = base.toString();
 
-    if (typeof localStorage !== "undefined" && localStorage.mlsid) {
-      params.mlsid = localStorage.mlsid;
-    }
+  if (typeof localStorage !== "undefined" && localStorage.mlsid) {
+    params.mlsid = localStorage.mlsid;
+  }
 
-    const hsum = hash_sum(params);
-    const cached = cachedQueryResult[hsum];
+  const hsum = hash_sum(params);
+  let cached = cachedQueryResult[hsum];
 
-    if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
-      cachedQueryResult[hsum] = {
-        timestamp: Date.now(),
-        promise: fetchViaProxy(url, params, {
+  if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
+    cachedQueryResult[hsum] = {
+      timestamp: Date.now(),
+      promise: fetchViaProxy(
+        url,
+        params,
+        {
           "content-type": "application/json",
-        }),
-        result: null,
-      };
+        },
+        false
+      ),
+      result: null,
+    };
 
-      const result = await cachedQueryResult[hsum].promise;
+    const result = await cachedQueryResult[hsum].promise;
+    cached = cachedQueryResult[hsum];
+    try {
+      JSON.parse(result);
       cachedQueryResult[hsum].result = result;
       return result;
+    } catch (e) {
+      console.error("DBQuery failed:" + result);
     }
+  }
 
-    return await cached.promise;
-  } catch (e) { }
+  return await cached.promise;
 };
