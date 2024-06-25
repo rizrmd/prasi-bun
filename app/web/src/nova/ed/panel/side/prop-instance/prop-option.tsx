@@ -227,7 +227,7 @@ export const EdPropInstanceOptions: FC<{
         }
       });
     },
-    [local.open]
+    [local.open, mprop, config?.opt]
   );
 
   let mode = cprop.meta?.option_mode;

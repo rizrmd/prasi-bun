@@ -1,25 +1,17 @@
 import { TransformResult, transform } from "esbuild";
 import { g } from "utils/global";
+import { validate } from "uuid";
 import { Doc } from "yjs";
 import { MContent } from "../../../../web/src/utils/types/general";
 import { MItem } from "../../../../web/src/utils/types/item";
 import { MRoot } from "../../../../web/src/utils/types/root";
 import { SAction } from "../actions";
+import { loadComponent } from "../editor/load-component";
+import { parseJs } from "../editor/parser/parse-js";
 import { docs } from "../entity/docs";
 import { gunzipAsync } from "../entity/zlib";
 import { SyncConnection } from "../type";
-import { parseJs } from "../editor/parser/parse-js";
-import { snapshot } from "../entity/snapshot";
-import { validate } from "uuid";
-import { gzipAsync } from "utils/diff/diff";
-import { user } from "../entity/user";
-import { loadComponent } from "../editor/load-component";
 const decoder = new TextDecoder();
-
-const timeout = {
-  page: {} as Record<string, any>,
-  comp: {} as Record<string, any>,
-};
 
 export const code_edit: SAction["code"]["edit"] = async function (
   this: SyncConnection,
