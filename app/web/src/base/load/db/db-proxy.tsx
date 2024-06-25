@@ -172,10 +172,10 @@ export const fetchSendDb = async (params: any, dburl: string) => {
       result: null,
     };
 
-    const result = await cachedQueryResult[hsum].promise;
+    let result = await cachedQueryResult[hsum].promise;
     cached = cachedQueryResult[hsum];
     try {
-      JSON.parse(result);
+      result = JSON.parse(result);
       cachedQueryResult[hsum].result = result;
       return result;
     } catch (e) {
