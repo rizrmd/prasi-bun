@@ -71,7 +71,7 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
         clearTimeout(page.update_timeout);
         page.update_timeout = setTimeout(async () => {
           if (origin === "local" || !p.sync) return;
-          console.log("page on update snap")
+          console.log("page on update snap");
 
           const res = await p.sync.yjs.sv_local(
             "page",
@@ -184,8 +184,10 @@ export const reloadPage = async (
           location.reload();
           return;
         }
+        if ((window as any).catch) {
+          throw new Error("woi");
+        }
 
-        console.log("page on update", origin)
         const res = await p.sync.yjs.sv_local(
           "page",
           p.page.cur.id,
