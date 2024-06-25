@@ -54,6 +54,11 @@ export const EdPropInstanceOptions: FC<{
     local.render();
   };
 
+  useEffect(() => {
+    local.metaFnInit = false;
+    local.render();
+  }, [name, active.item_id]);
+
   if (cprop.meta?.options || cprop.meta?.optionsBuilt) {
     if (!local.metaFn || local.optDeps.length > 0) {
       let fn = "" as any;
@@ -139,39 +144,44 @@ export const EdPropInstanceOptions: FC<{
     }
   }
 
+  const metaFnCallback = useCallback(
+    async (e: any) => {
+      local.loading = false;
+      local.options = e;
+
+      if (local.resetOnDeps) {
+        if (!local.metaFnInit) {
+          local.metaFnInit = true;
+        } else {
+          let reset = "[]";
+          if (typeof local.resetOnDeps === "function") {
+            reset = JSON.stringify(local.resetOnDeps());
+          }
+          await mprop.doc?.transact(() => {
+            mprop.set("value", reset);
+            mprop.set("valueBuilt", reset);
+          });
+
+          await treeRebuild(p);
+          p.render();
+        }
+      }
+      local.render();
+    },
+    [local.metaFnInit, local.resetOnDeps, mprop]
+  );
+
   useEffect(() => {
     if (local.metaFn) {
       local.loading = true;
       try {
         const res = local.metaFn();
-        const callback = (e: any) => {
-          local.loading = false;
-          local.options = e;
 
-          if (local.resetOnDeps) {
-            if (!local.metaFnInit) {
-              local.metaFnInit = true;
-            } else {
-              let reset = "[]";
-              if (typeof local.resetOnDeps === "function") {
-                reset = JSON.stringify(local.resetOnDeps());
-              }
-              mprop.doc?.transact(() => {
-                mprop.set("value", reset);
-                mprop.set("valueBuilt", reset);
-              });
-
-              treeRebuild(p);
-              p.render();
-            }
-          }
-          local.render();
-        };
         if (res instanceof Promise) {
-          res.then(callback).catch((e) => {
+          res.then(metaFnCallback).catch((e) => {
             console.error(e);
           });
-        } else callback(res);
+        } else metaFnCallback(res);
       } catch (e) {
         console.error(e);
       }
@@ -179,7 +189,7 @@ export const EdPropInstanceOptions: FC<{
       local.loading = false;
       local.render();
     }
-  }, local.optDeps);
+  }, [...local.optDeps]);
 
   let evalue: any = null;
   try {
