@@ -183,5 +183,15 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     }
   }
 
-  return await cached.promise;
+  if (cached.result) return cached.result;
+
+  let result = await cached.promise;
+  if (result) {
+    try {
+      return JSON.parse(result);
+    } catch (e) {
+      console.error("DBQuery failed:" + result);
+    }
+  }
+  return null;
 };
