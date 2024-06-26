@@ -135,7 +135,7 @@ export const baseTypings = `
     name: string;
     idx?: any;
     value: T;
-    children: ReactNode;
+    children: any;
     deps?: any[];
     effect?: (
       local: T & { render: () => void }
