@@ -32,7 +32,7 @@ export const EdApiDB = ({
         value={local.url}
         className="text-[13px] border p-2 mb-2 "
         onChange={(e) => {
-          local.url = e.currentTarget.value;
+          local.url = e.currentTarget.value.replace(/\s/, "");
           db.url = local.url;
           local.render();
         }}
