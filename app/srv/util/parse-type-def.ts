@@ -68,30 +68,66 @@ export const parseTypeDef = async (path: string) => {
                       val: body.declaration.id.value,
                     });
                   }
+                } else if (body.declaration.type === "TsInterfaceDeclaration") {
+                  if (body.declaration.id.type === "Identifier") {
+                    exports[t.id.value].push({
+                      type: "named",
+                      kind: "type",
+                      val: body.declaration.id.value,
+                    });
+                  }
+                } else {
+                  console.log(
+                    "export-declaration",
+                    Object.keys(body),
+                    body.declaration.type
+                  );
                 }
               } else if (body.type === "ExportNamedDeclaration") {
+                let exported = false;
                 if (body.source?.type === "StringLiteral") {
                   const ex = exports[body.source.value];
                   if (ex) {
                     for (const s of body.specifiers) {
                       if (s.type === "ExportSpecifier") {
-                        if (s.exported) {
+                        if (s.exported && s.exported?.value) {
                           const found = ex.find(
                             (e) => e.val === s.exported?.value
                           );
                           if (found) {
                             exports[t.id.value].push(found);
+                            exported = true;
+                          } else {
+                            exports[t.id.value].push({
+                              kind: "const",
+                              type: "named",
+                              val: s.exported.value,
+                            });
+                            exported = true;
                           }
                         } else if (s.orig) {
                           const found = ex.find((e) => e.val === s.orig?.value);
                           if (found) {
                             exports[t.id.value].push(found);
+                            exported = true;
+                          } else {
+                            exports[t.id.value].push({
+                              kind: "const",
+                              type: "named",
+                              val: s.orig.value,
+                            });
+                            exported = true;
                           }
                         }
                       }
                     }
                   }
+                  if (!exported) {
+                    console.log("export-named-declaration", body);
+                  }
                 } else {
+                  let exported = false;
+
                   for (const s of body.specifiers) {
                     if (s.type === "ExportSpecifier") {
                       if (s.exported) {
@@ -100,14 +136,20 @@ export const parseTypeDef = async (path: string) => {
                           kind: "const",
                           val: s.exported.value,
                         });
+                        exported = true;
                       } else if (s.orig) {
                         exports[t.id.value].push({
                           type: "named",
                           kind: "const",
                           val: s.orig.value,
                         });
+                        exported = true;
                       }
                     }
+                  }
+
+                  if (!exported) {
+                    console.log("export-named-declaration", Object.keys(body));
                   }
                 }
               }
