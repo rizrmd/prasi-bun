@@ -110,15 +110,19 @@ export const parseTypeDef = async (path: string) => {
                           if (found) {
                             exports[t.id.value].push(found);
                             exported = true;
-                          } else {
-                            exports[t.id.value].push({
-                              kind: "const",
-                              type: "named",
-                              val: s.orig.value,
-                            });
-                            exported = true;
                           }
                         }
+                      }
+                    }
+                  } else if (body.specifiers) {
+                    for (const s of body.specifiers) {
+                      if (s.type === "ExportSpecifier" && s.orig) {
+                        exports[t.id.value].push({
+                          kind: "type",
+                          type: "named",
+                          val: s.orig.value,
+                        });
+                        exported = true;
                       }
                     }
                   }

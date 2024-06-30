@@ -16,19 +16,22 @@ export const registerSiteTypings = (
 ) => {
   if (p.site_dts) {
     register(monaco, p.site_dts, "ts:site.d.ts");
-    register(
-      monaco,
-      `
-  declare global {
-    import * as _ from "index"
-    ${Object.entries(p.site_dts_entry)
+
+    const dts_text = Object.entries(p.site_dts_entry)
       .map(([name, type]) => {
         return `
-    ${type} ${name} = _.${name};`;
+  ${type} ${name} = _.${name};`;
       })
-      .join("\n")}
-  }
-  export {}
+      .join("\n");
+
+    register(
+      monaco,
+      `\
+declare global {
+  import * as _ from "index"
+  ${dts_text}
+}
+export {}
     `,
       "ts:active_global.d.ts"
     );
@@ -78,10 +81,8 @@ declare module "ts:runtime/library" {
           `ts:runtime/library.d.ts`
         );
 
-        register(
-          monaco,
-          `\
-declare module "ts:prisma" {
+        const prisma_text = `\
+declare global {
   ${prisma["prisma.d.ts"]
     .replace(
       `import * as runtime from './runtime/library.js';`,
@@ -90,10 +91,11 @@ declare module "ts:prisma" {
     .replace(
       `import * as runtime from './runtime/library';`,
       `import * as runtime from 'ts:runtime/library';`
-    )}
-}`,
-          `ts:prisma.d.ts`
-        );
+    )
+    .replaceAll(`export type`, `type`)}
+}
+export {}`;
+        register(monaco, prisma_text, `ts:prisma.d.ts`);
 
         register(
           monaco,
@@ -183,7 +185,6 @@ export function jsxs(
     monaco,
     `\
 import * as React from "react";
-import prisma from 'ts:prisma';
 import { PrismaExtend } from "ts:prisma_ext"
 
 ${iftext(
@@ -195,7 +196,7 @@ import type * as SRVAPI from "${apiPath}";`
 
 
 declare global {
-  const db: prisma.PrismaClient & PrismaExtend;
+  const db: PrismaClient & PrismaExtend;
   
   ${baseTypings}
 
