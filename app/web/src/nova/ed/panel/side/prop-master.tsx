@@ -67,7 +67,12 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
     });
 
     filtered = filtered.sort((a, b) => {
-      if (a.data && b.data) {
+      if (
+        a.data &&
+        b.data &&
+        typeof a.data.prop.idx !== "undefined" &&
+        typeof b.data.prop.idx !== "undefined"
+      ) {
         return a.data.prop.idx - b.data.prop.idx;
       }
       return 0;
