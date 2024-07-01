@@ -4,7 +4,7 @@ import { FNCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta } from "../../utils/types";
 
 const w = window as unknown as {
-  prasiEdit: Record<string, Record<string, SingleChange[]>>;
+  prasiEditDevItem: Record<string, Record<string, SingleChange[]>>;
 };
 
 type SingleChange =
@@ -45,13 +45,13 @@ export const devItem = (
   mitem: MItem,
   page_id: string
 ) => {
-  if (!w.prasiEdit) {
-    w.prasiEdit = {};
+  if (!w.prasiEditDevItem) {
+    w.prasiEditDevItem = {};
   }
-  let pedit = w.prasiEdit[page_id];
+  let pedit = w.prasiEditDevItem[page_id];
   if (!pedit) {
-    w.prasiEdit[page_id] = {};
-    pedit = w.prasiEdit[page_id];
+    w.prasiEditDevItem[page_id] = {};
+    pedit = w.prasiEditDevItem[page_id];
   }
 
   const initChanges = () => {

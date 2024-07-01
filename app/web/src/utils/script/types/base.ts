@@ -9,6 +9,10 @@ export const baseTypings = `
   const useEffect: typeof React.useEffect;
   const useState: typeof React.useState;
 
+  const prasi_internal: {
+    page: { id: string };
+  };
+  
   const pathname: string;
   const isEditor: boolean;
   const isLayout: boolean;

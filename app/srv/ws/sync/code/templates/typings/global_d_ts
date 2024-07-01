@@ -10,6 +10,11 @@ declare global {
   const api: { [k in ApiName]: Awaited<Api[k]["handler"]>["_"]["api"] } & {
     _raw: any;
   };
+
+  const prasi_internal: {
+    page: { id: string };
+  };
+
   const db: prisma.PrismaClient & PrismaExtend;
   interface PushNotificationSchema {
     title?: string;

@@ -14,6 +14,10 @@ type PRELOAD_ARGS = Parameters<PRELOAD>[0];
 
 const w = window as any;
 
+if (!w.prasi_internal) {
+  w.prasi_internal = { page: { id: "" } };
+}
+
 export const Vi: FC<{
   meta: Record<string, IMeta>;
   mode: "mobile" | "desktop";
@@ -52,6 +56,8 @@ export const Vi: FC<{
   vi.entry = entry;
   vi.on_preload = on_preload;
   vi.comp.load = comp_load;
+
+  if (page_id) w.prasi_internal.page.id = page_id;
 
   w.siteurl = (pathname: string, forceOriginal?: boolean) => {
     if (pathname.startsWith("http://") || pathname.startsWith("https://"))
