@@ -1,8 +1,7 @@
 import { Glob } from "bun";
 import { dir } from "dir";
-import { dirAsync, exists, copyAsync } from "fs-jetpack";
+import { copyAsync, dirAsync, exists } from "fs-jetpack";
 import { dirname } from "path";
-import { g } from "utils/global";
 import { code } from "../code";
 
 export const ensureFiles = async (path: string, id_site: string) => {
@@ -22,10 +21,14 @@ export const ensureFiles = async (path: string, id_site: string) => {
       const to = dir.data(path + `/${f}`);
       const file = Bun.file(to);
       const exists = await file.exists();
+
       if (!exists) {
         const from = dir.path(`${tdir}/${t}`);
         await dirAsync(dirname(to));
         await copyAsync(from, to);
+      } else if (f === "typings/global.d.ts") {
+        const from = dir.path(`${tdir}/${t}`);
+        await Bun.write(to, await Bun.file(from).arrayBuffer());
       }
     }
 
