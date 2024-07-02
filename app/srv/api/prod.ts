@@ -9,7 +9,7 @@ import { gzipAsync } from "../ws/sync/entity/zlib";
 import { ensureLib } from "../ws/sync/code/utlis/ensure-lib";
 import { ensureFiles } from "../ws/sync/code/utlis/ensure-files";
 import { g } from "utils/global";
-import broliPromise from "brotli-wasm";
+import brotliPromise from "brotli-wasm";
 import mime from "mime";
 
 export const _ = {
@@ -147,7 +147,7 @@ export const _ = {
               g.code_index_compressing.add(key);
               setTimeout(async () => {
                 if (!g.br) {
-                  g.br = await broliPromise;
+                  g.br = await brotliPromise;
                 }
                 g.code_index_cache[site_id][build_path] = {
                   ts,
@@ -190,7 +190,12 @@ export const _ = {
         case "route": {
           if (!g.route_cache) g.route_cache = {};
           if (g.route_cache[site_id]) {
-            return await responseCompressed(req, g.route_cache[site_id]);
+            return new Response(g.route_cache[site_id], {
+              headers: {
+                "content-type": "application/json",
+                "content-encoding": "br",
+              },
+            });
           }
 
           const site = await _db.site.findFirst({
@@ -238,14 +243,27 @@ export const _ = {
             select: { url: true, id: true },
           });
 
-          g.route_cache[site_id] = JSON.stringify({
+          const res = JSON.stringify({
             site: { ...site, api_url },
             urls,
             layout: layout
               ? { id: layout.id, root: layout.content_tree }
               : undefined,
           });
-          return await responseCompressed(req, g.route_cache[site_id]);
+
+          if (!g.br) {
+            g.br = await brotliPromise;
+          }
+          setTimeout(() => {
+            g.route_cache[site_id] = g.br.compress(res);
+          }, 100);
+
+          return new Response(res, {
+            headers: {
+              "content-type": "application/json",
+              "content-encoding": "gzip",
+            },
+          });
         }
         case "page": {
           const page_id = pathname.split("/").pop() as string;
