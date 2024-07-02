@@ -12,6 +12,7 @@ import { g } from "utils/global";
 import brotliPromise from "brotli-wasm";
 import mime from "mime";
 
+const encoder = new TextEncoder();
 export const _ = {
   url: "/prod/:site_id/**",
   async api() {
@@ -255,10 +256,15 @@ export const _ = {
             g.br = await brotliPromise;
           }
           setTimeout(() => {
-            g.route_cache[site_id] = g.br.compress(res);
+            if (!g.route_cache_compressing)
+              g.route_cache_compressing = new Set();
+            if (g.route_cache_compressing.has(site_id)) return;
+            g.route_cache_compressing.add(site_id);
+            g.route_cache[site_id] = g.br.compress(encoder.encode(res));
+            g.route_cache_compressing.delete(site_id);
           }, 100);
 
-          return new Response(res, {
+          return new Response(await gzipAsync(res), {
             headers: {
               "content-type": "application/json",
               "content-encoding": "gzip",
