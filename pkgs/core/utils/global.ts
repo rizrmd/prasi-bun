@@ -60,4 +60,10 @@ export const g = global as unknown as {
   syncronize: typeof syncronize;
   static_cache: any;
   route_cache: Record<string, any>;
+  code_index_compressing: Set<string>;
+  code_index_cache: Record<
+    string,
+    Record<string, { ts: number; content: any;type: string; }>
+  >;
+  br: any
 };
