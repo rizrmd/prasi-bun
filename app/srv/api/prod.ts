@@ -333,12 +333,32 @@ export const _ = {
     } else if (pathname === "index.html" || pathname === "_") {
       return index_html;
     } else {
-      const res = dir.path(`/app/srv/core/${pathname}`);
-      const file = Bun.file(res);
-      if (!(await file.exists())) {
-        return index_html;
+      const src_path = dir.path(`/app/srv/core/${pathname}`);
+
+      if (!g.main_cache) g.main_cache = {};
+      if (!g.main_cache[src_path]) {
+        if (!g.br) {
+          g.br = await brotliPromise;
+        }
+        const file = Bun.file(src_path);
+        if (await file.exists()) {
+          g.main_cache[src_path] = {
+            content: g.br.compress(
+              new Uint8Array(await Bun.file(src_path).arrayBuffer())
+            ),
+            type: mime.getType(src_path) || "",
+          };
+        }
       }
-      return new Response(file);
+      if (g.main_cache[src_path]) {
+        return new Response(g.main_cache[src_path].content, {
+          headers: {
+            "content-encoding": "br",
+            "content-type": g.main_cache[src_path].type,
+          },
+        });
+      }
+      return index_html;
     }
   },
 };
