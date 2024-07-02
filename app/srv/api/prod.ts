@@ -166,7 +166,9 @@ export const _ = {
               }
             );
           } catch (e) {
-            return new Response("");
+            return new Response("location.reload", {
+              headers: { "content-type": "application/javascript" },
+            });
           }
         }
         case "route": {

@@ -1,3 +1,4 @@
+import { g } from "utils/global";
 import { SAction } from "../actions";
 import { prepareComponentForPage } from "../editor/prep-comp-page";
 import { prepContentTree } from "../editor/prep-page";
@@ -37,8 +38,12 @@ export const page_load: SAction["page"]["load"] = async function (
     doc.on("update", async (update: Uint8Array, origin: any) => {
       const bin = Y.encodeStateAsUpdate(doc);
       snapshot.set("page", id, "bin", bin);
-
+      snap = snapshot.get("page", id);
       const sv_local = await gzipAsync(update);
+
+      if (snap?.name.startsWith("layout:") && snap.id_site && g.route_cache) {
+        delete g.route_cache[snap.id_site];
+      }
 
       const client_ids = new Set<string>();
       user.active.findAll({ page_id: id }).forEach((e) => {
