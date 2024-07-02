@@ -9,6 +9,8 @@ import { gzipAsync } from "../ws/sync/entity/zlib";
 import { ensureLib } from "../ws/sync/code/utlis/ensure-lib";
 import { ensureFiles } from "../ws/sync/code/utlis/ensure-files";
 import { g } from "utils/global";
+import broliPromise from "brotli-wasm";
+import mime from "mime";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -129,11 +131,61 @@ export const _ = {
               }, 100);
             });
           }
-          const body = Bun.gzipSync(await file.arrayBuffer());
 
-          return new Response(body, {
-            headers: { "content-type": file.type, "content-encoding": "gzip" },
-          });
+          const ts = file.lastModified;
+          if (!g.code_index_cache) g.code_index_cache = {};
+          if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
+          if (
+            !g.code_index_cache[site_id][build_path] ||
+            (g.code_index_cache[site_id][build_path] &&
+              g.code_index_cache[site_id][build_path].ts !== ts)
+          ) {
+            if (!g.code_index_compressing) g.code_index_compressing = new Set();
+
+            const key = `${site_id}-${build_path}`;
+            if (!g.code_index_compressing.has(key)) {
+              g.code_index_compressing.add(key);
+              setTimeout(async () => {
+                if (!g.br) {
+                  g.br = await broliPromise;
+                }
+                g.code_index_cache[site_id][build_path] = {
+                  ts,
+                  content: g.br.compress(
+                    new Uint8Array(await file.arrayBuffer())
+                  ),
+                  type: mime.getType(build_path) || "",
+                };
+                g.code_index_compressing.delete(key);
+              }, 100);
+            }
+          }
+
+          if (
+            g.code_index_cache[site_id] &&
+            g.code_index_cache[site_id][build_path] &&
+            g.code_index_cache[site_id][build_path].content
+          ) {
+            return new Response(
+              g.code_index_cache[site_id][build_path].content,
+              {
+                headers: {
+                  "content-encoding": "br",
+                  "content-type": g.code_index_cache[site_id][build_path].type,
+                },
+              }
+            );
+          }
+
+          return new Response(
+            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+            {
+              headers: {
+                "content-encoding": "gzip",
+                "content-type": mime.getType(build_path) || "",
+              },
+            }
+          );
         }
         case "route": {
           if (!g.route_cache) g.route_cache = {};
@@ -267,7 +319,7 @@ export const _ = {
   },
 };
 
-const responseCompressed = async (req: Request, body: string) => {
+const responseCompressed = async (req: Request, body: string | Uint8Array) => {
   if (req.headers.get("accept-encoding")?.includes("gz")) {
     return new Response(await gzipAsync(body), {
       headers: { "content-encoding": "gzip" },
