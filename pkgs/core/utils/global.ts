@@ -17,7 +17,7 @@ type SingleRoute = {
   args: string[];
   fn: (...arg: any[]) => Promise<any>;
   path: string;
-  raw: any
+  raw: any;
 };
 
 export const g = global as unknown as {
@@ -59,4 +59,5 @@ export const g = global as unknown as {
   Y: typeof Y;
   syncronize: typeof syncronize;
   static_cache: any;
+  route_cache: Record<string, any>;
 };
