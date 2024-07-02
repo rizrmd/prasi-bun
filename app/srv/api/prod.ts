@@ -8,6 +8,7 @@ import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 import { gzipAsync } from "../ws/sync/entity/zlib";
 import { ensureLib } from "../ws/sync/code/utlis/ensure-lib";
 import { ensureFiles } from "../ws/sync/code/utlis/ensure-files";
+import { g } from "utils/global";
 
 export const _ = {
   url: "/prod/:site_id/**",
@@ -135,6 +136,11 @@ export const _ = {
           });
         }
         case "route": {
+          if (!g.route_cache) g.route_cache = {};
+          if (g.route_cache[site_id]) {
+            return await responseCompressed(req, g.route_cache[site_id]);
+          }
+
           const site = await _db.site.findFirst({
             where: { id: site_id },
             select: {
@@ -180,16 +186,14 @@ export const _ = {
             select: { url: true, id: true },
           });
 
-          return await responseCompressed(
-            req,
-            JSON.stringify({
-              site: { ...site, api_url },
-              urls,
-              layout: layout
-                ? { id: layout.id, root: layout.content_tree }
-                : undefined,
-            }) as any
-          );
+          g.route_cache[site_id] = JSON.stringify({
+            site: { ...site, api_url },
+            urls,
+            layout: layout
+              ? { id: layout.id, root: layout.content_tree }
+              : undefined,
+          });
+          return await responseCompressed(req, g.route_cache[site_id]);
         }
         case "page": {
           const page_id = pathname.split("/").pop() as string;
