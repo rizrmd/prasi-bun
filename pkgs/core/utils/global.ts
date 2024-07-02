@@ -11,6 +11,7 @@ import {
   apiProxy,
 } from "../../../app/web/src/base/load/api/api-proxy";
 import { dbProxy } from "../../../app/web/src/base/load/db/db-proxy";
+import { BrotliWasmType } from "brotli-wasm";
 
 type SingleRoute = {
   url: string;
@@ -59,11 +60,12 @@ export const g = global as unknown as {
   Y: typeof Y;
   syncronize: typeof syncronize;
   static_cache: any;
+  route_cache_compressing: Set<string>;
   route_cache: Record<string, any>;
   code_index_compressing: Set<string>;
   code_index_cache: Record<
     string,
     Record<string, { ts: number; content: any;type: string; }>
   >;
-  br: any
+  br: BrotliWasmType
 };
