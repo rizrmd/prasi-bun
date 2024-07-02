@@ -80,6 +80,9 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
           );
 
           if (res) {
+            if (res.sv === res.diff && (res.sv as any) === "not-found")
+              location.reload();
+
             const diff_local = Y.encodeStateAsUpdate(
               doc as any,
               decompress(res.sv)
@@ -195,6 +198,9 @@ export const reloadPage = async (
         );
 
         if (res) {
+          if (res.sv === res.diff && (res.sv as any) === "not-found")
+            location.reload();
+          
           const diff_local = Y.encodeStateAsUpdate(
             doc as any,
             decompress(res.sv)

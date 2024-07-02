@@ -13,8 +13,7 @@ export const ResponsiveToggle = () => {
   const render = () => {
     const code = p.code["site"]?.doc;
     if (code) {
-      const src = code.getMap("map").get("files")?.get("index.js");
-      applyEnv(p, src);
+      applyEnv(p);
     }
 
     treeRebuild(p);

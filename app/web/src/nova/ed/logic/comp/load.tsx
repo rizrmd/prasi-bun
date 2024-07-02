@@ -84,6 +84,9 @@ export const loadCompSnapshot = async (
             );
 
             if (res) {
+              if (res.sv === res.diff && (res.sv as any) === "not-found")
+                location.reload();
+
               const diff_local = Y.encodeStateAsUpdate(
                 doc as any,
                 decompress(res.sv)
