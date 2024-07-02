@@ -116,6 +116,11 @@ export const page_load: SAction["page"]["load"] = async function (
       };
     }
   } else if (snap && !ydoc) {
+    const page = await _db.page.findFirst({
+      where: { id },
+      select: { name: true, url: true },
+    });
+
     const doc = new Y.Doc();
     snapshot.set("page", id, "id_doc", doc.clientID);
 
@@ -143,12 +148,17 @@ export const page_load: SAction["page"]["load"] = async function (
 
     return {
       id: id,
-      url: snap.url,
-      name: snap.name,
+      url: page?.url || "",
+      name: page?.name || "",
       snapshot: await gzipAsync(snap.bin),
       comps: comps || {},
     };
   } else if (snap && ydoc) {
+    const page = await _db.page.findFirst({
+      where: { id },
+      select: { name: true, url: true },
+    });
+
     user.active.add({
       ...defaultActive,
       client_id: this.client_id,
@@ -159,8 +169,8 @@ export const page_load: SAction["page"]["load"] = async function (
 
     return {
       id: snap.id,
-      url: snap.url,
-      name: snap.name,
+      url: page?.url || "",
+      name: page?.name || "",
       snapshot: await gzipAsync(snap.bin),
       comps: (await prepareComponentForPage(id, this, true)) || {},
     };
