@@ -86,56 +86,54 @@ export const _ = {
           }
           return new Response("");
         }
-        case "code": { 
+        case "code": {
           const arr = pathname.split("/").slice(2);
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
 
-          if (
-            g.code_index_cache &&
-            g.code_index_cache[site_id] &&
-            g.code_index_cache[site_id][build_path] &&
-            g.code_index_cache[site_id][build_path].content
-          ) {
-            return new Response(
-              g.code_index_cache[site_id][build_path].content,
-              {
-                headers: {
-                  "content-encoding": "br",
-                  "content-type": g.code_index_cache[site_id][build_path].type,
-                },
-              }
-            );
-          }
-
           try {
             let file = Bun.file(build_path);
-
-            if (!(await file.exists())) {
-              const root = `/code/${site_id}/site/src`;
-              await ensureLib(root, site_id);
-              await ensureFiles(root, site_id);
-              await initFrontEnd(root, site_id);
-              await new Promise<void>((resolve) => {
-                const ival = setInterval(async () => {
-                  file = Bun.file(build_path);
-                  const exists = await file.exists();
-                  if (exists) {
-                    clearInterval(ival);
-                    resolve();
-                  }
-                }, 100);
-              });
+            const ts = file.lastModified;
+            if (
+              g.code_index_cache &&
+              g.code_index_cache[site_id] &&
+              g.code_index_cache[site_id][build_path] &&
+              g.code_index_cache[site_id][build_path].content &&
+              g.code_index_cache[site_id][build_path] &&
+              g.code_index_cache[site_id][build_path].ts === ts
+            ) {
+              return new Response(
+                g.code_index_cache[site_id][build_path].content,
+                {
+                  headers: {
+                    "content-encoding": "br",
+                    "content-type":
+                      g.code_index_cache[site_id][build_path].type,
+                  },
+                }
+              );
             }
 
-            const ts = file.lastModified;
+            // if (!(await file.exists())) {
+            //   const root = `/code/${site_id}/site/src`;
+            //   await ensureLib(root, site_id);
+            //   await ensureFiles(root, site_id);
+            //   await initFrontEnd(root, site_id);
+            //   await new Promise<void>((resolve) => {
+            //     const ival = setInterval(async () => {
+            //       file = Bun.file(build_path);
+            //       const exists = await file.exists();
+            //       if (exists) {
+            //         clearInterval(ival);
+            //         resolve();
+            //       }
+            //     }, 100);
+            //   });
+            // }
+
             if (!g.code_index_cache) g.code_index_cache = {};
             if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
-            if (
-              !g.code_index_cache[site_id][build_path] ||
-              (g.code_index_cache[site_id][build_path] &&
-                g.code_index_cache[site_id][build_path].ts !== ts)
-            ) {
+            if (!g.code_index_cache[site_id][build_path]) {
               if (!g.code_index_compressing)
                 g.code_index_compressing = new Set();
 
