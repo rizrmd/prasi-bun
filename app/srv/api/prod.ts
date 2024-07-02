@@ -43,30 +43,6 @@ export const _ = {
           const path = dir.data(`/code/${site_id}/site/typings.d.ts`);
           const file = Bun.file(path);
           if (await file.exists()) {
-            // const glob = new Glob("type_def*");
-            // for await (const item of glob.scan(
-            //   dir.data(`/code/${site_id}/site`)
-            // )) {
-            //   const stamp = parseInt(item.split(".")[1]);
-            //   if (file.lastModified !== stamp) {
-            //     await removeAsync(dir.data(`/code/${site_id}/site/${item}`));
-            //   } else {
-            //     return new Response(
-            //       Bun.gzipSync(
-            //         await Bun.file(
-            //           dir.data(`/code/${site_id}/site/${item}`)
-            //         ).arrayBuffer()
-            //       ),
-            //       {
-            //         headers: {
-            //           "content-type": "application/json",
-            //           "content-encoding": "gzip",
-            //         },
-            //       }
-            //     );
-            //   }
-            // }
-
             try {
               const res = JSON.stringify(await parseTypeDef(path));
               await Bun.write(
@@ -114,53 +90,6 @@ export const _ = {
           const arr = pathname.split("/").slice(2);
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
-          let file = Bun.file(build_path);
-
-          if (!(await file.exists())) {
-            const root = `/code/${site_id}/site/src`;
-            await ensureLib(root, site_id);
-            await ensureFiles(root, site_id);
-            await initFrontEnd(root, site_id);
-            await new Promise<void>((resolve) => {
-              const ival = setInterval(async () => {
-                file = Bun.file(build_path);
-                const exists = await file.exists();
-                if (exists) {
-                  clearInterval(ival);
-                  resolve();
-                }
-              }, 100);
-            });
-          }
-
-          const ts = file.lastModified;
-          if (!g.code_index_cache) g.code_index_cache = {};
-          if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
-          if (
-            !g.code_index_cache[site_id][build_path] ||
-            (g.code_index_cache[site_id][build_path] &&
-              g.code_index_cache[site_id][build_path].ts !== ts)
-          ) {
-            if (!g.code_index_compressing) g.code_index_compressing = new Set();
-
-            const key = `${site_id}-${build_path}`;
-            if (!g.code_index_compressing.has(key)) {
-              g.code_index_compressing.add(key);
-              setTimeout(async () => {
-                if (!g.br) {
-                  g.br = await brotliPromise;
-                }
-                g.code_index_cache[site_id][build_path] = {
-                  ts,
-                  content: g.br.compress(
-                    new Uint8Array(await file.arrayBuffer())
-                  ),
-                  type: mime.getType(build_path) || "",
-                };
-                g.code_index_compressing.delete(key);
-              }, 100);
-            }
-          }
 
           if (
             g.code_index_cache[site_id] &&
@@ -178,15 +107,68 @@ export const _ = {
             );
           }
 
-          return new Response(
-            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-            {
-              headers: {
-                "content-encoding": "gzip",
-                "content-type": mime.getType(build_path) || "",
-              },
+          try {
+            let file = Bun.file(build_path);
+
+            if (!(await file.exists())) {
+              const root = `/code/${site_id}/site/src`;
+              await ensureLib(root, site_id);
+              await ensureFiles(root, site_id);
+              await initFrontEnd(root, site_id);
+              await new Promise<void>((resolve) => {
+                const ival = setInterval(async () => {
+                  file = Bun.file(build_path);
+                  const exists = await file.exists();
+                  if (exists) {
+                    clearInterval(ival);
+                    resolve();
+                  }
+                }, 100);
+              });
             }
-          );
+
+            const ts = file.lastModified;
+            if (!g.code_index_cache) g.code_index_cache = {};
+            if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
+            if (
+              !g.code_index_cache[site_id][build_path] ||
+              (g.code_index_cache[site_id][build_path] &&
+                g.code_index_cache[site_id][build_path].ts !== ts)
+            ) {
+              if (!g.code_index_compressing)
+                g.code_index_compressing = new Set();
+
+              const key = `${site_id}-${build_path}`;
+              if (!g.code_index_compressing.has(key)) {
+                g.code_index_compressing.add(key);
+                setTimeout(async () => {
+                  if (!g.br) {
+                    g.br = await brotliPromise;
+                  }
+                  g.code_index_cache[site_id][build_path] = {
+                    ts,
+                    content: g.br.compress(
+                      new Uint8Array(await file.arrayBuffer())
+                    ),
+                    type: mime.getType(build_path) || "",
+                  };
+                  g.code_index_compressing.delete(key);
+                }, 100);
+              }
+            }
+
+            return new Response(
+              await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+              {
+                headers: {
+                  "content-encoding": "gzip",
+                  "content-type": mime.getType(build_path) || "",
+                },
+              }
+            );
+          } catch (e) {
+            return new Response("");
+          }
         }
         case "route": {
           if (!g.route_cache) g.route_cache = {};
