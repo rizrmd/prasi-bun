@@ -62,10 +62,12 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
 const baseUrl = (url: string) => {
   const base = new URL(url);
 
-  // if (base.hostname !== "prasi.avolut.com") {
-  //   const cur = new URL(location.href);
-  //   base.hostname = cur.hostname;
-  // }
+  if (!["prasi.avolut.com", "localhost"].includes(base.hostname)) {
+    const cur = new URL(location.href);
+    if (!["prasi.avolut.com", "localhost"].includes(cur.hostname)) {
+      base.hostname = cur.hostname;
+    }
+  }
 
   return `${base.protocol}//${base.host}`;
 };
