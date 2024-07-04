@@ -1,16 +1,14 @@
+import brotliPromise from "brotli-wasm";
 import { dir } from "dir";
+import mime from "mime";
 import { apiContext } from "service-srv";
+import { g } from "utils/global";
 import { validate } from "uuid";
 import { parseTypeDef } from "../util/parse-type-def";
 import { prodIndex } from "../util/prod-index";
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 import { gzipAsync } from "../ws/sync/entity/zlib";
-import { ensureLib } from "../ws/sync/code/utlis/ensure-lib";
-import { ensureFiles } from "../ws/sync/code/utlis/ensure-files";
-import { g } from "utils/global";
-import brotliPromise from "brotli-wasm";
-import mime from "mime";
 
 const encoder = new TextEncoder();
 export const _ = {
@@ -114,23 +112,6 @@ export const _ = {
                 }
               );
             }
-
-            // if (!(await file.exists())) {
-            //   const root = `/code/${site_id}/site/src`;
-            //   await ensureLib(root, site_id);
-            //   await ensureFiles(root, site_id);
-            //   await initFrontEnd(root, site_id);
-            //   await new Promise<void>((resolve) => {
-            //     const ival = setInterval(async () => {
-            //       file = Bun.file(build_path);
-            //       const exists = await file.exists();
-            //       if (exists) {
-            //         clearInterval(ival);
-            //         resolve();
-            //       }
-            //     }, 100);
-            //   });
-            // }
 
             if (!g.code_index_cache) g.code_index_cache = {};
             if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
