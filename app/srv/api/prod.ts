@@ -100,7 +100,8 @@ export const _ = {
               g.code_index_cache[site_id][build_path] &&
               g.code_index_cache[site_id][build_path].content &&
               g.code_index_cache[site_id][build_path] &&
-              g.code_index_cache[site_id][build_path].ts === ts
+              g.code_index_cache[site_id][build_path].ts === ts &&
+              req.headers.get("accept-encoding")?.includes("br")
             ) {
               return new Response(
                 g.code_index_cache[site_id][build_path].content,
@@ -174,12 +175,29 @@ export const _ = {
         case "route": {
           if (!g.route_cache) g.route_cache = {};
           if (g.route_cache[site_id]) {
-            return new Response(g.route_cache[site_id], {
-              headers: {
-                "content-type": "application/json",
-                "content-encoding": "br",
-              },
-            });
+            if (
+              req.headers.get("accept-encoding")?.includes("br") &&
+              g.route_cache[site_id].br
+            ) {
+              return new Response(g.route_cache[site_id].br, {
+                headers: {
+                  "content-type": "application/json",
+                  "content-encoding": "br",
+                },
+              });
+            }
+
+            if (
+              req.headers.get("accept-encoding")?.includes("gzip") &&
+              g.route_cache[site_id].gzip
+            ) {
+              return new Response(g.route_cache[site_id].gzip, {
+                headers: {
+                  "content-type": "application/json",
+                  "content-encoding": "gzip",
+                },
+              });
+            }
           }
 
           const site = await _db.site.findFirst({
@@ -227,6 +245,10 @@ export const _ = {
             select: { url: true, id: true },
           });
 
+          if (!g.route_cache[site_id]) {
+            g.route_cache[site_id] = {};
+          }
+
           const res = JSON.stringify({
             site: { ...site, api_url },
             urls,
@@ -243,11 +265,13 @@ export const _ = {
               g.route_cache_compressing = new Set();
             if (g.route_cache_compressing.has(site_id)) return;
             g.route_cache_compressing.add(site_id);
-            g.route_cache[site_id] = g.br.compress(encoder.encode(res));
+            g.route_cache[site_id].br = g.br.compress(encoder.encode(res));
             g.route_cache_compressing.delete(site_id);
           }, 100);
 
-          return new Response(await gzipAsync(res), {
+          g.route_cache[site_id].gzip = await gzipAsync(res);
+
+          return new Response(g.route_cache[site_id].gzip, {
             headers: {
               "content-type": "application/json",
               "content-encoding": "gzip",
@@ -333,7 +357,11 @@ export const _ = {
           };
         }
       }
-      if (g.main_cache[src_path]) {
+
+      if (
+        req.headers.get("accept-encoding")?.includes("br") &&
+        g.main_cache[src_path]
+      ) {
         return new Response(g.main_cache[src_path].content, {
           headers: {
             "content-encoding": "br",
@@ -341,6 +369,20 @@ export const _ = {
           },
         });
       }
+      if (req.headers.get("accept-encoding")?.includes("gzip")) {
+        const file = Bun.file(src_path);
+
+        return new Response(
+          await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+          {
+            headers: {
+              "content-encoding": "gzip",
+              "content-type": mime.getType(src_path) || "",
+            },
+          }
+        );
+      }
+
       return index_html;
     }
   },

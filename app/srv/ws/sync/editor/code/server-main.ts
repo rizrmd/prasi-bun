@@ -5,11 +5,10 @@ import { g } from "utils/global";
 import { WSData } from "../../../../../../pkgs/core/server/create";
 import { prodIndex } from "../../../../util/prod-index";
 
-import { realpathSync } from 'fs'
+import { realpathSync } from 'fs';
 import { code } from "../../code/code";
-import "./server-runtime";
 import { initServer } from "../../code/parts/init/server";
-import { waitUntil } from "web-utils";
+import "./server-runtime";
 
 if (!g.server_main_handler) {
   g.server_main_handler = {};
