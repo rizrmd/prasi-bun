@@ -5,7 +5,7 @@ import { g } from "utils/global";
 import { WSData } from "../../../../../../pkgs/core/server/create";
 import { prodIndex } from "../../../../util/prod-index";
 
-import { realpathSync } from 'fs';
+import { realpathSync } from "fs";
 import { code } from "../../code/code";
 import { initServer } from "../../code/parts/init/server";
 import "./server-runtime";
@@ -36,7 +36,9 @@ const serverMain = () => ({
     }
   },
   async init(site_id: string) {
-    const server_src_path = realpathSync(code.path(site_id, "server", "build", "index.js"));
+    const server_src_path = realpathSync(
+      code.path(site_id, "server", "build", "index.js")
+    );
     const file = Bun.file(server_src_path);
 
     if (!code.internal.server[site_id]) {
@@ -49,7 +51,7 @@ const serverMain = () => ({
     if ((await file.exists()) && file.size && c.ts !== file.lastModified) {
       c.ts = file.lastModified;
       try {
-        delete require.cache[server_src_path]
+        delete require.cache[server_src_path];
         const svr = require(server_src_path);
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
@@ -150,7 +152,7 @@ const serverMain = () => ({
         }
         _fs.appendFile(
           code.path(site_id, "site", "src", "server.log"),
-          e.message + "\n"
+          e.message + "\n" + e.stack + "\n\n"
         );
       }
     }
