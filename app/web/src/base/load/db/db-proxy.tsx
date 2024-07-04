@@ -179,7 +179,7 @@ export const fetchSendDb = async (params: any, dburl: string) => {
       cachedQueryResult[hsum].result = result;
       return result;
     } catch (e) {
-      console.error("DBQuery failed:" + result);
+      console.error("DBQuery failed:", result);
     }
   }
 
@@ -190,7 +190,7 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     try {
       return JSON.parse(result);
     } catch (e) {
-      console.error("DBQuery failed:" + result);
+      console.error("DBQuery failed:", result);
     }
   }
   return null;

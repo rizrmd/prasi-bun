@@ -93,7 +93,16 @@ const injectSiteScript = () => {
 
     const ts = localStorage.getItem("api-ts-" + base_url);
 
-    script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
+    const cur = new URL(location.href);
+    cur.pathname = "";
+    if (!["prasi.avolut.com", "localhost"].includes(cur.hostname)) {
+      const cur_url = cur.toString();
+      script.src = `${
+        cur_url.endsWith("/") ? cur_url : `${cur_url}/`
+      }_prasi/load.js?url=${cur_url}&v3&ts=${ts}`;
+    } else {
+      script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
+    }
 
     if (!document.querySelector(`script[src="${script.src}"]`)) {
       d.body.appendChild(script);
