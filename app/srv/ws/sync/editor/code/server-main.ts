@@ -57,13 +57,14 @@ const serverMain = () => ({
           this.handler[site_id] = svr.server;
           svr.server.site_id = site_id;
 
-          if (typeof svr.server.init === "function") {
-            await svr.server.init({});
-          }
           Bun.write(
             Bun.file(code.path(site_id, "site", "src", "server.log")),
             ""
           );
+
+          if (typeof svr.server.init === "function") {
+            await svr.server.init({});
+          }
         } else {
           const file = await Bun.file(server_src_path).text();
           const log_path = code.path(site_id, "site", "src", "server.log");

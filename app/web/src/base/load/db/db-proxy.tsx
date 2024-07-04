@@ -175,9 +175,14 @@ export const fetchSendDb = async (params: any, dburl: string) => {
     let result = await cachedQueryResult[hsum].promise;
     cached = cachedQueryResult[hsum];
     try {
-      result = JSON.parse(result);
-      cachedQueryResult[hsum].result = result;
-      return result;
+      if (typeof result === "string") {
+        result = JSON.parse(result);
+        cachedQueryResult[hsum].result = result;
+        return result;
+      } else {
+        cachedQueryResult[hsum].result = result;
+        return result;
+      }
     } catch (e) {
       console.error("DBQuery failed:", result);
     }
@@ -188,7 +193,12 @@ export const fetchSendDb = async (params: any, dburl: string) => {
   let result = await cached.promise;
   if (result) {
     try {
-      return JSON.parse(result);
+      if (typeof result === "string") {
+        result = JSON.parse(result);
+        return result;
+      } else {
+        return result;
+      }
     } catch (e) {
       console.error("DBQuery failed:", result);
     }
