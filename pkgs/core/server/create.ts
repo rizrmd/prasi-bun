@@ -61,6 +61,8 @@ export const createServer = async () => {
           req,
           server,
           handle,
+          serveStatic,
+          serveAPI,
           wsHandler,
           prasi,
         });
