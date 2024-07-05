@@ -353,15 +353,17 @@ export const _ = {
       if (req.headers.get("accept-encoding")?.includes("gzip")) {
         const file = Bun.file(src_path);
 
-        return new Response(
-          await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-          {
-            headers: {
-              "content-encoding": "gzip",
-              "content-type": mime.getType(src_path) || "",
-            },
-          }
-        );
+        if (await file.exists()) {
+          return new Response(
+            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+            {
+              headers: {
+                "content-encoding": "gzip",
+                "content-type": mime.getType(src_path) || "",
+              },
+            }
+          );
+        }
       }
 
       return index_html;
