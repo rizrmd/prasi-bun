@@ -64,11 +64,6 @@ export const g = global as unknown as {
   static_cache: any;
   route_cache_compressing: Set<string>;
   route_cache: Record<string, { br?: any; gzip?: any }>;
-  code_index_compressing: Set<string>;
-  code_index_cache: Record<
-    string,
-    Record<string, { ts: number; content: any; type: string }>
-  >;
   main_cache: Record<string, { content: any; type: string }>;
   br: BrotliWasmType;
 };
