@@ -91,53 +91,6 @@ export const _ = {
 
           try {
             let file = Bun.file(build_path);
-            const ts = file.lastModified;
-            if (
-              g.code_index_cache &&
-              g.code_index_cache[site_id] &&
-              g.code_index_cache[site_id][build_path] &&
-              g.code_index_cache[site_id][build_path].content &&
-              g.code_index_cache[site_id][build_path] &&
-              g.code_index_cache[site_id][build_path].ts === ts &&
-              req.headers.get("accept-encoding")?.includes("br")
-            ) {
-              return new Response(
-                g.code_index_cache[site_id][build_path].content,
-                {
-                  headers: {
-                    "content-encoding": "br",
-                    "content-type":
-                      g.code_index_cache[site_id][build_path].type,
-                  },
-                }
-              );
-            }
-
-            if (!g.code_index_cache) g.code_index_cache = {};
-            if (!g.code_index_cache[site_id]) g.code_index_cache[site_id] = {};
-            if (!g.code_index_cache[site_id][build_path]) {
-              if (!g.code_index_compressing)
-                g.code_index_compressing = new Set();
-
-              const key = `${site_id}-${build_path}`;
-              if (!g.code_index_compressing.has(key)) {
-                g.code_index_compressing.add(key);
-                setTimeout(async () => {
-                  if (!g.br) {
-                    g.br = await brotliPromise;
-                  }
-                  g.code_index_cache[site_id][build_path] = {
-                    ts,
-                    content: g.br.compress(
-                      new Uint8Array(await file.arrayBuffer())
-                    ),
-                    type: mime.getType(build_path) || "",
-                  };
-                  g.code_index_compressing.delete(key);
-                }, 100);
-              }
-            }
-
             return new Response(
               await gzipAsync(new Uint8Array(await file.arrayBuffer())),
               {
