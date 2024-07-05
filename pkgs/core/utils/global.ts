@@ -31,6 +31,8 @@ export const g = global as unknown as {
     server: Server;
     handle: (req: Request) => Promise<Response | undefined>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
+    serveStatic?: any;
+    serveAPI?: any;
     prasi: { page_id?: string };
   }) => Promise<Response | undefined>;
   server_runtime: Record<
@@ -61,7 +63,7 @@ export const g = global as unknown as {
   syncronize: typeof syncronize;
   static_cache: any;
   route_cache_compressing: Set<string>;
-  route_cache: Record<string, {br?: any, gzip?: any}>;
+  route_cache: Record<string, { br?: any; gzip?: any }>;
   code_index_compressing: Set<string>;
   code_index_cache: Record<
     string,
