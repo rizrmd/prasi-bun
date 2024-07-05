@@ -58,6 +58,8 @@ declare global {
       server: Server;
       mode: "dev" | "prod";
       handle: (req: Request) => Promise<Response>;
+      serveStatic?: any;
+      serveAPI?: any;
       index: { head: string[]; body: string[]; render: () => string };
       prasi: { page_id?: string; params?: Record<string, any> };
     }) => Promise<Response>;
