@@ -18,9 +18,12 @@ const getRoute = () => {
   }>(async (done) => {
     let is_done = false;
 
-    let res = await (await fetch(base.url`_prasi/route`)).json();
+    let res = await fetch(base.url`_prasi/route`);
     if (!is_done) {
-      done(res);
+      if (!res.headers.get("content-encoding")) {
+        fetch(base.url`_prasi/compress/only-gz`);
+      }
+      done(await res.json());
     }
   });
 };
@@ -45,9 +48,6 @@ export const initBaseRoute = async () => {
       base.site = res.site;
       base.site.code = { mode: "vsc" };
       await injectSiteScript();
-
-
-
 
       base.site.api = apiProxy(base.site.api_url);
       base.site.db = dbProxy(base.site.api_url);
