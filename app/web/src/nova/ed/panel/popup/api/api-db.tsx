@@ -39,6 +39,7 @@ export const EdApiDB = ({
         onBlur={async () => {
           update();
         }}
+        spellCheck={false}
       />
       <div className="flex flex-col items-stretch justify-center h-[20px]">
         {server.status === "saving" ||
@@ -90,6 +91,7 @@ export const EdApiDB = ({
                       alert("DB GENERATE: OK\nRESTART: OK");
 
                       localStorage.removeItem(`schema-md-${p.site.id}`);
+                      _api.clear_route_cache(p.site.id);
                       location.reload();
                     }}
                   >
@@ -111,6 +113,7 @@ export const EdApiDB = ({
                     alert("DB PULL & GENERATE: OK\nRESTART: OK");
 
                     localStorage.removeItem(`schema-md-${p.site.id}`);
+                    _api.clear_route_cache(p.site.id);
                     location.reload();
                   }}
                 >
@@ -131,6 +134,7 @@ export const EdApiDB = ({
                 server.status = "ready";
                 render();
                 alert("RESTART: OK");
+                _api.clear_route_cache(p.site.id);
                 location.reload();
               }}
             >
