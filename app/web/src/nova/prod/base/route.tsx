@@ -98,7 +98,7 @@ const injectSiteScript = () => {
 
     const cur = new URL(location.href);
     cur.pathname = "";
-    if (!["prasi.avolut.com", "localhost"].includes(cur.hostname)) {
+    if (!["prasi.avolut.com"].includes(cur.hostname)) {
       const cur_url = cur.toString();
       script.src = `${
         cur_url.endsWith("/") ? cur_url : `${cur_url}/`
