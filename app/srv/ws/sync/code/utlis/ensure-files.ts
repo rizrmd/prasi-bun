@@ -26,7 +26,7 @@ export const ensureFiles = async (path: string, id_site: string) => {
         const from = dir.path(`${tdir}/${t}`);
         await dirAsync(dirname(to));
         await copyAsync(from, to);
-      } else if (f === "typings/global.d.ts") {
+      } else if (["typings/global.d.ts", ".vscode/settings.json"].includes(f)) {
         const from = dir.path(`${tdir}/${t}`);
         await Bun.write(to, await Bun.file(from).arrayBuffer());
       }
@@ -92,8 +92,8 @@ export const ensureFiles = async (path: string, id_site: string) => {
               "tailwind-merge": "^2.2.1",
               "tailwindcss-animate": "^1.0.7",
               uuid: "^9.0.1",
-              "xlsx": "npm:@e965/xlsx@^0.20.2-released.0",
-              "zod": "^3.22.4"
+              xlsx: "npm:@e965/xlsx@^0.20.2-released.0",
+              zod: "^3.22.4",
             },
           }),
           { mode: 777 }
