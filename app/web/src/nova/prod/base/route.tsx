@@ -78,7 +78,7 @@ const injectSiteScript = () => {
     if (base_url === "*") {
       base_url = `${location.protocol}//${location.host}`;
       base.site.api_url = base_url;
-    } 
+    }
 
     if (!localStorage.getItem("api-ts-" + base_url)) {
       localStorage.setItem("api-ts-" + base_url, Date.now().toString());
@@ -88,7 +88,10 @@ const injectSiteScript = () => {
 
     const cur = new URL(location.href);
     cur.pathname = "";
-    if (!["prasi.avolut.com"].includes(cur.hostname)) {
+    if (
+      !["prasi.avolut.com"].includes(cur.hostname) &&
+      cur.host !== "localhost:4550"
+    ) {
       const cur_url = cur.toString();
       script.src = `${
         cur_url.endsWith("/") ? cur_url : `${cur_url}/`

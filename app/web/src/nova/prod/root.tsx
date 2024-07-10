@@ -50,8 +50,9 @@ export const Root = () => {
         base.route.pages = pages;
 
         const basepath = w._prasi.basepath;
-        let url = `${basepath.endsWith("/") ? basepath : `${basepath}/`
-          }_prasi/code/index.js`;
+        let url = `${
+          basepath.endsWith("/") ? basepath : `${basepath}/`
+        }_prasi/code/index.js`;
 
         const cur = new URL(location.href);
         if (url.startsWith("/")) {
@@ -145,7 +146,7 @@ export const Root = () => {
             root,
             meta: {},
           };
-          await scanComponent(root.childs);
+          await scanComponent(root.childs, true);
           rebuildMeta(p.meta, root);
           base.page.cache[p.id] = p;
           render();
@@ -223,19 +224,19 @@ export const Root = () => {
 
                   await setkv(`comp-${id}`, item);
                 }
-              } catch (e) { }
+              } catch (e) {}
 
               return comp.list[comp_id];
             }}
             layout={
               base.layout.id && base.layout.root && base.layout.meta
                 ? {
-                  id: base.layout.id,
-                  meta: base.layout.meta,
-                  entry: Object.values(base.layout.root.childs)
-                    .filter((e) => e)
-                    .map((e) => e.id),
-                }
+                    id: base.layout.id,
+                    meta: base.layout.meta,
+                    entry: Object.values(base.layout.root.childs)
+                      .filter((e) => e)
+                      .map((e) => e.id),
+                  }
                 : undefined
             }
             script={{ init_local_effect: base.init_local_effect }}

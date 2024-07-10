@@ -16,13 +16,14 @@ export const ViScript: FC<{
   const vi = useGlobal(ViGlobal, "VI");
   const [_, _set] = useState({});
   meta.render = () => {
-    _set({});
+    _set({}); 
   };
 
   let _pass = passprop;
   if (meta.item.component?.id) {
     if (!_pass) _pass = {};
     viEvalProps(vi, meta, is_layout, _pass, depth, parent_key);
+
   }
 
   if (meta.item.adv?.html) {
