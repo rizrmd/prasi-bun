@@ -4,12 +4,12 @@ import { IItem } from "../../../utils/types/item";
 import { ISection } from "../../../utils/types/section";
 import { base } from "./base";
 
-export const scanComponent = async (items: IContent[]) => {
+export const scanComponent = async (items: IContent[], from_root?: boolean) => {
   const comp = base.comp;
 
   for (const item of items) {
     if (item && item.type !== "text") {
-      scanSingle(item);
+      scanSingle(item, from_root);
     }
   }
 
@@ -41,7 +41,8 @@ export const scanComponent = async (items: IContent[]) => {
   }
 };
 
-const scanSingle = (item: IItem | ISection) => {
+const scanSingle = (item: IItem | ISection, from_root?: boolean) => {
+ 
   const comp = base.comp;
   if (item.type === "item") {
     const comp_id = item.component?.id;
@@ -50,6 +51,7 @@ const scanSingle = (item: IItem | ISection) => {
       if (!comp.list[comp_id] && !comp.pending[comp_id]) {
         comp.pending[comp_id] = [];
       }
+
       if (comp.pending[comp_id]) {
         if (!comp.pending[comp_id].find((e) => e.id === item.id)) {
           comp.pending[comp_id].push(item);
@@ -61,16 +63,17 @@ const scanSingle = (item: IItem | ISection) => {
           for (const item of comp.pending[comp_id]) {
             for (const prop of Object.values(item.component?.props || {})) {
               if (prop.content) {
-                scanSingle(prop.content);
+                scanSingle(prop.content, from_root);
               }
             }
           }
           delete comp.pending[comp_id];
-        } else if (item.component?.props) {
-          for (const prop of Object.values(item.component?.props || {})) {
-            if (prop.content) {
-              scanSingle(prop.content);
-            }
+        }
+      }
+      if (item.component?.props) {
+        for (const prop of Object.values(item.component?.props || {})) {
+          if (prop.content) {
+            scanSingle(prop.content, from_root);
           }
         }
       }
@@ -81,7 +84,7 @@ const scanSingle = (item: IItem | ISection) => {
     for (const child of item.childs) {
       let c = child;
       if (c && c.type !== "text") {
-        scanSingle(c);
+        scanSingle(c, from_root);
       }
     }
   }

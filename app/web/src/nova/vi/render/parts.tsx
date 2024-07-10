@@ -62,8 +62,14 @@ export const viParts = (
         if (!item) return null;
         const { id } = item;
 
-        const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
-        if (!meta) return null;
+        let meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
+
+        if (!meta) {
+          if (item.type === "item" && item.component?.id) {
+            console.warn(`Warning component ${item.name} - ${item.component.id} failed to load.`);
+          }
+          return null;
+        }
 
         return (
           <ViRender

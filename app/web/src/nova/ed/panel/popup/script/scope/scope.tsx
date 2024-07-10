@@ -3,6 +3,8 @@ import { IContent } from "../../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { TypedArray } from "yjs-types";
 import { register } from "../../../../../../utils/script/typings";
+import { ReactElement } from "react";
+import get from "lodash.get";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -42,6 +44,34 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
   const comp_types = {} as Record<string, string>;
 
   for (const m of cur_path) {
+    if (
+      !m.item.component?.id &&
+      m.item.adv?.js?.includes("<Local") &&
+      m.item.adv.jsBuilt
+    ) {
+      try {
+        const local = new Function(
+          "render",
+          "props",
+          "children",
+          "Local",
+          m.item.adv.jsBuilt
+        );
+        local(
+          (el: ReactElement) => {
+            const name = get(el, "props.children.props.name");
+            const value = get(el, "props.children.props.value");
+            vars[name] = { mode: "local", val: value };
+          },
+          {},
+          null,
+          (prop: { name: string; value: any; children: any }) => prop.children
+        );
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     if (m.item.component?.props) {
       for (const [name, prop] of Object.entries(m.item.component.props)) {
         if (prop.meta?.type === "content-element") {
@@ -199,7 +229,7 @@ ${tree_usage.map((e) => e.import).join("\n")}
 declare global { 
 ${tree_usage.map((e) => e.usage).join("\n")} 
 }`,
-    "tree_usage.ts"
+    "ts:tree_usage.ts"
   );
   register(monaco, Object.values(comp_types).join("\n"), "ts:comp_types.d.ts");
 };
