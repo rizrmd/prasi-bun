@@ -207,7 +207,12 @@ export const Root = () => {
             db={base.site.db}
             api={base.site.api}
             preloaded={(url) => {
-              if (base.route.router?.lookup(url)) return true;
+              const found = base.route.router?.lookup(url);
+              if (found) {
+                if (base.page.cache[found.id]) {
+                  return true;
+                } 
+              }
               return false;
             }}
             comp_load={async (comp_id) => {
