@@ -9,7 +9,7 @@ export const startDevWatcher = async () => {
   await dirAsync(dir.path(`app/srv/api`));
   watch(dir.path(`app/srv/api`), async (event, filename) => {
     const s = file(dir.path(`app/srv/api/${filename}`));
-    if (s.size === 0) {
+    if (s.size === 0 && filename?.endsWith(".ts") && (await s.exists())) {
       await Bun.write(
         `app/srv/api/${filename}`,
         `\
