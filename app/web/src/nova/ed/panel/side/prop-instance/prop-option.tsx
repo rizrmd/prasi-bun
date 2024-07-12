@@ -179,6 +179,10 @@ export const EdPropInstanceOptions: FC<{
 
         if (res instanceof Promise) {
           res.then(metaFnCallback).catch((e) => {
+            console.error(
+              `ERROR in component ${meta.item.name}, prop ${name}:`
+            );
+            console.error(local.metaFn?.toString());
             console.error(e);
           });
         } else metaFnCallback(res);
