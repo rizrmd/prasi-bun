@@ -101,6 +101,10 @@ const injectSiteScript = () => {
     } else {
       script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
     }
+    
+    script.onerror = () => {
+      done();
+    };
 
     if (!document.querySelector(`script[src="${script.src}"]`)) {
       d.body.appendChild(script);

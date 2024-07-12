@@ -25,6 +25,9 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
     } else {
       script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
     }
+    script.onerror = () => {
+      done();
+    };
 
     if (!document.querySelector(`script[src="${script.src}"]`)) {
       d.body.appendChild(script);
