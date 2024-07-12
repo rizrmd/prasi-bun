@@ -1,17 +1,17 @@
+import { createRouter, RadixRouter } from "radix3";
 import { compress, decompress } from "wasm-gzip";
 import { deepClone } from "web-utils";
 import * as Y from "yjs";
+import { registerSiteTypings } from "../../../utils/script/typings";
 import { clientStartSync } from "../../../utils/sync/ws-client";
 import { w } from "../../../utils/types/general";
 import { Loading } from "../../../utils/ui/loading";
+import { loadFrontEnd, loadTypings } from "./code-loader";
+import { updateComponentMeta } from "./comp/load";
 import { EmptySite, PG } from "./ed-global";
-import { treeRebuild } from "./tree/build";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
-import { updateComponentMeta } from "./comp/load";
-import { createRouter, RadixRouter } from "radix3";
-import { loadCode, loadFrontEnd, loadTypings } from "./code-loader";
-import { registerSiteTypings } from "../../../utils/script/typings";
+import { treeRebuild } from "./tree/build";
 
 const decoder = new TextDecoder();
 
