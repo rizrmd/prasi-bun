@@ -165,7 +165,13 @@ const connect = (
             `${url.protocol}//${url.host}${url.pathname}`
           );
 
+          const timeout = setTimeout(() => {
+            ws.close();
+            retry(); 
+          }, 2000);
+
           ws.onopen = () => {
+            clearTimeout(timeout);
             w.offline = false;
             w.editorRender?.();
 
