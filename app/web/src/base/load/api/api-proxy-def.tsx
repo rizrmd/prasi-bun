@@ -1,6 +1,4 @@
 import trim from "lodash.trim";
-import { w } from "../../../utils/types/general";
-import { fetchViaProxy } from "../proxy";
 
 export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
   const url = trim(_url, "/");
@@ -20,10 +18,18 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
 
     const ts = localStorage.getItem("api-ts-" + url);
 
+    const url_target = new URL(url);
+    const url_cur = new URL(location.href);
+
+    let is_remote = "";
+    if (url_target.host !== url_cur.host) {
+      is_remote = "&remote=1";
+    }
+
     if (with_types) {
-      script.src = `${base}/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}`;
+      script.src = `/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}${is_remote}`;
     } else {
-      script.src = `${base}/_prasi/load.js?url=${url}&v3&ts=${ts}`;
+      script.src = `/_prasi/load.js?url=${url}&v3&ts=${ts}${is_remote}`;
     }
     script.onerror = () => {
       done();
