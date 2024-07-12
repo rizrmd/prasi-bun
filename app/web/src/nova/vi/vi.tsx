@@ -23,6 +23,7 @@ export const Vi: FC<{
   mode: "mobile" | "desktop";
   comp_load: (comp_id: string) => Promise<IItem>;
   entry: string[];
+  preloaded?: (url: string) => boolean;
   api_url: string;
   site_id: string;
   page_id: string;
@@ -44,6 +45,7 @@ export const Vi: FC<{
   db,
   visit,
   script,
+  preloaded,
   page_id,
   render_stat: rs,
   on_status_changed,
@@ -99,6 +101,11 @@ export const Vi: FC<{
   };
   w.isMobile = mode === "mobile";
   w.isDesktop = mode === "desktop";
+  w.preloaded =
+    preloaded ||
+    ((url: string) => {
+      false;
+    });
   w.preload = (_urls: PRELOAD_ARGS["urls"], opt: PRELOAD_ARGS["opt"]) => {
     if (vi.on_preload) {
       return new Promise<void>((done) => {
