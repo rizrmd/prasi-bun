@@ -206,6 +206,10 @@ export const Root = () => {
             site_id={base.site.id}
             db={base.site.db}
             api={base.site.api}
+            preloaded={(url) => {
+              if (base.route.router?.lookup(url)) return true;
+              return false;
+            }}
             comp_load={async (comp_id) => {
               const comp = base.comp;
               if (comp.list[comp_id]) {

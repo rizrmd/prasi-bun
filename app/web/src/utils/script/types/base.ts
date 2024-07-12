@@ -20,6 +20,7 @@ export const baseTypings = `
   const isDesktop: boolean;
   const __props: any;
   const siteurl: (path:string) => string;
+  const preloaded: (url:string) => boolean;
   const preload: (urls: string | string[], opt?: {
     on_load?: (
       pages: {
