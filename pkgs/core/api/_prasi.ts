@@ -10,6 +10,7 @@ const cache = {
 
 export const _ = {
   url: "/_prasi/*",
+  raw: true,
   async api() {
     const { req, res } = apiContext(this);
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -24,6 +25,20 @@ export const _ = {
         const url = req.query_parameters["url"]
           ? JSON.stringify(req.query_parameters["url"])
           : "undefined";
+
+        const is_remote = req.query_parameters["remote"];
+        if (is_remote) {
+          const cur_url = new URL(req.url);
+          const remote_url = new URL(req.query_parameters["url"]);
+          cur_url.hostname = remote_url.hostname;
+          cur_url.port = remote_url.port;
+          cur_url.protocol = remote_url.protocol;
+          const res = await (await fetch(cur_url.toString())).text();
+
+          return new Response(res, {
+            headers: { "content-type": "text/javascript; charset=UTF-8" },
+          });
+        }
 
         const mode = req.query_parameters["dev"] ? "dev" : "prod";
 
@@ -77,7 +92,7 @@ export const _ = {
     const run = action[pathname];
 
     if (run) {
-      await run();
+      return await run();
     }
   },
 };
