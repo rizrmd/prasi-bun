@@ -28,7 +28,8 @@ export const createViLocal = (
     deps?: any[];
   }) => {
     const isEditor =
-      ["localhost", "prasi.avolut.com"].includes(location.hostname) &&
+      (["prasi.avolut.com"].includes(location.hostname) ||
+        location.host === "localhost:4550") &&
       location.pathname.startsWith("/ed/");
     let id = meta.item.id;
 

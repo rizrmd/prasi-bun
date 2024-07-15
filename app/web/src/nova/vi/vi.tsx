@@ -66,7 +66,10 @@ export const Vi: FC<{
       return pathname;
 
     try {
-      if (["prasi.avolut.com"].includes(location.hostname)) {
+      if (
+        ["prasi.avolut.com"].includes(location.hostname) ||
+        location.host === "localhost:4550"
+      ) {
         if (vi.site.api_url) {
           if (!vi.site_url) {
             vi.site_url = new URL(vi.site.api_url);
