@@ -77,6 +77,10 @@ export const EdLeft = () => {
         </div>
         <div
           className="tree-body flex relative flex-1 overflow-y-auto overflow-x-hidden"
+          onContextMenu={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
           ref={(ref) => {
             if (ref) local.tree = ref;
           }}
