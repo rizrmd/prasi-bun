@@ -147,14 +147,14 @@ export const viEvalProps = (
     `
           );
 
-          script.props[name] = { value: src };
+          script.props[name] = { value: src, valueBuilt: src };
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
             script.props[name].fn = val;
-            val = (...args: any[]) => {
-              if (script) return script.props?.[name].fn(...args);
-            };
+            // val = (...args: any[]) => {
+            //   if (script) return script.props?.[name].fn(...args);
+            // };
           }
 
           arg[name] = val;
