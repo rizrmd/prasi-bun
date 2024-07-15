@@ -1,9 +1,8 @@
-import { Root as ReactRoot, createRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
-import { Root, isPreview } from "./root";
 import { initBaseConfig } from "./base/base";
+import { Root, isPreview } from "./root";
 import { w } from "./w";
-import { sworkerRegister } from "../../sworker-boot";
 
 (async () => {
   initBaseConfig();

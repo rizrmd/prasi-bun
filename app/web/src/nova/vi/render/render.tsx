@@ -69,7 +69,6 @@ export const ViRender: FC<{
     console.log(spaces + meta.item.id, meta.item.name);
   }
 
-
   if (meta.item.adv?.js || meta.item.component?.id) {
     return (
       <ErrorBox meta={meta}>
