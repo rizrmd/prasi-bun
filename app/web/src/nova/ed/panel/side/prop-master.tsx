@@ -67,6 +67,9 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
     });
 
     filtered = filtered.sort((a, b) => {
+
+      if (a.data?.name.startsWith('new_prop')) return 1;
+      if (b.data?.name.startsWith('new_prop')) return -1;
       if (
         a.data &&
         b.data &&
@@ -201,15 +204,15 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
                     idx = parseInt(idx) + 1;
                   }
 
-                  let name = `prop_${idx}`;
+                  let name = `new_prop_${idx}`;
                   while (mprops.get(name)) {
                     idx = parseInt(idx) + 1;
-                    name = `prop_${idx}`;
+                    name = `new_prop_${idx}`;
                   }
 
                   const map = new Y.Map() as FMCompDef;
                   syncronize(map, {
-                    idx: idx,
+                    idx,
                     name,
                     type: "string",
                     value: '"hello"',
