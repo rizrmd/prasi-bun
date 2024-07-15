@@ -152,13 +152,16 @@ export const viEvalProps = (
 
           if (typeof val === "function") {
             script.props[name].fn = val;
-            val = new Function(
-              `// [${meta.item.name}] ${name}: ${meta.item.id}
-const { ${Object.keys(arg).join(", ")} } = this;
-const fn = ${val.toString()}
-return fn(...arguments);
-            `
-            ).bind(arg);
+            val = (...args: any[]) => {
+              return meta.item.script?.props?.[name].fn(...args);
+            };
+            //             val = new Function(
+            //               `// [${meta.item.name}] ${name}: ${meta.item.id}
+            // const { ${Object.keys(arg).join(", ")} } = this;
+            // const fn = ${val.toString()}
+            // return fn(...arguments);
+            //             `
+            //             ).bind(arg);
           }
 
           arg[name] = val;
