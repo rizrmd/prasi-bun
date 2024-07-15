@@ -165,9 +165,10 @@ const connect = (
             `${url.protocol}//${url.host}${url.pathname}`
           );
 
-          const timeout = setTimeout(() => {
+          let timeout = setTimeout(() => {
+            clearTimeout(timeout);
             ws.close();
-            retry(); 
+            retry();
           }, 2000);
 
           ws.onopen = () => {
@@ -179,20 +180,7 @@ const connect = (
             conf.ws = ws;
             event.opened();
           };
-          ws.onclose = async () => {
-            w.offline = true;
-            w.editorRender?.();
-
-            const res = event.disconnected();
-            if (res.reconnect) {
-              setTimeout(async () => {
-                reconnect++;
-                retry();
-              }, reconnect * WS_CONFIG.reconnectTimeout);
-            } else {
-              reject();
-            }
-          };
+         
           ws.onmessage = async (e) => {
             const raw = e.data as Blob;
             const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
