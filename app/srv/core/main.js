@@ -99,8 +99,7 @@ Error generating stack: `+o.message+`
 try {
 ${p}
 } catch(e) {
-  console.error("Error at item ${t.item.name} (id: ${t.item.id}):
-", ___js);
+  console.error("Error at item ${t.item.name} (id: ${t.item.id}):\\n", ___js);
   console.error(e);
 }
   `)(...Object.values(u),t.item.adv?.js)}catch(f){console.error(`Error at item ${t.item.name} (id: ${t.item.id}):

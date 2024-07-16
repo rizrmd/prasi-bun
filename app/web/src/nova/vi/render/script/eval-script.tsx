@@ -172,7 +172,7 @@ export const viEvalScript = (
 try {
 ${src}
 } catch(e) {
-  console.error("Error at item ${meta.item.name} (id: ${meta.item.id}):\n", ___js);
+  console.error("Error at item ${meta.item.name} (id: ${meta.item.id}):\\n", ___js);
   console.error(e);
 }
   `
