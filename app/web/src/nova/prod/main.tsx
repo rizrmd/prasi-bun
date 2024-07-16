@@ -5,6 +5,7 @@ import { Root, isPreview } from "./root";
 import { w } from "./w";
 
 (async () => {
+  import("./font");
   initBaseConfig();
   const div = document.getElementById("root");
   if (div) {
@@ -35,6 +36,5 @@ import { w } from "./w";
       document.body.classList.remove("opacity-0");
     }
 
-    import("./font");
   }
 })();
