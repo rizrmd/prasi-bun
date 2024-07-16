@@ -189,7 +189,6 @@ export const edInitSync = (p: PG) => {
           if (mode === "frontend") {
             await loadFrontEnd(p, ts);
           } else {
-            console.log("Code updated");
             await loadTypings(p);
             if (p.ui.monaco) {
               registerSiteTypings(p.ui.monaco, p);

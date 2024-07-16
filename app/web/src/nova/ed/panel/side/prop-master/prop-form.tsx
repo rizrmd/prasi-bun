@@ -1,13 +1,12 @@
+import { createId } from "@paralleldrive/cuid2";
 import { FC, useEffect } from "react";
-import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { useGlobal, useLocal } from "web-utils";
 import { TypedMap } from "yjs-types";
-import { createEditScript } from "./edit-script";
-import { EDGlobal } from "../../../logic/ed-global";
-import { createId } from "@paralleldrive/cuid2";
 import { IItem, MItem } from "../../../../../utils/types/item";
-import { MContent } from "../../../../../utils/types/general";
+import { FMCompDef } from "../../../../../utils/types/meta-fn";
+import { EDGlobal } from "../../../logic/ed-global";
 import { fillID } from "../../../logic/tree/fill-id";
+import { createEditScript } from "./edit-script";
 
 export const propPopover = {
   name: "",
