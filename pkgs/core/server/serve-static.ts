@@ -103,48 +103,6 @@ export const serveStatic = {
       await this.walk();
     }
 
-    return new Response(
-      `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0"
-    />
-    <title>Prasi: App Builder</title>
-    <link rel="stylesheet" href="/index.a760dd30.css" />
-    <link
-      rel="stylesheet"
-      crossorigin
-      href="/jetbrains-mono.5b173976.css"
-    />
-    <link
-      rel="stylesheet"
-      crossorigin
-      href="/source-sans-3.3e555e80.css"
-    />
-    <script src="/index.runtime.3830e76f.js"></script>
-    <script>
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
-        isDisabled: !0,
-        _renderers: {},
-      };
-    </script>
-  </head>
-  <body classname="flex-col flex-1 w-full min-h-screen flex opacity-0">
-    <div id="root"></div>
-    <script src="/index.bcb738f4.js" defer></script>
-  </body>
-</html>
-`,
-      {
-        headers: {
-          "content-type": "text/html",
-        },
-      }
-    );
-
     file = cache.static["/index.html"];
 
     if (file) {
