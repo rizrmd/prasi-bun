@@ -74,11 +74,6 @@ export const _ = {
         },
       };
 
-      if (await existsAsync(dir.path("/app/static/index.css"))) {
-        result.code.site["index.css"] =
-          (await readAsync(dir.path("/app/static/index.css"))) || "";
-      }
-
       return await gzipAsync(JSON.stringify(result));
     }
     return new Response("NOT FOUND", { status: 403 });
