@@ -124,6 +124,7 @@ export const Root = () => {
       page.params = w._prasi.routed.params;
     }
   }
+
   if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
 
   if (page.id !== local.page_id) {
@@ -211,7 +212,7 @@ export const Root = () => {
               if (found) {
                 if (base.page.cache[found.id]) {
                   return true;
-                } 
+                }
               }
               return false;
             }}

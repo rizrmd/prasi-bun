@@ -23,8 +23,9 @@ export const _ = {
       headers: { "content-type": "text/html" },
     });
 
-    if (!validate(site_id))
+    if (!validate(site_id) && site_id !== "_") {
       return new Response("site not found", { status: 403 });
+    }
 
     if (pathname.startsWith("_prasi")) {
       const action = pathname.split("/")[1];

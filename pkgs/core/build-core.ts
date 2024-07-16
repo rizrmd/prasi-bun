@@ -1,5 +1,10 @@
 import { dir } from "dir";
 import { context } from "esbuild";
+import { $ } from "bun";
+
+await $`bun tailwindcss -i  src/nova/prod/tailwind.css -m -o ../srv/core/index.css`
+  .cwd(dir.path(`/app/web`))
+  .quiet();
 
 const ctx = await context({
   bundle: true,
@@ -10,7 +15,7 @@ const ctx = await context({
   format: "esm",
   jsx: "transform",
   minify: true,
-  sourcemap: true,
+  sourcemap: false,
   logLevel: "error",
   assetNames: `[name]`,
   loader: { ".woff": "file", ".ttf": "file", ".woff2": "file" },
