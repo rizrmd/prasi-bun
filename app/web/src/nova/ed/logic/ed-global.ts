@@ -29,7 +29,13 @@ export const EmptySite = {
 export type ESite = typeof EmptySite;
 export type EPage = typeof EmptyPage;
 export type EComp = typeof EmptyComp;
-export type PropFieldKind = "visible" | "gen" | "value" | "option" | "typings";
+export type PropFieldKind =
+  | "onChange"
+  | "visible"
+  | "gen"
+  | "value"
+  | "option"
+  | "typings";
 export type ISingleScope = {
   p: string[];
   n: string;

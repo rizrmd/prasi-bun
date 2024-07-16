@@ -8,6 +8,7 @@ import { treeRebuild } from "../../../logic/tree/build";
 import { EdPropLabel } from "./prop-label";
 import { ChevronDown } from "../../tree/node/item/indent";
 import { Popover } from "../../../../../utils/ui/popover";
+import { propInstanceOnChange } from "./on-change";
 
 type MetaOption = {
   label: string;
@@ -45,6 +46,7 @@ export const EdPropInstanceOptions: FC<{
     resetOnDeps: false as boolean | (() => any[]),
     open: false,
     pendingVal: null as any,
+    changedTimeout: null as any,
   });
   const p = useGlobal(EDGlobal, "EDITOR");
 
@@ -230,6 +232,11 @@ export const EdPropInstanceOptions: FC<{
 
       treeRebuild(p);
       p.render();
+
+      clearTimeout(local.changedTimeout);
+      local.changedTimeout = setTimeout(() => {
+        propInstanceOnChange(p, name, val);
+      }, 1000);
 
       setTimeout(() => {
         if (item?.reload) {

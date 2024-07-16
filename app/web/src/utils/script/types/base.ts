@@ -74,7 +74,7 @@ export const baseTypings = `
     };
     childs: IItem[];
   };
-  
+
   type SingleChange =
     | { type: "set"; name: string; value: any }
     | ({ type: "prop"; name: string } & PropVal)
@@ -92,23 +92,23 @@ export const baseTypings = `
   };
 
   type SimpleItem = Partial<Omit<IItem, "component">> & {
-   component?: { id: string; props: Record<string, PropVal> };
+    component?: { id: string; props: Record<string, PropVal> };
   };
 
-  export type PrasiEdit = {
+  type PrasiEdit = {
     edit: {
       setValue: <T extends keyof IItem>(name: T, value: IItem[T]) => void;
       setProp: (name: string, value: PropVal | string) => void;
       pending: SingleChange[];
       childs: (IItem & PrasiEdit)[];
       setChilds: (childs: ((IItem & PrasiEdit) | SimpleItem)[]) => void;
-      readonly parent: null | ParentArg; 
+      readonly parent: null | ParentArg;
       commit: () => Promise<void>;
       readonly props?: Record<string, PropVal>;
     };
   };
 
-  const _item: undefined | PrasiItem;
+  type PrasiItem = IItem & PrasiEdit;
   
   const PassProp: (arg:Record<string, any> & { children: ReactNode }>) => ReactElement;
   const mobile: {

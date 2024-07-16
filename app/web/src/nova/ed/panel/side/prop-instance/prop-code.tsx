@@ -1,8 +1,8 @@
 import { FC } from "react";
-import { FMCompDef } from "../../../../../utils/types/meta-fn";
-import { EdPropLabel } from "./prop-label";
 import { useGlobal } from "web-utils";
-import { EDGlobal, active } from "../../../logic/ed-global";
+import { FMCompDef } from "../../../../../utils/types/meta-fn";
+import { EDGlobal } from "../../../logic/ed-global";
+import { EdPropLabel } from "./prop-label";
 import { reset } from "./prop-reset";
 
 export const EdPropInstanceCode: FC<{

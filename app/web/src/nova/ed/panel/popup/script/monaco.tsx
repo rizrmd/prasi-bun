@@ -17,6 +17,7 @@ import { declareScope } from "./scope/scope";
 // @ts-ignore
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
 import { editorLocalValue } from "../../../../vi/render/script/local";
+import { propInstanceOnChange } from "../../side/prop-instance/on-change";
 
 const scriptEdit = {
   timeout: null as any,
@@ -342,6 +343,11 @@ export const EdScriptMonaco: FC<{}> = () => {
                 value: compress(encode.encode(value || "")),
                 ...arg,
               });
+
+              if (p.ui.popup.script.prop_kind === "value") {
+                propInstanceOnChange(p, p.ui.popup.script.prop_name, value);
+              }
+
               if (typeof code_result === "string") {
                 p.ui.popup.script.typings.status = "error";
                 p.ui.popup.script.typings.err_msg = code_result;

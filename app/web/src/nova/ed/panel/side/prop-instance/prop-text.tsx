@@ -10,6 +10,7 @@ import { FMCompDef } from "../../../../../utils/types/meta-fn";
 import { EdPropLabel } from "./prop-label";
 import { treeRebuild } from "../../../logic/tree/build";
 import { EDGlobal } from "../../../logic/ed-global";
+import { propInstanceOnChange } from "./on-change";
 
 export const EdPropInstanceText: FC<{
   name: string;
@@ -25,6 +26,7 @@ export const EdPropInstanceText: FC<{
     codeEditing: false,
     timeout: null as any,
     focus: false,
+    changedTimeout: null as any,
   });
 
   useEffect(() => {
@@ -44,26 +46,26 @@ export const EdPropInstanceText: FC<{
         dragnum={
           typeof valnum === "number" && !isNaN(valnum)
             ? {
-              value: valnum,
-              onChange(value) {
-                local.value = Math.round(value) + "";
-                local.render();
-              },
-              onChanged(value) {
-                local.value = Math.round(value) + "";
-                local.render();
+                value: valnum,
+                onChange(value) {
+                  local.value = Math.round(value) + "";
+                  local.render();
+                },
+                onChanged(value) {
+                  local.value = Math.round(value) + "";
+                  local.render();
 
-                clearTimeout(local.timeout);
-                local.timeout = setTimeout(() => {
-                  mprop.doc?.transact(() => {
-                    mprop.set("value", `\`${local.value}\``);
-                    mprop.set("valueBuilt", `\`${local.value}\``);
-                  });
-                  treeRebuild(p);
-                  p.render();
-                }, 1000);
-              },
-            }
+                  clearTimeout(local.timeout);
+                  local.timeout = setTimeout(() => {
+                    mprop.doc?.transact(() => {
+                      mprop.set("value", `\`${local.value}\``);
+                      mprop.set("valueBuilt", `\`${local.value}\``);
+                    });
+                    treeRebuild(p);
+                    p.render();
+                  }, 1000);
+                },
+              }
             : undefined
         }
       />
@@ -84,6 +86,8 @@ export const EdPropInstanceText: FC<{
           local.value = e.currentTarget.value;
           local.render();
           clearTimeout(local.timeout);
+          clearTimeout(local.changedTimeout);
+
           local.timeout = setTimeout(() => {
             mprop.doc?.transact(() => {
               mprop.set("value", `\`${local.value}\``);
@@ -91,6 +95,11 @@ export const EdPropInstanceText: FC<{
             });
             treeRebuild(p);
             p.render();
+
+            clearTimeout(local.changedTimeout);
+            local.changedTimeout = setTimeout(() => {
+              propInstanceOnChange(p, name, `\`${local.value}\``);
+            }, 500);
           }, 200);
         }}
       />
