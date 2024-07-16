@@ -24,6 +24,7 @@ await build({
   format: "esm",
   jsx: "transform",
   minify: true,
+  external: ["*.png", "*.woff", "*.woff2", "*.ttf", "*.jpeg", "*.jpg", "*.svg"],
   sourcemap: true,
   logLevel: "error",
   define: {

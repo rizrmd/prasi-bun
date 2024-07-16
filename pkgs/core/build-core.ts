@@ -12,6 +12,7 @@ const ctx = await context({
   minify: true,
   sourcemap: true,
   logLevel: "error",
+  external: ["*.png", "*.woff", "*.woff2", "*.ttf", "*.jpeg", "*.jpg", "*.svg"],
   define: {
     "process.env.NODE_ENV": `"production"`,
   },

@@ -3,6 +3,7 @@ import { defineReact, defineWindow } from "web-utils";
 import { initBaseConfig } from "./base/base";
 import { Root, isPreview } from "./root";
 import { w } from "./w";
+import "@fontsource/source-sans-3";
 
 (async () => {
   initBaseConfig();
