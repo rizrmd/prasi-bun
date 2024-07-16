@@ -244,7 +244,8 @@ export const PanelFont: FC<{
                 if (!doc.querySelector(`link[href="${_href}]`)) {
                   const link = doc.createElement("link");
                   link.type = "text/css";
-                  link.rel = "stylesheet";
+                  link.rel = "stylesheet preload prefetch";
+                  link.as = "style";
                   link.crossOrigin = "anonymous";
                   link.href = _href;
                   doc.head.appendChild(link);
