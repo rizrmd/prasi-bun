@@ -12,7 +12,7 @@ export const EdTreeSearch = () => {
     focus: false,
     hover: false,
     cursor: null as number | null,
-    search_timeout: null as any
+    search_timeout: null as any,
   });
 
   p.ui.tree.search_ref = local.sref;
@@ -122,13 +122,20 @@ export const doTreeSearch = (p: PG) => {
     ptree = p.comp.list[active.comp_id].tree;
   }
 
-  const comp_searched = new Set<string>()
+  const comp_searched = new Set<string>();
 
   const searchInPTree = (ptree: NodeModel<IMeta>[], id_component?: string) => {
     if (p.ui.tree.search_mode.Name) {
       const found = fuzzy(ptree, "text", search);
 
+      const id_found = ptree.find((e) => e.id === search);
       let i = 0;
+
+      if (id_found) {
+        tree[id_found.id] = { idx: 0, node: { ...id_found, parent: "root" } };
+        i = 1;
+      }
+
       for (const row of found) {
         if (row.data) {
           if (id_component && row.data.parent)
@@ -183,7 +190,7 @@ export const doTreeSearch = (p: PG) => {
         }
       }
     }
-  }
+  };
 
   searchInPTree(ptree);
 
