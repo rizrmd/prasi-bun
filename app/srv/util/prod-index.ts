@@ -17,7 +17,7 @@ export const prodIndex = (
   <link rel="stylesheet" href="/index.css">
   <link 
     as="style"
-    rel="stylesheet preload prefetch" 
+    rel="stylesheet" 
     href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&display=swap" 
     type="text/css" 
     crossorigin="anonymous" />
