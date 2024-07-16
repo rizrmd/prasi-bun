@@ -13,6 +13,10 @@
     "*.wasm": [
       "...",
       "@parcel/transformer-raw"
+    ],
+    "bundle-text:*": [
+      "...",
+      "@parcel/transformer-inline-string"
     ]
   }
 }
