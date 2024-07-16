@@ -62,7 +62,7 @@ if (!g.apiPrepared) {
   await syncActionDefinition();
   g.log.info("WS Action defined");
   await prepareAPITypes();
-  g.log.info("API Prepared");
+  g.log.info("API prepared");
   g.apiPrepared = true;
 
   if (g.mode === "dev") {
@@ -70,7 +70,11 @@ if (!g.apiPrepared) {
   }
 }
 
-if (g.mode === "dev") await import("./build-core");
+if (g.mode === "dev") {
+  await import("./build-core");
+  g.log.info("Core built");
+
+}
 
 if (!g.parcel && g.mode === "dev") {
   await parcelBuild();

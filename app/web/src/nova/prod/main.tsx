@@ -34,5 +34,7 @@ import { w } from "./w";
     if (document.body.classList.contains("opacity-0")) {
       document.body.classList.remove("opacity-0");
     }
+
+    import("./font");
   }
 })();

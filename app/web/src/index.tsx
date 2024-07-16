@@ -7,7 +7,6 @@ import { Root } from "./base/root";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
 
-
 const start = async () => {
   let react = {
     root: null as null | ReactRoot,
@@ -39,6 +38,8 @@ const start = async () => {
     react.root = createRoot(el);
     react.root.render(<Root />);
   }
+
+  import("./font");
 };
 
 start();

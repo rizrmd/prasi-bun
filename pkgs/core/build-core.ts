@@ -1,7 +1,9 @@
+import { $ } from "bun";
 import { dir } from "dir";
 import { context } from "esbuild";
-import { $ } from "bun";
+import { removeAsync } from "fs-jetpack";
 
+await removeAsync(dir.path('/app/srv/core'))
 await $`bun tailwindcss -i  src/nova/prod/tailwind.css -m -o ../srv/core/index.css`
   .cwd(dir.path(`/app/web`))
   .quiet();
