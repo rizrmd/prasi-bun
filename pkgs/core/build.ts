@@ -5,7 +5,6 @@ import { dir } from "dir";
 import { build } from "esbuild";
 import { fdir } from "fdir";
 import { statSync } from "fs";
-import { platform } from "os";
 import {
   copyAsync,
   existsAsync,
@@ -13,6 +12,8 @@ import {
   removeAsync,
   writeAsync,
 } from "fs-jetpack";
+import { platform } from "os";
+
 const brotli = await brotliPromise;
 
 await build({
@@ -24,9 +25,10 @@ await build({
   format: "esm",
   jsx: "transform",
   minify: true,
-  external: ["*.png", "*.woff", "*.woff2", "*.ttf", "*.jpeg", "*.jpg", "*.svg"],
   sourcemap: true,
   logLevel: "error",
+  assetNames: `[name]`,
+  loader: { ".woff": "file", ".ttf": "file", ".woff2": "file" },
   define: {
     "process.env.NODE_ENV": `"production"`,
   },
