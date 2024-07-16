@@ -1,7 +1,6 @@
 import { TypedArray, TypedDoc, TypedMap } from "yjs-types";
-import { ISection } from "./section";
 import { MItem } from "./item";
-import * as Y from "yjs";
+import { ISection } from "./section";
 export type IRoot = {
   id: "root";
   type: "root";
