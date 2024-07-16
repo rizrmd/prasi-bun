@@ -5,7 +5,6 @@ import { w } from "../utils/types/general";
 import { Loading } from "../utils/ui/loading";
 import * as pages from "./pages";
 
-
 export const Root: FC<{}> = ({}) => {
   const local = useLocal(
     {

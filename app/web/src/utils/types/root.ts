@@ -7,7 +7,7 @@ export type IRoot = {
   id_page?: string;
   childs: ISection[];
   component_ids?: string[];
-};
+}; 
 export type MRoot = TypedMap<{
   id: "root";
   id_page?: string;
