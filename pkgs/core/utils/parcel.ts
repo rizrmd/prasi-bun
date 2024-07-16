@@ -17,7 +17,7 @@ export const parcelBuild = async () => {
     ),
     g.mode === "dev" ? "watch" : "build",
     "./src/index.html",
-    g.mode === "dev" ? "--no-hmr" : "",
+    g.mode === "dev" ? "--no-hmr" : "--no-optimize",
     "--dist-dir",
     dir.path(`app/static`),
   ];
