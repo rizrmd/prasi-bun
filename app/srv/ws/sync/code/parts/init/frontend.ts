@@ -130,7 +130,7 @@ export const initFrontEnd = async (
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
           const srv = code.internal.server[id_site];
-          if (filename?.startsWith("app/routes")) {
+          if (filename?.startsWith("app/routes/")) {
             prasiDefineLocalRoute(id_site);
           }
           if (filename?.startsWith("node_modules")) return;

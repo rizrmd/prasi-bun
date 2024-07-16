@@ -9,7 +9,7 @@ import { Loading } from "../../utils/ui/loading";
 
 export default page({
   url: "/ed/:site_id/:page_id",
-  component: ({ }) => {
+  component: ({}) => {
     const p = useGlobal(EDGlobal, "EDITOR");
     const local = useLocal({
       new_site: false,
@@ -22,6 +22,20 @@ export default page({
         (window as any).Y = await import("yjs");
         (window as any).syncronize = (await import("y-pojo")).syncronize;
         p.render();
+
+        // const res = await _api.local_files({
+        //   mode: "list",
+        //   path: "/app",
+        //   id_site: "53f19c29-a36b-48b1-b13a-25dcdaef8ea5",
+        // });
+        // console.log(res);
+
+        // await _api.local_files({
+        //   mode: "write",
+        //   path: "/app/routes/path.tsx",
+        //   content: "haloha",
+        //   id_site: "53f19c29-a36b-48b1-b13a-25dcdaef8ea5",
+        // });
       })();
       return <Loading note="init" />;
     }
@@ -40,7 +54,7 @@ export default page({
                   location.href = `/ed/${data.id}/_`;
                 }
               }}
-              onClose={() => { }}
+              onClose={() => {}}
               header={
                 <div className="border-b border-blue-500 text-xl">
                   Create New Site
@@ -123,14 +137,14 @@ const navSitePage = async (p: PG) => {
       site: validate(params.site_id)
         ? { id: params.site_id }
         : {
-          org: {
-            org_user: {
-              some: {
-                id_user: p.user.id,
+            org: {
+              org_user: {
+                some: {
+                  id_user: p.user.id,
+                },
               },
             },
           },
-        },
       name: {
         contains: "root",
         mode: "insensitive",
@@ -153,14 +167,14 @@ const navSitePage = async (p: PG) => {
         site: validate(params.site_id)
           ? { id: params.site_id }
           : {
-            org: {
-              org_user: {
-                some: {
-                  id_user: p.user.id,
+              org: {
+                org_user: {
+                  some: {
+                    id_user: p.user.id,
+                  },
                 },
               },
             },
-          },
         name: {
           contains: "home",
           mode: "insensitive",
@@ -178,14 +192,14 @@ const navSitePage = async (p: PG) => {
           site: validate(params.site_id)
             ? { id: params.site_id }
             : {
-              org: {
-                org_user: {
-                  some: {
-                    id_user: p.user.id,
+                org: {
+                  org_user: {
+                    some: {
+                      id_user: p.user.id,
+                    },
                   },
                 },
               },
-            },
         },
         select: { id: true, id_site: true },
       });
