@@ -7,8 +7,6 @@ import { Root } from "./base/root";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
 
-import "@fontsource/jetbrains-mono";
-import "@fontsource/source-sans-3";
 
 const start = async () => {
   let react = {
