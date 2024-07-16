@@ -93,7 +93,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   evn(arg);
                 } catch (e) {
                   console.error(e);
-                  console.warn(k, v.value);
+                  console.error(k, v.value);
                 }
               }
             }
@@ -107,7 +107,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                   );
                   evn(arg);
                 } catch (e) {
-                  console.warn(
+                  console.error(
                     `Error prop ${k} in item [${meta.item.name}], source:`,
                     v.valueBuilt
                   );
@@ -126,7 +126,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
               return;
             }
           } catch (e) {
-            console.warn("Failed to parse visible on prop: ", key);
+            console.error("Failed to parse visible on prop: ", key);
             console.error(e);
           }
         } catch (e) {

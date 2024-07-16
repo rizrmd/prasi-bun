@@ -45,12 +45,12 @@ export const pushTreeNode = (
   }
 
   if (!meta.item || !meta.item.id) {
-    console.warn("Emptry Tree Item ", meta);
+    console.error("Emptry Tree Item ", meta);
     return null;
   }
 
   if (tree.find((t) => t.id === meta.item.id)) {
-    console.warn("Double Tree Item: ", meta.item.id, meta.item.name);
+    console.error("Double Tree Item: ", meta.item.id, meta.item.name);
   } else {
     if (!meta.parent?.comp_id) {
       tree.push({

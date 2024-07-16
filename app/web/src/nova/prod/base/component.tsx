@@ -28,7 +28,7 @@ export const scanComponent = async (items: IContent[], from_root?: boolean) => {
         await set(`comp-${id}`, item);
       }
       if (Object.keys(comp.pending).length > 0) {
-        console.warn(
+        console.error(
           `Warning: component not found: ${Object.keys(comp.pending)}`
         );
         return;

@@ -172,14 +172,14 @@ export const viEvalScript = (
 try {
 ${src}
 } catch(e) {
-  console.warn("Error at item ${meta.item.name}:", ___js);
+  console.error("Error at item ${meta.item.name}:", ___js);
   console.error(e);
 }
   `
     );
     fn(...Object.values(arg), meta.item.adv?.js);
   } catch (e) {
-    console.warn(`Error at item ${meta.item.name}:`, meta.item.adv?.js);
+    console.error(`Error at item ${meta.item.name}:`, meta.item.adv?.js);
     console.error(e);
   }
 

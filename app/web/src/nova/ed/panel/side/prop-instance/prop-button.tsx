@@ -38,7 +38,7 @@ export const EdPropInstanceButton: FC<{
             evn(arg);
           } catch (e) {
             console.error(e);
-            console.warn(k, v.value);
+            console.error(k, v.value);
           }
         }
       }
@@ -50,7 +50,7 @@ export const EdPropInstanceButton: FC<{
             evn(arg);
           } catch (e) {
             console.error(e);
-            console.warn(k, v.valueBuilt);
+            console.error(k, v.valueBuilt);
           }
         }
       }
