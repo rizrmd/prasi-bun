@@ -180,6 +180,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
             if (node.data?.parent?.comp_id) {
               active.comp_id = node.data?.parent?.comp_id;
             }
+            p.ui.tree.open_all = true;
           }
 
           p.ui.tree.search = "";

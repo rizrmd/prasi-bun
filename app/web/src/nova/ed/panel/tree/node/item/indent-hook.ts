@@ -14,6 +14,14 @@ export const expandTreeHook = (
       p.ui.prevent_indent_hook = false;
       return;
     }
+
+    if (p.ui.tree.open_all) {
+      p.ui.tree.open_all = false;
+      local.tree?.openAll();
+      p.render();
+      return;
+    }
+
     const open = JSON.parse(localStorage.getItem("prasi-tree-open") || "{}");
     p.ui.tree.open = open;
 
@@ -24,6 +32,7 @@ export const expandTreeHook = (
     const cur = getMetaById(p, active.item_id);
     if (cur && cur.parent?.id) {
       const id = cur.parent.id;
+
       if (id) {
         shouldOpen.add(id);
 
@@ -32,7 +41,7 @@ export const expandTreeHook = (
         while (meta) {
           i++;
           if (i > 5000) {
-            console.error(
+            console.warn(
               "WARNING: Prasi expand item parent tree exceed 5000 loop, maybe infinite loop?"
             );
             break;
@@ -74,5 +83,5 @@ export const expandTreeHook = (
         }
       }
     }
-  }, [p.page.tree, active.comp_id, active.item_id]);
+  }, [p.page.tree, active.comp_id, active.item_id, p.ui.tree.open_all]);
 };

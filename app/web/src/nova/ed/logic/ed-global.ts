@@ -231,6 +231,7 @@ export const EDGlobal = {
         CSS: false,
       },
       rename_id: "",
+      open_all: false,
       open: {} as Record<string, string[]>,
     },
     popup: {

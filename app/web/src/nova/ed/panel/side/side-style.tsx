@@ -38,6 +38,7 @@ export const EdSideStyle: FC<{ meta: IMeta }> = ({ meta }) => {
               )}
               spellCheck={false}
               value={local.value}
+              readOnly
             ></textarea>
           }
         >
