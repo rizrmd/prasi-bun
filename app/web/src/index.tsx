@@ -38,8 +38,6 @@ const start = async () => {
     react.root = createRoot(el);
     react.root.render(<Root />);
   }
-
-  import("./font");
 };
 
 start();
