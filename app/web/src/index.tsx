@@ -4,9 +4,9 @@ import { apiProxy } from "./base/load/api/api-proxy";
 import { loadApiProxyDef } from "./base/load/api/api-proxy-def";
 import { dbProxy } from "./base/load/db/db-proxy";
 import { Root } from "./base/root";
-import "./index.css";
 import { sworkerAddCache, sworkerRegister } from "./sworker-boot";
 import { w } from "./utils/types/general";
+
 import "@fontsource/jetbrains-mono";
 import "@fontsource/source-sans-3";
 
