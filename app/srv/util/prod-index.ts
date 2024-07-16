@@ -14,7 +14,6 @@ export const prodIndex = (
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
-  <link rel="preload stylesheet" as="style" crossorigin="anonymous" href="/prod/_/main.css">
   <link rel="stylesheet" href="/prod/_/index.css">
   ${this.head.join("\n")}
 </head>
