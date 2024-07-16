@@ -63,7 +63,7 @@ if (build_all) {
         : "node_modules/.bin/parcel"
     ),
     "build",
-    "./src/index.tsx",
+    "./src/index.html",
     // "--no-optimize",
     "--no-scope-hoist",
     "--dist-dir",
