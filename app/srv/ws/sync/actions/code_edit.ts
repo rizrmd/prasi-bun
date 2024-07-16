@@ -175,6 +175,9 @@ export const code_edit: SAction["code"]["edit"] = async function (
                 if (prop_kind === "value") {
                   mprop.set("value", src);
                   mprop.set("valueBuilt", res.code.substring(6));
+                } else if (prop_kind === "onChange") {
+                  mprop.set("onChange", src);
+                  mprop.set("onChangeBuilt", res.code.substring(6));
                 } else if (prop_kind === "gen") {
                   mprop.set("gen", src);
                   mprop.set("genBuilt", res.code.substring(6));

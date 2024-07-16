@@ -36,6 +36,8 @@ export type FNCompDef = {
   gen?: string;
   genBuilt?: string;
   is_name?: boolean;
+  onChange?: string;
+  onChangeBuilt?: string;
   jsxCalledBy?: string[];
   content?: IItem;
   visible?: string;

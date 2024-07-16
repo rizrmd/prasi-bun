@@ -38,6 +38,13 @@ export const edMonacoDefaultVal = (p: PG, adv: FNAdv, mitem: MItem) => {
 
         if (kind === "value") {
           val = mprop.get("value");
+        } else if (kind === "onChange") {
+          val =
+            mprop.get("onChange") ||
+            `\
+({ name, value, item }: { name: string; value: string; item: PrasiItem }) => {
+  // on prop changed
+}`;
         } else if (kind === "gen") {
           val =
             mprop.get("gen") ||
