@@ -184,3 +184,4 @@ app/srv/site
 app/srv/site/*
 app/srv/site.zip
 app/static
+app/static-br
