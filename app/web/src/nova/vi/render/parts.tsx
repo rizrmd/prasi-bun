@@ -66,7 +66,7 @@ export const viParts = (
 
         if (!meta) {
           if (item.type === "item" && item.component?.id) {
-            console.warn(`Warning component ${item.name} - ${item.component.id} failed to load.`);
+            console.error(`Warning component ${item.name} - ${item.component.id} failed to load.`);
           }
           return null;
         }

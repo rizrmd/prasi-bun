@@ -32,7 +32,7 @@ export const expandTreeHook = (
         while (meta) {
           i++;
           if (i > 5000) {
-            console.warn(
+            console.error(
               "WARNING: Prasi expand item parent tree exceed 5000 loop, maybe infinite loop?"
             );
             break;

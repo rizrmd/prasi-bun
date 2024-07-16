@@ -16,7 +16,7 @@ export const ErrorBox = withErrorBoundary(
   }) => {
     const local = useLocal({ retrying: false, meta });
     const [error, resetError] = useErrorBoundary((error, errorInfo) => {
-      if (silent !== true) console.warn(error);
+      if (silent !== true) console.error(error);
     });
 
     if (meta && local.meta !== meta) {

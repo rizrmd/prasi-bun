@@ -22,7 +22,7 @@ export const viLoadSnapshot = async (p: PG) => {
     }
   } catch (e: any) {
     if (e && !e.message.toLowerCase().includes("invalid url")) {
-      console.warn("Failed to load API [Snapshot]:", api_url);
+      console.error("Failed to load API [Snapshot]:", api_url);
     } else {
     }
   }

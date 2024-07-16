@@ -12,6 +12,6 @@ export const _ = {
       return new Response(file as any);
     }
 
-    return `console.warn("Script not found\n", "   mode: ${mode}\\n", "   id  : ${id_site}")`;
+    return `console.error("Script not found\n", "   mode: ${mode}\\n", "   id  : ${id_site}")`;
   },
 };
