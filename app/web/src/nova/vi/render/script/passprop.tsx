@@ -22,7 +22,7 @@ export const createViPassProp = (
     }
 
     let script = meta.item.script;
-    if (internal_key) {
+    if (typeof internal_key !== "undefined") {
       if (!meta.item.script_keyed) {
         meta.item.script_keyed = {};
       }
@@ -37,18 +37,27 @@ export const createViPassProp = (
       script.passprop = {};
     }
 
-    const script_pass: any = {};
-    if (script.passprop) {
-      let is_changed = false;
-      for (const [k, v] of Object.entries(arg)) {
-        if (!["children", "key"].includes(k)) {
-          is_changed = true;
-          script_pass[k] = v;
-        }
+    const filtered_args: any = {};
+    let is_changed = false;
+    for (const [k, v] of Object.entries(arg)) {
+      if (!["children", "key"].includes(k)) {
+        is_changed = true;
+        filtered_args[k] = v;
       }
     }
 
-    const _pass = { ...passprop, ...script_pass };
+    let _pass = { ...passprop, ...filtered_args };
+
+    if (typeof internal_key !== "undefined") {
+      if (typeof script.passprop.internal_key === "undefined") {
+        script.passprop = _pass;
+      } else if (internal_key === script.passprop.internal_key) {
+        script.passprop = _pass;
+      }
+
+      _pass = script.passprop;
+    }
+
     meta.editor_props = _pass;
 
     if (

@@ -278,7 +278,7 @@ export const _ = {
       const src_path = dir.path(`/app/srv/core/${pathname}`);
 
       if (!g.main_cache) g.main_cache = {};
-      if (!g.main_cache[src_path]) {
+      if (!g.main_cache[src_path] && g.mode === "prod") {
         if (!g.br) {
           g.br = await brotliPromise;
         }
@@ -294,6 +294,7 @@ export const _ = {
       }
 
       if (
+        g.mode === "prod" &&
         req.headers.get("accept-encoding")?.includes("br") &&
         g.main_cache[src_path]
       ) {

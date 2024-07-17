@@ -140,6 +140,7 @@ export const viEvalProps = (
 
           const js = prop.valueBuilt || "";
           const src = replaceWithObject(js, replacement) || "";
+
           const fn = new Function(
             ...Object.keys(arg),
             `// [${meta.item.name}] ${name}: ${meta.item.id} 
@@ -151,9 +152,16 @@ export const viEvalProps = (
           let val = fn(...Object.values(arg));
 
           if (typeof val === "function") {
-            script.props[name].fn = val;
             val = (...args: any[]) => {
-              return meta.item.script?.props?.[name].fn(...args);
+              const definer = new Function(
+                ...Object.keys(arg),
+                `// [${meta.item.name}] ${name}: ${meta.item.id} 
+  return ${src}
+    `
+              );
+
+              const fn = definer(...Object.values(arg));
+              return fn(...args);
             };
           }
 
