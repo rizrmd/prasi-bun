@@ -131,6 +131,14 @@ export const active = {
   },
 };
 
+export type CompListItem = {
+  comp: EComp;
+  doc: DComp;
+  tree: NodeModel<IMeta>[];
+  meta: Record<string, IMeta>;
+  on_update: (bin: Uint8Array, origin: any) => Promise<void>;
+};
+
 export const EDGlobal = {
   mode: "" as "desktop" | "mobile",
   user: { id: "", username: "", client_id: "" },
@@ -195,16 +203,7 @@ export const EDGlobal = {
     doc: null as null | DComp,
     item: null as null | IItem,
     loaded: {} as GenMetaP["comps"],
-    list: {} as Record<
-      string,
-      {
-        comp: EComp;
-        doc: DComp;
-        tree: NodeModel<IMeta>[];
-        meta: Record<string, IMeta>;
-        on_update: (bin: Uint8Array, origin: any) => Promise<void>;
-      }
-    >,
+    list: {} as Record<string, CompListItem>,
     group: {} as Record<string, Awaited<ReturnType<SAction["comp"]["group"]>>>,
   },
   code: {} as Record<string, { doc: null | DCode }>,

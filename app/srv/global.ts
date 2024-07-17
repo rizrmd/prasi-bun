@@ -3,13 +3,6 @@ import { site, user } from "dbgen";
 import { ExecaChildProcess } from "execa";
 import { g } from "utils/global";
 
-declare global {
-  //@ts-ignore
-  const Y: typeof Y;
-  //@ts-ignore
-  const syncronize: typeof Y.syncronize;
-}
-
 export const glb = global as unknown as {
   lastUpdate: Record<string, number>;
   prasiSrv: {

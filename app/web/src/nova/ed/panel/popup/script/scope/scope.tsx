@@ -77,7 +77,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         if (prop.meta?.type === "content-element") {
           vars[name] = { mode: "prop", val: "ReactElement" };
         } else {
-          vars[name] = { mode: "prop", val: prop.value };
+          vars[name] = { mode: "prop", val: typeof prop.value };
         }
       }
     }

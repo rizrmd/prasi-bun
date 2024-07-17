@@ -6,7 +6,7 @@ export const docs = {
     {
       id: string;
       doc: DPage;
-      um: Y.UndoManager;
+      um: YJS.UndoManager;
     }
   >,
   page: {} as Record<
@@ -14,7 +14,7 @@ export const docs = {
     {
       id: string;
       doc: DPage;
-      um: Y.UndoManager;
+      um: YJS.UndoManager;
     }
   >,
   comp: {} as Record<
@@ -22,7 +22,7 @@ export const docs = {
     {
       id: string;
       doc: DComp;
-      um: Y.UndoManager;
+      um: YJS.UndoManager;
     }
   >,
   code: {} as Record<string, { id: string; build: Record<string, DCode> }>,

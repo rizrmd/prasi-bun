@@ -11,7 +11,7 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
   let snap = snapshot.get("comp", comp_id);
   let ydoc = docs.comp[comp_id];
 
-  const createUndoManager = async (root: Y.Map<any>) => {
+  const createUndoManager = async (root: YJS.Map<any>) => {
     const um = new Y.UndoManager(root, {
       ignoreRemoteMapChanges: true,
     });
@@ -19,7 +19,7 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
     return um;
   };
 
-  const attachOnUpdate = async (doc: Y.Doc, um: Y.UndoManager) => {
+  const attachOnUpdate = async (doc: YJS.Doc, um: YJS.UndoManager) => {
     snapshot.set("comp", comp_id, "id_doc", um.doc.clientID);
 
     doc.on("update", async (update: Uint8Array, origin: any) => {

@@ -164,26 +164,32 @@ export const viEvalScript = (
   const js = meta.item.adv?.jsBuilt || "";
   const src = replaceWithObject(js, replacement) || "";
 
-  try {
-    const fn = new Function(
-      ...Object.keys(arg),
-      "___js",
-      `// ${meta.item.name}: ${meta.item.id} 
+  const final_src = `\
+// ${meta.item.name}: ${meta.item.id} 
 try {
-${src}
-} catch(e) {
-  console.error("Error at item ${meta.item.name} (id: ${meta.item.id}):\\n", ___js);
-  console.error(e);
+  ${src}
+} catch (e) {
+  console.error(\`\\
+Error in item ${meta.item.name}: ${meta.item.id} 
+
+$\{__js}
+
+ERROR: $\{e.message}
+\`)
 }
-  `
-    );
+  `;
+  try {
+    const fn = new Function(...Object.keys(arg), '__js', final_src);
     fn(...Object.values(arg), meta.item.adv?.js);
-  } catch (e) {
-    console.error(
-      `Error at item ${meta.item.name} (id: ${meta.item.id}):\n`,
-      meta.item.adv?.js
-    );
-    console.error(e);
+  } catch (e: any) {
+    console.error(`\n
+// Syntax Error in ${meta.item.name}: ${meta.item.id} 
+// arg: ${Object.keys(arg).join(", ")}
+
+${final_src}
+
+${e.message}
+`);
   }
 
   updatePropScope(vi, meta, passprop, parent_key);
