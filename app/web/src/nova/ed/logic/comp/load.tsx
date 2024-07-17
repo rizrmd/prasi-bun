@@ -6,7 +6,7 @@ import { DComp } from "../../../../utils/types/root";
 import { initLoadComp } from "../../../vi/meta/comp/init-comp-load";
 import { genMeta } from "../../../vi/meta/meta";
 import { isTextEditing } from "../active/is-editing";
-import { IMeta, PG } from "../ed-global";
+import { CompListItem, IMeta, PG } from "../ed-global";
 import { assignMitem } from "../tree/assign-mitem";
 import { treeRebuild } from "../tree/build";
 import { pushTreeNode } from "../tree/build/push-tree";
@@ -56,16 +56,17 @@ export const loadCompSnapshot = async (
   const mitem = doc.getMap("map").get("root");
   if (mitem) {
     p.comp.loaded[comp_id] = mitem.toJSON() as IItem;
-    if (typeof p.comp.list[comp_id]?.on_update === "function") {
-      doc.off("update", p.comp.list[comp_id].on_update);
+    const ref = p.comp.list[comp_id] as CompListItem | undefined;
+    if (typeof ref?.on_update === "function") {
+      doc.off("update", ref.on_update);
     }
 
     const updated = await updateComponentMeta(p, doc, comp_id);
     if (updated) {
       const { meta, tree } = updated;
-      if (p.comp.list[comp_id]) {
-        p.comp.list[comp_id].meta = meta;
-        p.comp.list[comp_id].tree = tree;
+      if (ref) {
+        ref.meta = meta;
+        ref.tree = tree;
       } else {
         p.comp.list[comp_id] = {
           comp: { id: comp_id, snapshot },

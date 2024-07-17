@@ -24,7 +24,7 @@ export const page_load: SAction["page"]["load"] = async function (
 
   conf.page_id = id;
 
-  const createUndoManager = async (root: Y.Map<any>) => {
+  const createUndoManager = async (root: YJS.Map<any>) => {
     const um = new Y.UndoManager(root, {
       ignoreRemoteMapChanges: true,
     });
@@ -32,7 +32,7 @@ export const page_load: SAction["page"]["load"] = async function (
     return um;
   };
 
-  const attachOnUpdate = async (doc: Y.Doc, um: Y.UndoManager) => {
+  const attachOnUpdate = async (doc: YJS.Doc, um: YJS.UndoManager) => {
     snapshot.set("page", id, "id_doc", um.doc.clientID);
 
     doc.on("update", async (update: Uint8Array, origin: any) => {

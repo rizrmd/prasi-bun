@@ -199,6 +199,8 @@ export const EdPropPopoverForm: FC<{
               .toLowerCase()
               .replace(/\W/gi, "_");
 
+            if (local.name?.length > 0 && !local.name[0].match(/[a-zA-Z_]/i)) return;
+
             if (!local.label) {
               local.label = local.name.replace(/\_/gi, " ");
             }
