@@ -15,7 +15,7 @@ export const createViPassProp = (
     arg: Record<string, any> & { children: ReactNode; internal_key: any }
   ) => {
     const [_, render] = useState({});
-    const internal_key = arg.internal_key;
+    const internal_key = arg.idx || arg.internal_key;
 
     if (!meta.item.script) {
       meta.item.script = {};
