@@ -12,6 +12,7 @@ import { user } from "../../../entity/user";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
+import { $ } from "bun";
 const pending = {} as any;
 
 export const initFrontEnd = async (
@@ -51,11 +52,13 @@ export const initFrontEnd = async (
 
   try {
     await isInstalling(id_site);
+    const out_dir_temp = dir.data(`code/${id_site}/site/build-temp`);
+    const out_dir_switch = dir.data(`code/${id_site}/site/build-switch`);
     const out_dir = dir.data(`code/${id_site}/site/build`);
     const build_ctx = await context({
       absWorkingDir: dir.data(root),
       entryPoints: ["index.tsx"],
-      outdir: out_dir,
+      outdir: out_dir_temp,
       format: "esm",
       bundle: true,
       minify: true,
@@ -107,6 +110,10 @@ export const initFrontEnd = async (
                         data: { ts: now, mode: "frontend" },
                       });
                   });
+
+                  await $`rm -rf ${out_dir_switch}`.quiet();
+                  await $`mv ${out_dir} ${out_dir_switch}`.quiet();
+                  await $`mv ${out_dir_temp} ${out_dir}`.quiet();
                 }
               });
             } catch (e) {
