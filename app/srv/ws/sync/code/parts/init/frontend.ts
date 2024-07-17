@@ -4,6 +4,7 @@ import { dir } from "dir";
 import { context, formatMessages } from "esbuild";
 import { cleanPlugin } from "esbuild-clean-plugin";
 import { watch } from "fs";
+import { existsAsync } from "fs-jetpack";
 import { appendFile } from "node:fs/promises";
 import { server } from "../../../editor/code/server-main";
 import { conns } from "../../../entity/conn";
@@ -11,8 +12,6 @@ import { user } from "../../../entity/user";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
-import { existsAsync } from "fs-jetpack";
-import { prasiDefineLocalRoute } from "../../utlis/local-routers";
 const pending = {} as any;
 
 export const initFrontEnd = async (
@@ -117,7 +116,6 @@ export const initFrontEnd = async (
         },
       ],
     });
-    prasiDefineLocalRoute(id_site);
     code.internal.frontend[id_site] = {
       ctx: build_ctx,
       timeout: null,
@@ -130,9 +128,6 @@ export const initFrontEnd = async (
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
           const srv = code.internal.server[id_site];
-          if (filename?.startsWith("app/routes/")) {
-            prasiDefineLocalRoute(id_site);
-          }
           if (filename?.startsWith("node_modules")) return;
           if (
             filename?.endsWith(".tsx") ||
