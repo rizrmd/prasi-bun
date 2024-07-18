@@ -13,6 +13,7 @@ import { expandTreeHook } from "./node/item/indent-hook";
 import { canDrop, nodeOnDrop } from "./node/on-drop";
 import { nodeRender } from "./node/render";
 import { doTreeSearch } from "./search";
+import { ErrorBox } from "../../../vi/utils/error-box";
 
 export const EdTreeBody = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -68,7 +69,7 @@ export const EdTreeBody = () => {
     );
 
   return (
-    <>
+    <ErrorBox>
       <TypedTree
         tree={tree}
         rootId={"root"}
@@ -99,7 +100,7 @@ export const EdTreeBody = () => {
           <Placeholder node={node} params={params} />
         )}
       />
-    </>
+    </ErrorBox>
   );
 };
 
