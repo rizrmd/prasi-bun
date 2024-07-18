@@ -48,11 +48,6 @@ export const devItem = (
 ) => {
   const added = _added || {};
   const id = mitem.get("id") || "";
-  if (added[id]) {
-    console.error(added);
-    throw new Error("already added " + id);
-    return added[id];
-  }
 
   if (!w.prasiEditDevItem) {
     w.prasiEditDevItem = {};
@@ -349,9 +344,6 @@ export const devItem = (
                 ? added[parent_id]
                 : devItem(metas, parent_meta, page_id, added);
 
-              if (added[parent_id]) {
-                throw new Error("wi");
-              }
               return {
                 item,
                 child_type: "child",
