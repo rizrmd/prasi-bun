@@ -336,19 +336,33 @@ export const devItem = (
       get parent() {
         if (mitem) {
           const parent = mitem.parent.toJSON();
+          let parent_id = null;
           if (Array.isArray(parent)) {
-            const parent_id = (mitem.parent?.parent as any).get("id");
-            const parent_meta = metas[parent_id]?.mitem;
-            if (parent_meta) {
-              const item = added[parent_id]
-                ? added[parent_id]
-                : devItem(metas, parent_meta, page_id, added);
+            parent_id = (mitem.parent?.parent as any).get("id");
+          } else {
+            const parent = mitem.parent?.parent?.parent?.parent as any;
+            if (
+              typeof parent === "object" &&
+              typeof parent.get === "function"
+            ) {
+              parent_id = parent.get("id");
+            }
+          }
 
+          const parent_meta = metas[parent_id]?.mitem;
+          if (parent_meta) {
+            const item = added[parent_id]
+              ? added[parent_id]
+              : devItem(metas, parent_meta, page_id, added);
+
+            if (Array.isArray(parent)) {
               return {
                 item,
                 child_type: "child",
                 child_idx: parent.findIndex((e) => e.id === item.id),
               };
+            } else {
+              return { item, child_type: "prop" };
             }
           }
         }
