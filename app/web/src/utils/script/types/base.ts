@@ -109,6 +109,7 @@ export const baseTypings = `
   };
 
   type PrasiItem = IItem & PrasiEdit;
+  type _item = IItem & PrasiEdit;
   
   const PassProp: (arg:Record<string, any> & { children: ReactNode }>) => ReactElement;
   const mobile: {
