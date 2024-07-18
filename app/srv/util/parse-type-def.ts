@@ -123,6 +123,16 @@ export const parseTypeDef = async (path: string) => {
                           val: s.orig.value,
                         });
                         exported = true;
+                      } else if (
+                        s.type === "ExportNamespaceSpecifier" &&
+                        s.name
+                      ) {
+                        exports[t.id.value].push({
+                          kind: "type",
+                          type: "named",
+                          val: s.name.value,
+                        });
+                        exported = true;
                       }
                     }
                   }
