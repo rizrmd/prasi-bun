@@ -105,7 +105,13 @@ export const EdBase = () => {
                 <Loading note={`page-${p.status}`} />
               ) : (
                 <>
-                  <EdMain />
+                  {location.search !== "?norender" ? (
+                    <EdMain />
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      Editor Render: Disabled
+                    </div>
+                  )}
                   <EdPane type="right" min_size={240} />
                   <EdRight />
                 </>
@@ -138,25 +144,24 @@ export const EdBase = () => {
         </div>
       )}
 
-      {w.offline && <div
-        className={cx(
-          css`
-                      position: fixed;
-                      bottom: 20px;
-                      left: 0px;
-                      right: 0px;
-                      z-index: 999;
-                    `,
-          "flex justify-center cursor-pointer"
-        )}
-      >
+      {w.offline && (
         <div
-          className="bg-red-500 text-white px-4 py-2 rounded-full text-sm"
+          className={cx(
+            css`
+              position: fixed;
+              bottom: 20px;
+              left: 0px;
+              right: 0px;
+              z-index: 999;
+            `,
+            "flex justify-center cursor-pointer"
+          )}
         >
-          Reconnecting, changes are not saved...
+          <div className="bg-red-500 text-white px-4 py-2 rounded-full text-sm">
+            Reconnecting, changes are not saved...
+          </div>
         </div>
-      </div>
-      }
+      )}
     </div>
   );
 };
