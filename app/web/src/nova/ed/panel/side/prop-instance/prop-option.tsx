@@ -85,8 +85,6 @@ export const EdPropInstanceOptions: FC<{
                 const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
                 evn(arg);
               } catch (e) {
-                console.error(e);
-                console.error(k, v.value);
               }
             }
           }

@@ -43,8 +43,17 @@ export type PrasiEdit = {
 export const devItem = (
   metas: Record<string, IMeta>,
   mitem: MItem,
-  page_id: string
+  page_id: string,
+  _added?: Record<string, any>
 ) => {
+  const added = _added || {};
+  const id = mitem.get("id") || "";
+  if (added[id]) {
+    console.error(added);
+    throw new Error("already added " + id);
+    return added[id];
+  }
+
   if (!w.prasiEditDevItem) {
     w.prasiEditDevItem = {};
   }
@@ -66,7 +75,7 @@ export const devItem = (
 
   const item = mitem.toJSON() as IItem;
 
-  return {
+  const result = {
     ...item,
     edit: {
       get props() {
@@ -81,10 +90,18 @@ export const devItem = (
                 ?.get("content");
 
               if (content) {
-                result[k] = {
-                  mode: "jsx",
-                  value: devItem(metas, content, page_id),
-                };
+                const id = content.get("id") || "";
+                if (added[id]) {
+                  result[k] = {
+                    mode: "jsx",
+                    value: added[id],
+                  };
+                } else {
+                  result[k] = {
+                    mode: "jsx",
+                    value: devItem(metas, content, page_id, added),
+                  };
+                }
               } else {
                 result[k] = {
                   mode: "jsx",
@@ -284,18 +301,20 @@ export const devItem = (
         changes.push({ type: "child", childs });
       },
       get childs() {
-        const item = mitem?.toJSON() as IItem;
-
         if (item.component?.id) {
           const child = item.component?.props.child;
-          if (child.content) {
+          if (child && child.content) {
             const m = mitem
               .get("component")
               ?.get("props")
               ?.get("child")
               ?.get("content");
             if (m) {
-              return [devItem(metas, m, page_id)];
+              const id = m.get("id") || "";
+              if (added[id]) {
+                return [added[id]];
+              }
+              return [devItem(metas, m, page_id, added)];
             }
           }
           return [];
@@ -306,7 +325,12 @@ export const devItem = (
             .map((e) => {
               if (e) {
                 const m = metas[e.id];
-                if (m && m.mitem) return devItem(metas, m.mitem, page_id);
+
+                if (added[e.id]) {
+                  return added[e.id];
+                }
+                if (m && m.mitem)
+                  return devItem(metas, m.mitem, page_id, added);
               }
             })
             .filter((e) => e);
@@ -319,10 +343,17 @@ export const devItem = (
           const parent = mitem.parent.toJSON();
           if (Array.isArray(parent)) {
             const parent_id = (mitem.parent?.parent as any).get("id");
-            const parent_meta = metas[parent_id].mitem;
+            const parent_meta = metas[parent_id]?.mitem;
             if (parent_meta) {
+              const item = added[parent_id]
+                ? added[parent_id]
+                : devItem(metas, parent_meta, page_id, added);
+
+              if (added[parent_id]) {
+                throw new Error("wi");
+              }
               return {
-                item: devItem(metas, parent_meta, page_id),
+                item,
                 child_type: "child",
                 child_idx: parent.findIndex((e) => e.id === item.id),
               };
@@ -333,6 +364,10 @@ export const devItem = (
       },
     },
   } as IItem & PrasiEdit;
+
+  added[id] = result;
+
+  return result;
 };
 
 const complexifyProps = (

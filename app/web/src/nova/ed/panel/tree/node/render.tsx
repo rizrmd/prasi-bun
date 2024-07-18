@@ -90,13 +90,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   }
 
   return (
-    <Tooltip
-      placement="right"
-      content={bytesToHumanFileSize(
-        JSON.stringify(hydrateItem(p, item)).length
-      )}
-      delay={0}
-    >
+    <Tooltip placement="right" content={`ID: ${node.data.item.id}`} delay={0}>
       <div
         tabIndex={0}
         className={cx(
