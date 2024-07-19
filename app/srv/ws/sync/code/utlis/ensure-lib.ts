@@ -1,8 +1,6 @@
 import { $ } from "bun";
 import { dir } from "dir";
-import { exists, dirAsync } from "fs-jetpack";
-import { removeAsync } from "fs-jetpack";
-import { g } from "utils/global";
+import { dirAsync, exists } from "fs-jetpack";
 
 export const ensureLib = async (src_dir: string, id_site: string) => {
   if (!exists(dir.data(src_dir))) {
@@ -13,7 +11,7 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
     const _ = $.cwd(dir.data(src_dir));
     await _`git clone https://github.com/avolut/prasi-lib lib`;
   }
-  if (true || !exists(dir.data(`${src_dir}/typings`))) {
+  if (!exists(dir.data(`${src_dir}/typings`))) {
     try {
       const site = await _db.site.findFirst({
         where: { id: id_site },
@@ -38,6 +36,10 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
           for (const [k, v] of Object.entries(prismaTypes)) {
             await Bun.write(dir.data(`${src_dir}/typings/${k}`), v as any);
           }
+          await Bun.write(
+            `${src_dir}/typings/api.d.ts`,
+            w.prasiApi["http://127.0.0.1/"]["apiTypes"]
+          );
         }
       }
     } catch (e) {

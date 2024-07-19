@@ -156,8 +156,8 @@ export const viEvalProps = (
               const definer = new Function(
                 ...Object.keys(arg),
                 `// [${meta.item.name}] ${name}: ${meta.item.id} 
-  return ${src}
-    `
+return ${src.trim()}
+`
               );
 
               const fn = definer(...Object.values(arg));
