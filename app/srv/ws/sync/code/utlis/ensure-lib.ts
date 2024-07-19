@@ -37,7 +37,7 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
             await Bun.write(dir.data(`${src_dir}/typings/${k}`), v as any);
           }
           await Bun.write(
-            `${src_dir}/typings/api.d.ts`,
+            dir.data(`${src_dir}/typings/api.d.ts`),
             w.prasiApi["http://127.0.0.1/"]["apiTypes"]
           );
         }
