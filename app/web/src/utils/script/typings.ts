@@ -128,9 +128,9 @@ ${await loadText(
     },
     {
       filePath: "react.d.ts",
-      content: `declare module "react" {
-${await loadText("https://cdn.jsdelivr.net/npm/@types/react@18.3.1/index.d.ts")}
-}`,
+      content: `
+${await loadText("https://cdn.jsdelivr.net/npm/@types/react@18.3.3/index.d.ts")}
+`,
     },
     {
       filePath: "jsx-runtime.d.ts",
@@ -184,7 +184,6 @@ export function jsxs(
   register(
     monaco,
     `\
-import * as React from "react";
 import { PrismaExtend } from "ts:prisma_ext"
 
 ${iftext(
