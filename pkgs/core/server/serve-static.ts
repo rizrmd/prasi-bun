@@ -99,8 +99,15 @@ export const serveStatic = {
       });
     }
 
-    if (g.mode === "dev" && url.pathname.endsWith(".js")) {
-      await this.walk();
+    if (url.pathname.endsWith(".js")) {
+      if (g.mode === "dev") {
+        await this.walk();
+      } else {
+        return new Response("", {
+          status: 404,
+          headers: { "content-type": "text/javascript" },
+        });
+      }
     }
 
     file = cache.static["/index.html"];
