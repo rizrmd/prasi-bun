@@ -1,4 +1,4 @@
-import { NodeRender } from "@minoru/react-dnd-treeview";
+import { NodeModel, NodeRender } from "@minoru/react-dnd-treeview";
 import { FC } from "react";
 import { useLocal } from "web-utils";
 import { TypedMap } from "yjs-types";
@@ -6,6 +6,7 @@ import { MItem } from "../../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../../utils/types/meta-fn";
 import { Popover } from "../../../../../utils/ui/popover";
 import { EdPropPopoverForm, propPopover } from "./prop-form";
+import { ChevronDown, ChevronRight } from "../../tree/node/item/indent";
 
 export type PropItem = {
   name: string;
@@ -18,7 +19,9 @@ export const EdPropCompTreeItem: FC<{
   node: Parameters<NodeRender<PropItem>>[0];
   params: Parameters<NodeRender<PropItem>>[1];
   render: () => void;
-}> = ({ node, params, render }) => {
+  hidden: boolean;
+  toggleExpand: (node: NodeModel<PropItem>) => void;
+}> = ({ node, params, render, hidden, toggleExpand }) => {
   const local = useLocal({ closing: false });
 
   if (node.id === "root") {
@@ -30,12 +33,43 @@ export const EdPropCompTreeItem: FC<{
   else if (node.data?.prop.meta?.type === "file") type = "FILE";
   else if (node.data?.prop.meta?.type === "content-element") type = "JSX";
 
-  const plabel = node.data?.prop.label;
+  let is_group = false;
+  let is_header = false;
+  if (node.text.split("__").length >= 2) {
+    is_group = true;
+    if (node.text.endsWith("__")) {
+      is_header = true;
+    }
+  }
+
+  if (hidden && !is_header) return null;
+
+  let plabel = node.data?.prop.label;
+  if (is_group) {
+    if (!plabel) {
+      plabel = node.text.split("__").slice(1).join(" ");
+    }
+
+    if (!plabel && is_header) {
+      plabel = node.text.split("__").shift();
+    }
+  }
   const label = (
     <div className="flex items-center justify-between flex-1">
-      <div className="flex-1">
-        {node.text}{" "}
-        {plabel && <span className="border px-1 ml-2 text-xs">{plabel}</span>}
+      {is_header && (
+        <div
+          className={"pr-1"}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            toggleExpand(node);
+          }}
+        >
+          {!hidden ? <ChevronDown /> : <ChevronRight />}
+        </div>
+      )}
+      <div className={cx("flex-1", is_group && !is_header && "pl-4")}>
+        <>{plabel || node.text}</>
       </div>
       {node.data?.prop.typings && (
         <div className="text-[7px] h-[14px] px-1 border border-slate-400 ml-1 text-slate-500 flex items-center">
@@ -47,6 +81,7 @@ export const EdPropCompTreeItem: FC<{
       </div>
     </div>
   );
+
   return (
     <div className="flex items-stretch border-b text-[14px] min-h-[27px]">
       <div

@@ -67,9 +67,8 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
     });
 
     filtered = filtered.sort((a, b) => {
-
-      if (a.data?.name.startsWith('new_prop')) return 1;
-      if (b.data?.name.startsWith('new_prop')) return -1;
+      if (a.data?.name.startsWith("new_prop")) return 1;
+      if (b.data?.name.startsWith("new_prop")) return -1;
       if (
         a.data &&
         b.data &&
@@ -81,6 +80,34 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
       return 0;
     });
   }
+
+  const grouped: Record<string, NodeModel<PropItem>[]> = {};
+  for (const item of filtered) {
+    let [group, ...names] = item.text.split("__");
+    let name = names.join("_");
+
+    if (!name && !item.text.endsWith("__")) {
+      name = group;
+      group = "_";
+    }
+
+    if (!grouped[group]) {
+      grouped[group] = [];
+    }
+
+    grouped[group].push(item);
+  }
+  const final_tree: NodeModel<PropItem>[] = [];
+  for (const items of Object.values(grouped)) {
+    const idx = items.findIndex((e) => e.text.endsWith("__"));
+    const plucked = items.splice(idx, 1);
+    items.unshift(plucked[0]);
+    for (const item of items) {
+      final_tree.push(item);
+    }
+  }
+
+  let hide = localStorage.getItem("prasi-prop-hide")?.split(",") || [];
 
   return (
     <div className="flex flex-col text-[12px] flex-1">
@@ -158,7 +185,7 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
             })}
           >
             <TypedTree
-              tree={filtered}
+              tree={final_tree}
               sort={false}
               onDrop={(tree, { dragSourceId, relativeIndex }) => {
                 const doc = meta.mitem?.doc;
@@ -178,6 +205,21 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
                   node={node}
                   render={render}
                   params={params}
+                  hidden={
+                    node.text.includes("__") &&
+                    hide.includes(node.text.split("__")[0])
+                  }
+                  toggleExpand={(node) => {
+                    const group = node.text.split("__")[0];
+                    if (hide.includes(group)) {
+                      hide = hide.filter((e) => e !== group);
+                    } else {
+                      hide.push(group);
+                    }
+
+                    localStorage.setItem("prasi-prop-hide", hide?.join(","));
+                    local.render();
+                  }}
                 />
               )}
               rootId={"root"}
