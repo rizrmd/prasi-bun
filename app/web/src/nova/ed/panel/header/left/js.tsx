@@ -34,6 +34,8 @@ export const EdSiteJS = () => {
           p.ui.popup.code.open = true;
           p.render();
         } else {
+          local.ctrl = false;
+          local.render();
           const vscode_url = isLocalhost()
             ? "http://localhost:8443?"
             : "https://prasi-vsc.avolut.com/?tkn=prasi&";
