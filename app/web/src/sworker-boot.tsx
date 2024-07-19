@@ -2,11 +2,6 @@ import { Root as ReactRoot } from "react-dom/client";
 import { Root } from "./base/root";
 import { w } from "./utils/types/general";
 import { isLocalhost } from "./utils/ui/is-localhost";
-import { version } from "../timestamp";
-
-const state = {
-  updating: false,
-};
 
 export const sworkerRegister = async (react: { root: null | ReactRoot }) => {
   if (navigator.serviceWorker) {

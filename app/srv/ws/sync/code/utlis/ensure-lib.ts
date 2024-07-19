@@ -23,7 +23,7 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
         const config = site.config as any;
         if (config.api_url) {
           new URL(config.api_url);
-          const url = `${config.api_url}/_prasi/load.js?dev=1`;
+          const url = `${config.api_url}/_prasi/load.js?dev=1&v3&remote=1`;
 
           const res = await fetch(url);
           const apires = await res.text();
@@ -32,7 +32,7 @@ export const ensureLib = async (src_dir: string, id_site: string) => {
           const w = {} as any;
           fn(w, { href: "http://127.0.0.1" });
 
-          const { prismaTypes } = w.prasiApi["http://127.0.0.1/"];
+          const { prismaTypes, apiTypes } = w.prasiApi["http://127.0.0.1/"];
           for (const [k, v] of Object.entries(prismaTypes)) {
             await Bun.write(dir.data(`${src_dir}/typings/${k}`), v as any);
           }
