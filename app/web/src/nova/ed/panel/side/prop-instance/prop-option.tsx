@@ -12,6 +12,7 @@ import { propInstanceOnChange } from "./on-change";
 
 type MetaOption = {
   label: string;
+  alt?: string;
   value: any;
   checked?: boolean;
   options?: MetaOption[];
@@ -84,8 +85,7 @@ export const EdPropInstanceOptions: FC<{
               try {
                 const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
                 evn(arg);
-              } catch (e) {
-              }
+              } catch (e) {}
             }
           }
         }
@@ -394,7 +394,7 @@ export const EdPropInstanceOptions: FC<{
                   ref={(el) => {
                     if (!local.checkbox.width && el) {
                       const bound = el.getBoundingClientRect();
-                      local.checkbox.width = bound.width;
+                      local.checkbox.width = bound.width + 100;
                       setTimeout(local.render, 500);
                     }
                   }}
@@ -529,7 +529,16 @@ const SingleCheckbox = ({
         }}
       >
         {!is_check ? unchecked : checked}
-        <div>{item.label}</div>
+        <div className="flex-1">{item.label}</div>
+        <div
+          className={cx(css`
+            padding-left: 10px;
+            padding-right: 20px;
+            color: #aaa;
+          `)}
+        >
+          {item.alt}
+        </div>
       </div>
 
       {item.options &&
