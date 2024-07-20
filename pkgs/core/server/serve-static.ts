@@ -103,10 +103,20 @@ export const serveStatic = {
       if (g.mode === "dev") {
         await this.walk();
       } else {
-        return new Response("", {
-          status: 404,
-          headers: { "content-type": "text/javascript" },
-        });
+        return new Response(
+          `
+navigator.serviceWorker.getRegistration().then(function(reg) {
+  if (reg) {
+    reg.unregister().then(function() { window.location.reload(true); });
+  } else {
+     window.location.reload(true);
+  }
+});
+`,
+          {
+            headers: { "content-type": "text/javascript" },
+          }
+        );
       }
     }
 
