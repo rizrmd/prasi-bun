@@ -33,7 +33,14 @@ export const baseTypings = `
         visit: (item: IContent) => void | Promise<void>
       ) => void
     ) => void;}) => ReactNode;
-  const navigate: (url: string) => void;
+  const navigate: (url: string,
+    params?: {
+      where?: any;
+      create?: any;
+      update?: any;
+      breads?: { label: string; url?: string }[];
+    }
+  ) => void;
   const params: any;
   const cx: (...classNames: any[]) => string;
   const css: (
