@@ -104,6 +104,7 @@ export const activateMeta = (p: PG, meta: IMeta) => {
             } else break;
           }
         } else {
+          const meta_parent = p.page.meta[parent.id];
           if (active.item_id !== meta.parent.instance_id && !meta.jsx_prop) {
             active.item_id = meta.parent.instance_id;
           } else if (parent.comp_id && meta.item.originalId) {
@@ -111,6 +112,8 @@ export const activateMeta = (p: PG, meta: IMeta) => {
             active.instance.item_id = active.item_id;
             active.comp_id = parent.comp_id;
             active.item_id = meta.item.originalId;
+          } else if (meta.jsx_prop?.is_root && meta_parent.item.component?.id) {
+            active.item_id = meta_parent.item.id;
           } else {
             active.item_id = meta.item.id;
           }
