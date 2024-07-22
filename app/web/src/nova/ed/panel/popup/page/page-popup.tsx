@@ -170,22 +170,24 @@ export const EdPopPage = () => {
                             select: { id: true },
                           });
                         } else {
-                          await _db.page_folder.update({
-                            where: {
-                              id: opt.dragSourceId as string,
-                            },
-                            data: {
-                              parent_id: (opt.dropTargetId === "root" ||
-                              !opt.dropTargetId
-                                ? null
-                                : opt.dropTargetId) as string,
-                            },
-                            select: {
-                              id: true,
-                            },
-                          });
+                          if (opt.dropTargetId !== opt.dragSourceId) {
+                            await _db.page_folder.update({
+                              where: {
+                                id: opt.dragSourceId as string,
+                              },
+                              data: {
+                                parent_id: (opt.dropTargetId === "root" ||
+                                !opt.dropTargetId
+                                  ? null
+                                  : opt.dropTargetId) as string,
+                              },
+                              select: {
+                                id: true,
+                              },
+                            });
+                            reloadPagePicker(p);
+                          }
                         }
-                        reloadPagePicker(p);
                       }}
                       dragPreviewRender={() => <></>}
                       canDrag={() => true}
