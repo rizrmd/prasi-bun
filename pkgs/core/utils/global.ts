@@ -66,5 +66,6 @@ export const g = global as unknown as {
   route_cache: Record<string, { br?: any; gzip?: any }>;
   main_cache: Record<string, { content: any; type: string }>;
   br: BrotliWasmType;
-  preview_page_timeout: Record<string, Timer>
+  preview_page_timeout: Record<string, Timer>;
+  preview_comp_timeout: Record<string, Timer>;
 };
