@@ -1,6 +1,6 @@
-import { base } from "./base";
+import { get } from "idb-keyval";
 import { IRoot } from "../../../utils/types/root";
-import { get, set } from "idb-keyval";
+import { base } from "./base";
 
 export const loadPage = (page_id: string) => {
   return new Promise<{

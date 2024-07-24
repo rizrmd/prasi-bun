@@ -77,6 +77,13 @@ export const initDevLiveReload = () => {
             rebuildMeta(p.meta, root);
             base.page.cache[p.id] = p;
             w.prasiContext.render();
+          } else if (msg.event === "comp_changed") {
+            const id = msg.data.map.id;
+            base.comp.list[id] = msg.data.map.root;
+            const p = base.page.cache[base.page.id];
+            await scanComponent([base.comp.list[id]]);
+            rebuildMeta(p.meta, p.root);
+            w.prasiContext.render();
           } else if (msg.event === "code_changes") {
             const { mode, ts, status } = msg.data;
             if (mode === "frontend") {

@@ -67,7 +67,7 @@ export const page_load: SAction["page"]["load"] = async function (
             }
           }
         }
-      }, 500);
+      }, 300);
 
       for (const f of found) {
         const client_id = f.client_id;

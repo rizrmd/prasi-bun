@@ -8,7 +8,9 @@ export const previewLiveReload = (
     | { mode: "init"; data: { client_id: string; site_id: string } }
     | {
         mode: "listen";
-        data: { type: "page"; id: string; client_id: string };
+        data:
+          | { type: "page"; id: string; client_id: string }
+          | { type: "comp"; ids: string[]; client_id: string };
       }
 ) => {
   if (msg.mode === "init") {
@@ -22,6 +24,13 @@ export const previewLiveReload = (
         client_id: msg.data.client_id,
         page_id: msg.data.id,
       });
+    } else if (msg.data.type === "comp") {
+      for (const id of msg.data.ids) {
+        user.active.add({
+          client_id: msg.data.client_id,
+          comp_id: id,
+        });
+      }
     }
   }
 };

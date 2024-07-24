@@ -1,3 +1,4 @@
+import { g } from "utils/global";
 import { IItem } from "../../../../web/src/utils/types/item";
 import { conns } from "../entity/conn";
 import { docs } from "../entity/docs";
@@ -28,23 +29,47 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
 
       const sv_local = await gzipAsync(update);
 
-      const client_ids = user.active
-        .findAll({ comp_id: comp_id })
-        .map((e) => e.client_id);
+      const found = user.active.findAll({ comp_id: comp_id });
 
-      client_ids.forEach((client_id) => {
-        if (origin !== um) {
-          if (client_id === origin) return;
+      if (!g.preview_comp_timeout) g.preview_comp_timeout = {};
+      clearTimeout(g.preview_comp_timeout[comp_id]);
+      g.preview_comp_timeout[comp_id] = setTimeout(() => {
+        let json = doc.toJSON();
+        for (const f of found) {
+          const client_id = f.client_id;
+          const ws = conns.get(client_id)?.ws;
+
+          if (client_id && ws) {
+            if (!f.user_id) {
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "comp_changed",
+                data: json,
+              });
+            }
+          }
         }
+      }, 300);
 
+      for (const f of found) {
+        const client_id = f.client_id;
         const ws = conns.get(client_id)?.ws;
-        if (ws)
-          sendWS(ws, {
-            type: SyncType.Event,
-            event: "remote_svlocal",
-            data: { type: "comp", sv_local, id: comp_id },
-          });
-      });
+        if (client_id && ws) {
+          if (!!f.user_id) {
+            if (ws) {
+              if (origin !== um) {
+                if (client_id === origin) return;
+              }
+
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "remote_svlocal",
+                data: { type: "comp", sv_local, id: comp_id },
+              });
+            }
+          }
+        }
+      }
     });
   };
 
