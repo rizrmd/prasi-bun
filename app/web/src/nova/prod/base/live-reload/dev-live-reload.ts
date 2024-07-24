@@ -76,6 +76,12 @@ export const initDevLiveReload = () => {
             await scanComponent(root.childs, true);
             rebuildMeta(p.meta, root);
             base.page.cache[p.id] = p;
+
+            console.log(
+              `${format(Date.now(), "HH:mm:ss")} 🚧 Page [${
+                msg.data.map.root.name
+              }] updated `
+            );
             w.prasiContext.render();
           } else if (msg.event === "comp_changed") {
             const id = msg.data.map.id;
@@ -83,6 +89,12 @@ export const initDevLiveReload = () => {
             const p = base.page.cache[base.page.id];
             await scanComponent([base.comp.list[id]]);
             rebuildMeta(p.meta, p.root);
+
+            console.log(
+              `${format(Date.now(), "HH:mm:ss")} 🚧 Component [${
+                msg.data.map.root.name
+              }] updated `
+            );
             w.prasiContext.render();
           } else if (msg.event === "code_changes") {
             const { mode, ts, status } = msg.data;
