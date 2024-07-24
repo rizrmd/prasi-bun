@@ -48,6 +48,7 @@ export const loadPages = (page_ids: string[]) => {
         break;
       }
     }
+    
     if (is_done) {
       done(result);
     }

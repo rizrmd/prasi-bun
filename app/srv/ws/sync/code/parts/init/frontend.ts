@@ -85,6 +85,9 @@ export const initFrontEnd = async (
           async setup(setup) {
             try {
               setup.onEnd(async (res) => {
+                const client_ids = user.active
+                  .findAll({ site_id: id_site })
+                  .map((e) => e.client_id);
                 if (res.errors.length > 0) {
                   await codeError(
                     id_site,
@@ -92,13 +95,6 @@ export const initFrontEnd = async (
                       "\n\n"
                     )
                   );
-                } else {
-                  await codeError(id_site, "");
-
-                  const client_ids = new Set<string>();
-                  user.active.findAll({ site_id: id_site }).forEach((e) => {
-                    client_ids.add(e.client_id);
-                  });
 
                   const now = Date.now();
                   client_ids.forEach((client_id) => {
@@ -107,13 +103,26 @@ export const initFrontEnd = async (
                       sendWS(ws, {
                         type: SyncType.Event,
                         event: "code_changes",
-                        data: { ts: now, mode: "frontend" },
+                        data: { ts: now, mode: "frontend", status: "error" },
                       });
                   });
+                } else {
+                  await codeError(id_site, "");
 
                   await $`rm -rf ${out_dir_switch}`.quiet();
                   await $`mv ${out_dir} ${out_dir_switch}`.quiet();
                   await $`mv ${out_dir_temp} ${out_dir}`.quiet();
+
+                  const now = Date.now();
+                  client_ids.forEach((client_id) => {
+                    const ws = conns.get(client_id)?.ws;
+                    if (ws)
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        event: "code_changes",
+                        data: { ts: now, mode: "frontend", status: "ok" },
+                      });
+                  });
                 }
               });
             } catch (e) {
@@ -123,6 +132,24 @@ export const initFrontEnd = async (
         },
       ],
     });
+    const broadcastLoading = async () => {
+      const client_ids = user.active
+        .findAll({ site_id: id_site })
+        .map((e) => e.client_id);
+
+      const now = Date.now();
+
+      client_ids.forEach((client_id) => {
+        const ws = conns.get(client_id)?.ws;
+        if (ws)
+          sendWS(ws, {
+            type: SyncType.Event,
+            event: "code_changes",
+            data: { ts: now, mode: "frontend", status: "building" },
+          });
+      });
+    };
+
     code.internal.frontend[id_site] = {
       ctx: build_ctx,
       timeout: null,
@@ -135,7 +162,7 @@ export const initFrontEnd = async (
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
           const srv = code.internal.server[id_site];
-          if (filename?.startsWith("node_modules")) return;
+          if (filename?.startsWith("node_modules") || filename?.startsWith("typings")) return;
           if (
             filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
@@ -144,10 +171,14 @@ export const initFrontEnd = async (
           ) {
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
-              try {
-                await fe.ctx.rebuild();
-              } catch (e) {}
-              fe.rebuilding = false;
+              clearTimeout(fe.timeout);
+              fe.timeout = setTimeout(async () => {
+                try {
+                  broadcastLoading();
+                  await fe.ctx.rebuild();
+                } catch (e) {}
+                fe.rebuilding = false;
+              }, 500);
             }
 
             if (typeof srv !== "undefined" && !srv.rebuilding && srv.ctx) {

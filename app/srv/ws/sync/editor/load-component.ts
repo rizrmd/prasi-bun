@@ -28,12 +28,9 @@ export const loadComponent = async (comp_id: string, sync?: SyncConnection) => {
 
       const sv_local = await gzipAsync(update);
 
-      user.active.findAll({ comp_id: comp_id });
-
-      const client_ids = new Set<string>();
-      user.active.findAll({ comp_id: comp_id }).forEach((e) => {
-        client_ids.add(e.client_id);
-      });
+      const client_ids = user.active
+        .findAll({ comp_id: comp_id })
+        .map((e) => e.client_id);
 
       client_ids.forEach((client_id) => {
         if (origin !== um) {

@@ -97,7 +97,11 @@ export const clientStartSync = async (arg: {
         }
       >
     ) => void;
-    code_changes: (arg: { ts: number; mode: "frontend" | "typings" }) => void;
+    code_changes: (arg: {
+      ts: number;
+      mode: "frontend" | "typings";
+      status: "error" | "ok" | "building";
+    }) => void;
     disconnected: () => { reconnect: boolean };
     opened: () => void;
     shakehand: (client_id: string) => void;
@@ -180,7 +184,7 @@ const connect = (
             conf.ws = ws;
             event.opened();
           };
-         
+
           ws.onmessage = async (e) => {
             const raw = e.data as Blob;
             const msg = packr.unpack(Buffer.from(await raw.arrayBuffer()));
