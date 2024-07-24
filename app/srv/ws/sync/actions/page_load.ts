@@ -10,6 +10,7 @@ import { gzipAsync } from "../entity/zlib";
 import { sendWS } from "../sync-handler";
 import { SyncConnection, SyncType } from "../type";
 import { validate } from "uuid";
+
 export const page_load: SAction["page"]["load"] = async function (
   this: SyncConnection,
   id: string
@@ -45,24 +46,48 @@ export const page_load: SAction["page"]["load"] = async function (
         delete g.route_cache[snap.id_site];
       }
 
-      const client_ids = new Set<string>();
-      user.active.findAll({ page_id: id }).forEach((e) => {
-        client_ids.add(e.client_id);
-      });
+      const found = user.active.findAll({ page_id: id });
 
-      client_ids.forEach((client_id) => {
-        if (origin !== um) {
-          if (client_id === origin) return;
+      if (!g.preview_page_timeout) g.preview_page_timeout = {};
+      clearTimeout(g.preview_page_timeout[id]);
+      g.preview_page_timeout[id] = setTimeout(() => {
+        let json = doc.toJSON();
+        for (const f of found) {
+          const client_id = f.client_id;
+          const ws = conns.get(client_id)?.ws;
+
+          if (client_id && ws) {
+            if (!f.user_id) {
+              console.log(client_id);
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "page_changed",
+                data: json,
+              });
+            }
+          }
         }
+      }, 1000);
 
+      for (const f of found) {
+        const client_id = f.client_id;
         const ws = conns.get(client_id)?.ws;
-        if (ws)
-          sendWS(ws, {
-            type: SyncType.Event,
-            event: "remote_svlocal",
-            data: { type: "page", sv_local, id },
-          });
-      });
+        if (client_id && ws) {
+          if (!!f.user_id) {
+            if (ws) {
+              if (origin !== um) {
+                if (client_id === origin) return;
+              }
+
+              sendWS(ws, {
+                type: SyncType.Event,
+                event: "remote_svlocal",
+                data: { type: "page", sv_local, id },
+              });
+            }
+          }
+        }
+      }
     });
   };
 

@@ -1,8 +1,8 @@
-import getTime from "date-fns/getTime";
-import { PG } from "./ed-global";
 import { format } from "date-fns";
+import { PG } from "./ed-global";
 
 export const loadFrontEnd = async (p: PG, ts?: number) => {
+  
   const id_site = p.site.id;
   const url = `/prod/${id_site}/_prasi/code/index.js?ts=${ts}`;
   const fn = new Function(
@@ -17,12 +17,12 @@ import("${url}")
       try {
         fn((exports: any) => {
           const w = window as any;
+
           for (const [k, v] of Object.entries(exports)) {
             w[k] = v;
             p.site_exports[k] = v;
           }
           resolve(exports);
-          console.log(`🚧 Code updated from vscode - ${format(Date.now(), "HH:mm:ss")}`);
         });
       } catch (e) {
         console.log("Failed to load site code", e);

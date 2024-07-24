@@ -12,6 +12,7 @@ import { EmptySite, PG } from "./ed-global";
 import { reloadPage } from "./ed-route";
 import { loadSite } from "./ed-site";
 import { treeRebuild } from "./tree/build";
+import { format } from "date-fns";
 
 const decoder = new TextDecoder();
 
@@ -151,6 +152,7 @@ export const edInitSync = (p: PG) => {
         },
         shakehand(client_id) {
           p.user.client_id = client_id;
+          console.log(`Prasi connected: ${client_id}`);
         },
         disconnected() {
           console.log("offline, reconnecting...");
@@ -185,9 +187,23 @@ export const edInitSync = (p: PG) => {
           }
           p.render();
         },
-        async code_changes({ ts, mode }) {
+        async code_changes({ ts, mode, status }) {
           if (mode === "frontend") {
-            await loadFrontEnd(p, ts);
+            if (status === "ok") {
+              console.clear();
+              console.log(
+                `${format(Date.now(), "HH:mm:ss")} 🚧 Code updated from vscode `
+              );
+
+              await loadFrontEnd(p, ts);
+            } else if (status === "building") {
+              console.log(
+                `${format(
+                  Date.now(),
+                  "HH:mm:ss"
+                )} ⏳ Code changed from vscode, rebuilding...`
+              );
+            }
           } else {
             await loadTypings(p);
             if (p.ui.monaco) {

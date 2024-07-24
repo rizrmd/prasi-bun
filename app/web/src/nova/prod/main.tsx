@@ -1,11 +1,13 @@
 import { createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { initBaseConfig } from "./base/base";
+import { initDevLiveReload } from "./base/live-reload/dev-live-reload";
 import { Root, isPreview } from "./root";
 import { w } from "./w";
 
 (async () => {
   import("./font");
+  initDevLiveReload();
   initBaseConfig();
   const div = document.getElementById("root");
   if (div) {
@@ -35,6 +37,5 @@ import { w } from "./w";
     if (document.body.classList.contains("opacity-0")) {
       document.body.classList.remove("opacity-0");
     }
-
   }
 })();

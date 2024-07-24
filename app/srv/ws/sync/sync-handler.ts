@@ -10,6 +10,7 @@ import { loadSitePage } from "./editor/load-sitepage";
 import { conns, wconns } from "./entity/conn";
 import { UserConf, user } from "./entity/user";
 import { SyncType } from "./type";
+import { previewLiveReload } from "./preview/live-reload";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
@@ -43,6 +44,9 @@ export const syncHandler: WebSocketHandler<WSData> = {
       const conn = conns.get(conn_id);
       if (conn) {
         const msg = packr.unpack(Buffer.from(raw));
+        if (msg.type === "preview") {
+          previewLiveReload(ws, msg);
+        }
         if (msg.type === SyncType.UserID) {
           const { user_id, page_id, site_id } = msg;
           conn.user_id = user_id;
