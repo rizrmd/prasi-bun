@@ -105,8 +105,12 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
               }
             }
           `,
-          is_active ? ["bg-blue-100"] : [isComponent && `bg-purple-50`],
-          is_hover && "bg-blue-50"
+          is_active
+            ? [(item as any).type === "section" ? "bg-blue-200" : "bg-blue-100"]
+            : [isComponent && `bg-purple-50`],
+          is_hover && [
+            (item as any).type === "section" ? "bg-blue-100" : "bg-blue-50",
+          ]
         )}
         onKeyDown={treeItemKeyMap(p, prm, item)}
         onContextMenu={(event) => {
@@ -198,12 +202,12 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
           p.render();
         }}
       >
-        {active.hover.id === item.id && (
+        {active.hover.id === item.id && (item as any).type !== "section" && (
           <div
             className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-300")}
           ></div>
         )}
-        {active.item_id === item.id && (
+        {active.item_id === item.id && (item as any).type !== "section" && (
           <div
             className={cx("absolute left-0 bottom-0 top-0 w-[4px] bg-blue-500")}
           ></div>

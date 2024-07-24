@@ -195,14 +195,24 @@ export const EdPropPopoverForm: FC<{
           value={local.name}
           autoFocus
           onChange={(e) => {
-            local.name = e.currentTarget.value
-              .toLowerCase()
-              .replace(/\W/gi, "_");
+            let is_$ = false;
+            local.name = e.currentTarget.value;
+            if (local.name.startsWith("$")) {
+              is_$ = true;
+              local.name = local.name.substring(1);
+            }
 
-            if (local.name?.length > 0 && !local.name[0].match(/[a-zA-Z_]/i)) return;
+            local.name = local.name.toLowerCase().replace(/\W/gi, "_");
+
+            if (local.name?.length > 0 && !local.name[0].match(/[a-zA-Z_]/i))
+              return;
 
             if (!local.label) {
               local.label = local.name.replace(/\_/gi, " ");
+            }
+
+            if (is_$) {
+              local.name = `\$${local.name}`;
             }
 
             local.render();

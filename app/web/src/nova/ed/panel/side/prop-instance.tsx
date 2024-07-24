@@ -91,8 +91,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 try {
                   const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
                   evn(arg);
-                } catch (e) {
-                }
+                } catch (e) {}
               }
             }
           } else if (meta.item.component) {
@@ -278,7 +277,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                     {group !== "_" && (
                       <div
                         className={cx(
-                          "border-b px-1 cursor-pointer py-1 hover:bg-blue-100 select-none flex items-center",
+                          "border-b px-1 cursor-pointer py-1 hover:bg-blue-100 select-none flex items-center justify-between",
                           !hide.includes(group) && "bg-slate-50"
                         )}
                         onClick={() => {
@@ -295,14 +294,40 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                           local.render();
                         }}
                       >
-                        <div className="">{header?.cprop?.label || group}</div>
-                        <div className="flex-1 pl-1">
-                          {!hide.includes(group) ? (
-                            <ChevronDown />
-                          ) : (
-                            <ChevronRight />
-                          )}
+                        <div className="flex items-center">
+                          <div>{header?.cprop?.label || group}</div>
+                          <div className="flex-1 pl-1">
+                            {!hide.includes(group) ? (
+                              <ChevronDown />
+                            ) : (
+                              <ChevronRight />
+                            )}
+                          </div>
                         </div>
+                        {group.startsWith("$") && (
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+
+                              if (group) {
+                                const props = mcprops?.toJSON() as Record<
+                                  string,
+                                  FNCompDef
+                                >;
+                                const array_prop = {} as any;
+                                for (const [k, v] of Object.entries(props)) {
+                                  if (k.startsWith(group)) {
+                                    array_prop[k] = v;
+                                  }
+                                }
+                              }
+                            }}
+                            className="border rounded-md bg-white px-2 hover:bg-blue-500 hover:text-white"
+                          >
+                            + Add
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className={cx(hide.includes(group) && "hidden")}>
