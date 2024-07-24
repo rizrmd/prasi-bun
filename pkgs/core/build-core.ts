@@ -25,7 +25,6 @@ const ctx = await context({
   define: {
     "process.env.NODE_ENV": `"production"`,
   },
-
   plugins: [
     polyfillNode({
       polyfills: {
