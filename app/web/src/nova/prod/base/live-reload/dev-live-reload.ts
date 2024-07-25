@@ -78,9 +78,7 @@ export const initDevLiveReload = () => {
             base.page.cache[p.id] = p;
 
             console.log(
-              `${format(Date.now(), "HH:mm:ss")} 🚧 Page [${
-                msg.data.map.root.name
-              }] updated `
+              `${format(Date.now(), "HH:mm:ss")} 🚧 Page [${page.id}] updated `
             );
             w.prasiContext.render();
           } else if (msg.event === "comp_changed") {
@@ -91,9 +89,7 @@ export const initDevLiveReload = () => {
             rebuildMeta(p.meta, p.root);
 
             console.log(
-              `${format(Date.now(), "HH:mm:ss")} 🚧 Component [${
-                msg.data.map.root.name
-              }] updated `
+              `${format(Date.now(), "HH:mm:ss")} 🚧 Component [${id}] updated `
             );
             w.prasiContext.render();
           } else if (msg.event === "code_changes") {
