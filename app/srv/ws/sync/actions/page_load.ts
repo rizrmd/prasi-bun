@@ -58,7 +58,6 @@ export const page_load: SAction["page"]["load"] = async function (
 
           if (client_id && ws) {
             if (!f.user_id) {
-              console.log(client_id);
               sendWS(ws, {
                 type: SyncType.Event,
                 event: "page_changed",
