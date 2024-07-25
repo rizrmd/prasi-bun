@@ -145,7 +145,7 @@ export const Root = () => {
   base.page.url = page.url;
   const cache = base.page.cache[page.id];
 
-  if (!cache) {
+  if (!cache || router.ctx.rootNode.children.size === 0) {
     loadPage(page.id)
       .then(async ({ root }) => {
         if (page) {
