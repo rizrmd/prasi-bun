@@ -129,7 +129,7 @@ export const Root = () => {
   }
 
   if (!page) {
-    console.error("Page Not Found:", page, base.pathname, page_found);
+    console.error("Page Not Found:", page, base.pathname, page_found, router);
     return <DeadEnd>Page Not Found</DeadEnd>;
   }
 
