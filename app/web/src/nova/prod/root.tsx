@@ -94,6 +94,7 @@ export const Root = () => {
     url: string;
   }> | null = null;
 
+  let page_found = null;
   // hydrate page_id from server.ts
   if (w._prasi.page_id) {
     router.insert(base.pathname, {
@@ -111,6 +112,7 @@ export const Root = () => {
     page = router.lookup(base.pathname);
     if (page_id_from_url) {
       const found = base.route.pages.find((e) => page_id_from_url === e.id);
+      page_found = found;
       if (found) {
         page = found;
       }
@@ -126,7 +128,10 @@ export const Root = () => {
     }
   }
 
-  if (!page) return <DeadEnd>Page Not Found</DeadEnd>;
+  if (!page) {
+    console.error("Page Not Found:", page, base.pathname, page_found);
+    return <DeadEnd>Page Not Found</DeadEnd>;
+  }
 
   if (page.id !== local.page_id) {
     base.init_local_effect = {};
