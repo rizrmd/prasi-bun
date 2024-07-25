@@ -176,7 +176,9 @@ export const initFrontEnd = async (
                 try {
                   broadcastLoading();
                   await fe.ctx.rebuild();
-                } catch (e) {}
+                } catch (e) {
+                  console.error('Fronted failed rebuild', e);
+                }
                 fe.rebuilding = false;
               }, 500);
             }
@@ -227,123 +229,3 @@ const isInstalling = async (id_site: string) => {
 
   return false;
 };
-
-// const readPackageJSON = async (id_site: string) => {
-//   const file = Bun.file(code.path(id_site, "site", "src", "package.json"));
-//   const deps = new Set<string>();
-
-//   if (await file.exists()) {
-//     const json = await file.json();
-
-//     if (json.dependencies) {
-//       for (const k of Object.keys(json.dependencies)) {
-//         deps.add(k);
-//       }
-//     }
-
-//     if (json.devDependencies) {
-//       for (const k of Object.keys(json.devDependencies)) {
-//         deps.add(k);
-//       }
-//     }
-//   }
-//   return deps;
-// };
-
-// const installDeps = async (
-//   root: string,
-//   res: BuildResult<BuildOptions>,
-//   id_site: string
-// ) => {
-//   const pkgjson = await readPackageJSON(id_site);
-//   const imports = new Set<string>();
-
-//   if (res.errors.length > 0) {
-//     for (const err of res.errors) {
-//       if (err.notes?.[0].text.startsWith("You can mark the path ")) {
-//         let im = err.notes?.[0].text.split('"')[1];
-
-//         if (
-//           !im.startsWith(".") &&
-//           !im.startsWith("@/") &&
-//           !im.startsWith("app") &&
-//           !im.startsWith("lib") &&
-//           !im.startsWith("server")
-//         ) {
-//           const parts = im.split("/");
-//           if (im.startsWith("@")) {
-//             im = `${parts[0]}/${parts[1]}`;
-//           } else {
-//             im = parts[0];
-//           }
-//           imports.add(im);
-//         }
-//       }
-//     }
-//   }
-
-//   if (res.metafile) {
-//     for (const [_, file] of Object.entries(res.metafile?.inputs || {})) {
-//       for (const im of file.imports) {
-//         if (im.kind === "import-statement" && im.external) {
-//           if (
-//             !im.path.startsWith(".") &&
-//             !im.path.startsWith("@/") &&
-//             !im.path.startsWith("app") &&
-//             !im.path.startsWith("lib") &&
-//             !im.path.startsWith("server")
-//           ) {
-//             const parts = im.path.split("/");
-//             let src = im.path;
-//             if (src.startsWith("@")) {
-//               src = `${parts[0]}/${parts[1]}`;
-//             } else {
-//               src = parts[0];
-//             }
-
-//             imports.add(src);
-//           }
-//         }
-//       }
-//     }
-//   }
-
-//   if (!isEqual(imports, pkgjson)) {
-//     const pkgjson = Bun.file(code.path(id_site, "site", "src", "package.json"));
-//     if (!(await pkgjson.exists())) {
-//       await Bun.write(
-//         pkgjson,
-//         JSON.stringify({
-//           name: id_site,
-//           scripts: {
-//             startup:
-//               "ulimit -c 0; tailwindcss --watch -i ./app/css/global.css -o ./app/css/build.css --minify",
-//           },
-//         })
-//       );
-//     }
-
-//     await codeError(
-//       id_site,
-//       "Installing dependencies:\n " + [...imports].join("\n ")
-//     );
-//     let proc = Bun.spawn([`npm`, `install`, ...imports], {
-//       stdio: ["inherit", "pipe", "pipe"],
-//       cwd: dir.data(root),
-//     });
-
-//     async function print(generator: ReadableStream<Uint8Array>, prefix: any) {
-//       for await (let value of generator) {
-//         const str = decoder.decode(value);
-//         await codeError(id_site, `${prefix} ${str}`, true);
-//       }
-//     }
-
-//     print(proc.stdout, "stdout:");
-//     print(proc.stderr, "stderr:");
-
-//     await proc.exited;
-//     // await codeError(id_site, "");
-//     return true;
-//   }
-// };
