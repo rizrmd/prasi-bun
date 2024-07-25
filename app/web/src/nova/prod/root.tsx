@@ -129,7 +129,14 @@ export const Root = () => {
   }
 
   if (!page) {
-    console.error("Page Not Found:", page, base.pathname, page_found, router);
+    console.error(
+      "Page Not Found:",
+      page,
+      base.pathname,
+      page_found,
+      router,
+      base.route.status
+    );
     return <DeadEnd>Page Not Found</DeadEnd>;
   }
 
@@ -145,7 +152,7 @@ export const Root = () => {
   base.page.url = page.url;
   const cache = base.page.cache[page.id];
 
-  if (!cache || router.ctx.rootNode.children.size === 0) {
+  if (!cache) {
     loadPage(page.id)
       .then(async ({ root }) => {
         if (page) {
