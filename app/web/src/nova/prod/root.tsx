@@ -41,8 +41,11 @@ export const Root = () => {
   // #region init
   const isPreviewProd = isPreview() && location.pathname.startsWith("/prod");
 
-  if (base.route.status !== "ready") {
-    if (base.route.status === "init") {
+  if (
+    base.route.status !== "ready" ||
+    base.route.router?.ctx.rootNode.children.size === 0
+  ) {
+    if (base.route.status !== "loading") {
       base.route.status = "loading";
       initBaseRoute().then(async ({ router, pages }) => {
         detectResponsiveMode();
@@ -129,14 +132,7 @@ export const Root = () => {
   }
 
   if (!page) {
-    console.error(
-      "Page Not Found:",
-      page,
-      base.pathname,
-      page_found,
-      router,
-      base.route.status
-    );
+    console.error("Page Not Found:", page, base);
     return <DeadEnd>Page Not Found</DeadEnd>;
   }
 
