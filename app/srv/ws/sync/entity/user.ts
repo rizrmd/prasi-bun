@@ -79,7 +79,10 @@ export const user = {
         if (cid && !this.comps[cid]) {
           this.comps[cid] = new Set();
         }
-        this.comps[cid].add(found.comp_id);
+
+        if (cid) {
+          this.comps[cid].add(found.comp_id);
+        }
       }
     },
   },
