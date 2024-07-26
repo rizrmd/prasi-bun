@@ -52,86 +52,7 @@ export const initFrontEnd = async (
 
   try {
     await isInstalling(id_site);
-    const out_dir_temp = dir.data(`code/${id_site}/site/build-temp`);
-    const out_dir_switch = dir.data(`code/${id_site}/site/build-switch`);
-    const out_dir = dir.data(`code/${id_site}/site/build`);
-    const build_ctx = await context({
-      absWorkingDir: dir.data(root),
-      entryPoints: ["index.tsx"],
-      outdir: out_dir_temp,
-      format: "esm",
-      bundle: true,
-      minify: true,
-      treeShaking: true,
-      splitting: true,
-      logLevel: "silent",
-      sourcemap: true,
-      metafile: true,
-      plugins: [
-        cleanPlugin(),
-        style(),
-        globalExternals({
-          react: {
-            varName: "window.React",
-            type: "cjs",
-          },
-          "react-dom": {
-            varName: "window.ReactDOM",
-            type: "cjs",
-          },
-        }),
-        {
-          name: "prasi",
-          async setup(setup) {
-            try {
-              setup.onEnd(async (res) => {
-                const client_ids = user.active
-                  .findAll({ site_id: id_site })
-                  .map((e) => e.client_id);
-                if (res.errors.length > 0) {
-                  await codeError(
-                    id_site,
-                    (await formatMessages(res.errors, { kind: "error" })).join(
-                      "\n\n"
-                    )
-                  );
 
-                  const now = Date.now();
-                  client_ids.forEach((client_id) => {
-                    const ws = conns.get(client_id)?.ws;
-                    if (ws)
-                      sendWS(ws, {
-                        type: SyncType.Event,
-                        event: "code_changes",
-                        data: { ts: now, mode: "frontend", status: "error" },
-                      });
-                  });
-                } else {
-                  await codeError(id_site, "");
-
-                  await $`rm -rf ${out_dir_switch}`.quiet();
-                  await $`mv ${out_dir} ${out_dir_switch}`.quiet();
-                  await $`mv ${out_dir_temp} ${out_dir}`.quiet();
-
-                  const now = Date.now();
-                  client_ids.forEach((client_id) => {
-                    const ws = conns.get(client_id)?.ws;
-                    if (ws)
-                      sendWS(ws, {
-                        type: SyncType.Event,
-                        event: "code_changes",
-                        data: { ts: now, mode: "frontend", status: "ok" },
-                      });
-                  });
-                }
-              });
-            } catch (e) {
-              console.log("ERROR");
-            }
-          },
-        },
-      ],
-    });
     const broadcastLoading = async () => {
       const client_ids = user.active
         .findAll({ site_id: id_site })
@@ -151,7 +72,7 @@ export const initFrontEnd = async (
     };
 
     code.internal.frontend[id_site] = {
-      ctx: build_ctx,
+      ctx: await initBuildCtx({ id_site, root }),
       timeout: null,
       rebuilding: false,
       watch: watch(
@@ -173,15 +94,20 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(`Changed ${id_site} ${filename}`, fe);
-
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
+                const build_timeout = setTimeout(async () => {
+                  console.log(`Build unfinished ${id_site} ${filename}`);
+                  await fe.ctx.dispose();
+                  fe.ctx = await initBuildCtx({ id_site, root });
+                }, 3000);
+                
                 try {
                   broadcastLoading();
                   await fe.ctx.rebuild();
+                  clearTimeout(build_timeout);
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
                   console.error(e.messsage);
@@ -235,4 +161,93 @@ const isInstalling = async (id_site: string) => {
   } catch (e) {}
 
   return false;
+};
+
+const initBuildCtx = async ({
+  id_site,
+  root,
+}: {
+  id_site: string;
+  root: string;
+}) => {
+  const out_dir_temp = dir.data(`code/${id_site}/site/build-temp`);
+  const out_dir_switch = dir.data(`code/${id_site}/site/build-switch`);
+  const out_dir = dir.data(`code/${id_site}/site/build`);
+  return await context({
+    absWorkingDir: dir.data(root),
+    entryPoints: ["index.tsx"],
+    outdir: out_dir_temp,
+    format: "esm",
+    bundle: true,
+    minify: true,
+    treeShaking: true,
+    splitting: true,
+    logLevel: "silent",
+    sourcemap: true,
+    metafile: true,
+    plugins: [
+      cleanPlugin(),
+      style(),
+      globalExternals({
+        react: {
+          varName: "window.React",
+          type: "cjs",
+        },
+        "react-dom": {
+          varName: "window.ReactDOM",
+          type: "cjs",
+        },
+      }),
+      {
+        name: "prasi",
+        async setup(setup) {
+          try {
+            setup.onEnd(async (res) => {
+              const client_ids = user.active
+                .findAll({ site_id: id_site })
+                .map((e) => e.client_id);
+              if (res.errors.length > 0) {
+                await codeError(
+                  id_site,
+                  (await formatMessages(res.errors, { kind: "error" })).join(
+                    "\n\n"
+                  )
+                );
+
+                const now = Date.now();
+                client_ids.forEach((client_id) => {
+                  const ws = conns.get(client_id)?.ws;
+                  if (ws)
+                    sendWS(ws, {
+                      type: SyncType.Event,
+                      event: "code_changes",
+                      data: { ts: now, mode: "frontend", status: "error" },
+                    });
+                });
+              } else {
+                await codeError(id_site, "");
+
+                await $`rm -rf ${out_dir_switch}`.quiet();
+                await $`mv ${out_dir} ${out_dir_switch}`.quiet();
+                await $`mv ${out_dir_temp} ${out_dir}`.quiet();
+
+                const now = Date.now();
+                client_ids.forEach((client_id) => {
+                  const ws = conns.get(client_id)?.ws;
+                  if (ws)
+                    sendWS(ws, {
+                      type: SyncType.Event,
+                      event: "code_changes",
+                      data: { ts: now, mode: "frontend", status: "ok" },
+                    });
+                });
+              }
+            });
+          } catch (e) {
+            console.log("ERROR");
+          }
+        },
+      },
+    ],
+  });
 };
