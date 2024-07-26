@@ -63,6 +63,7 @@ export const initDevLiveReload = () => {
           });
         } else if (msg.type === SyncType.Event) {
           if (w.pointer_active) return;
+          console.clear()
           if (msg.event === "page_changed") {
             const id = msg.data.map.id;
             const page = base.page.cache[id];
