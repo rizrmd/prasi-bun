@@ -173,16 +173,17 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
+            console.log(`Changed ${id_site} ${filename}`);
+
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
                 try {
-                  console.log(`Changed ${id_site} ${filename}`);
                   broadcastLoading();
                   await fe.ctx.rebuild();
                 } catch (e: any) {
-                  console.error(`Frontend failed rebuild (site: id_site)`);
+                  console.error(`Frontend failed rebuild (site: ${id_site})`);
                   console.error(e.messsage);
                 }
                 fe.rebuilding = false;
