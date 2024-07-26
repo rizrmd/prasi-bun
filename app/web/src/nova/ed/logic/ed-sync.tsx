@@ -188,7 +188,7 @@ export const edInitSync = (p: PG) => {
           p.render();
         },
         async code_changes({ ts, mode, status }) {
-          if (mode === "frontend") {
+          if (mode === "frontend" && !w.pointer_active) {
             if (status === "ok") {
               console.clear();
               console.log(

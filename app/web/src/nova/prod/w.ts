@@ -5,6 +5,7 @@ export const w = window as unknown as {
   };
   params: any;
   navigateOverride: (href: string) => void;
+  pointerActive: boolean
   _prasi: {
     basepath: string;
     page_id?: string;
