@@ -173,7 +173,7 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(`Changed ${id_site} ${filename}`);
+            console.log(`Changed ${id_site} ${filename}`, fe);
 
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
