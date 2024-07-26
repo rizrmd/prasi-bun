@@ -80,7 +80,15 @@ export const EdBase = () => {
   const Editor = jscript.editor;
 
   return (
-    <div className={cx("flex flex-col flex-1", style)}>
+    <div
+      className={cx("flex flex-col flex-1", style)}
+      onPointerLeave={() => {
+        w.pointer_active = false;
+      }}
+      onPointerEnter={() => {
+        w.pointer_active = true;
+      }}
+    >
       <div className="flex justify-between"></div>
       <div className="flex flex-1 items-stretch">
         {p.status === "ready" && (

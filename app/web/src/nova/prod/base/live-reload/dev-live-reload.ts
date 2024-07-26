@@ -62,6 +62,7 @@ export const initDevLiveReload = () => {
             },
           });
         } else if (msg.type === SyncType.Event) {
+          if (w.pointer_active) return;
           if (msg.event === "page_changed") {
             const id = msg.data.map.id;
             const page = base.page.cache[id];
@@ -89,7 +90,7 @@ export const initDevLiveReload = () => {
             rebuildMeta(p.meta, p.root);
 
             console.log(
-              `${format(Date.now(), "HH:mm:ss")} 🚧 Component [${id}] updated `
+              `${format(Date.now(), "HH:mm:ss")} 🚧 Component [${msg.data.map.root.name}] updated `
             );
             w.prasiContext.render();
           } else if (msg.event === "code_changes") {

@@ -177,7 +177,15 @@ export const Root = () => {
 
   return (
     <Provider value={w.prasiContext}>
-      <div className={cx("relative flex flex-1 items-center justify-center")}>
+      <div
+        className={cx("relative flex flex-1 items-center justify-center")}
+        onPointerLeave={() => {
+          w.pointerActive = false;
+        }}
+        onPointerEnter={() => {
+          w.pointerActive = true;
+        }}
+      >
         <div
           className={cx(
             "absolute flex flex-col items-stretch flex-1 bg-white main-content-preview",

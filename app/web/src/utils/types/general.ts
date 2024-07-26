@@ -49,6 +49,7 @@ export const w = window as unknown as {
     on: any;
     off: any;
   };
+  pointer_active: boolean
 };
 
 export type Page = {
