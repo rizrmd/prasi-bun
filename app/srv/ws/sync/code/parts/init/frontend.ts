@@ -178,6 +178,7 @@ export const initFrontEnd = async (
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
                 try {
+                  console.log(`Changed ${id_site} ${filename}`);
                   broadcastLoading();
                   await fe.ctx.rebuild();
                 } catch (e: any) {
