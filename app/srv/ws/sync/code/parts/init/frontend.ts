@@ -162,7 +162,11 @@ export const initFrontEnd = async (
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
           const srv = code.internal.server[id_site];
-          if (filename?.startsWith("node_modules") || filename?.startsWith("typings")) return;
+          if (
+            filename?.startsWith("node_modules") ||
+            filename?.startsWith("typings")
+          )
+            return;
           if (
             filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
@@ -176,8 +180,9 @@ export const initFrontEnd = async (
                 try {
                   broadcastLoading();
                   await fe.ctx.rebuild();
-                } catch (e) {
-                  console.error('Fronted failed rebuild', e);
+                } catch (e: any) {
+                  console.error(`Frontend failed rebuild (site: id_site)`);
+                  console.error(e.messsage);
                 }
                 fe.rebuilding = false;
               }, 500);
