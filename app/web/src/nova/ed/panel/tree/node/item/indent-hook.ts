@@ -69,6 +69,11 @@ export const expandTreeHook = (
       }
     }
 
+    if (shouldOpen.size > 0 && local.tree) {
+      local.tree.open([...shouldOpen]);
+      local.render();
+    }
+    
     scrollTreeActiveItem();
   }, [p.page.tree, active.comp_id, active.item_id, p.ui.tree.open_all]);
 };
