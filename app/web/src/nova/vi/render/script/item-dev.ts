@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { IItem, MItem } from "../../../../utils/types/item";
 import { FNCompDef } from "../../../../utils/types/meta-fn";
 import { IMeta } from "../../utils/types";
+import { codeBuild } from "./code-build";
 
 const w = window as unknown as {
   prasiEditDevItem: Record<string, Record<string, SingleChange[]>>;
@@ -217,9 +218,10 @@ export const devItem = (
               for (const [k, v] of Object.entries(compile)) {
                 src[k] = v.value;
               }
-
-              console.log(src);
-              const code_result = await _api.code_build(src);
+              let code_result = codeBuild(src);
+              await new Promise((done) => {
+                setTimeout(done);
+              });
 
               if (props) {
                 for (const [k, v] of Object.entries(code_result) as any) {
