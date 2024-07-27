@@ -2,7 +2,8 @@ import { getBackendOptions } from "@minoru/react-dnd-treeview";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal } from "./logic/ed-global";
+import { active, EDGlobal } from "./logic/ed-global";
+import { treeRebuild } from "./logic/tree/build";
 import { EdApi } from "./panel/header/left/api";
 import { EdSiteJS } from "./panel/header/left/js";
 import { EdSitePicker } from "./panel/header/left/site-picker";
@@ -10,7 +11,6 @@ import { EdTreeBody } from "./panel/tree/body";
 import { EdPageHistoryBtn } from "./panel/tree/history-btn";
 import { EdPageHistoryList } from "./panel/tree/history-list";
 import { EdTreeSearch } from "./panel/tree/search";
-import { treeRebuild } from "./logic/tree/build";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -83,6 +83,15 @@ export const EdLeft = () => {
           }}
           ref={(ref) => {
             if (ref) local.tree = ref;
+          }}
+          onPointerMove={() => {
+            active.hover.tree = true;
+          }}
+          onPointerOut={() => {
+            active.hover.tree = false;
+          }}
+          onPointerLeave={() => {
+            active.hover.tree = false;
           }}
         >
           {p.page.history.show ? (

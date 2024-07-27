@@ -35,18 +35,7 @@ export const EdTreeBody = () => {
 
   if (tree.length === 0)
     return (
-      <div
-        className="flex py-[100px] select-none justify-center flex-1"
-        onPointerMove={() => {
-          active.hover.tree = true;
-        }}
-        onPointerOut={() => {
-          active.hover.tree = false;
-        }}
-        onPointerLeave={() => {
-          active.hover.tree = false;
-        }}
-      >
+      <div className="flex py-[100px] select-none justify-center flex-1">
         <div className="flex flex-col items-center">
           <img
             draggable={false}
