@@ -17,7 +17,6 @@ export const codeEditAdvJs = (p: PG, value: string) => {
         mprop.doc?.transact(() => {
           mprop.set("js", value);
           mprop.set("jsBuilt", valueBuilt);
-          console.log(mprop.toJSON());
         });
       } catch (e: any) {
         return e.message;
