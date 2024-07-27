@@ -1,7 +1,7 @@
 {
   "name": "web",
   "@parcel/bundler-default": {
-    "minBundles": 1e7,
+    "minBundles": 10000000,
     "minBundleSize": 3000,
     "maxParallelRequests": 20
   },

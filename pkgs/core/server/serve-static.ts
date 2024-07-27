@@ -1,23 +1,10 @@
 import { dir } from "dir";
-import { exists, inspectTreeAsync } from "fs-jetpack";
-import { InspectTreeResult } from "fs-jetpack/types";
-import { join } from "path";
 import { watch } from "fs";
-import { CORS_HEADERS } from "./serve-api";
 import mime from "mime";
+import { join } from "path";
 import { g } from "utils/global";
-
-const web = {
-  brExists: null as null | boolean,
-  get path() {
-    if (g.mode === "dev") return "static";
-    if (this.brExists === null) {
-      this.brExists = !!exists(dir.path("app/static-br"));
-    }
-    if (this.brExists) return "static-br";
-    else return "static";
-  },
-};
+import { CORS_HEADERS } from "./serve-api";
+import { existsAsync } from "fs-jetpack";
 
 if (!g.static_cache) {
   g.static_cache = {};
@@ -37,51 +24,57 @@ export const serveStatic = {
         delete cache.static[k];
       }
     }
-    await this.walk();
+    await Promise.all([this.load("app/static"), this.load("app/web/public")]);
     if (g.mode === "dev") {
-      watch(dir.path(`app/static`), async (_, filename) => {
-        if (filename) {
-          const path = join("static", filename);
-          try {
-            const file = Bun.file(dir.path(`app/${path}`));
-            if (await file.exists()) {
-              cache.static[`/${filename}`] = {
-                type: mime.getType(path) || "application/octet-stream",
-                compression: g.mode === "prod" ? "br" : "",
-                content: await file.arrayBuffer(),
-              };
+      ["app/static", "app/web/public"].forEach((base_path) => {
+        watch(dir.path(`app/static`), async (_, filename) => {
+          if (filename) {
+            try {
+              const file = Bun.file(dir.path(`${base_path}/${filename}`));
+              if (await file.exists()) {
+                cache.static[`/${filename}`] = {
+                  type: mime.getType(filename) || "application/octet-stream",
+                  compression: "",
+                  content: await file.arrayBuffer(),
+                };
+              }
+            } catch (e: any) {
+              cache.static = {};
             }
-          } catch (e: any) {
-            cache.static = {};
           }
-        }
+        });
       });
     }
   },
-  walk: async () => {
-    const list = await inspectTreeAsync(dir.path(`app/${web.path}`));
-    const walk = async (
-      list: InspectTreeResult,
-      parent?: InspectTreeResult[]
-    ) => {
-      if (list.type === "dir") {
-        for (const item of list.children) {
-          await walk(item, [...(parent || []), list]);
+  async load(base_path: string) {
+    try {
+      const glob = new Bun.Glob("**");
+
+      for await (const file_path of glob.scan(dir.path(base_path))) {
+        const r_path = dir.path(`${base_path}/${file_path}`);
+        const br_path = dir.path(`${base_path}-br/${file_path}`);
+
+        let final_path = r_path;
+        let br = false;
+        if (await existsAsync(br_path)) {
+          final_path = br_path;
+          br = true;
         }
-      } else {
-        const path = join(...(parent || []).map((e) => e.name), list.name);
-        const file = Bun.file(dir.path(`app/${path}`));
-        if (await file.exists()) {
-          cache.static[path.substring(web.path.length)] = {
-            type: mime.getType(path) || "application/octet-stream",
-            compression: g.mode === "prod" ? "br" : "",
-            content: await file.arrayBuffer(),
+
+        try {
+          cache.static[`/${file_path}`] = {
+            type: mime.getType(file_path) || "application/octet-stream",
+            compression: br ? "br" : "",
+            content: await Bun.file(final_path).arrayBuffer(),
           };
+        } catch (e: any) {
+          console.error(`Failed to load static file: ${final_path}`);
+          console.error(`  ${e.message}`);
         }
       }
-    };
-    if (list) {
-      await walk(list);
+    } catch (e: any) {
+      console.error(`Failed to load static dir: ${base_path}`);
+      console.error(`  ${e.message}`);
     }
   },
   exists: (url: URL) => {
@@ -100,24 +93,21 @@ export const serveStatic = {
     }
 
     if (url.pathname.endsWith(".js")) {
-      if (g.mode === "dev") {
-        await this.walk();
-      } else {
-        return new Response(
-          `
+      return new Response(
+        `
+// ${url.pathname} not found, just reload the page
 navigator.serviceWorker.getRegistration().then(function(reg) {
   if (reg) {
-    reg.unregister().then(function() { window.location.reload(true); });
+    reg.unregister().then(function() { window.location.reload(); });
   } else {
-     window.location.reload(true);
+     window.location.reload();
   }
 });
 `,
-          {
-            headers: { "content-type": "text/javascript" },
-          }
-        );
-      }
+        {
+          headers: { "content-type": "text/javascript" },
+        }
+      );
     }
 
     file = cache.static["/index.html"];
@@ -130,5 +120,6 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         },
       });
     }
+    return new Response(`Not Found: ${url.pathname}`, { status: 404 });
   },
 };

@@ -43,12 +43,12 @@ export const jscript = {
         this.events.prettierLoaded();
 
         const e = await import("@monaco-editor/react");
-        jscript.editor = e.Editor;
         e.loader.config({
           paths: {
             vs: "/monaco/min/vs",
           },
         });
+        jscript.editor = e.Editor;
         this.events.editorLoaded();
         render();
       });
