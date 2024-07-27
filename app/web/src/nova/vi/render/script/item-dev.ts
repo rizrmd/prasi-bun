@@ -218,6 +218,7 @@ export const devItem = (
                 src[k] = v.value;
               }
 
+              console.log(src);
               const code_result = await _api.code_build(src);
 
               if (props) {

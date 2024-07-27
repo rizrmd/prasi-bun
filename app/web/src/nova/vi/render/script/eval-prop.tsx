@@ -205,6 +205,7 @@ const updatePropValueBuilt = (mprop: FMCompDef, src: string) => {
   }
   clearTimeout(conf.timeout);
   conf.timeout = setTimeout(async () => {
+    console.log(conf.src);
     const result = await _api.code_build(conf.src);
 
     let doc = null as unknown as Doc;
