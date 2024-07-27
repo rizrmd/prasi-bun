@@ -234,7 +234,9 @@ ${tree_usage.map((e) => e.import).join("\n")}
 
 declare global { 
 ${tree_usage.map((e) => e.usage).join("\n")} 
-}`,
+}
+export {}
+`,
     "typings:tree_usage.ts"
   );
   register(

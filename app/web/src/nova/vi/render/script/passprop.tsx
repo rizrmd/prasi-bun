@@ -189,12 +189,17 @@ export const modifyChild = (arg: any, passprop?: any, add_props?: any) => {
   return modify(prop.children, prop, passprop, add_props);
 };
 
-const modify = (el: ReactNode, arg: any, passprop?: any, add_props?: any) => {
+const modify = (
+  el: ReactNode | ReactNode[],
+  arg: any,
+  passprop?: any,
+  add_props?: any
+): ReactNode | ReactNode[] => {
   if (isValidElement(el)) {
     const passarg = { ...arg };
     delete passarg.children;
 
-    return {
+    const result = {
       ...el,
       props: {
         ...el.props,
@@ -202,6 +207,10 @@ const modify = (el: ReactNode, arg: any, passprop?: any, add_props?: any) => {
         passprop: { ...passprop, ...passarg },
       },
     };
+
+    return result;
+  } else if (Array.isArray(el)) {
+    return modifyChild(el, passprop, add_props);
   }
   return el;
 };
