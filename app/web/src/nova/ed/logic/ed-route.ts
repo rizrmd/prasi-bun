@@ -81,6 +81,7 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
 
           if (res) {
             if (res.sv === res.diff && (res.sv as any) === "not-found") {
+              console.warn("reload 1");
               //location.reload();();
             }
 
@@ -185,6 +186,8 @@ export const reloadPage = async (
 
         if (page.page.id !== remotePage.id) {
           alert("Page ID Mismatch!\n Refreshing to preventing data loss...");
+          console.warn("reload 2");
+
           //location.reload();();
           return;
         }
@@ -200,9 +203,11 @@ export const reloadPage = async (
 
         if (res) {
           if (res.sv === res.diff && (res.sv as any) === "not-found") {
+            console.warn("reload 3");
+
             //location.reload();();
           }
-          
+
           const diff_local = Y.encodeStateAsUpdate(
             doc as any,
             decompress(res.sv)
@@ -248,6 +253,8 @@ export const reloadPage = async (
         p.sync.code
           .action({ type: "flush-page-cache", page_id: page_id })
           .then(() => {
+            console.warn("reload 4");
+
             //location.reload();();
           });
       }
