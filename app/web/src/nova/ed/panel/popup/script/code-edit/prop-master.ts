@@ -14,29 +14,33 @@ export const codeEditPropMaster = (p: PG, value: string) => {
       ?.get("props")
       ?.get(prop_name);
     if (mprop) {
-      const valueBuilt = codeBuild({ _: value })["_"];
-      mprop.doc?.transact(() => {
-        if (prop_kind === "value") {
-          mprop.set("value", value);
-          mprop.set("valueBuilt", valueBuilt);
-        } else if (prop_kind === "onChange") {
-          mprop.set("onChange", value);
-          mprop.set("onChangeBuilt", valueBuilt);
-        } else if (prop_kind === "gen") {
-          mprop.set("gen", value);
-          mprop.set("genBuilt", valueBuilt);
-        } else if (prop_kind === "visible") {
-          mprop.set("visible", value);
-        } else if (prop_kind === "typings") {
-          mprop.set("typings", value);
-        } else if (prop_kind === "option") {
-          const meta = mprop.get("meta");
-          if (meta) {
-            meta.set("options", value);
-            meta.set("optionsBuilt", valueBuilt);
+      try {
+        const valueBuilt = codeBuild({ _: value })["_"];
+        mprop.doc?.transact(() => {
+          if (prop_kind === "value") {
+            mprop.set("value", value);
+            mprop.set("valueBuilt", valueBuilt);
+          } else if (prop_kind === "onChange") {
+            mprop.set("onChange", value);
+            mprop.set("onChangeBuilt", valueBuilt);
+          } else if (prop_kind === "gen") {
+            mprop.set("gen", value);
+            mprop.set("genBuilt", valueBuilt);
+          } else if (prop_kind === "visible") {
+            mprop.set("visible", value);
+          } else if (prop_kind === "typings") {
+            mprop.set("typings", value);
+          } else if (prop_kind === "option") {
+            const meta = mprop.get("meta");
+            if (meta) {
+              meta.set("options", value);
+              meta.set("optionsBuilt", valueBuilt);
+            }
           }
-        }
-      });
+        });
+      } catch (e: any) {
+        return e.message;
+      }
     }
   }
 };
