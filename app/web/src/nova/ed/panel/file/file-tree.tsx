@@ -101,7 +101,8 @@ const TreeItem: FC<{
         css`
           padding-left: ${depth * 10 + 10}px;
         `,
-        f.path === path && "border-r-2 bg-blue-100 border-r-blue-700"
+        f.path === path &&
+          "border-r-2 bg-blue-100 border-r-blue-700"
       )}
       onClick={() => {
         f.selected.clear();

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { IContent } from "../../../../../../utils/types/general";
 import { getMetaById } from "../../../../logic/active/get-meta";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
+import { scrollTreeActiveItem } from "../../scroll-tree";
 
 export const expandTreeHook = (
   p: PG,
@@ -83,5 +84,6 @@ export const expandTreeHook = (
         }
       }
     }
+    scrollTreeActiveItem();
   }, [p.page.tree, active.comp_id, active.item_id, p.ui.tree.open_all]);
 };

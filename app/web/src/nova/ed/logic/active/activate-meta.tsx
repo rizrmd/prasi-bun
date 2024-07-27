@@ -1,40 +1,17 @@
+import { scrollTreeActiveItem } from "../../panel/tree/scroll-tree";
 import { IMeta, PG, active } from "../ed-global";
+import { getMetaById } from "./get-meta";
 
 export const activateMeta = (p: PG, _meta: IMeta) => {
+  scrollTreeActiveItem();
+  
   let meta = _meta;
   let parent_comp_id = meta.parent?.comp_id;
 
   if (!active.comp_id && meta.parent?.comp_id) {
-    let parent = meta.parent;
-
-    let is_jsx = false;
-    let i = 0;
-    while (parent) {
-      const meta_parent = p.page.meta[parent.id];
-
-      if (meta_parent && meta_parent.parent) {
-        if (meta_parent.item.component?.id === meta.parent?.comp_id) {
-          is_jsx = true;
-          break;
-        }
-
-        parent = meta_parent.parent;
-      } else {
-        break;
-      }
-      if (i > 10000) {
-        console.warn("warning cyclic item tree possibility detected.");
-        break;
-      }
-      i++;
-    }
-
-    if (is_jsx) {
-      if (meta.parent.instance_id) {
-        meta = p.page.meta[meta.parent.instance_id];
-      } else {
-        return;
-      }
+    if (!Object.keys(meta).includes("jsx_prop") && meta.parent.instance_id) {
+      const comp = getMetaById(p, meta.parent.instance_id);
+      if (comp) meta = comp;
     }
   }
 
