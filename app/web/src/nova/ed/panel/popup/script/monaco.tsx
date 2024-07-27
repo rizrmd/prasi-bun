@@ -64,6 +64,12 @@ export const EdScriptMonaco: FC<{}> = () => {
     }
 
     return () => {
+      p.ui.monaco.editor.getModels().forEach((model: any) => {
+        const uri = model.uri.toString();
+        if (uri.startsWith("typings:")) {
+          model.dispose();
+        }
+      });
       p.ui.monaco = null;
       p.script.do_edit = async () => {};
     };

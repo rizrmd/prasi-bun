@@ -1,12 +1,10 @@
 import type { OnMount } from "@monaco-editor/react";
+import { traverse } from "estree-toolkit";
+import { TypedArray } from "yjs-types";
+import { jscript } from "../../../../../../utils/script/jscript";
+import { register } from "../../../../../../utils/script/typings";
 import { IContent } from "../../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
-import { TypedArray } from "yjs-types";
-import { register } from "../../../../../../utils/script/typings";
-import { ReactElement } from "react";
-import get from "lodash.get";
-import { traverse } from "estree-toolkit";
-import { jscript } from "../../../../../../utils/script/jscript";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -146,14 +144,6 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
         }
       }
     }
-    if (m.item.id !== meta.item.id) {
-      const script = m.item.script;
-      if (script) {
-        if (script.local) {
-          vars[script.local.name] = { mode: "local", val: script.local.value };
-        }
-      }
-    }
 
     const comp = m.item.component;
 
@@ -236,7 +226,7 @@ export const ${k} = null as unknown as ${v.val};
     }
   }
 
-  register(monaco, tree_types.join("\n"), "ts:tree_types.d.ts");
+  register(monaco, tree_types.join("\n"), "typings:tree_types.d.ts");
   register(
     monaco,
     `\
@@ -245,9 +235,13 @@ ${tree_usage.map((e) => e.import).join("\n")}
 declare global { 
 ${tree_usage.map((e) => e.usage).join("\n")} 
 }`,
-    "ts:tree_usage.ts"
+    "typings:tree_usage.ts"
   );
-  register(monaco, Object.values(comp_types).join("\n"), "ts:comp_types.d.ts");
+  register(
+    monaco,
+    Object.values(comp_types).join("\n"),
+    "typings:comp_types.d.ts"
+  );
 };
 
 const map_childs = (
