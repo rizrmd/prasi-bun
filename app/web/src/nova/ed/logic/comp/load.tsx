@@ -86,6 +86,8 @@ export const loadCompSnapshot = async (
 
             if (res) {
               if (res.sv === res.diff && (res.sv as any) === "not-found") {
+                console.warn("reload 5");
+
                 //location.reload();();
               }
 

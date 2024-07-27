@@ -92,6 +92,8 @@ export const EdApiDB = ({
 
                       localStorage.removeItem(`schema-md-${p.site.id}`);
                       _api.clear_route_cache(p.site.id);
+                      console.warn("reload 6");
+
                       //location.reload();();
                     }}
                   >
@@ -114,6 +116,8 @@ export const EdApiDB = ({
 
                     localStorage.removeItem(`schema-md-${p.site.id}`);
                     _api.clear_route_cache(p.site.id);
+                    console.warn("reload 7");
+
                     //location.reload();();
                   }}
                 >
@@ -135,6 +139,8 @@ export const EdApiDB = ({
                 render();
                 alert("RESTART: OK");
                 _api.clear_route_cache(p.site.id);
+                console.warn("reload 8");
+
                 //location.reload();();
               }}
             >
