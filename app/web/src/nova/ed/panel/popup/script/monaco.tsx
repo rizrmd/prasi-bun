@@ -9,7 +9,7 @@ import { jscript } from "../../../../../utils/script/jscript";
 import { jsMount } from "../../../../../utils/script/mount";
 import { monacoTypings } from "../../../../../utils/script/typings";
 import { Loading } from "../../../../../utils/ui/loading";
-import { getActiveMeta } from "../../../logic/active/get-meta";
+import { getActiveMeta, getMetaById } from "../../../logic/active/get-meta";
 import { EDGlobal, IMeta, active } from "../../../logic/ed-global";
 import { edMonacoDefaultVal } from "./default-val";
 import { declareScope } from "./scope/scope";
@@ -346,13 +346,27 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             } else {
               editorLocalValue[active.item_id] = null;
-              const code_result = codeEditAdvJs(p, value);
+              if (mode === "js") {
+                const code_result = codeEditAdvJs(p, value);
 
-              if (typeof code_result === "string") {
-                p.ui.popup.script.typings.status = "error";
-                p.ui.popup.script.typings.err_msg = code_result;
-              } else if (typeof code_result === "object") {
-                scope = code_result;
+                if (typeof code_result === "string") {
+                  p.ui.popup.script.typings.status = "error";
+                  p.ui.popup.script.typings.err_msg = code_result;
+                } else if (typeof code_result === "object") {
+                  scope = code_result;
+                }
+              } else {
+                const meta = getMetaById(p, active.item_id);
+
+                if (meta) {
+                  const madv = meta.mitem?.get("adv");
+                  if (madv) {
+                    if (mode === "css") madv.set("css", value);
+                    else {
+                      madv.set("html", value);
+                    }
+                  }
+                }
               }
             }
             if (typeof scope === "object") {
