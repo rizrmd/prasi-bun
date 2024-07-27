@@ -92,16 +92,6 @@ await build({
 const build_all =
   process.argv[process.argv.length - 1] === "main" ? false : true;
 if (build_all) {
-  const glob = new Glob("**");
-  const public_files = [] as string[];
-  for await (const file of glob.scan(dir.path("app/web/public"))) {
-    public_files.push(file);
-  }
-  await Bun.write(
-    dir.path("app/web/public_files.ts"),
-    `export const files = ${JSON.stringify(public_files, null, 2)}`
-  );
-
   await removeAsync(dir.path("app/web/.parcel-cache"));
   await removeAsync(dir.path("app/static"));
 
@@ -133,14 +123,16 @@ if (build_all) {
   await parcel.exited;
 
   const public_br = dir.path("app/web/public-br");
-  if (!(await existsAsync(public_br))) {
-    const api = new fdir()
-      .withRelativePaths()
-      .crawl(dir.path("app/web/public"));
-    const files = api.sync();
-    if (files) {
+  const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
+  await removeAsync(public_br);
+  const public_files = await listAsync(dir.path("app/static"));
+  if (public_files) {
+    const public_files = api.sync();
+    if (public_files) {
       await Promise.all(
-        files.map(async (file) => {
+        public_files.map(async (file) => {
+          public_files.push(file);
+
           const br = brotli.compress(
             new Uint8Array(
               await Bun.file(dir.path(`app/web/public/${file}`)).arrayBuffer()
@@ -157,14 +149,18 @@ if (build_all) {
         })
       );
     }
+    await Bun.write(
+      dir.path("app/web/public_files.ts"),
+      `export const files = ${JSON.stringify(public_files, null, 2)}`
+    );
   }
 
   const static_br = dir.path("app/static-br");
   await removeAsync(static_br);
-  const files = await listAsync(dir.path("app/static"));
-  if (files) {
+  const static_files = await listAsync(dir.path("app/static"));
+  if (static_files) {
     await Promise.all(
-      files
+      static_files
         .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
         .map(async (file) => {
           if (!(await Bun.file(dir.path(`app/static-br/${file}`)).exists())) {
@@ -184,19 +180,5 @@ if (build_all) {
           }
         })
     );
-    const pub = await listAsync(dir.path("app/web/public-br"));
-    if (pub) {
-      await Promise.all(
-        pub.map(async (file) => {
-          if (await existsAsync(`app/static-br/${file}`)) {
-            await removeAsync(`app/static-br/${file}`);
-          }
-          await copyAsync(
-            dir.path(`app/web/public-br/${file}`),
-            dir.path(`app/static-br/${file}`)
-          );
-        })
-      );
-    }
   }
 }

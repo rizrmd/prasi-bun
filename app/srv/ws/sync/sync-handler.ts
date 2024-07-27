@@ -39,62 +39,68 @@ export const syncHandler: WebSocketHandler<WSData> = {
     }
   },
   async message(ws, raw) {
-    const conn_id = wconns.get(ws);
-    if (conn_id) {
-      const conn = conns.get(conn_id);
-      if (conn) {
-        const msg = packr.unpack(Buffer.from(raw));
-        if (msg.type === "preview") {
-          previewLiveReload(ws, msg);
-        }
-        if (msg.type === SyncType.UserID) {
-          const { user_id, page_id, site_id } = msg;
-          conn.user_id = user_id;
-
-          conn.user = await _db.user.findFirst({ where: { id: user_id } });
-          let conf = await user.conf.getOrCreate(user_id);
-          if (site_id) {
-            const newconf = await loadSitePage(user_id, site_id, page_id);
-            if (newconf) conf = newconf;
-          } else if (!conf.site_id) {
-            await loadDefaultSite(user_id);
+    try {
+      const conn_id = wconns.get(ws);
+      if (conn_id) {
+        const conn = conns.get(conn_id);
+        if (conn) {
+          const msg = packr.unpack(Buffer.from(raw));
+          if (msg.type === "preview") {
+            previewLiveReload(ws, msg);
           }
-          conn.conf = new Proxy(conf, {
-            get(_, p) {
-              const conf = user.conf.get(user_id);
-              if (p === "toJSON") return () => conf;
-              if (conf) return conf[p as keyof typeof conf];
-            },
-            set(_, p, newValue) {
-              user.conf.set(user_id, p as keyof UserConf, newValue);
-              return true;
-            },
-          }) as UserConf & { toJSON: () => UserConf };
-          sendWS(ws, {
-            type: SyncType.Event,
-            event: "editor_start" as ClientEvent,
-            data: conn.conf.toJSON(),
-          });
-        }
-        if (msg.type === SyncType.Action) {
-          const code = msg.code as keyof typeof SyncActionPaths;
-          const actionName = SyncActionPaths[code].replace(/\./gi, "_");
-          if (actionName) {
-            const baseAction = (actions as any)[actionName];
-            if (!baseAction) {
-              console.log(`app/srv/ws/sync/actions/${actionName}.ts not found`);
+          if (msg.type === SyncType.UserID) {
+            const { user_id, page_id, site_id } = msg;
+            conn.user_id = user_id;
+
+            conn.user = await _db.user.findFirst({ where: { id: user_id } });
+            let conf = await user.conf.getOrCreate(user_id);
+            if (site_id) {
+              const newconf = await loadSitePage(user_id, site_id, page_id);
+              if (newconf) conf = newconf;
+            } else if (!conf.site_id) {
+              await loadDefaultSite(user_id);
             }
-            if (baseAction) {
-              const action = baseAction.bind(conn);
-              sendWS(ws, {
-                type: SyncType.ActionResult,
-                argid: msg.argid,
-                val: await action(...msg.args),
-              });
+            conn.conf = new Proxy(conf, {
+              get(_, p) {
+                const conf = user.conf.get(user_id);
+                if (p === "toJSON") return () => conf;
+                if (conf) return conf[p as keyof typeof conf];
+              },
+              set(_, p, newValue) {
+                user.conf.set(user_id, p as keyof UserConf, newValue);
+                return true;
+              },
+            }) as UserConf & { toJSON: () => UserConf };
+            sendWS(ws, {
+              type: SyncType.Event,
+              event: "editor_start" as ClientEvent,
+              data: conn.conf.toJSON(),
+            });
+          }
+          if (msg.type === SyncType.Action) {
+            const code = msg.code as keyof typeof SyncActionPaths;
+            const actionName = SyncActionPaths[code].replace(/\./gi, "_");
+            if (actionName) {
+              const baseAction = (actions as any)[actionName];
+              if (!baseAction) {
+                console.log(
+                  `app/srv/ws/sync/actions/${actionName}.ts not found`
+                );
+              }
+              if (baseAction) {
+                const action = baseAction.bind(conn);
+                sendWS(ws, {
+                  type: SyncType.ActionResult,
+                  argid: msg.argid,
+                  val: await action(...msg.args),
+                });
+              }
             }
           }
         }
       }
+    } catch (e) {
+      console.error(e);
     }
   },
 };
