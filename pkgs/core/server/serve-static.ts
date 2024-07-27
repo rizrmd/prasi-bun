@@ -95,13 +95,15 @@ export const serveStatic = {
     if (url.pathname.endsWith(".js")) {
       return new Response(
         `
-// ${url.pathname} not found, just reload the page
+console.warn("${url.pathname} not found, force reloading for clearing cache.")
 navigator.serviceWorker.getRegistration().then(function(reg) {
-  if (reg) {
-    reg.unregister().then(function() { window.location.reload(); });
-  } else {
-     window.location.reload();
-  }
+  setTimeout(() => {
+    if (reg) {
+      reg.unregister().then(function() { window.location.reload(); });
+    } else {
+      window.location.reload();
+    }
+  }, 2000);
 });
 `,
         {
