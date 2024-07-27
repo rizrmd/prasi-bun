@@ -1,7 +1,41 @@
 import { IMeta, PG, active } from "../ed-global";
 
-export const activateMeta = (p: PG, meta: IMeta) => {
+export const activateMeta = (p: PG, _meta: IMeta) => {
+  let meta = _meta;
   let parent_comp_id = meta.parent?.comp_id;
+
+  if (!active.comp_id && meta.parent?.comp_id) {
+    let parent = meta.parent;
+
+    let is_jsx = false;
+    let i = 0;
+    while (parent) {
+      const meta_parent = p.page.meta[parent.id];
+
+      if (meta_parent && meta_parent.parent) {
+        if (meta_parent.jsx_prop) {
+          is_jsx = true;
+        }
+
+        parent = meta_parent.parent;
+      } else {
+        break;
+      }
+      if (i > 10000) {
+        console.warn("warning cyclic item tree possibility detected.");
+        break;
+      }
+      i++;
+    }
+
+    if (!is_jsx) {
+      if (meta.parent.instance_id) {
+        meta = p.page.meta[meta.parent.instance_id];
+      } else {
+        return;
+      }
+    }
+  }
 
   if (
     active.comp_id &&

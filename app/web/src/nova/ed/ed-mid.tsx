@@ -30,7 +30,7 @@ export const EdMid: FC<{}> = () => {
             <div className="border-r border-r-slate-100 text-slate-400 text-[9px] flex items-center px-1 mr-1">
               ADD
             </div>
-            {!active.comp_id && <EdAddSection />}
+            <EdAddSection />
             <EdAddItem />
             <EdAddText />
             <EdCompPicker />
@@ -70,7 +70,7 @@ export const EdMid: FC<{}> = () => {
             </TopBtn>
           </a>
         </div>
-      </div> 
+      </div>
     </div>
   );
-}; 
+};
