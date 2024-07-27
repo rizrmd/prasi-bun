@@ -80,8 +80,9 @@ export const reloadLayout = async (p: PG, layout_id: string, note: string) => {
           );
 
           if (res) {
-            if (res.sv === res.diff && (res.sv as any) === "not-found")
-              location.reload();
+            if (res.sv === res.diff && (res.sv as any) === "not-found") {
+              //location.reload();();
+            }
 
             const diff_local = Y.encodeStateAsUpdate(
               doc as any,
@@ -184,7 +185,7 @@ export const reloadPage = async (
 
         if (page.page.id !== remotePage.id) {
           alert("Page ID Mismatch!\n Refreshing to preventing data loss...");
-          location.reload();
+          //location.reload();();
           return;
         }
         if ((window as any).catch) {
@@ -198,8 +199,9 @@ export const reloadPage = async (
         );
 
         if (res) {
-          if (res.sv === res.diff && (res.sv as any) === "not-found")
-            location.reload();
+          if (res.sv === res.diff && (res.sv as any) === "not-found") {
+            //location.reload();();
+          }
           
           const diff_local = Y.encodeStateAsUpdate(
             doc as any,
@@ -246,7 +248,7 @@ export const reloadPage = async (
         p.sync.code
           .action({ type: "flush-page-cache", page_id: page_id })
           .then(() => {
-            location.reload();
+            //location.reload();();
           });
       }
     }
