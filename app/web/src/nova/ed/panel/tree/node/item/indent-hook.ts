@@ -69,21 +69,6 @@ export const expandTreeHook = (
       }
     }
 
-    if (shouldOpen.size > 0 && local.tree) {
-      local.tree.open([...shouldOpen]);
-      local.render();
-      if (active.item_id) {
-        const meta = getMetaById(p, active.item_id);
-        if (meta && (meta.item as IContent).type !== "text") {
-          setTimeout(() => {
-            const el = document.getElementsByClassName(active.item_id);
-            if (el.length > 0) {
-              el[0].scrollIntoView({ behavior: "instant", block: "center" });
-            }
-          });
-        }
-      }
-    }
     scrollTreeActiveItem();
   }, [p.page.tree, active.comp_id, active.item_id, p.ui.tree.open_all]);
 };
