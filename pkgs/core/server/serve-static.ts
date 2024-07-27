@@ -15,6 +15,7 @@ const cache = {
     string,
     { type: string; content: any; compression: "" | "br" }
   >,
+  dev: {} as Record<string, ReturnType<typeof Bun.file>>,
 };
 
 export const serveStatic = {
@@ -23,27 +24,16 @@ export const serveStatic = {
       for (const k of Object.keys(cache.static)) {
         delete cache.static[k];
       }
-    }
-    await Promise.all([this.load("app/static"), this.load("app/web/public")]);
-    if (g.mode === "dev") {
+
       ["app/static", "app/web/public"].forEach((base_path) => {
-        watch(dir.path(`app/static`), async (_, filename) => {
+        watch(dir.path(`app/static`), async (event, filename) => {
           if (filename) {
-            try {
-              const file = Bun.file(dir.path(`${base_path}/${filename}`));
-              if (await file.exists()) {
-                cache.static[`/${filename}`] = {
-                  type: mime.getType(filename) || "application/octet-stream",
-                  compression: "",
-                  content: await file.arrayBuffer(),
-                };
-              }
-            } catch (e: any) {
-              cache.static = {};
-            }
+            cache.dev = {};
           }
         });
       });
+    } else {
+      await Promise.all([this.load("app/static"), this.load("app/web/public")]);
     }
   },
   async load(base_path: string) {
@@ -81,20 +71,23 @@ export const serveStatic = {
     return !!cache.static[url.pathname];
   },
   async serve(url: URL) {
-    let file = cache.static[url.pathname];
-    if (file) {
-      return new Response(file.content, {
-        headers: {
-          ...CORS_HEADERS,
-          ...{ "content-type": file.type },
-          ...(file.compression ? { "content-encoding": file.compression } : {}),
-        },
-      });
-    }
+    if (g.mode === "prod") {
+      let file = cache.static[url.pathname];
+      if (file) {
+        return new Response(file.content, {
+          headers: {
+            ...CORS_HEADERS,
+            ...{ "content-type": file.type },
+            ...(file.compression
+              ? { "content-encoding": file.compression }
+              : {}),
+          },
+        });
+      }
 
-    if (url.pathname.endsWith(".js")) {
-      return new Response(
-        `
+      if (url.pathname.endsWith(".js")) {
+        return new Response(
+          `
 console.warn("${url.pathname} not found, force reloading for clearing cache.")
 navigator.serviceWorker.getRegistration().then(function(reg) {
   setTimeout(() => {
@@ -106,21 +99,44 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
   }, 2000);
 });
 `,
-        {
-          headers: { "content-type": "text/javascript" },
-        }
-      );
-    }
+          {
+            headers: { "content-type": "text/javascript" },
+          }
+        );
+      }
 
-    file = cache.static["/index.html"];
+      file = cache.static["/index.html"];
 
-    if (file) {
-      return new Response(file.content, {
-        headers: {
-          ...{ "content-type": file.type },
-          ...(file.compression ? { "content-encoding": file.compression } : {}),
-        },
-      });
+      if (file) {
+        return new Response(file.content, {
+          headers: {
+            ...{ "content-type": file.type },
+            ...(file.compression
+              ? { "content-encoding": file.compression }
+              : {}),
+          },
+        });
+      }
+    } else {
+      if (cache.dev[url.pathname]) {
+        return new Response(cache.dev[url.pathname]);
+      }
+
+      let file = Bun.file(dir.path(`/app/static${url.pathname}`));
+      if (await file.exists()) {
+        cache.dev[url.pathname] = file;
+        return new Response(file);
+      }
+      file = Bun.file(dir.path(`/app/web/public${url.pathname}`));
+      if (await file.exists()) {
+        cache.dev[url.pathname] = file;
+        return new Response(file);
+      }
+      file = Bun.file(dir.path(`/app/static/index.html`));
+      if (await file.exists()) {
+        cache.dev[`/index.html`] = file;
+        return new Response(file);
+      }
     }
     return new Response(`Not Found: ${url.pathname}`, { status: 404 });
   },

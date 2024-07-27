@@ -5,6 +5,7 @@ import { IMeta, active } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { ViRender } from "../render";
 import { viScriptArg } from "./arg";
+import { codeBuild } from "./code-build";
 import { replaceWithObject, replacement } from "./eval-script";
 import { extractNavigate } from "./extract-nav";
 
@@ -204,9 +205,8 @@ const updatePropValueBuilt = (mprop: FMCompDef, src: string) => {
     conf.src[id] = src;
   }
   clearTimeout(conf.timeout);
-  conf.timeout = setTimeout(async () => {
-    console.log(conf.src);
-    const result = await _api.code_build(conf.src);
+  conf.timeout = setTimeout(() => {
+    const result = codeBuild(conf.src);
 
     let doc = null as unknown as Doc;
     for (const [k, v] of Object.entries(result)) {
