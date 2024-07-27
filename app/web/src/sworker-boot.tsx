@@ -5,7 +5,7 @@ import { isLocalhost } from "./utils/ui/is-localhost";
 
 export const sworkerRegister = async (react: { root: null | ReactRoot }) => {
   if (navigator.serviceWorker) {
-    if (true || !isLocalhost()) {
+    if (!isLocalhost()) {
       const sw = await registerServiceWorker();
       const cacheCurrentPage = () => {
         const swController = navigator.serviceWorker.controller;
