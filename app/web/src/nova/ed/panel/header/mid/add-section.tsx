@@ -13,7 +13,12 @@ export const EdAddSection = () => {
   return (
     <TopBtn
       style="slim"
-      onClick={() => {
+      className={cx(active.comp_id && "opacity-20")}
+      onClick={async () => {
+        if (active.comp_id) {
+          alert("Cannot add section while editing component");
+          return;
+        }
         const json = {
           id: createId(),
           name: `New Section`,

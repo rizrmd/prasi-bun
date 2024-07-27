@@ -16,7 +16,12 @@ export const EdAddText = () => {
   return (
     <TopBtn
       style="slim"
+      className={cx(active.comp_id && "opacity-20")}
       onClick={async () => {
+        if (active.comp_id) {
+          alert("Cannot add text while editing component");
+          return;
+        }
         let meta = getActiveMeta(p);
 
         if (!meta) {
@@ -76,7 +81,7 @@ export const EdAddText = () => {
             }
 
             if (mitem) {
-              if (mitem.get("type") === "section") {
+              if ((mitem as any).get("type") === "section") {
                 const json = {
                   id: createId(),
                   name: `new_item`,
