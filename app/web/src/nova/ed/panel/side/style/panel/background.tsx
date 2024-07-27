@@ -51,10 +51,15 @@ export const PanelBackground: FC<{
             />
           </div>
         </Tooltip>
-      </div>
-
-      <div className="flex items-stretch space-x-2">
-        <Tooltip content={"Background Size"}>
+        <Tooltip
+          content={"Background Size"}
+          className={css`
+            .dropdown {
+              max-width: 90px;
+              overflow: hidden;
+            }
+          `}
+        >
           <Dropdown
             {...dropdownProp}
             value={bg.size}
