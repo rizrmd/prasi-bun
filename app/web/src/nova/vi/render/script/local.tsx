@@ -106,9 +106,10 @@ export const createViLocal = (
       }
     }, [editorLocalValue[id]]);
 
-    return modifyChild(children, {
+    const result = modifyChild(children, {
       ...meta.script?.scope,
       [arg.name]: local,
     });
+    return result;
   };
 };

@@ -24,7 +24,6 @@ export const ViScript: FC<{
     if (!_pass) _pass = {};
     viEvalProps(vi, meta, is_layout, _pass, depth, parent_key);
   }
-  
 
   if (meta.item.adv?.html) {
     return (
