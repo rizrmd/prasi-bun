@@ -133,18 +133,19 @@ if (build_all) {
         public_files.map(async (file) => {
           public_files.push(file);
 
-          const br = brotli.compress(
-            new Uint8Array(
-              await Bun.file(dir.path(`app/web/public/${file}`)).arrayBuffer()
-            ),
-            { quality: 11 }
-          );
-          if (br) {
-            console.log(`Compressing [public] ${file}`);
-            await writeAsync(
-              dir.path(`app/web/public-br/${file}`),
-              Buffer.from(br)
+          const bfile = Bun.file(dir.path(`app/web/public/${file}`));
+          if (!(await bfile.exists())) {
+            const br = brotli.compress(
+              new Uint8Array(await bfile.arrayBuffer()),
+              { quality: 11 }
             );
+            if (br) {
+              console.log(`Compressing [public] ${file}`);
+              await writeAsync(
+                dir.path(`app/web/public-br/${file}`),
+                Buffer.from(br)
+              );
+            }
           }
         })
       );
