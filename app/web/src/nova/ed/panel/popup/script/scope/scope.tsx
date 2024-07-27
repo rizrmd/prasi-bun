@@ -5,6 +5,8 @@ import { TypedArray } from "yjs-types";
 import { register } from "../../../../../../utils/script/typings";
 import { ReactElement } from "react";
 import get from "lodash.get";
+import { traverse } from "estree-toolkit";
+import { jscript } from "../../../../../../utils/script/jscript";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -49,27 +51,45 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
       m.item.adv?.js?.includes("<Local") &&
       m.item.adv.jsBuilt
     ) {
-      try {
-        const local = new Function(
-          "render",
-          "props",
-          "children",
-          "Local",
-          m.item.adv.jsBuilt
-        );
-        local(
-          (el: ReactElement) => {
-            const name = get(el, "props.children.props.name");
-            const value = get(el, "props.children.props.value");
-            vars[name] = { mode: "local", val: value };
-          },
-          {},
-          null,
-          (prop: { name: string; value: any; children: any }) => prop.children
-        );
-      } catch (e) {
-        console.log(e);
-      }
+      const parsed = jscript.prettier.ts?.parsers.typescript.parse(
+        m.item.adv.js,
+        {} as any
+      );
+
+      let name = "";
+      traverse(parsed, {
+        JSXAttribute: ({ node }) => {
+          if (
+            node &&
+            node.type === "JSXAttribute" &&
+            node.name.type === "JSXIdentifier" &&
+            node.name.name === "name" &&
+            node.value?.type === "Literal"
+          ) {
+            name = node.value.value as string;
+          }
+        },
+      });
+
+      traverse(parsed, {
+        JSXAttribute: ({ node }) => {
+          if (
+            node &&
+            node.type === "JSXAttribute" &&
+            node.name.type === "JSXIdentifier" &&
+            node.name.name === "value" &&
+            node.value?.type === "JSXExpressionContainer"
+          ) {
+            const range = node.value?.expression?.range;
+            if (range && m.item.adv && m.item.adv.js && name) {
+              vars[name] = {
+                mode: "local",
+                val: m.item.adv.js.substring(range[0], range[1]),
+              };
+            }
+          }
+        },
+      });
     }
 
     if (m.item.component?.props) {
@@ -83,6 +103,7 @@ export const declareScope = (p: PG, meta: IMeta, monaco: Monaco) => {
     }
     if (m.editor_props) {
       for (const [k, v] of Object.entries(m.editor_props) as any) {
+        if (vars[k] && vars[k].mode === "local") continue;
         vars[k] = { mode: "prop", val: typeof v === "object" ? v : typeof v };
       }
     }
@@ -191,24 +212,15 @@ return typings;
   for (const [k, v] of Object.entries(vars)) {
     i++;
     if (v.mode === "local") {
-      const im = tree_types.length;
-      const fn = new Function(
-        `return ${typeof v.val === "string" ? v.val : JSON.stringify(v.val)}`
-      );
-      const local_type = `\
-declare module "item-${im}" {
-  export const \$\$_${k} = ${fn.toString()};
-}
-`;
-      tree_types.push(local_type);
       tree_usage.push({
-        import: `import { \$\$_${k} } from "item-${im}";`,
-        usage: `const ${k} = null as unknown as (ReturnType<typeof \$\$_${k}> & { render: ()=> void });  `,
+        import: ``,
+        usage: `
+        const \$\$_${k} = ${v.val};
+        const ${k} = null as unknown as typeof \$\$_${k} & {render: () => void};`,
       });
     } else if (v.mode === "prop") {
       const im = tree_types.length;
       tree_types.push(`\
-
 declare module "item-${im}" {
   export const \$\$_${k} = ${v.val};
 }

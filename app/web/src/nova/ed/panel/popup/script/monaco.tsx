@@ -2,7 +2,6 @@ import type { Monaco, OnMount } from "@monaco-editor/react";
 import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
 import { FC, useEffect } from "react";
-import { compress } from "wasm-gzip";
 import { useGlobal, useLocal } from "web-utils";
 import type { ParsedScope } from "../../../../../../../srv/ws/sync/editor/parser/parse-js";
 import { jscript } from "../../../../../utils/script/jscript";
@@ -18,9 +17,9 @@ import { declareScope } from "./scope/scope";
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
 import { editorLocalValue } from "../../../../vi/render/script/local";
 import { propInstanceOnChange } from "../../side/prop-instance/on-change";
-import { codeEditPropMaster } from "./code-edit/prop-master";
-import { codeEditPropInstance } from "./code-edit/prop-instance";
 import { codeEditAdvJs } from "./code-edit/adv-js";
+import { codeEditPropInstance } from "./code-edit/prop-instance";
+import { codeEditPropMaster } from "./code-edit/prop-master";
 
 const scriptEdit = {
   timeout: null as any,
