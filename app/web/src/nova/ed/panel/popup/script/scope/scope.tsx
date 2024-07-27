@@ -192,11 +192,15 @@ return typings;
     i++;
     if (v.mode === "local") {
       const im = tree_types.length;
-      tree_types.push(`\
+      const fn = new Function(`return ${JSON.stringify(v.val)}`);
+      const local_type = `\
 declare module "item-${im}" {
-  export const \$\$_${k} = ${v.val};
+  const fn = ${fn.toString()};
+  export const \$\$_${k}: ReturnType<typeof fn>;
 }
-`);
+`;
+      console.log(local_type);
+      tree_types.push(local_type);
       tree_usage.push({
         import: `import { \$\$_${k} } from "item-${im}";`,
         usage: `const ${k} = null as unknown as (typeof \$\$_${k} & { render: ()=> void });  `,
