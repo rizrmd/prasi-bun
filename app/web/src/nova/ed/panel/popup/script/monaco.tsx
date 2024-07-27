@@ -18,6 +18,9 @@ import { declareScope } from "./scope/scope";
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
 import { editorLocalValue } from "../../../../vi/render/script/local";
 import { propInstanceOnChange } from "../../side/prop-instance/on-change";
+import { codeEditPropMaster } from "./code-edit/prop-master";
+import { codeEditPropInstance } from "./code-edit/prop-instance";
+import { codeEditAdvJs } from "./code-edit/adv-js";
 
 const scriptEdit = {
   timeout: null as any,
@@ -327,22 +330,9 @@ export const EdScriptMonaco: FC<{}> = () => {
             p.ui.popup.script.typings.err_msg = "";
 
             if (stype === "prop-master") {
-              p.sync.code.edit({
-                type: "prop-master",
-                prop_kind: p.ui.popup.script.prop_kind,
-                prop_name: p.ui.popup.script.prop_name,
-                value: compress(encode.encode(value || "")),
-                ...arg,
-              });
+              codeEditPropMaster(p, value);
             } else if (stype === "prop-instance") {
-              const code_result = await p.sync.code.edit({
-                type: "prop-instance",
-                mode: mode,
-                prop_name: p.ui.popup.script.prop_name,
-                item_id: active.item_id,
-                value: compress(encode.encode(value || "")),
-                ...arg,
-              });
+              const code_result = codeEditPropInstance(p, value);
 
               if (p.ui.popup.script.prop_kind === "value") {
                 propInstanceOnChange(p, p.ui.popup.script.prop_name, value);
@@ -356,13 +346,7 @@ export const EdScriptMonaco: FC<{}> = () => {
               }
             } else {
               editorLocalValue[active.item_id] = null;
-              const code_result = await p.sync.code.edit({
-                type: "adv",
-                mode: mode,
-                item_id: active.item_id,
-                value: compress(encode.encode(value || "")),
-                ...arg,
-              });
+              const code_result = codeEditAdvJs(p, value);
 
               if (typeof code_result === "string") {
                 p.ui.popup.script.typings.status = "error";

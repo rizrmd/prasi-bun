@@ -179,7 +179,7 @@ ERROR: $\{e.message}
 }
   `;
   try {
-    const fn = new Function(...Object.keys(arg), '__js', final_src);
+    const fn = new Function(...Object.keys(arg), "__js", final_src);
     fn(...Object.values(arg), meta.item.adv?.js);
   } catch (e: any) {
     console.error(`\n
@@ -210,6 +210,7 @@ export const replacement = {
   "stroke-linejoin": "strokeLinejoin",
   "stroke-linecap": "strokeLinecap",
   "clip-path": "clipPath",
+  "stroke-miterlimit": "strokeMiterlimit",
 };
 
 export const replaceWithObject = (tpl: string, data: any) => {
