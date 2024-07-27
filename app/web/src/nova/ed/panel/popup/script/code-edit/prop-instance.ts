@@ -9,12 +9,15 @@ export const codeEditPropInstance = (p: PG, value: string) => {
   if (meta) {
     const mprop = meta.mitem?.get("component")?.get("props")?.get(prop_name);
     if (mprop) {
-      const valueBuilt = codeBuild({ _: value })["_"];
-      mprop.doc?.transact(() => {
-        mprop.set("value", value);
-        mprop.set("valueBuilt", valueBuilt);
-      });
-      return valueBuilt;
+      try {
+        const valueBuilt = codeBuild({ _: value })["_"];
+        mprop.doc?.transact(() => {
+          mprop.set("value", value);
+          mprop.set("valueBuilt", valueBuilt);
+        });
+      } catch (e: any) {
+        return e.message;
+      }
     }
   }
 };
