@@ -13,8 +13,9 @@ export const activateMeta = (p: PG, _meta: IMeta) => {
       const meta_parent = p.page.meta[parent.id];
 
       if (meta_parent && meta_parent.parent) {
-        if (meta_parent.jsx_prop) {
+        if (meta_parent.item.component?.id === meta.parent?.comp_id) {
           is_jsx = true;
+          break;
         }
 
         parent = meta_parent.parent;
@@ -28,7 +29,7 @@ export const activateMeta = (p: PG, _meta: IMeta) => {
       i++;
     }
 
-    if (!is_jsx) {
+    if (is_jsx) {
       if (meta.parent.instance_id) {
         meta = p.page.meta[meta.parent.instance_id];
       } else {
