@@ -192,7 +192,9 @@ return typings;
     i++;
     if (v.mode === "local") {
       const im = tree_types.length;
-      const fn = new Function(`return ${v.val}`);
+      const fn = new Function(
+        `return ${typeof v.val === "string" ? v.val : JSON.stringify(v.val)}`
+      );
       const local_type = `\
 declare module "item-${im}" {
   export const \$\$_${k} = ${fn.toString()};
