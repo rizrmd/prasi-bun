@@ -8,7 +8,7 @@ export const scrollTreeActiveItem = () => {
         `.tree-${active.item_id}`
       ) as HTMLDivElement;
       if (div) {
-        div.scrollIntoView();
+        if (!active.hover.tree) div.scrollIntoView();
       }
       if (i > 7) clearInterval(ival);
       i++;
