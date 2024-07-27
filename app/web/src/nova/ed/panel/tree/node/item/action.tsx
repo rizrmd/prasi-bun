@@ -40,7 +40,7 @@ export const EdTreeAction = ({
   }
 
   return (
-    <div className="flex items-center pr-1 space-x-1">
+    <div className="flex items-center pr-4 space-x-1">
       {!!item.hidden && (
         <Tooltip content="Hidden: All">
           <div
