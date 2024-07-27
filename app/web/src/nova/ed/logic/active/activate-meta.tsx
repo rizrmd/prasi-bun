@@ -4,12 +4,17 @@ import { getMetaById } from "./get-meta";
 
 export const activateMeta = (p: PG, _meta: IMeta) => {
   scrollTreeActiveItem();
-  
+
   let meta = _meta;
   let parent_comp_id = meta.parent?.comp_id;
 
   if (!active.comp_id && meta.parent?.comp_id) {
-    if (!Object.keys(meta).includes("jsx_prop") && meta.parent.instance_id) {
+    const meta_keys = Object.keys(meta);
+    if (
+      (!meta_keys.includes("jsx_prop") ||
+        (meta_keys.includes("jsx_prop") && meta.jsx_prop?.is_root)) &&
+      meta.parent.instance_id
+    ) {
       const comp = getMetaById(p, meta.parent.instance_id);
       if (comp) meta = comp;
     }

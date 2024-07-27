@@ -165,6 +165,10 @@ export const viEvalScript = (
   const js = meta.item.adv?.jsBuilt || "";
   const src = replaceWithObject(js, replacement) || "";
 
+  if (js.includes("parent_props")) {
+    console.log(meta.item.name, arg);
+  }
+
   const final_src = `\
 // ${meta.item.name}: ${meta.item.id} 
 try {
