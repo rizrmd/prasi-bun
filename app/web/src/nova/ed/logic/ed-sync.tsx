@@ -152,7 +152,8 @@ export const edInitSync = (p: PG) => {
         },
         shakehand(client_id) {
           p.user.client_id = client_id;
-          console.log(`Prasi connected: ${client_id}`);
+          console.clear();
+          console.log(`🚀 Prasi Ready (client_id: ${client_id})`);
         },
         disconnected() {
           console.log("offline, reconnecting...");

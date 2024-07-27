@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../web/src/nova/prod/font.ts"],
-  "sourcesContent": ["import \"@fontsource/source-sans-3\";\n"],
-  "mappings": "sDAAAA,IAAAC,IAAAC",
-  "names": ["init_dirname", "init_buffer", "init_process"]
-}
