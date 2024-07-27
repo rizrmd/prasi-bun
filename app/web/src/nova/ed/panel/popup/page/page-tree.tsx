@@ -19,6 +19,11 @@ export const edPageTreeRender: NodeRender<PageItem> = (
   const item = node.data;
   if (!item) return <></>;
 
+  if (p.page.cur.id === item.id) {
+    p.page.cur.url = item.url || "";
+    p.page.cur.name = item.name || "";
+  }
+
   return (
     <div
       className={cx(
