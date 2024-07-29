@@ -92,9 +92,9 @@ export const EdApiDB = ({
 
                       localStorage.removeItem(`schema-md-${p.site.id}`);
                       _api.clear_route_cache(p.site.id);
-                      console.warn("reload 6");
+                      _api.type_rebuild(p.site.id);
 
-                      //location.reload();();
+                      location.reload();
                     }}
                   >
                     Generate
@@ -116,9 +116,8 @@ export const EdApiDB = ({
 
                     localStorage.removeItem(`schema-md-${p.site.id}`);
                     _api.clear_route_cache(p.site.id);
-                    console.warn("reload 7");
-
-                    //location.reload();();
+                    _api.type_rebuild(p.site.id);
+                    location.reload();
                   }}
                 >
                   DB Pull
@@ -141,7 +140,7 @@ export const EdApiDB = ({
                 _api.clear_route_cache(p.site.id);
                 console.warn("reload 8");
 
-                //location.reload();();
+                location.reload();
               }}
             >
               Restart Server

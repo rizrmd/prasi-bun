@@ -34,7 +34,6 @@ export const EdApiDeploy = ({
               const res = await api._deploy({
                 type: "deploy",
                 id_site: p.site.id,
-                dlurl: `${serverurl}/site-export/${p.site.id}`,
               });
 
               server.status = "ready";
