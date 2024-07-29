@@ -5,7 +5,7 @@ import { removeAsync } from "fs-jetpack";
 import { polyfillNode } from "esbuild-plugin-polyfill-node";
 
 await removeAsync(dir.path("/app/srv/core"));
-await $`bun tailwindcss -i  src/nova/prod/tailwind.css -m -o ../srv/core/index.css`
+await $`bun tailwindcss -i  src/nova/prod/tailwind.css -o ../srv/core/index.css`
   .cwd(dir.path(`/app/web`))
   .quiet();
 
