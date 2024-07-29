@@ -6,13 +6,17 @@ import { validate } from "uuid";
 import { dir } from "dir";
 import { existsAsync, readAsync, exists } from "fs-jetpack";
 import { code } from "../ws/sync/code/code";
-
+import { encode } from "msgpackr";
+import { binaryExtensions } from "../util/binary-ext";
 export const _ = {
   url: "/prod-zip/:site_id",
   async api(site_id: string) {
     const { req, res } = apiContext(this);
 
+    let is_msgpack = req.query_parameters["msgpack"];
+
     if (validate(site_id)) {
+      const mode = is_msgpack ? "binary" : "string";
       const result = {
         layouts: await _db.page.findMany({
           where: {
@@ -53,6 +57,7 @@ export const _ = {
           select: { id: true, content_tree: true },
         }),
         public: readDirectoryRecursively(
+          mode,
           code.path(site_id, "site", "src", "public")
         ),
         site: await _db.site.findFirst({
@@ -67,24 +72,29 @@ export const _ = {
         }),
         code: {
           server: readDirectoryRecursively(
+            mode,
             code.path(site_id, "server", "build")
           ),
-          site: readDirectoryRecursively(code.path(site_id, "site", "build")),
-          core: readDirectoryRecursively(dir.path(`/app/srv/core`)),
+          site: readDirectoryRecursively(
+            mode,
+            code.path(site_id, "site", "build")
+          ),
+          core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
         },
       };
 
-      return await gzipAsync(JSON.stringify(result));
+      return await gzipAsync(encode(result));
     }
     return new Response("NOT FOUND", { status: 403 });
   },
 };
 
 export function readDirectoryRecursively(
+  mode: "string" | "binary",
   dirPath: string,
   baseDir?: string[]
-): Record<string, string> {
-  const result: Record<string, string> = {};
+): Record<string, string | Uint8Array> {
+  const result: Record<string, string | Uint8Array> = {};
 
   if (!exists(dirPath)) return result;
   const contents = fs.readdirSync(dirPath);
@@ -94,11 +104,19 @@ export function readDirectoryRecursively(
     const stats = fs.statSync(itemPath);
 
     if (stats.isFile()) {
-      const content = fs.readFileSync(itemPath, "utf-8");
+      let content: any = "";
+      if (mode === "string") content = fs.readFileSync(itemPath, "utf-8");
+      else {
+        if (binaryExtensions.includes(itemPath.split(".").pop() || "")) {
+          content = new Uint8Array(fs.readFileSync(itemPath));
+        } else {
+          content = fs.readFileSync(itemPath, "utf-8");
+        }
+      }
       result[[...(baseDir || []), item].join("/")] = content;
     } else if (stats.isDirectory()) {
       if (item !== "node_modules") {
-        const subdirResult = readDirectoryRecursively(itemPath, [
+        const subdirResult = readDirectoryRecursively(mode, itemPath, [
           ...(baseDir || []),
           item,
         ]);
