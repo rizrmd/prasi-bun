@@ -7,6 +7,8 @@ import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { scanComponent } from "./component";
 
+const cached = { route: null as any };
+
 const getRoute = () => {
   return new Promise<{
     site: any;
@@ -16,6 +18,8 @@ const getRoute = () => {
     }[];
     layout: any;
   }>(async (done) => {
+    if (cached.route) done(cached.route);
+    
     let is_done = false;
 
     let res = await fetch(base.url`_prasi/route`);
@@ -23,7 +27,8 @@ const getRoute = () => {
       if (!res.headers.get("content-encoding")) {
         fetch(base.url`_prasi/compress/only-gz`);
       }
-      done(await res.json());
+      cached.route = await res.json();
+      done(cached.route);
     }
   });
 };
@@ -101,7 +106,7 @@ const injectSiteScript = () => {
     } else {
       script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
     }
-    
+
     script.onerror = () => {
       done();
     };
