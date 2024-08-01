@@ -13,6 +13,7 @@ import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
 import { $ } from "bun";
+import { waitUntil } from "web-utils";
 const pending = {} as any;
 
 export const initFrontEnd = async (
@@ -135,7 +136,10 @@ export const initFrontEnd = async (
     fe.rebuilding = true;
     try {
       await fe.ctx.rebuild();
-    } catch (e) {}
+    } catch (e) {
+      console.log(`Failed to rebuild front-end ${id_site}`);
+      console.error(e);
+    }
     fe.rebuilding = false;
   } catch (e: any) {
     console.error("Error building front end", id_site);
@@ -205,46 +209,46 @@ const initBuildCtx = async ({
         name: "prasi",
         async setup(setup) {
           try {
-            setup.onEnd(async (res) => {
-              const client_ids = user.active
-                .findAll({ site_id: id_site })
-                .map((e) => e.client_id);
-              if (res.errors.length > 0) {
-                await codeError(
-                  id_site,
-                  (await formatMessages(res.errors, { kind: "error" })).join(
-                    "\n\n"
-                  )
-                );
+            setup.onEnd((res) => {
+              setTimeout(async () => {
+                const client_ids = user.active
+                  .findAll({ site_id: id_site })
+                  .map((e) => e.client_id);
+                if (res.errors.length > 0) {
+                  await codeError(
+                    id_site,
+                    (await formatMessages(res.errors, { kind: "error" })).join(
+                      "\n\n"
+                    )
+                  );
 
-                const now = Date.now();
-                client_ids.forEach((client_id) => {
-                  const ws = conns.get(client_id)?.ws;
-                  if (ws)
-                    sendWS(ws, {
-                      type: SyncType.Event,
-                      event: "code_changes",
-                      data: { ts: now, mode: "frontend", status: "error" },
-                    });
-                });
-              } else {
-                await codeError(id_site, "");
+                  const now = Date.now();
+                  client_ids.forEach((client_id) => {
+                    const ws = conns.get(client_id)?.ws;
+                    if (ws)
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        event: "code_changes",
+                        data: { ts: now, mode: "frontend", status: "error" },
+                      });
+                  });
+                } else {
+                  await codeError(id_site, "");
+                  await $`rm -rf ${out_dir}`.quiet();
+                  await $`mv ${out_dir_temp} ${out_dir}`.quiet();
 
-                await $`rm -rf ${out_dir_switch}`.quiet();
-                await $`mv ${out_dir} ${out_dir_switch}`.quiet();
-                await $`mv ${out_dir_temp} ${out_dir}`.quiet();
-
-                const now = Date.now();
-                client_ids.forEach((client_id) => {
-                  const ws = conns.get(client_id)?.ws;
-                  if (ws)
-                    sendWS(ws, {
-                      type: SyncType.Event,
-                      event: "code_changes",
-                      data: { ts: now, mode: "frontend", status: "ok" },
-                    });
-                });
-              }
+                  const now = Date.now();
+                  client_ids.forEach((client_id) => {
+                    const ws = conns.get(client_id)?.ws;
+                    if (ws)
+                      sendWS(ws, {
+                        type: SyncType.Event,
+                        event: "code_changes",
+                        data: { ts: now, mode: "frontend", status: "ok" },
+                      });
+                  });
+                }
+              });
             });
           } catch (e) {
             console.log("ERROR");
