@@ -100,7 +100,9 @@ export const initFrontEnd = async (
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
                 const build_timeout = setTimeout(async () => {
-                  console.log(`Build unfinished ${id_site} ${filename}`);
+                  console.log(
+                    `Build front-end unfinished ${id_site} ${filename}`
+                  );
                   await fe.ctx.dispose();
                   fe.ctx = await initBuildCtx({ id_site, root });
                 }, 3000);
