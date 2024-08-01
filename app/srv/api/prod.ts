@@ -90,22 +90,16 @@ export const _ = {
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
 
-          try {
-            let file = Bun.file(build_path);
-            return new Response(
-              await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-              {
-                headers: {
-                  "content-encoding": "gzip",
-                  "content-type": mime.getType(build_path) || "",
-                },
-              }
-            );
-          } catch (e) {
-            return new Response("location.reload", {
-              headers: { "content-type": "application/javascript" },
-            });
-          }
+          let file = Bun.file(build_path);
+          return new Response(
+            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+            {
+              headers: {
+                "content-encoding": "gzip",
+                "content-type": mime.getType(build_path) || "",
+              },
+            }
+          );
         }
         case "route": {
           if (!g.route_cache) g.route_cache = {};
