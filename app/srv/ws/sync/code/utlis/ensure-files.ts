@@ -94,7 +94,7 @@ export const ensureFiles = async (path: string, id_site: string) => {
               "tailwind-merge": "^2.2.1",
               "tailwindcss-animate": "^1.0.7",
               uuid: "^9.0.1",
-              xlsx: "npm:@e965/xlsx@^0.20.2-released.0",
+              xlsx: "npm:@e965/xlsx",
               zod: "^3.22.4",
             },
           }),
