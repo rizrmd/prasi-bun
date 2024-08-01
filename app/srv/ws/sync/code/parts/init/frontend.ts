@@ -85,6 +85,7 @@ export const initFrontEnd = async (
           const srv = code.internal.server[id_site];
           if (
             filename?.startsWith("node_modules") ||
+            filename?.startsWith("server.ts") ||
             filename?.startsWith("typings")
           )
             return;
@@ -103,7 +104,7 @@ export const initFrontEnd = async (
                   await fe.ctx.dispose();
                   fe.ctx = await initBuildCtx({ id_site, root });
                 }, 3000);
-                
+
                 try {
                   broadcastLoading();
                   await fe.ctx.rebuild();
