@@ -90,16 +90,30 @@ export const _ = {
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
 
-          let file = Bun.file(build_path);
-          return new Response(
-            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-            {
-              headers: {
-                "content-encoding": "gzip",
-                "content-type": mime.getType(build_path) || "",
-              },
-            }
-          );
+          
+          try {
+            let file = Bun.file(build_path);
+
+            return new Response(
+              await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+              {
+                headers: {
+                  "content-encoding": "gzip",
+                  "content-type": mime.getType(build_path) || "",
+                },
+              }
+            );
+          } catch (e: any) {
+            return new Response(
+              `
+              console.error("Failed to load index.js")
+              console.error("${e.message}")
+`,
+              {
+                headers: { "content-type": "application/javascript" },
+              }
+            );
+          }
         }
         case "route": {
           if (!g.route_cache) g.route_cache = {};
