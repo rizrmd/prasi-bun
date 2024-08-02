@@ -4,6 +4,7 @@ import { IItem } from "../../../../utils/types/item";
 import { FMCompDef, FNCompDef } from "../../../../utils/types/meta-fn";
 import { Menu, MenuItem } from "../../../../utils/ui/context-menu";
 import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
+import { ChevronDown, ChevronRight } from "../tree/node/item/indent";
 import { createEditScript } from "./prop-instance/edit-script";
 import { EdPropInstanceButton } from "./prop-instance/prop-button";
 import { EdPropInstanceCode } from "./prop-instance/prop-code";
@@ -12,8 +13,8 @@ import { EdPropInstanceOptions } from "./prop-instance/prop-option";
 import { reset } from "./prop-instance/prop-reset";
 import { EdPropInstanceText } from "./prop-instance/prop-text";
 import { EdStyleAll } from "./style/side-all";
-import { ChevronDown, ChevronRight } from "../tree/node/item/indent";
-import { ChevronLeft } from "../popup/script/workbench";
+import { NodeModel } from "@minoru/react-dnd-treeview";
+import { PropItem } from "./prop-master/tree-item";
 
 const w = window as any;
 
@@ -89,10 +90,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
             for (const [k, v] of Object.entries(meta.item.script?.props)) {
               if (v.value && v.value.length > 3) {
                 try {
-                  const evn = new Function(
-                    "arg",
-                    `arg["${k}"] = (() => { ${v.value} })()`
-                  );
+                  const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
                   evn(arg);
                 } catch (e) {}
               }
@@ -103,7 +101,7 @@ export const EdSidePropInstance: FC<{ meta: IMeta }> = ({ meta }) => {
                 try {
                   const evn = new Function(
                     "arg",
-                    `arg["${k}"] = (() => { ${v.valueBuilt} })()`
+                    `arg["${k}"] = ${v.valueBuilt}`
                   );
                   evn(arg);
                 } catch (e) {
