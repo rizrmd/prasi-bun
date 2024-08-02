@@ -34,7 +34,10 @@ export const EdPropInstanceButton: FC<{
       for (const [k, v] of Object.entries(meta.item.script?.props)) {
         if (v.value && v.value.length > 3) {
           try {
-            const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
+            const evn = new Function(
+              "arg",
+              `arg["${k}"] = (() => { ${v.value} })()`
+            );
             evn(arg);
           } catch (e) {
             console.error(e);
@@ -46,7 +49,10 @@ export const EdPropInstanceButton: FC<{
       for (const [k, v] of Object.entries(meta.item.component.props)) {
         if (v.valueBuilt && v.valueBuilt.length > 3) {
           try {
-            const evn = new Function("arg", `arg["${k}"] = ${v.valueBuilt}`);
+            const evn = new Function(
+              "arg",
+              `arg["${k}"] = (() => { ${v.valueBuilt} })()`
+            );
             evn(arg);
           } catch (e) {
             console.error(e);
