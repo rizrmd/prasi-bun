@@ -19,7 +19,7 @@ export const EdPageHistoryList = () => {
         <Loading backdrop={false} />
       ) : (
         <div className="flex flex-1 flex-col items-stretch">
-          {local.list.map((e) => {
+          {local.list.map((e, idx) => {
             return (
               <div
                 className={cx(
@@ -34,6 +34,15 @@ export const EdPageHistoryList = () => {
                   local.render();
                 }}
               >
+                <div
+                  className={cx(css`
+                    width: 20px;
+                    border-right: 1px solid #ccc;
+                    margin-right: 5px;
+                  `)}
+                >
+                  {idx + 1}
+                </div>
                 <div className="flex-1">
                   {format(parseInt(e.ts) * 5000, "yyyy-MM-dd HH:mm:ss")}
                 </div>
