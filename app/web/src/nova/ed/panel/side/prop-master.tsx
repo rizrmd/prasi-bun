@@ -97,15 +97,26 @@ export const EdSidePropComp: FC<{ meta: IMeta }> = ({ meta }) => {
 
     grouped[group].push(item);
   }
-  const final_tree: NodeModel<PropItem>[] = [];
+
+  let final_tree: NodeModel<PropItem>[] = [];
+  let root_tree: NodeModel<PropItem>[] = [];
   for (const items of Object.values(grouped)) {
     const idx = items.findIndex((e) => e.text.endsWith("__"));
     const plucked = items.splice(idx, 1);
     items.unshift(plucked[0]);
     for (const item of items) {
-      final_tree.push(item);
+      if (item.data?.name.includes("__")) {
+        final_tree.push(item);
+      } else {
+        root_tree.push(item);
+      }
     }
   }
+
+  root_tree = root_tree.sort((a, b) => {
+    return (a.data?.prop?.idx || 0) - (b.data?.prop?.idx || 0);
+  });
+  final_tree = [...root_tree, ...final_tree];
 
   let hide = localStorage.getItem("prasi-prop-hide")?.split(",") || [];
 
