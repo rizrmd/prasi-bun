@@ -18,7 +18,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
     return;
   }
   if (mode === "page" || mode === "comp") {
-    const doc = docs[mode][id].doc as Y.Doc;
+    const doc = docs[mode][id].doc as YJS.Doc;
     const diff = await gunzipAsync(bin);
     const um = docs[mode][id].um;
     um.addTrackedOrigin(this.client_id);
@@ -55,11 +55,26 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
                 ts: "desc",
               },
             });
-            const ids = [];
+            const ids: string[] = [];
+
+            let last_ts = 0;
+            let last_stacked = false;
             for (let i = 0; i < res.length; i++) {
+              const ts = parseInt(res[i].ts);
+
+              if (!last_ts) last_ts = ts;
+
               if (i > 25) {
-                ids.push(res[i].id);
+                if (!last_stacked) {
+                  if (((last_ts - ts) / 1000) * 60 < 10) {
+                    last_stacked = true;
+                    ids.push(res[i].id);
+                  }
+                } else {
+                  last_stacked = false;
+                }
               }
+              last_ts = ts;
             }
             await _db.page_history.deleteMany({
               where: { id: { in: ids } },
