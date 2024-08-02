@@ -83,10 +83,7 @@ export const EdPropInstanceOptions: FC<{
           for (const [k, v] of Object.entries(meta.item.script?.props)) {
             if (v.value && v.value.length > 3) {
               try {
-                const evn = new Function(
-                  "arg",
-                  `arg["${k}"] = (() => { ${v.value} })()`
-                );
+                const evn = new Function("arg", `arg["${k}"] = ${v.value}`);
                 evn(arg);
               } catch (e) {}
             }
@@ -98,7 +95,7 @@ export const EdPropInstanceOptions: FC<{
               try {
                 const evn = new Function(
                   "arg",
-                  `arg["${k}"] = (() => { ${v.valueBuilt} })()`
+                  `arg["${k}"] = ${v.valueBuilt}`
                 );
                 evn(arg);
               } catch (e) {
