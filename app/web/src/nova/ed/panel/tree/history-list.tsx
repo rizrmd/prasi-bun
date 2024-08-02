@@ -48,7 +48,10 @@ export const EdPageHistoryList = () => {
                 </div>
 
                 <div className="text-right text-[11px]">
-                  {formatDistance(Date.now(), parseInt(e.ts) * 5000) + " ago"}
+                  {formatDistance(Date.now(), parseInt(e.ts) * 5000).replace(
+                    "less than a minute",
+                    "seconds"
+                  ) + " ago"}
                 </div>
               </div>
             );
