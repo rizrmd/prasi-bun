@@ -15,6 +15,7 @@ export const _ = {
 
     let is_msgpack = req.query_parameters["msgpack"];
 
+    console.log(is_msgpack);
     if (validate(site_id)) {
       const mode = is_msgpack ? "binary" : "string";
       const result = {
@@ -83,7 +84,9 @@ export const _ = {
         },
       };
 
-      return await gzipAsync(encode(result));
+      return await gzipAsync(
+        mode === "binary" ? encode(result) : JSON.stringify(result)
+      );
     }
     return new Response("NOT FOUND", { status: 403 });
   },
