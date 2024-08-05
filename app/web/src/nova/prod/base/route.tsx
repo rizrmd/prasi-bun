@@ -21,15 +21,12 @@ const getRoute = () => {
   }>(async (done) => {
     if (cached.route) done(cached.route);
 
-    let is_done = false;
     const res = await fetch(base.url`_prasi/route`);
-    if (!is_done) {
-      if (!res.headers.get("content-encoding")) {
-        fetch(base.url`_prasi/compress/only-gz`);
-      }
-      cached.route = await res.json();
-      done(cached.route);
+    if (!res.headers.get("content-encoding")) {
+      fetch(base.url`_prasi/compress/only-gz`);
     }
+    cached.route = await res.json();
+    done(cached.route);
   });
 };
 
@@ -94,8 +91,9 @@ const injectSiteScript = () => {
     const cur = new URL(location.href);
     cur.pathname = "";
     if (
-      !["prasi.avolut.com"].includes(cur.hostname) &&
-      cur.host !== "localhost:4550"
+      !base_url ||
+      (!["prasi.avolut.com"].includes(cur.hostname) &&
+        cur.host !== "localhost:4550")
     ) {
       const cur_url = cur.toString();
       script.src = `${
