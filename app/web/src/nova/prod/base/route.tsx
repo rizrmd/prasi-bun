@@ -7,10 +7,11 @@ import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { scanComponent } from "./component";
 
-const cached = { route: null as any };
+const cached = { route: null as any, promise: null as any };
 
 const getRoute = () => {
-  return new Promise<{
+  if (cached.promise) return cached.promise;
+  cached.promise = new Promise<{
     site: any;
     urls: {
       id: string;
@@ -19,10 +20,9 @@ const getRoute = () => {
     layout: any;
   }>(async (done) => {
     if (cached.route) done(cached.route);
-    
-    let is_done = false;
 
-    let res = await fetch(base.url`_prasi/route`);
+    let is_done = false;
+    const res = await fetch(base.url`_prasi/route`);
     if (!is_done) {
       if (!res.headers.get("content-encoding")) {
         fetch(base.url`_prasi/compress/only-gz`);

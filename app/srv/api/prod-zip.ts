@@ -15,7 +15,6 @@ export const _ = {
 
     let is_msgpack = req.query_parameters["msgpack"];
 
-    console.log(is_msgpack);
     if (validate(site_id)) {
       const mode = is_msgpack ? "binary" : "string";
       const result = {
