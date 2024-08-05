@@ -2,8 +2,19 @@ import { get } from "idb-keyval";
 import { IRoot } from "../../../utils/types/root";
 import { base } from "./base";
 
+const pendingPage = {} as Record<
+  string,
+  Promise<{
+    id: string;
+    url: string;
+    root: IRoot;
+  }>
+>;
+
 export const loadPage = (page_id: string) => {
-  return new Promise<{
+  if (typeof pendingPage[page_id] === "object") return pendingPage[page_id];
+
+  pendingPage[page_id] = new Promise<{
     id: string;
     url: string;
     root: IRoot;
@@ -22,10 +33,18 @@ export const loadPage = (page_id: string) => {
       id: string;
       url: string;
       root: IRoot;
+      content_tree?: IRoot;
     };
+
+    if (!res.root && res.content_tree) {
+      res.root = res.content_tree;
+      delete res.content_tree;
+    }
 
     if (!returned) done(res);
   });
+
+  return pendingPage[page_id];
 };
 
 export const loadPages = (page_ids: string[]) => {
@@ -48,7 +67,7 @@ export const loadPages = (page_ids: string[]) => {
         break;
       }
     }
-    
+
     if (is_done) {
       done(result);
     }
