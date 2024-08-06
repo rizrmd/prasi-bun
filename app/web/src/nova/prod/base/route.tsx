@@ -95,10 +95,8 @@ const injectSiteScript = () => {
       (!["prasi.avolut.com"].includes(cur.hostname) &&
         cur.host !== "localhost:4550")
     ) {
-      const cur_url = cur.toString();
-      script.src = `${
-        cur_url.endsWith("/") ? cur_url : `${cur_url}/`
-      }_prasi/load.js?url=${cur_url}&v3`;
+      let cur_url = trim(cur.toString(), "/");
+      script.src = `${cur_url}/_prasi/load.js?url=${cur_url}&v3`;
 
       base.site.api_url = `${cur.protocol}//${cur.host}`;
     } else {

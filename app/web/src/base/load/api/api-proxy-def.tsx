@@ -25,15 +25,11 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
     }
 
     url_cur.pathname = "";
-    let cur_url = url_cur.toString();
+    let cur_url = trim(url_cur.toString(), "/");
     if (with_types) {
-      script.src = `${
-        cur_url.endsWith("/") ? cur_url : `${cur_url}/`
-      }_prasi/load.js?url=${url}&v3&dev=1${is_remote}`;
+      script.src = `${cur_url}/_prasi/load.js?url=${url}&v3&dev=1${is_remote}`;
     } else {
-      script.src = `${
-        cur_url.endsWith("/") ? cur_url : `${cur_url}/`
-      }_prasi/load.js?url=${url}&v3${is_remote}`;
+      script.src = `${cur_url}/_prasi/load.js?url=${url}&v3${is_remote}`;
     }
     script.onerror = () => {
       done();
