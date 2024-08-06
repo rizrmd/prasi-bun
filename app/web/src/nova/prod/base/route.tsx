@@ -81,12 +81,11 @@ const injectSiteScript = () => {
       base_url = `${location.protocol}//${location.host}`;
       base.site.api_url = base_url;
     }
+    base_url = base_url.trim();
 
     if (!localStorage.getItem("api-ts-" + base_url)) {
       localStorage.setItem("api-ts-" + base_url, Date.now().toString());
     }
-
-    const ts = localStorage.getItem("api-ts-" + base_url);
 
     const cur = new URL(location.href);
     cur.pathname = "";
@@ -98,11 +97,11 @@ const injectSiteScript = () => {
       const cur_url = cur.toString();
       script.src = `${
         cur_url.endsWith("/") ? cur_url : `${cur_url}/`
-      }_prasi/load.js?url=${cur_url}&v3&ts=${ts}`;
+      }_prasi/load.js?url=${cur_url}&v3`;
 
       base.site.api_url = `${cur.protocol}//${cur.host}`;
     } else {
-      script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3&ts=${ts}`;
+      script.src = `${base_url}/_prasi/load.js?url=${base_url}&v3`;
     }
 
     script.onerror = () => {
