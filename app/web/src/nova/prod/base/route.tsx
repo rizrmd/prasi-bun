@@ -6,6 +6,7 @@ import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { scanComponent } from "./component";
+import trim from "lodash.trim";
 
 const cached = { route: null as any, promise: null as any };
 
@@ -81,7 +82,7 @@ const injectSiteScript = () => {
       base_url = `${location.protocol}//${location.host}`;
       base.site.api_url = base_url;
     }
-    base_url = base_url.trim();
+    base_url = trim(base_url, "/");
 
     if (!localStorage.getItem("api-ts-" + base_url)) {
       localStorage.setItem("api-ts-" + base_url, Date.now().toString());
