@@ -3,8 +3,6 @@ import trim from "lodash.trim";
 export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
   const url = trim(_url, "/");
 
-  const base = baseUrl(url);
-
   await new Promise<void>((done) => {
     const d = document;
     const script = d.createElement("script");
@@ -26,10 +24,11 @@ export const loadApiProxyDef = async (_url: string, with_types: boolean) => {
       is_remote = "&remote=1";
     }
 
+    url_cur.pathname = ""
     if (with_types) {
-      script.src = `/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}${is_remote}`;
+      script.src = `${url_cur.toString()}/_prasi/load.js?url=${url}&v3&dev=1&ts=${ts}${is_remote}`;
     } else {
-      script.src = `/_prasi/load.js?url=${url}&v3&ts=${ts}${is_remote}`;
+      script.src = `${url_cur.toString()}/_prasi/load.js?url=${url}&v3&ts=${ts}${is_remote}`;
     }
     script.onerror = () => {
       done();
