@@ -201,18 +201,20 @@ return typings;
   let i = 0;
   for (const [k, v] of Object.entries(vars)) {
     i++;
+    let vval = typeof v.val !== "string" ? JSON.stringify(v.val) : v.val;
+
     if (v.mode === "local") {
       tree_usage.push({
         import: ``,
         usage: `
-        const \$\$_${k} = ${v.val};
+        const \$\$_${k} = ${vval};
         const ${k} = null as unknown as typeof \$\$_${k} & {render: () => void};`,
       });
     } else if (v.mode === "prop") {
       const im = tree_types.length;
       tree_types.push(`\
 declare module "item-${im}" {
-  export const \$\$_${k} = ${v.val};
+  export const \$\$_${k} = ${vval};
 }
 `);
       tree_usage.push({
@@ -221,11 +223,11 @@ declare module "item-${im}" {
       });
     } else if (v.mode === "type") {
       tree_types.push(`
-export const ${k} = null as unknown as ${v.val};
+export const ${k} = null as unknown as ${vval};
 `);
     }
   }
-
+  console.log(tree_types, tree_usage);
   register(monaco, tree_types.join("\n"), "typings:tree_types.d.ts");
   register(
     monaco,
