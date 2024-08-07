@@ -1,6 +1,7 @@
 import hash_sum from "hash-sum";
 import pako from "pako";
 import { fetchViaProxy } from "../proxy";
+import { del, get, set } from "idb-keyval";
 
 const schema_promise = {
   tables: {} as Record<string, any>,
@@ -138,10 +139,7 @@ export const dbProxy = (dburl: string) => {
   );
 };
 
-const cachedQueryResult: Record<
-  string,
-  { timestamp: number; result: any; promise: Promise<any> }
-> = {};
+const editorQueryLoaded: Record<string, true> = {};
 
 export const fetchSendDb = async (params: any, dburl: string) => {
   const base = new URL(dburl);
@@ -156,55 +154,49 @@ export const fetchSendDb = async (params: any, dburl: string) => {
   }
 
   const hsum = hash_sum(params);
-  let cached = cachedQueryResult[hsum];
 
-  if (!cached || (cached && Date.now() - cached.timestamp > 1000)) {
-    cachedQueryResult[hsum] = {
-      timestamp: Date.now(),
-      promise: fetchViaProxy(
-        url,
-        params,
-        {
-          "content-type": "application/json",
-        },
-        false
-      ),
-      result: null,
-    };
+  let isEditor = false;
+  if (
+    base.hostname !== location.hostname &&
+    (window as any).isEditor &&
+    ["prasi.avolut.com", "localhost:4550"].includes(location.host)
+  )
+    isEditor = true;
 
-    let result = await cachedQueryResult[hsum].promise;
-    cached = cachedQueryResult[hsum];
+  const load = async () => {
+    const result = await fetchViaProxy(
+      url,
+      params,
+      {
+        "content-type": "application/json",
+      },
+      false
+    );
+
     try {
-      if (typeof result === "string") {
-        result = JSON.parse(result);
-        cachedQueryResult[hsum].result = result;
-        return result;
-      } else {
-        cachedQueryResult[hsum].result = result;
-        return result;
-      }
+      if (typeof result === "string") return JSON.parse(result);
     } catch (e) {
-      if (result) {
-        throw new Error("DBQuery failed:\n" + result);
-      }
-      return null;
+      return result;
     }
+  };
+
+  if (isEditor) {
+    let result = await get(`editor-db-cache-${hsum}`);
+    if (!result) {
+      result = await load();
+      editorQueryLoaded[hsum] = true;
+      set(`editor-db-cache-${hsum}`, result);
+    } else {
+      if (!editorQueryLoaded[hsum]) {
+        load().then((result) => {
+          set(`editor-db-cache-${hsum}`, result);
+        });
+        editorQueryLoaded[hsum] = true;
+      }
+    }
+
+    return result;
   }
 
-  if (cached.result) return cached.result;
-
-  let result = await cached.promise;
-  if (result) {
-    try {
-      if (typeof result === "string") {
-        result = JSON.parse(result);
-        return result;
-      } else {
-        return result;
-      }
-    } catch (e) {
-      console.error("DBQuery failed:", result);
-    }
-  }
-  return null;
+  return await load();
 };

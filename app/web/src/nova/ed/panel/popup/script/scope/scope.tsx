@@ -227,7 +227,6 @@ export const ${k} = null as unknown as ${vval};
 `);
     }
   }
-  console.log(tree_types, tree_usage);
   register(monaco, tree_types.join("\n"), "typings:tree_types.d.ts");
   register(
     monaco,

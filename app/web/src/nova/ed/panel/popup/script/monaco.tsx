@@ -1,5 +1,4 @@
 import type { Monaco, OnMount } from "@monaco-editor/react";
-import { createStore } from "idb-keyval";
 import trim from "lodash.trim";
 import { FC, useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
@@ -43,7 +42,6 @@ export const EdScriptMonaco: FC<{}> = () => {
     mode: "",
     imports: "",
     active_id: "",
-    idbstore: createStore(`prasi-page-${p.page.cur.id}`, "script-history"),
   });
 
   const Editor = jscript.editor;
