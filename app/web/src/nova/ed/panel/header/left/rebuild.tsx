@@ -29,10 +29,10 @@ export const EdRebuildJs = () => {
     >
       <div
         className={cx(
-          "flex text-center items-center  cursor-pointer px-[5px] transition-all",
+          "flex text-center items-center cursor-pointer px-[5px] transition-all",
           "rounded",
           p.ui.popup.code.rebuilding
-            ? "bg-blue-600  text-white"
+            ? "bg-blue-600 text-white"
             : "hover:bg-blue-50"
         )}
         dangerouslySetInnerHTML={{
