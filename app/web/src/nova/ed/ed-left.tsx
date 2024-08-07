@@ -11,6 +11,7 @@ import { EdTreeBody } from "./panel/tree/body";
 import { EdPageHistoryBtn } from "./panel/tree/history-btn";
 import { EdPageHistoryList } from "./panel/tree/history-list";
 import { EdTreeSearch } from "./panel/tree/search";
+import { EdRebuildJs } from "./panel/header/left/rebuild";
 
 export const EdLeft = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -54,6 +55,7 @@ export const EdLeft = () => {
           </div>
 
           <div className="flex items-stretch space-x-1 pl-2">
+            <EdRebuildJs />
             <EdSiteJS />
             <EdApi />
           </div>

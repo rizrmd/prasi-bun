@@ -8,12 +8,11 @@ import { EDGlobal } from "../../../logic/ed-global";
 import {
   iconDownload,
   iconHourglass,
-  iconLoading,
   iconNewTab,
   iconRebuild,
   iconScrollOff,
   iconScrollOn,
-  iconUpload,
+  iconUpload
 } from "./icons";
 
 export const code = {

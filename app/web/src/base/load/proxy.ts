@@ -88,6 +88,7 @@ export const fetchViaProxy = async (
         );
         const raw = await res.text();
         if (parse_json === false) return raw;
+
         try {
           return JSON.parse(raw, replacer);
         } catch (e) {
