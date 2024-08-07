@@ -185,7 +185,7 @@ export const fetchSendDb = async (params: any, dburl: string) => {
       }
     } catch (e) {
       if (result) {
-        throw new Error("DBQuery failed:\n" +  result);
+        throw new Error("DBQuery failed:\n" + result);
       }
       return null;
     }
