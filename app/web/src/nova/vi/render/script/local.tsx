@@ -42,8 +42,9 @@ export const createViLocal = (
     const [_, set] = useState({});
     const local = ref.current;
     local.render = () => {
-      if ((window as any).prasiContext.render) {
-        (window as any).prasiContext.render();
+      const w = window as any;
+      if (!w.isEditor && w.prasiContext.render) {
+        w.prasiContext.render();
       } else {
         set({});
       }
