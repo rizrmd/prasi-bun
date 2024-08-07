@@ -5,6 +5,7 @@ import { jscript } from "../../../../../../utils/script/jscript";
 import { register } from "../../../../../../utils/script/typings";
 import { IContent } from "../../../../../../utils/types/general";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
+import inspect from "object-inspect";
 
 type Monaco = Parameters<OnMount>[1];
 export type MonacoEditor = Parameters<OnMount>[0];
@@ -201,7 +202,7 @@ return typings;
   let i = 0;
   for (const [k, v] of Object.entries(vars)) {
     i++;
-    let vval = typeof v.val !== "string" ? JSON.stringify(v.val) : v.val;
+    let vval = typeof v.val !== "string" ? inspect(v.val) : v.val;
 
     if (v.mode === "local") {
       tree_usage.push({
