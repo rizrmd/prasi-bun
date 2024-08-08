@@ -58,6 +58,7 @@ export const ensureFiles = async (path: string, id_site: string) => {
               "@radix-ui/react-navigation-menu": "^1.2.0",
               "@radix-ui/react-popover": "^1.0.7",
               "@radix-ui/react-progress": "^1.1.0",
+              "@radix-ui/react-scroll-area": "^1.1.0",
               "@radix-ui/react-slider": "^1.1.2",
               "@radix-ui/react-slot": "^1.0.2",
               "@radix-ui/react-switch": "^1.1.0",
