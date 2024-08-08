@@ -218,7 +218,7 @@ export const devItem = (
               for (const [k, v] of Object.entries(compile)) {
                 src[k] = v.value;
               }
-              let code_result = codeBuild(src);
+              let code_result = await codeBuild(src);
               await new Promise((done) => {
                 setTimeout(done);
               });
