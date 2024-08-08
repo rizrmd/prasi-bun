@@ -18,8 +18,9 @@ const ctx = await context({
   format: "esm",
   jsx: "transform",
   minify: true,
-  sourcemap: false,
+  sourcemap: true,
   logLevel: "error",
+  metafile: true,
   assetNames: `[name]`,
   loader: { ".woff": "file", ".ttf": "file", ".woff2": "file" },
   define: {
@@ -81,4 +82,7 @@ const ctx = await context({
   ],
 });
 
+ctx.rebuild().then((e) => {
+  Bun.write(dir.data("metafile.json"), JSON.stringify(e.metafile));
+});
 ctx.watch();

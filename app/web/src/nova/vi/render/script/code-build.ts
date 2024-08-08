@@ -1,9 +1,20 @@
-import { transform } from "sucrase";
+import type { transform } from "sucrase";
 
-export const codeBuild = (codes: Record<string, string>, filePath?: string) => {
+const imported = {
+  transform: null as null | typeof transform,
+};
+
+export const codeBuild = async (
+  codes: Record<string, string>,
+  filePath?: string
+) => {
+  if (!imported.transform) {
+    imported.transform = (await import("sucrase")).transform;
+  }
+
   const result = {} as Record<string, string>;
   for (const [k, v] of Object.entries(codes)) {
-    result[k] = transform(v, {
+    result[k] = imported.transform(v, {
       transforms: ["typescript", "imports", "jsx"],
       preserveDynamicImport: true,
       disableESTransforms: true,

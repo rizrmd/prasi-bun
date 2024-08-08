@@ -1,7 +1,7 @@
 import { codeBuild } from "../../../../../vi/render/script/code-build";
 import { active, PG } from "../../../../logic/ed-global";
 
-export const codeEditPropMaster = (p: PG, value: string) => {
+export const codeEditPropMaster = async (p: PG, value: string) => {
   const prop_kind = p.ui.popup.script.prop_kind;
   const prop_name = p.ui.popup.script.prop_name;
   const comp = p.comp.list[active.comp_id];
@@ -15,7 +15,7 @@ export const codeEditPropMaster = (p: PG, value: string) => {
       ?.get(prop_name);
     if (mprop) {
       try {
-        const valueBuilt = codeBuild({ _: value })["_"];
+        const valueBuilt = (await codeBuild({ _: value }))["_"];
         mprop.doc?.transact(() => {
           if (prop_kind === "value") {
             mprop.set("value", value);
