@@ -1,13 +1,12 @@
 import { createRoot } from "react-dom/client";
 import { defineReact, defineWindow } from "web-utils";
 import { initBaseConfig } from "./base/base";
-import { initDevLiveReload } from "./base/live-reload/dev-live-reload";
 import { Root, isPreview } from "./root";
 import { w } from "./w";
 
 (async () => {
   import("./font");
-  initDevLiveReload();
+  // initDevLiveReload();
   initBaseConfig();
   const div = document.getElementById("root");
   if (div) {
