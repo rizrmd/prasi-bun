@@ -1,5 +1,6 @@
 import globalExternals from "@fal-works/esbuild-plugin-global-externals";
 import style from "@hyrious/esbuild-plugin-style";
+import { $ } from "bun";
 import { dir } from "dir";
 import { context, formatMessages } from "esbuild";
 import { cleanPlugin } from "esbuild-clean-plugin";
@@ -12,8 +13,6 @@ import { user } from "../../../entity/user";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
-import { $ } from "bun";
-import { waitUntil } from "web-utils";
 const pending = {} as any;
 
 export const initFrontEnd = async (
@@ -178,11 +177,30 @@ const initBuildCtx = async ({
   root: string;
 }) => {
   const out_dir_temp = dir.data(`code/${id_site}/site/build-temp`);
-  const out_dir_switch = dir.data(`code/${id_site}/site/build-switch`);
   const out_dir = dir.data(`code/${id_site}/site/build`);
+
+  const site_filename = "internal.tsx";
+  const site_tsx = Bun.file(dir.data(root + `/${site_filename}`));
+  if (!(await site_tsx.exists())) {
+    await Bun.write(
+      site_tsx,
+      `\
+import React from "react";
+
+// export const Loading = () => {
+//   return <></>;
+// };
+
+// export const NotFound = () => {
+//   return <></>;
+// };
+`
+    );
+  }
+
   return await context({
     absWorkingDir: dir.data(root),
-    entryPoints: ["index.tsx"],
+    entryPoints: ["index.tsx", site_filename],
     outdir: out_dir_temp,
     format: "esm",
     bundle: true,
