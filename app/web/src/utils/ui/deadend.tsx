@@ -1,11 +1,15 @@
 import { FC } from "react";
-import { treeRebuild } from "../../nova/ed/logic/tree/build";
-import { useGlobal } from "web-utils";
+
+const w = window as any;
 
 export const DeadEnd: FC<{ children: any; back?: () => void }> = ({
   children,
   back,
 }) => {
+  if (w.ContentNotFound) {
+    return <w.ContentNotFound />;
+  }
+
   return (
     <div className="flex items-center justify-center w-full h-full fixed inset-0 flex-col">
       <div>{children}</div>

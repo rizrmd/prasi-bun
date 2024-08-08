@@ -30,6 +30,7 @@ const start = async () => {
   sworkerRegister(react);
   defineReact();
   await defineWindow(false);
+
   sworkerAddCache(base_url);
 
   const el = document.getElementById("root");

@@ -5,6 +5,7 @@ import { join } from "path";
 import { g } from "utils/global";
 import { CORS_HEADERS } from "./serve-api";
 import { existsAsync } from "fs-jetpack";
+import { code } from "../../../app/srv/ws/sync/code/code";
 
 if (!g.static_cache) {
   g.static_cache = {};
@@ -69,6 +70,23 @@ export const serveStatic = {
   },
   exists: (url: URL) => {
     return !!cache.static[url.pathname];
+  },
+  serveSitePublic: (url: URL) => {
+    if (!cache.static[url.pathname] && url.pathname.startsWith("/prod")) {
+      const parts = url.pathname.split("/");
+      const id_site = parts[2];
+      if (id_site && id_site.length > 5) {
+        const trail = parts.slice(3).join("/");
+        if (!trail.startsWith("_prasi") && trail.length > 3) {
+          const path = code.path(id_site, "site", "src", `/public/${trail}`);
+
+          const file = Bun.file(path);
+          if (file.size > 0) {
+            return new Response(file);
+          }
+        }
+      }
+    }
   },
   async serve(url: URL) {
     if (g.mode === "prod") {

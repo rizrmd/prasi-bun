@@ -45,6 +45,11 @@ export const createServer = async () => {
 
         if (serveStatic.exists(url)) {
           return serveStatic.serve(url);
+        } else {
+          try {
+            const response = serveStatic.serveSitePublic(url);
+            if (response) return response;
+          } catch (e) {}
         }
 
         const api_response = await serveAPI.serve(url, req, prasi);

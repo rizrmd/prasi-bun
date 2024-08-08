@@ -1,7 +1,10 @@
 import { FC, ReactElement, ReactNode, useEffect } from "react";
 import { useLocal } from "web-utils";
 
-const w = window as unknown as { loadingIcon: string };
+const w = window as unknown as {
+  loadingIcon: string;
+  ContentLoading?: FC<{ alt?: any; note?: any }>;
+};
 
 export const Loading: FC<{
   children?: ReactNode;
@@ -46,6 +49,8 @@ export const Loading: FC<{
     };
   }, []);
 
+  const CustomLoading = w.ContentLoading;
+  console.log()
   return (
     <>
       {backdrop !== false && (
@@ -96,33 +101,37 @@ export const Loading: FC<{
             typeof show !== "undefined" ? (show ? "" : "hidden") : ""
           )}
         >
-          <div
-            className={cx(
-              "w-1/6 flex flex-col items-center justify-center",
-              css`
-                min-width: 30px;
-                .pr-outer {
-                  background: rgba(0, 0, 0, 0.1) !important;
-                }
-              `
-            )}
-          >
-            <div className="text-[10px] text-slate-400 whitespace-nowrap">
-              {note}
-            </div>
+          {CustomLoading ? (
+            <CustomLoading alt={alt} note={note} />
+          ) : (
+            <div
+              className={cx(
+                "w-1/6 flex flex-col items-center justify-center",
+                css`
+                  min-width: 30px;
+                  .pr-outer {
+                    background: rgba(0, 0, 0, 0.1) !important;
+                  }
+                `
+              )}
+            >
+              <div className="text-[10px] text-slate-400 whitespace-nowrap">
+                {note}
+              </div>
 
-            <div className="pr-outer w-full h-[3px] flex items-stretch rounded-sm overflow-hidden">
-              <div
-                className={cx(
-                  "bg-blue-800 transition-all duration-200 rounded-sm w-full",
-                  css`
-                    transform: translate(${-100 + local.value * 200}%);
-                  `
-                )}
-              ></div>
+              <div className="pr-outer w-full h-[3px] flex items-stretch rounded-sm overflow-hidden">
+                <div
+                  className={cx(
+                    "bg-blue-800 transition-all duration-200 rounded-sm w-full",
+                    css`
+                      transform: translate(${-100 + local.value * 200}%);
+                    `
+                  )}
+                ></div>
+              </div>
+              {alt}
             </div>
-            {alt}
-          </div>
+          )}
         </div>
       )}
     </>
