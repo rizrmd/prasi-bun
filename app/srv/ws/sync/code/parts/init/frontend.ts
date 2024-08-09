@@ -99,23 +99,15 @@ export const initFrontEnd = async (
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
-                const build_timeout = setTimeout(async () => {
-                  console.log(
-                    `Build front-end unfinished ${id_site} ${filename}`
-                  );
-                  await fe.ctx.dispose();
-                  fe.ctx = await initBuildCtx({ id_site, root });
-                }, 3000);
-
                 try {
                   broadcastLoading();
                   await fe.ctx.rebuild();
-                  clearTimeout(build_timeout);
+                  fe.rebuilding = false;
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
                   console.error(e.messsage);
+                  fe.rebuilding = false;
                 }
-                fe.rebuilding = false;
               }, 500);
             }
 
