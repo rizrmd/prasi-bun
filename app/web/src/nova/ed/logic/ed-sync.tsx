@@ -190,8 +190,6 @@ export const edInitSync = (p: PG) => {
         },
         async code_changes({ ts, mode, status }) {
           if (mode === "frontend") {
-            console.log(ts, mode, status);
-
             if (status === "ok") {
               p.ui.build.status = "ready";
               p.render();
