@@ -12,7 +12,7 @@ import {
   iconRebuild,
   iconScrollOff,
   iconScrollOn,
-  iconUpload
+  iconUpload,
 } from "./icons";
 
 export const code = {
@@ -243,39 +243,6 @@ const CodeBody = () => {
                 "border-b-2 border-b-transparent"
               )}
               dangerouslySetInnerHTML={{ __html: iconNewTab }}
-            ></div>
-          </Tooltip>
-
-          <Tooltip
-            content="Rebuild"
-            delay={0}
-            placement="bottom"
-            className={cx("flex items-stretch relative")}
-            onClick={async () => {
-              p.ui.popup.code.rebuilding = true;
-              p.render();
-
-              await _api.rebuild(p.site.id);
-
-              alert("Rebuild Done");
-
-              p.ui.popup.code.rebuilding = false;
-              p.render();
-            }}
-          >
-            <div
-              className={cx(
-                "border-r flex text-center items-center  cursor-pointer px-2 transition-all",
-                "border-b-2 border-b-transparent",
-                p.ui.popup.code.rebuilding
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-blue-50"
-              )}
-              dangerouslySetInnerHTML={{
-                __html: !p.ui.popup.code.rebuilding
-                  ? iconRebuild
-                  : iconHourglass,
-              }}
             ></div>
           </Tooltip>
         </div>

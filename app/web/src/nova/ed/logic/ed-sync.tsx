@@ -190,20 +190,28 @@ export const edInitSync = (p: PG) => {
         },
         async code_changes({ ts, mode, status }) {
           if (mode === "frontend") {
+            console.log(ts, mode, status);
+
             if (status === "ok") {
-              console.clear();
+              p.ui.build.status = "ready";
+              p.render();
               console.log(
                 `${format(Date.now(), "HH:mm:ss")} 🚧 Code updated from vscode `
               );
 
               await loadFrontEnd(p, ts);
             } else if (status === "building") {
+              p.ui.build.status = "loading";
+              p.render();
               console.log(
                 `${format(
                   Date.now(),
                   "HH:mm:ss"
                 )} ⏳ Code changed from vscode, rebuilding...`
               );
+            } else {
+              p.ui.build.status = "error";
+              p.render();
             }
           } else {
             await loadTypings(p);

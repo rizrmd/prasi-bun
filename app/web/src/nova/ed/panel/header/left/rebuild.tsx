@@ -2,8 +2,9 @@ import { useGlobal } from "web-utils";
 import { Tooltip } from "../../../../../utils/ui/tooltip";
 import { EDGlobal } from "../../../logic/ed-global";
 import {
-    iconHourglass,
-    iconRebuildLarge
+  iconHourglass,
+  iconRebuildLarge,
+  iconWarning,
 } from "../../popup/code/icons";
 
 export const EdRebuildJs = () => {
@@ -11,7 +12,18 @@ export const EdRebuildJs = () => {
 
   return (
     <Tooltip
-      content="Rebuild"
+      content={
+        <>
+          {p.ui.build.status === "ready" ? (
+            "Rebuild"
+          ) : (
+            <div className="text-red-500">
+              Code Error, please see index.log. <br />
+              Press this button to force rebuild.
+            </div>
+          )}
+        </>
+      }
       delay={0}
       placement="bottom"
       className={cx("flex items-stretch relative")}
@@ -33,12 +45,16 @@ export const EdRebuildJs = () => {
           "rounded",
           p.ui.popup.code.rebuilding
             ? "bg-blue-600 text-white"
-            : "hover:bg-blue-50"
+            : "hover:bg-blue-50",
+          p.ui.build.status === "error" && "text-red-500"
         )}
         dangerouslySetInnerHTML={{
-          __html: !p.ui.popup.code.rebuilding
-            ? iconRebuildLarge
-            : iconHourglass,
+          __html:
+            !p.ui.popup.code.rebuilding && p.ui.build.status !== "loading"
+              ? p.ui.build.status === "ready"
+                ? iconRebuildLarge
+                : iconWarning
+              : iconHourglass,
         }}
       ></div>
     </Tooltip>
