@@ -169,6 +169,7 @@ const initBuildCtx = async ({
   root: string;
 }) => {
   const out_dir_temp = dir.data(`code/${id_site}/site/build-temp`);
+  const out_dir_old = dir.data(`code/${id_site}/site/build-old`);
   const out_dir = dir.data(`code/${id_site}/site/build`);
 
   const site_filename = "internal.tsx";
@@ -244,8 +245,9 @@ import React from "react";
                   });
                 } else {
                   await codeError(id_site, "");
-                  await $`rm -rf ${out_dir}`.quiet();
+                  await $`mv ${out_dir} ${out_dir_old}`.quiet();
                   await $`mv ${out_dir_temp} ${out_dir}`.quiet();
+                  await $`rm -rf ${out_dir_old}`.quiet();
 
                   const now = Date.now();
                   client_ids.forEach((client_id) => {
