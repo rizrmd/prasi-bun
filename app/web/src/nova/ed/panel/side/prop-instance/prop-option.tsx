@@ -9,6 +9,7 @@ import { EdPropLabel } from "./prop-label";
 import { ChevronDown } from "../../tree/node/item/indent";
 import { Popover } from "../../../../../utils/ui/popover";
 import { propInstanceOnChange } from "./on-change";
+import { Tooltip } from "../../../../../utils/ui/tooltip";
 
 type MetaOption = {
   label: string;
@@ -529,7 +530,15 @@ const SingleCheckbox = ({
         }}
       >
         {!is_check ? unchecked : checked}
-        <div className="flex-1">{item.label}</div>
+        <div className="flex-1">
+          {item.label.length > 15 ? (
+            <Tooltip content={item.label}>
+              {item.label.substring(0, 15) + "..."}
+            </Tooltip>
+          ) : (
+            item.label
+          )}
+        </div>
         <div
           className={cx(css`
             padding-left: 10px;
