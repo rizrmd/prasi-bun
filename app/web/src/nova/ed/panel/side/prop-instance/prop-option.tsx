@@ -74,6 +74,8 @@ export const EdPropInstanceOptions: FC<{
         }
 
         arg = {
+          _meta: meta,
+          _metas: p.page.meta,
           ...window.exports,
           db: p.script.db,
           api: p.script.api,
