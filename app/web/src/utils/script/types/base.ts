@@ -117,6 +117,34 @@ export const baseTypings = `
 
   type PrasiItem = IItem & PrasiEdit;
   const _item: PrasiItem;
+  const _metas: Record<string, any>;
+  const _meta: {
+    item: any;
+    mitem?: any;
+    parent?: {
+      id: string;
+      instance_id?: string;
+      comp_id?: string;
+    };
+    instances?: Record<string, Record<string, string>>;
+    jsx_prop?: {
+      name: string;
+      comp_id: string;
+      is_root: boolean;
+      child?: {
+        prop_id: string;
+        comp_id: string;
+      };
+    };
+    editor_props?: any;
+    script?: {
+      scope?: any;
+      result: any;
+      Local: any;
+      PassProp: any;
+    };
+    render?: () => void;
+  };
   
   const PassProp: (arg:Record<string, any> & { children: ReactNode }>) => ReactElement;
   const mobile: {
