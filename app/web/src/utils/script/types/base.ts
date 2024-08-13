@@ -12,7 +12,7 @@ export const baseTypings = `
   const prasi_internal: {
     page: { id: string };
   };
-  
+
   const pathname: string;
   const isEditor: boolean;
   const isLayout: boolean;
@@ -35,6 +35,7 @@ export const baseTypings = `
     ) => void;}) => ReactNode;
   const navigate: (url: string,
     params?: {
+      name?: string;
       where?: any;
       create?: any;
       update?: any;
@@ -54,7 +55,7 @@ export const baseTypings = `
     onPointerMove?: () => void;
     onPointerLeave?: () => void;
     inherit?: {
-      style: any, 
+      style: any,
       className: string
     }
   };
@@ -145,7 +146,7 @@ export const baseTypings = `
     };
     render?: () => void;
   };
-  
+
   const PassProp: (arg:Record<string, any> & { children: ReactNode }>) => ReactElement;
   const mobile: {
     notif: {
