@@ -160,8 +160,7 @@ export const EDGlobal = {
       { entry: string[]; meta: Record<string, IMeta>; url: string }
     >,
   },
-  sync: null as null | Awaited<ReturnType<typeof clientStartSync>>,
-  sync_assigned: false,
+  sync: undefined as undefined | Awaited<ReturnType<typeof clientStartSync>>,
   site: deepClone(EmptySite),
   site_tstamp: Date.now(),
   site_exports: {} as Record<string, any>,

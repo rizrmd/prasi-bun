@@ -58,7 +58,7 @@ const runtime = {
   action: {
     pending: {} as Record<
       string,
-      { ts: number; resolve: (value: any) => void }
+      { ts: number; resolve: (value: any) => void; timeout: any }
     >,
   },
 };
@@ -208,6 +208,7 @@ const connect = (
               const pending = runtime.action.pending[msg.argid];
               if (pending) {
                 pending.resolve(msg.val);
+                clearTimeout(pending.timeout);
                 delete runtime.action.pending[msg.argid];
                 const idb = conf.idb;
                 if (idb) {
@@ -258,6 +259,11 @@ const doAction = async <T>(arg: {
       runtime.action.pending[argid] = {
         ts: Date.now(),
         resolve,
+        timeout: path.startsWith("yjs.")
+          ? setTimeout(() => {
+              w.sync_too_long = true;
+            }, 10000)
+          : undefined,
       };
 
       sendWs(ws, { type: SyncType.Action, code, args, argid });

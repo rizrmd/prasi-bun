@@ -44,6 +44,7 @@ export const w = window as unknown as {
   _api: any;
   _db: any;
   offline: boolean;
+  sync_too_long: boolean;
   editorRender?: () => void;
   debug: {
     on: any;
