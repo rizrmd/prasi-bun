@@ -95,9 +95,10 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
+            console.log(filename);
+
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
-              console.log(filename);
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
                 try {
@@ -106,7 +107,7 @@ export const initFrontEnd = async (
                   fe.rebuilding = false;
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
-                  console.error(e.messsage);
+                  console.error(e.message);
                   fe.rebuilding = false;
                 }
               }, 500);
