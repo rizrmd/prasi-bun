@@ -95,7 +95,7 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(filename);
+            console.log(filename); 
 
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;

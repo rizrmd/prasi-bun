@@ -41,51 +41,6 @@ export const loadSession = (p: PG) => {
 
 export const edInitSync = (p: PG) => {
   loadSession(p);
-  if (location.pathname.startsWith("/vi/")) {
-    if (page.list.length === 0) {
-      _db.page
-        .findMany({
-          where: {
-            id_site: params.site_id,
-            is_deleted: false,
-            is_default_layout: false,
-          },
-          select: {
-            id: true,
-            url: true,
-          },
-        })
-        .then((list) => {
-          page.list = list;
-          edInitSync(p);
-        });
-
-      return;
-    }
-    if (!page.route) {
-      page.route = createRouter();
-      for (const e of page.list) {
-        page.route.insert(e.url, e);
-      }
-    }
-
-    const arrpath = location.pathname.split("/");
-    const pathname = "/" + arrpath.slice(3).join("/");
-
-    if (!params.page_id) {
-      const res = page.route.lookup(pathname);
-      if (res) {
-        params.page_id = res.id;
-        if (res.params) {
-          for (const [k, v] of Object.entries(res.params)) {
-            if (!["site_id", "page_id"].includes(k)) {
-              params[k] = v;
-            }
-          }
-        }
-      }
-    }
-  }
 
   if (p.sync) {
     if (p.site.id === "--loading--") return false;
@@ -131,8 +86,7 @@ export const edInitSync = (p: PG) => {
       return false;
     }
   }
-  if (!p.sync && !p.sync_assigned) {
-    p.sync_assigned = true;
+  if (!p.sync) {
     p.site = deepClone(EmptySite);
     clientStartSync({
       user_id: p.user.id,

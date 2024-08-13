@@ -21,6 +21,7 @@ import { EdPopSite } from "./panel/popup/site/site-popup";
 import { iconVSCode } from "./panel/popup/code/icons";
 import { isLocalhost } from "../../utils/ui/is-localhost";
 import { w } from "../../utils/types/general";
+import { edInitSync } from "./logic/ed-sync";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -167,6 +168,37 @@ export const EdBase = () => {
         >
           <div className="bg-red-500 text-white px-4 py-2 rounded-full text-sm">
             Reconnecting, changes are not saved...
+          </div>
+        </div>
+      )}
+      {w.sync_too_long && (
+        <div
+          className={cx(
+            css`
+              position: fixed;
+              bottom: 20px;
+              left: 0px;
+              right: 0px;
+              z-index: 999;
+            `,
+            "flex justify-center cursor-pointer"
+          )}
+        >
+          <div className="space-x-2 flex bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm">
+            <div>Sync taking too long...</div>
+            <div
+              className={cx(
+                css`
+                  background: white;
+                `,
+                "rounded-full px-3 cursor-pointer border border-red-500"
+              )}
+              onClick={() => {
+                location.reload();
+              }}
+            >
+              Reload Page
+            </div>
           </div>
         </div>
       )}
