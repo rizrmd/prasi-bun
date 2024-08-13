@@ -97,6 +97,7 @@ export const initFrontEnd = async (
           ) {
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
+              console.log(filename);
               clearTimeout(fe.timeout);
               fe.timeout = setTimeout(async () => {
                 try {
