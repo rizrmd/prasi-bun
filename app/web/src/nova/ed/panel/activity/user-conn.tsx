@@ -10,7 +10,7 @@ export const EdUserConn = ({ client_ids }: { client_ids: string[] }) => {
   useEffect(() => {
     client_ids.forEach((e) => {
       if (!p.clients[e]) {
-        p.sync.client.info(client_ids).then((res) => {
+        p.sync?.client.info(client_ids).then((res) => {
           p.clients = { ...p.clients, ...res };
           p.render();
         });
@@ -21,7 +21,10 @@ export const EdUserConn = ({ client_ids }: { client_ids: string[] }) => {
   return (
     <>
       {client_ids.map((e) => {
-        const bg = tinycolor(stringToColour(e)).darken(20).desaturate(30).toString();
+        const bg = tinycolor(stringToColour(e))
+          .darken(20)
+          .desaturate(30)
+          .toString();
         const fg = "#ffffff";
         return (
           <Tooltip
