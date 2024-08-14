@@ -28,7 +28,6 @@ const w = window as unknown as {
   monaco_loaded: boolean;
 };
 
-const encode = new TextEncoder();
 export type MonacoEditor = Parameters<OnMount>[0];
 export const EdScriptMonaco: FC<{}> = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -58,7 +57,6 @@ export const EdScriptMonaco: FC<{}> = () => {
   useEffect(() => {
     if (!w.monaco_loaded) {
       w.monaco_loaded = true;
-      // setTimeout(console.clear, 500);
     }
 
     return () => {
@@ -345,7 +343,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 p.ui.popup.script.typings.status = "error";
                 p.ui.popup.script.typings.err_msg = code_result;
               } else if (typeof code_result === "object") {
-                scope = code_result;
+                scope = await code_result;
               }
             } else {
               editorLocalValue[active.item_id] = null;
@@ -356,7 +354,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                   p.ui.popup.script.typings.status = "error";
                   p.ui.popup.script.typings.err_msg = code_result;
                 } else if (typeof code_result === "object") {
-                  scope = code_result;
+                  scope = (await code_result) as any;
                 }
               } else {
                 const meta = getMetaById(p, active.item_id);
@@ -387,6 +385,8 @@ export const EdScriptMonaco: FC<{}> = () => {
         scriptEdit.timeout = setTimeout(applyChanges, 1000);
       }}
       onMount={async (editor, monaco) => {
+        monaco.languages.register({ id: "typescript" });
+
         local.monaco = monaco;
         local.editor = editor;
         local.render();
