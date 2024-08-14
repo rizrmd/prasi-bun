@@ -1,3 +1,4 @@
+import trim from "lodash.trim";
 import { createRouter } from "radix3";
 import { apiProxy } from "../../../base/load/api/api-proxy";
 import { dbProxy } from "../../../base/load/db/db-proxy";
@@ -6,7 +7,6 @@ import { genMeta } from "../../vi/meta/meta";
 import { IMeta } from "../../vi/utils/types";
 import { base } from "./base";
 import { scanComponent } from "./component";
-import trim from "lodash.trim";
 
 const cached = { route: null as any, promise: null as any };
 
@@ -95,6 +95,7 @@ const injectSiteScript = () => {
       (!["prasi.avolut.com"].includes(cur.hostname) &&
         cur.host !== "localhost:4550")
     ) {
+      cur.hash = "";
       let cur_url = trim(cur.toString(), "/");
       script.src = `${cur_url}/_prasi/load.js?url=${cur_url}&v3`;
 
@@ -124,7 +125,7 @@ export const rebuildMeta = (meta: Record<string, IMeta>, root: IRoot) => {
         meta,
         mode: "page",
       },
-      { item }
+      { item },
     );
   }
 };
