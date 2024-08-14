@@ -9,6 +9,7 @@ import { conns } from "../../../entity/conn";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { platform } from "os";
+
 export const initTypings = async (
   root: string,
   id_site: string,
@@ -37,19 +38,20 @@ export const initTypings = async (
       dir.data(`/code/${id_site}/site/src/typings.log`)
     );
     await Bun.write(typings_log, "");
+    const cmd = [
+      ...`${dir.path(
+        platform() === "win32"
+          ? "node_modules/.bin/tsc.exe"
+          : "node_modules/.bin/tsc"
+      )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
+        " "
+      ),
+    ];
     code.internal.typings[id_site] = {
       timeout: Date.now(),
       watch: watch(typings_path),
       spawn: Bun.spawn({
-        cmd: [
-          ...`${dir.path(
-            platform() === "win32"
-              ? "node_modules/.bin/tsc.exe"
-              : "node_modules/.bin/tsc"
-          )} --watch --moduleResolution node --emitDeclarationOnly --outFile ../typings.d.ts --declaration --noEmit false`.split(
-            " "
-          ),
-        ],
+        cmd,
         cwd: dir.data(`/code/${id_site}/site/src`),
         stdio: [typings_log, typings_log, "ignore"],
       }),

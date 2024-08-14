@@ -157,6 +157,7 @@ export const fetchSendDb = async (params: any, dburl: string) => {
 
   let isEditor = false;
   if (
+    typeof location !== "undefined" &&
     base.hostname !== location.hostname &&
     (window as any).isEditor &&
     ["prasi.avolut.com", "localhost:4550"].includes(location.host)
