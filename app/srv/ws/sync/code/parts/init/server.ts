@@ -40,15 +40,18 @@ export const initServer = async (
       treeShaking: true,
       format: "cjs",
       logLevel: "silent",
-      // plugins: [
-      //   {
-      //     name: "prasi",
-      //     setup(build) {
-      //       build.onEnd(() => {
-      //       });
-      //     },
-      //   },
-      // ],
+      plugins: [
+        {
+          name: "prasi",
+          setup(build) {
+            build.onEnd((e) => {
+              if (e.errors.length === 0) {
+                server.init(id_site);
+              }
+            });
+          },
+        },
+      ],
       banner: {
         js: `\
 const _fs = require('node:fs/promises');
@@ -109,10 +112,5 @@ if (typeof global.server_hook === "function") {
     }),
   };
 
-  code.internal.server[id_site].rebuilding = true;
-  try {
-    await code.internal.server[id_site].ctx.rebuild();
-    await server.init(id_site);
-  } catch (e) {}
-  code.internal.server[id_site].rebuilding = false;
+  code.internal.server[id_site].ctx.watch();
 };
