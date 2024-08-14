@@ -261,6 +261,12 @@ const doAction = async <T>(arg: {
         resolve,
         timeout: path.startsWith("yjs.")
           ? setTimeout(() => {
+              console.error(`Sync too long: `, {
+                type: SyncType.Action,
+                code,
+                args,
+                argid,
+              });
               w.sync_too_long = true;
             }, 10000)
           : undefined,

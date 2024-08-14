@@ -17,6 +17,10 @@ export const _ = {
 
     if (validate(site_id)) {
       const mode = is_msgpack ? "binary" : "string";
+      const public_data = readDirectoryRecursively(
+        mode,
+        code.path(site_id, "site", "src", "public")
+      );
       const result = {
         layouts: await _db.page.findMany({
           where: {
@@ -56,10 +60,7 @@ export const _ = {
           },
           select: { id: true, content_tree: true },
         }),
-        public: readDirectoryRecursively(
-          mode,
-          code.path(site_id, "site", "src", "public")
-        ),
+        public: public_data,
         site: await _db.site.findFirst({
           where: { id: site_id },
           select: {
@@ -82,6 +83,7 @@ export const _ = {
           core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
         },
       };
+      console.log(public_data);
 
       return await gzipAsync(
         mode === "binary" ? encode(result) : JSON.stringify(result)
