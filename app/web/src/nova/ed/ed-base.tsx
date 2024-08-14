@@ -173,6 +173,10 @@ export const EdBase = () => {
       )}
       {w.sync_too_long && (
         <div
+          onClick={() => {
+            w.sync_too_long = false;
+            p.render();
+          }}
           className={cx(
             css`
               position: fixed;
