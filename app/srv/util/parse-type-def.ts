@@ -79,11 +79,11 @@ export const parseTypeDef = async (path: string) => {
                     });
                   }
                 } else {
-                  console.log(
-                    "export-declaration",
-                    Object.keys(body),
-                    body.declaration.type
-                  );
+                  // console.log(
+                  //   "export-declaration",
+                  //   Object.keys(body),
+                  //   body.declaration.type
+                  // );
                 }
               } else if (body.type === "ExportNamedDeclaration") {
                 let exported = false;
