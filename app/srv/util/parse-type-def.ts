@@ -7,6 +7,8 @@ type SingleExport = {
   type: "all" | "named" | "default";
   kind: "const" | "type";
   val: string;
+  as?: string;
+  from?: string;
 };
 
 function simple<T = unknown>(
@@ -85,6 +87,7 @@ export const parseTypeDef = async (path: string) => {
                 }
               } else if (body.type === "ExportNamedDeclaration") {
                 let exported = false;
+
                 if (body.source?.type === "StringLiteral") {
                   const ex = exports[body.source.value];
                   if (ex) {
@@ -115,12 +118,16 @@ export const parseTypeDef = async (path: string) => {
                       }
                     }
                   } else if (body.specifiers) {
+                    const kind = body.typeOnly ? "type" : "const";
+
                     for (const s of body.specifiers) {
                       if (s.type === "ExportSpecifier" && s.orig) {
                         exports[t.id.value].push({
-                          kind: "type",
+                          kind,
                           type: "named",
                           val: s.orig.value,
+                          as: s.exported?.value,
+                          from: body.source?.value,
                         });
                         exported = true;
                       } else if (
@@ -128,7 +135,7 @@ export const parseTypeDef = async (path: string) => {
                         s.name
                       ) {
                         exports[t.id.value].push({
-                          kind: "type",
+                          kind,
                           type: "named",
                           val: s.name.value,
                         });
@@ -176,18 +183,30 @@ export const parseTypeDef = async (path: string) => {
   );
 
   const result = {} as Record<string, "const" | "type">;
+
+  const re_import_from_node: string[] = [];
   const traverse = (items: SingleExport[]) => {
     if (typeof items === "object") {
       for (const item of items) {
+        if (item.from) {
+          if (!exports[item.from]) {
+            re_import_from_node.push(item.from);
+          }
+        }
         if (item.type === "all") {
           const found = exports[item.val];
           traverse(found);
         } else {
-          result[item.val] = item.kind;
+          if (item.as) {
+            result[item.as] = item.kind;
+          } else {
+            result[item.val] = item.kind;
+          }
         }
       }
     }
   };
   traverse(exports.index);
+
   return result;
 };
