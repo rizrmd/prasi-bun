@@ -40,7 +40,9 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   }
 
   const compilerOptions: CompilerOptions = {
-    jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+    // note: ReactJSX ga bisa solve type buat <div> etc...
+    // yg bisa solve cmn JsxEmit.React
+    jsx: monaco.languages.typescript.JsxEmit.React,
     target: monaco.languages.typescript.ScriptTarget.ES2015,
     allowNonTsExtensions: true,
     lib: ["esnext", "dom"],

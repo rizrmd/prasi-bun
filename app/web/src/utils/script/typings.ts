@@ -135,8 +135,8 @@ ${await loadText("https://cdn.jsdelivr.net/npm/@types/react@18.3.3/index.d.ts")}
     {
       filePath: "jsx-runtime.d.ts",
       content: `declare module "react/jsx-runtime" {
-import * as React from "react";
-export { Fragment } from "react";
+import * as React from "./";
+export { Fragment } from "./";
 
 export namespace JSX {
   type ElementType = React.JSX.ElementType;
