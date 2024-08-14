@@ -83,7 +83,6 @@ export const _ = {
           core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
         },
       };
-      console.log(public_data);
 
       return await gzipAsync(
         mode === "binary" ? encode(result) : JSON.stringify(result)
