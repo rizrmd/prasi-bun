@@ -141,9 +141,14 @@ export const dbProxy = (dburl: string) => {
 
 const editorQueryLoaded: Record<string, true> = {};
 
-export const fetchSendDb = async (params: any, dburl: string) => {
+export const fetchSendDb = async (
+  _params: Record<string, any>,
+  dburl: string
+) => {
   const base = new URL(dburl);
   base.pathname = `/_dbs`;
+  const params = _params || {};
+
   if (params.table) {
     base.pathname += `/${params.table}`;
   }
@@ -176,9 +181,8 @@ export const fetchSendDb = async (params: any, dburl: string) => {
 
     try {
       if (typeof result === "string") return JSON.parse(result);
-    } catch (e) {
-      return result;
-    }
+    } catch (e) {}
+    return result;
   };
 
   if (isEditor) {
