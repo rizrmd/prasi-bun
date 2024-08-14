@@ -85,18 +85,16 @@ export const initFrontEnd = async (
           const srv = code.internal.server[id_site];
           if (
             filename?.startsWith("node_modules") ||
-            filename?.startsWith("server.ts") ||
             filename?.startsWith("typings")
           )
             return;
+            
           if (
             filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(filename); 
-
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
@@ -111,15 +109,6 @@ export const initFrontEnd = async (
                   fe.rebuilding = false;
                 }
               }, 500);
-            }
-
-            if (typeof srv !== "undefined" && !srv.rebuilding && srv.ctx) {
-              srv.rebuilding = true;
-              try {
-                await srv.ctx.rebuild();
-                await server.init(id_site);
-              } catch (e) {}
-              srv.rebuilding = false;
             }
           }
         }
