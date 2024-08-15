@@ -56,6 +56,7 @@ const conf = {
 
 const runtime = {
   action: {
+    done: [] as string[],
     pending: {} as Record<
       string,
       { ts: number; resolve: (value: any) => void; timeout: any }
@@ -254,7 +255,15 @@ const doAction = async <T>(arg: {
     const path = (SyncActionPaths as any)[code];
     const argid = await xxhash32(`op-${path}-${sargs}`);
 
+    if (runtime.action.done.includes(argid)) {
+      resolve(undefined);
+      return;
+    }
     if (ws && ws.readyState === ws.OPEN) {
+      runtime.action.done.push(argid);
+      while (runtime.action.done.length > 50) {
+        runtime.action.done.shift();
+      }
       // online
       runtime.action.pending[argid] = {
         ts: Date.now(),
