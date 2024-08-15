@@ -94,7 +94,12 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(filename, typeof fe !== "undefined" && !fe.rebuilding);
+            console.log(
+              filename,
+              typeof fe !== "undefined" && !fe.rebuilding
+                ? "start-rebuild"
+                : "rebuilding..."
+            );
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
