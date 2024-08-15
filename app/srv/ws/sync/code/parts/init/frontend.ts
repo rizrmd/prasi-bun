@@ -88,7 +88,7 @@ export const initFrontEnd = async (
             filename?.startsWith("typings")
           )
             return;
-            
+
           if (
             filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
@@ -141,6 +141,39 @@ const codeError = async (id_site: string, error: string, append?: boolean) => {
 };
 
 const isInstalling = async (id_site: string) => {
+  const modules = Bun.file(
+    code.path(id_site, "site", "src", "lib/modules.json")
+  );
+
+  if (await modules.exists()) {
+    const pkg = Bun.file(code.path(id_site, "site", "src", "package.json"));
+    try {
+      const module_json = await modules.json();
+      const pkg_json = await pkg.json();
+      let should_install = false;
+      if (module_json) {
+        if (module_json.dependencies) {
+          for (const [k, v] of Object.entries(module_json.dependencies)) {
+            if (!pkg_json.dependencies[k]) should_install = true;
+            pkg_json.dependencies[k] = v;
+          }
+        }
+
+        if (module_json.devDependencies) {
+          for (const [k, v] of Object.entries(module_json.devDependencies)) {
+            if (!pkg_json.devDependencies[k]) should_install = true;
+            pkg_json.devDependencies[k] = v;
+          }
+        }
+
+        if (should_install) {
+          await Bun.write(pkg, JSON.stringify(pkg_json, null, 2));
+          await $`npm i`.cwd(code.path(id_site, "site", "src")).quiet();
+        }
+      }
+    } catch (e) {}
+  }
+
   const path = code.path(id_site, "site", "src", "index.log");
   const file = Bun.file(path);
   try {
