@@ -1,5 +1,6 @@
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
+import { initServer } from "../ws/sync/code/parts/init/server";
 
 export const _ = {
   url: "/rebuild/:id_site",
@@ -9,7 +10,7 @@ export const _ = {
     // delete frontend[id_site];
     // delete server[id_site];
     await initFrontEnd(root, id_site, true);
-    // await initServer(root, id_site, true);
+    await initServer(root, id_site, true);
     // await initTypings(root, id_site, true);
 
     return "ok";
