@@ -7,7 +7,6 @@ import { cleanPlugin } from "esbuild-clean-plugin";
 import { watch } from "fs";
 import { existsAsync } from "fs-jetpack";
 import { appendFile } from "node:fs/promises";
-import { server } from "../../../editor/code/server-main";
 import { conns } from "../../../entity/conn";
 import { user } from "../../../entity/user";
 import { sendWS } from "../../../sync-handler";
@@ -95,6 +94,7 @@ export const initFrontEnd = async (
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
+            console.log(filename, typeof fe !== "undefined" && !fe.rebuilding);
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
