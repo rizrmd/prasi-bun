@@ -42,45 +42,46 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
                 ts: history[id],
               },
             });
+            setTimeout(async () => {
+              const res = await _db.page_history.findMany({
+                where: {
+                  id_page: id,
+                },
+                select: {
+                  id: true,
+                  ts: true,
+                },
+                orderBy: {
+                  ts: "desc",
+                },
+              });
+              const ids: string[] = [];
 
-            const res = await _db.page_history.findMany({
-              where: {
-                id_page: id,
-              },
-              select: {
-                id: true,
-                ts: true,
-              },
-              orderBy: {
-                ts: "desc",
-              },
-            });
-            const ids: string[] = [];
+              let last_ts = 0;
+              let last_stacked = false;
+              for (let i = 0; i < res.length; i++) {
+                const ts = parseInt(res[i].ts);
 
-            let last_ts = 0;
-            let last_stacked = false;
-            for (let i = 0; i < res.length; i++) {
-              const ts = parseInt(res[i].ts);
+                if (!last_ts) last_ts = ts;
 
-              if (!last_ts) last_ts = ts;
-
-              if (i > 25) {
-                if (!last_stacked) {
-                  if (((last_ts - ts) / 1000) * 60 < 10) {
-                    last_stacked = true;
-                    ids.push(res[i].id);
+                if (i > 25) {
+                  if (!last_stacked) {
+                    if (((last_ts - ts) / 1000) * 60 < 10) {
+                      last_stacked = true;
+                      ids.push(res[i].id);
+                    }
+                  } else {
+                    last_stacked = false;
                   }
-                } else {
-                  last_stacked = false;
                 }
+                last_ts = ts;
               }
-              last_ts = ts;
-            }
-            await _db.page_history.deleteMany({
-              where: { id: { in: ids } },
+              _db.page_history.deleteMany({
+                where: { id: { in: ids } },
+              });
             });
           } else {
-            await _db.page_history.updateMany({
+            _db.page_history.updateMany({
               data: {
                 content_tree: await gzipAsync(JSON.stringify(root.toJSON())),
               },
@@ -91,7 +92,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
             });
           }
 
-          await _db.page.update({
+          _db.page.update({
             where: { id },
             data: {
               content_tree: root.toJSON(),
