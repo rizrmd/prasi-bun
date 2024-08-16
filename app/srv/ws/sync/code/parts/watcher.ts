@@ -66,9 +66,10 @@ export class Watcher {
       const files = await readdir(path);
       for (const file of files) {
         if (file.startsWith(".") || file === "node_modules") continue;
-        const stats = statSync(file);
+        const fullpath = join(path, file);
+        const stats = statSync(fullpath);
         if (stats.isDirectory()) {
-          this.watchers[file] = createWatcher(join(path, file), true);
+          this.watchers[file] = createWatcher(fullpath, true);
         }
       }
     } catch (e) {
