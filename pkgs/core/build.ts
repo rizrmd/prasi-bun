@@ -109,16 +109,14 @@ if (build_all) {
     dir.path(`app/static`),
   ];
 
-  const parcel = spawn({
-    cmd: args,
-    cwd: dir.path("app/web"),
-    stdio: ["ignore", "inherit", "inherit"],
-  });
-  await parcel.exited;
+  let build_static =
+    process.argv[process.argv.length - 1] === "public" ? false : true;
 
-  // const public_br = dir.path("app/web/public-br");
-  // await removeAsync(public_br);
-
+  if (!build_static) {
+    const public_br = dir.path("app/web/public-br");
+    await removeAsync(public_br);
+  }
+  
   const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
   const public_files = api.sync();
   if (public_files) {
@@ -153,30 +151,39 @@ if (build_all) {
     );
   }
 
-  const static_br = dir.path("app/static-br");
-  await removeAsync(static_br);
-  const static_files = await listAsync(dir.path("app/static"));
-  if (static_files) {
-    await Promise.all(
-      static_files
-        .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
-        .map(async (file) => {
-          if (!(await Bun.file(dir.path(`app/static-br/${file}`)).exists())) {
-            const br = brotli.compress(
-              new Uint8Array(
-                await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
-              ),
-              { quality: 11 }
-            );
-            if (br) {
-              console.log(`Compressing [static] ${file}`);
-              await writeAsync(
-                dir.path(`app/static-br/${file}`),
-                Buffer.from(br)
+  if (build_static) {
+    const parcel = spawn({
+      cmd: args,
+      cwd: dir.path("app/web"),
+      stdio: ["ignore", "inherit", "inherit"],
+    });
+    await parcel.exited;
+
+    const static_br = dir.path("app/static-br");
+    await removeAsync(static_br);
+    const static_files = await listAsync(dir.path("app/static"));
+    if (static_files) {
+      await Promise.all(
+        static_files
+          .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
+          .map(async (file) => {
+            if (!(await Bun.file(dir.path(`app/static-br/${file}`)).exists())) {
+              const br = brotli.compress(
+                new Uint8Array(
+                  await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
+                ),
+                { quality: 11 }
               );
+              if (br) {
+                console.log(`Compressing [static] ${file}`);
+                await writeAsync(
+                  dir.path(`app/static-br/${file}`),
+                  Buffer.from(br)
+                );
+              }
             }
-          }
-        })
-    );
+          })
+      );
+    }
   }
 }
