@@ -2,6 +2,7 @@ import Parcel from "@parcel/core";
 import { Subprocess } from "bun";
 import type { BuildContext } from "esbuild";
 import { FSWatcher } from "fs";
+import { Watcher } from "./watcher";
 const g = global as unknown as {
   prasi_code: any;
 };
@@ -24,7 +25,7 @@ export const codeInternal = {
       {
         ctx: BuildContext;
         timeout: any;
-        watch?: FSWatcher;
+        watch?: Watcher;
         rebuilding: boolean;
         npm?: Promise<void>;
       }

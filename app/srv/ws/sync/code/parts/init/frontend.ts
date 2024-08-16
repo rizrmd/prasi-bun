@@ -4,7 +4,6 @@ import { $ } from "bun";
 import { dir } from "dir";
 import { context, formatMessages } from "esbuild";
 import { cleanPlugin } from "esbuild-clean-plugin";
-import { watch } from "fs";
 import { existsAsync } from "fs-jetpack";
 import { appendFile } from "node:fs/promises";
 import { conns } from "../../../entity/conn";
@@ -12,6 +11,7 @@ import { user } from "../../../entity/user";
 import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
+import { Watcher } from "../watcher";
 const pending = {} as any;
 
 export const initFrontEnd = async (
@@ -50,83 +50,16 @@ export const initFrontEnd = async (
   try {
     await isInstalling(id_site);
 
-    const broadcastLoading = async () => {
-      const client_ids = user.active
-        .findAll({ site_id: id_site })
-        .map((e) => e.client_id);
-
-      const now = Date.now();
-
-      client_ids.forEach((client_id) => {
-        const ws = conns.get(client_id)?.ws;
-        if (ws)
-          sendWS(ws, {
-            type: SyncType.Event,
-            event: "code_changes",
-            data: { ts: now, mode: "frontend", status: "building" },
-          });
-      });
-    };
+    if (code.internal.frontend[id_site]?.watch) {
+      await code.internal.frontend[id_site].watch.close();
+    }
 
     code.internal.frontend[id_site] = {
-      ...(code.internal.frontend[id_site] || {}),
       ctx: await initBuildCtx({ id_site, root }),
       timeout: null,
       rebuilding: false,
+      watch: new Watcher(dir.data(root), id_site),
     };
-
-    if (code.internal.frontend[id_site].watch) {
-      code.internal.frontend[id_site].watch.close();
-    }
-    console.log("watching", dir.data(root));
-    code.internal.frontend[id_site].watch = watch(
-      dir.data(root),
-      {
-        recursive: true,
-        persistent: true
-      },
-      async (event, filename) => {
-        const fe = code.internal.frontend[id_site];
-        const srv = code.internal.server[id_site];
-
-        if (
-          filename?.startsWith("node_modules") ||
-          filename?.startsWith("typings") ||
-          filename?.endsWith(".log")
-        )
-          return;
-
-        console.log(
-          event,
-          filename,
-          typeof fe !== "undefined" && !fe.rebuilding
-            ? "start-rebuild"
-            : "rebuilding..."
-        );
-        if (
-          filename?.endsWith(".tsx") ||
-          filename?.endsWith(".ts") ||
-          filename?.endsWith(".css") ||
-          filename?.endsWith(".html")
-        ) {
-          if (typeof fe !== "undefined" && !fe.rebuilding) {
-            fe.rebuilding = true;
-            clearTimeout(fe.timeout);
-            fe.timeout = setTimeout(async () => {
-              try {
-                broadcastLoading();
-                await fe.ctx.rebuild();
-                fe.rebuilding = false;
-              } catch (e: any) {
-                console.error(`Frontend failed rebuild (site: ${id_site})`);
-                console.error(e.message);
-                fe.rebuilding = false;
-              }
-            }, 500);
-          }
-        }
-      }
-    );
     const fe = code.internal.frontend[id_site];
     fe.rebuilding = true;
     try {
