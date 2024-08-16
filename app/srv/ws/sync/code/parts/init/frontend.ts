@@ -75,56 +75,58 @@ export const initFrontEnd = async (
       rebuilding: false,
     };
 
-    if (!code.internal.frontend[id_site].watch) {
-      console.log('watching', dir.data(root))
-      code.internal.frontend[id_site].watch = watch(
-        dir.data(root),
-        {
-          recursive: true,
-        },
-        async (event, filename) => {
-          const fe = code.internal.frontend[id_site];
-          const srv = code.internal.server[id_site];
+    if (code.internal.frontend[id_site].watch) {
+      code.internal.frontend[id_site].watch.close();
+    }
+    console.log("watching", dir.data(root));
+    code.internal.frontend[id_site].watch = watch(
+      dir.data(root),
+      {
+        recursive: true,
+        persistent: true
+      },
+      async (event, filename) => {
+        const fe = code.internal.frontend[id_site];
+        const srv = code.internal.server[id_site];
 
-          if (
-            filename?.startsWith("node_modules") ||
-            filename?.startsWith("typings") ||
-            filename?.endsWith(".log")
-          )
-            return;
+        if (
+          filename?.startsWith("node_modules") ||
+          filename?.startsWith("typings") ||
+          filename?.endsWith(".log")
+        )
+          return;
 
-          console.log(
-            event,
-            filename,
-            typeof fe !== "undefined" && !fe.rebuilding
-              ? "start-rebuild"
-              : "rebuilding..."
-          );
-          if (
-            filename?.endsWith(".tsx") ||
-            filename?.endsWith(".ts") ||
-            filename?.endsWith(".css") ||
-            filename?.endsWith(".html")
-          ) {
-            if (typeof fe !== "undefined" && !fe.rebuilding) {
-              fe.rebuilding = true;
-              clearTimeout(fe.timeout);
-              fe.timeout = setTimeout(async () => {
-                try {
-                  broadcastLoading();
-                  await fe.ctx.rebuild();
-                  fe.rebuilding = false;
-                } catch (e: any) {
-                  console.error(`Frontend failed rebuild (site: ${id_site})`);
-                  console.error(e.message);
-                  fe.rebuilding = false;
-                }
-              }, 500);
-            }
+        console.log(
+          event,
+          filename,
+          typeof fe !== "undefined" && !fe.rebuilding
+            ? "start-rebuild"
+            : "rebuilding..."
+        );
+        if (
+          filename?.endsWith(".tsx") ||
+          filename?.endsWith(".ts") ||
+          filename?.endsWith(".css") ||
+          filename?.endsWith(".html")
+        ) {
+          if (typeof fe !== "undefined" && !fe.rebuilding) {
+            fe.rebuilding = true;
+            clearTimeout(fe.timeout);
+            fe.timeout = setTimeout(async () => {
+              try {
+                broadcastLoading();
+                await fe.ctx.rebuild();
+                fe.rebuilding = false;
+              } catch (e: any) {
+                console.error(`Frontend failed rebuild (site: ${id_site})`);
+                console.error(e.message);
+                fe.rebuilding = false;
+              }
+            }, 500);
           }
         }
-      );
-    }
+      }
+    );
     const fe = code.internal.frontend[id_site];
     fe.rebuilding = true;
     try {
