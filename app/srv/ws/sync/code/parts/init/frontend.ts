@@ -76,6 +76,7 @@ export const initFrontEnd = async (
     };
 
     if (!code.internal.frontend[id_site].watch) {
+      console.log('watching', dir.data(root))
       code.internal.frontend[id_site].watch = watch(
         dir.data(root),
         {
