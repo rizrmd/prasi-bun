@@ -31,9 +31,7 @@ export const initFrontEnd = async (
     } else {
       if (force) {
         try {
-          existing.watch.close();
           await existing.ctx.dispose();
-          delete code.internal.frontend[id_site];
         } catch (e) {}
       } else {
         if (existing.ctx) {
@@ -71,10 +69,14 @@ export const initFrontEnd = async (
     };
 
     code.internal.frontend[id_site] = {
+      ...(code.internal.frontend[id_site] || {}),
       ctx: await initBuildCtx({ id_site, root }),
       timeout: null,
       rebuilding: false,
-      watch: watch(
+    };
+
+    if (!code.internal.frontend[id_site].watch) {
+      code.internal.frontend[id_site].watch = watch(
         dir.data(root),
         {
           recursive: true,
@@ -120,8 +122,8 @@ export const initFrontEnd = async (
             }
           }
         }
-      ),
-    };
+      );
+    }
     const fe = code.internal.frontend[id_site];
     fe.rebuilding = true;
     try {
@@ -133,7 +135,6 @@ export const initFrontEnd = async (
     fe.rebuilding = false;
   } catch (e: any) {
     console.error("Error building front end", id_site);
-    delete code.internal.frontend[id_site];
   }
 };
 

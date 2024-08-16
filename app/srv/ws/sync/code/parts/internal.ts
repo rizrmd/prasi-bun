@@ -24,7 +24,7 @@ export const codeInternal = {
       {
         ctx: BuildContext;
         timeout: any;
-        watch: FSWatcher;
+        watch?: FSWatcher;
         rebuilding: boolean;
         npm?: Promise<void>;
       }
