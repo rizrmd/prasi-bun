@@ -1,18 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
 import brotliPromise from "brotli-wasm";
-import { Glob, spawn } from "bun";
+import { spawn } from "bun";
 import { dir } from "dir";
 import { build } from "esbuild";
+import { polyfillNode } from "esbuild-plugin-polyfill-node";
 import { fdir } from "fdir";
 import { statSync } from "fs";
-import {
-  copyAsync,
-  existsAsync,
-  listAsync,
-  removeAsync,
-  writeAsync,
-} from "fs-jetpack";
-import { polyfillNode } from "esbuild-plugin-polyfill-node";
+import { listAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { platform } from "os";
 
 const brotli = await brotliPromise;
@@ -122,36 +116,37 @@ if (build_all) {
   });
   await parcel.exited;
 
-  const public_br = dir.path("app/web/public-br");
-  const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
-  await removeAsync(public_br);
-  const public_files = await listAsync(dir.path("app/static"));
-  if (public_files) {
-    const public_files = api.sync();
-    if (public_files) {
-      await Promise.all(
-        public_files.map(async (file) => {
-          if (file !== "favicon.ico" && !file.startsWith("monaco")) {
-            public_files.push(file);
-          }
+  // const public_br = dir.path("app/web/public-br");
+  // await removeAsync(public_br);
 
+  const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
+  const public_files = api.sync();
+  if (public_files) {
+    await Promise.all(
+      public_files.map(async (file) => {
+        if (file !== "favicon.ico" && !file.startsWith("monaco")) {
+          public_files.push(file);
+        }
+
+        const brfile = Bun.file(dir.path(`app/web/public-br/${file}`));
+        if (!(await brfile.exists())) {
           const bfile = Bun.file(dir.path(`app/web/public/${file}`));
-          if (!(await bfile.exists())) {
-            const br = brotli.compress(
-              new Uint8Array(await bfile.arrayBuffer()),
-              { quality: 11 }
-            );
-            if (br) {
-              console.log(`Compressing [public] ${file}`);
-              await writeAsync(
-                dir.path(`app/web/public-br/${file}`),
-                Buffer.from(br)
-              );
+          const br = brotli.compress(
+            new Uint8Array(await bfile.arrayBuffer()),
+            {
+              quality: 11,
             }
+          );
+          if (br) {
+            console.log(`Compressing [public] ${file}`);
+            await Bun.write(
+              dir.path(`app/web/public-br/${file}`),
+              Buffer.from(br)
+            );
           }
-        })
-      );
-    }
+        }
+      })
+    );
     await Bun.write(
       dir.path("app/web/public_files.ts"),
       `export const files = ${JSON.stringify(public_files, null, 2)}`
