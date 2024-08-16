@@ -88,18 +88,18 @@ export const initFrontEnd = async (
           )
             return;
 
+          console.log(
+            event, filename,
+            typeof fe !== "undefined" && !fe.rebuilding
+              ? "start-rebuild"
+              : "rebuilding..."
+          );
           if (
             filename?.endsWith(".tsx") ||
             filename?.endsWith(".ts") ||
             filename?.endsWith(".css") ||
             filename?.endsWith(".html")
           ) {
-            console.log(
-              filename,
-              typeof fe !== "undefined" && !fe.rebuilding
-                ? "start-rebuild"
-                : "rebuilding..."
-            );
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
