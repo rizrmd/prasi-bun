@@ -82,14 +82,17 @@ export const initFrontEnd = async (
         async (event, filename) => {
           const fe = code.internal.frontend[id_site];
           const srv = code.internal.server[id_site];
+
           if (
             filename?.startsWith("node_modules") ||
-            filename?.startsWith("typings")
+            filename?.startsWith("typings") ||
+            filename?.endsWith(".log")
           )
             return;
 
           console.log(
-            event, filename,
+            event,
+            filename,
             typeof fe !== "undefined" && !fe.rebuilding
               ? "start-rebuild"
               : "rebuilding..."
