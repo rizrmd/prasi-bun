@@ -1,14 +1,13 @@
-import watcher, { AsyncSubscription } from "@parcel/watcher";
-import { readdir } from "node:fs/promises";
-import { statSync } from "node:fs";
-import { join } from "path";
-import { code } from "../code";
-import { user } from "../../entity/user";
 import { conns } from "../../entity/conn";
+import { user } from "../../entity/user";
 import { sendWS } from "../../sync-handler";
 import { SyncType } from "../../type";
+import { FSWatcher, statSync, watch } from "fs";
+import { readdir } from "node:fs/promises";
+import { code } from "../code";
+import { join } from "path";
 export class Watcher {
-  subcription = null as null | AsyncSubscription;
+  watchers = {} as Record<string, FSWatcher>;
 
   constructor(path: string, id_site: string) {
     this.init(path, id_site);
@@ -34,51 +33,52 @@ export class Watcher {
         });
       };
 
-      this.subcription = await watcher.subscribe(path, (err, events) => {
-        for (const e of events) {
-          const filename = e.path.substring(path.length + 1);
-          if (e.type === "create" || e.type === "update") {
-            const fe = code.internal.frontend[id_site];
-            if (
-              filename?.startsWith("node_modules") ||
-              filename?.startsWith("typings") ||
-              filename?.endsWith(".log")
-            )
-              return;
+      const createWatcher = (p: string, recursive: boolean) => {
+        return watch(p, { recursive }, (e, filename) => {
+          const fe = code.internal.frontend[id_site];
 
-            if (
-              filename?.endsWith(".tsx") ||
-              filename?.endsWith(".ts") ||
-              filename?.endsWith(".css") ||
-              filename?.endsWith(".html")
-            ) {
-              if (typeof fe !== "undefined" && !fe.rebuilding) {
-                fe.rebuilding = true;
-                clearTimeout(fe.timeout);
-                fe.timeout = setTimeout(async () => {
-                  try {
-                    broadcastLoading();
-                    await fe.ctx.rebuild();
-                    fe.rebuilding = false;
-                  } catch (e: any) {
-                    console.error(`Frontend failed rebuild (site: ${id_site})`);
-                    console.error(e.message);
-                    fe.rebuilding = false;
-                  }
-                }, 500);
-              }
+          if (
+            filename?.endsWith(".tsx") ||
+            filename?.endsWith(".ts") ||
+            filename?.endsWith(".css") ||
+            filename?.endsWith(".html")
+          ) {
+            if (typeof fe !== "undefined" && !fe.rebuilding) {
+              fe.rebuilding = true;
+              clearTimeout(fe.timeout);
+              fe.timeout = setTimeout(async () => {
+                try {
+                  broadcastLoading();
+                  await fe.ctx.rebuild();
+                  fe.rebuilding = false;
+                } catch (e: any) {
+                  console.error(`Frontend failed rebuild (site: ${id_site})`);
+                  console.error(e.message);
+                  fe.rebuilding = false;
+                }
+              }, 500);
             }
           }
+        });
+      };
+
+      this.watchers["."] = createWatcher(path, false);
+      const files = await readdir(path);
+      for (const file of files) {
+        if (file.startsWith(".") || file === "node_modules") continue;
+        const stats = statSync(file);
+        if (stats.isDirectory()) {
+          this.watchers[file] = createWatcher(join(path, file), true);
         }
-      });
+      }
     } catch (e) {
       console.error(e);
     }
   }
 
   async close() {
-    if (this.subcription) {
-      await this.subcription.unsubscribe();
+    for (const v of Object.values(this.watchers)) {
+      v.close();
     }
   }
 }
