@@ -69,7 +69,10 @@ export const ViRender: FC<{
     console.log(spaces + meta.item.id, meta.item.name);
   }
 
-  if (meta.item.adv?.js || meta.item.component?.id) {
+  if (
+    !(is_layout && meta.item.name === "children") &&
+    (meta.item.adv?.js || meta.item.component?.id)
+  ) {
     return (
       <ErrorBox meta={meta}>
         <ViScript
@@ -82,6 +85,7 @@ export const ViRender: FC<{
       </ErrorBox>
     );
   }
+
   return (
     <ErrorBox meta={meta}>
       <ViChild
@@ -106,6 +110,7 @@ export const ViChild: FC<{
 
   if (is_layout && meta.item.name === "children") {
     const childs: ReactNode[] = [];
+
     for (const item_id of vi.entry) {
       const meta = vi.meta[item_id];
 
