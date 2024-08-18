@@ -189,7 +189,8 @@ export const Root = () => {
         <div
           className={cx(
             "absolute flex flex-col items-stretch flex-1 bg-white main-content-preview",
-            base.mode === "mobile"
+            base.mode === "mobile" &&
+              ["prasi.avolut.com", "localhost:4550"].includes(location.host)
               ? css`
                   @media (min-width: 768px) {
                     border-left: 1px solid #ccc;
