@@ -33,13 +33,11 @@ export const ViRoot: FC<{}> = ({}) => {
         entry.map((id) => {
           const meta = is_layout ? vi.layout?.meta[id] : vi.meta[id];
           if (meta) {
-            if (Element) {
-              return (
-                <ErrorBox key={meta.item.id}>
-                  <ViRender meta={meta} is_layout={is_layout} depth={0} />
-                </ErrorBox>
-              );
-            }
+            return (
+              <ErrorBox key={meta.item.id}>
+                <ViRender meta={meta} is_layout={is_layout} depth={0} />
+              </ErrorBox>
+            );
           }
           return null;
         })}

@@ -109,6 +109,7 @@ export const Vi: FC<{
     ((url: string) => {
       false;
     });
+
   w.preload = (_urls: PRELOAD_ARGS["urls"], opt: PRELOAD_ARGS["opt"]) => {
     if (vi.on_preload) {
       return new Promise<void>((done) => {
