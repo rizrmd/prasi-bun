@@ -19,8 +19,12 @@ const g = {
 
 async function install() {
   const cache = await caches.open(version);
-  await cache.addAll([...manifest, ...files]);
-  g.broadcast({ type: "installed" });
+
+  const entries = [...manifest, ...files];
+  if (entries.length > 0) {
+    await cache.addAll(entries);
+    g.broadcast({ type: "installed" });
+  }
 }
 addEventListener("install", (e) => (e as ExtendableEvent).waitUntil(install()));
 
