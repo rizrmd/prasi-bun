@@ -103,7 +103,7 @@ export const _ = {
                 },
               }
             );
-          } catch (e: any) {
+          } catch () {
             try {
               let file = Bun.file(build_old);
 
@@ -116,7 +116,7 @@ export const _ = {
                   },
                 }
               );
-            } catch (e) {
+            } catch (e: any) {
               return new Response(
                 `
               console.error("Failed to load index.js")
