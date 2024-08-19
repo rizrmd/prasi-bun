@@ -4,6 +4,7 @@ export const useLocal = <T extends object>(
   data: T,
   effect?: (arg: {
     init: boolean;
+    setDelayedRender: (arg: boolean) => void;
   }) => Promise<void | (() => void)> | void | (() => void),
   deps?: any[]
 ): {
@@ -16,15 +17,23 @@ export const useLocal = <T extends object>(
     },
     deps: (deps || []) as any[],
     ready: false,
-    _loading: {} as any,
+    _loading: {} as any, 
     lastRender: 0,
     lastRenderCount: 0,
+    delayedRender: false,
+    delayedRenderTimeout: null as any,
   });
   const local = _.current;
 
   useEffect(() => {
     local.ready = true;
-    if (effect) effect({ init: true });
+    if (effect)
+      effect({
+        init: true,
+        setDelayedRender(arg) {
+          local.delayedRender = arg;
+        },
+      });
   }, []);
 
   if (local.ready === false) {
@@ -32,6 +41,17 @@ export const useLocal = <T extends object>(
 
     local.data.render = () => {
       if (local.ready) {
+        if (local.delayedRender) {
+          if (Date.now() - local.lastRender > 100) {
+            local.lastRender = Date.now();
+            _render({});
+          } else {
+            clearTimeout(local.delayedRenderTimeout);
+            local.delayedRenderTimeout = setTimeout(local.data.render, 50);
+          }
+          return;
+        }
+
         if (Date.now() - local.lastRender < 300) {
           local.lastRenderCount++;
         } else {
@@ -39,7 +59,9 @@ export const useLocal = <T extends object>(
         }
 
         if (local.lastRenderCount > 300) {
-          throw new Error("local.render more than 300 times in less than 300ms");
+          throw new Error(
+            "local.render more than 300 times in less than 300ms"
+          );
         }
 
         local.lastRender = Date.now();
@@ -54,7 +76,12 @@ export const useLocal = <T extends object>(
 
           if (effect) {
             setTimeout(() => {
-              effect({ init: false });
+              effect({
+                init: false,
+                setDelayedRender(arg) {
+                  local.delayedRender = arg;
+                },
+              });
             });
           }
           break;

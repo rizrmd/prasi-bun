@@ -33,23 +33,28 @@ export const EdPropInstanceOptions: FC<{
   labelClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
 }> = ({ name, mprop, cprop, label, labelClick, meta }) => {
   const prop = mprop.toJSON() as FNCompDef;
-  const local = useLocal({
-    codeEditing: false,
-    loading: true,
-    isOpen: false,
-    val: "",
-    metaFnInit: false,
-    metaFn: null as null | (() => Promise<MetaOption[]>),
-    checkbox: {
-      width: 0,
+  const local = useLocal(
+    {
+      codeEditing: false,
+      loading: true,
+      isOpen: false,
+      val: "",
+      metaFnInit: false,
+      metaFn: null as null | (() => Promise<MetaOption[]>),
+      checkbox: {
+        width: 0,
+      },
+      options: [] as MetaOption[],
+      optDeps: [] as any[],
+      resetOnDeps: false as boolean | (() => any[]),
+      open: false,
+      pendingVal: null as any,
+      changedTimeout: null as any,
     },
-    options: [] as MetaOption[],
-    optDeps: [] as any[],
-    resetOnDeps: false as boolean | (() => any[]),
-    open: false,
-    pendingVal: null as any,
-    changedTimeout: null as any,
-  });
+    ({ setDelayedRender }) => {
+      setDelayedRender(true);
+    }
+  );
   const p = useGlobal(EDGlobal, "EDITOR");
 
   config.opt[name] = () => {
@@ -97,6 +102,7 @@ export const EdPropInstanceOptions: FC<{
             if (v.valueBuilt && v.valueBuilt.length > 3) {
               if (v.valueBuilt.startsWith(`const _jsxFileName = "";`)) {
                 v.valueBuilt = `(() => { ${v.valueBuilt.replace(
+                  `const _jsxFileName = "";`,
                   `const _jsxFileName = ""; return `
                 )} })()`;
               }
