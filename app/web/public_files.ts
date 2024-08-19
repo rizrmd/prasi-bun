@@ -114,5 +114,4 @@ export const files = [
   "monaco/min/vs/editor/editor.main.nls.js",
   "monaco/min/vs/editor/editor.main.nls.fr.js",
   "monaco/min/vs/loader.js",
-  "img/empty.png"
-]
+];
