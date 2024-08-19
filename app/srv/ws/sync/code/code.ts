@@ -26,7 +26,7 @@ export const code = {
   path(
     id_site: string,
     mode: "site" | "server",
-    type: "src" | "build" | "build_cache",
+    type: "src" | "build" | "build_old" | "build_cache",
     path?: string
   ) {
     let file_path = "";

@@ -89,8 +89,8 @@ export const _ = {
           const arr = pathname.split("/").slice(2);
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
+          const build_old = code.path(site_id, "site", "build_old", codepath);
 
-          
           try {
             let file = Bun.file(build_path);
 
@@ -104,15 +104,29 @@ export const _ = {
               }
             );
           } catch (e: any) {
-            return new Response(
-              `
+            try {
+              let file = Bun.file(build_old);
+
+              return new Response(
+                await gzipAsync(new Uint8Array(await file.arrayBuffer())),
+                {
+                  headers: {
+                    "content-encoding": "gzip",
+                    "content-type": mime.getType(build_path) || "",
+                  },
+                }
+              );
+            } catch (e) {
+              return new Response(
+                `
               console.error("Failed to load index.js")
               console.error("${e.message}")
 `,
-              {
-                headers: { "content-type": "application/javascript" },
-              }
-            );
+                {
+                  headers: { "content-type": "application/javascript" },
+                }
+              );
+            }
           }
         }
         case "route": {

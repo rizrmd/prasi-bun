@@ -216,7 +216,6 @@ import React from "react";
                   await codeError(id_site, "");
                   await $`mv ${out_dir} ${out_dir_old}`.quiet();
                   await $`mv ${out_dir_temp} ${out_dir}`.quiet();
-                  await $`rm -rf ${out_dir_old}`.quiet();
 
                   const now = Date.now();
                   client_ids.forEach((client_id) => {
