@@ -35,7 +35,7 @@ export const yjs_diff_local: SAction["yjs"]["diff_local"] = async function (
           }
           history[id] = cur;
           if (mode === "create") {
-            _db.page_history.create({
+            await _db.page_history.create({
               data: {
                 id_page: id,
                 content_tree: await gzipAsync(JSON.stringify(root.toJSON())),
