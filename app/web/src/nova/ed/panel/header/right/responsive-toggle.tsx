@@ -8,7 +8,7 @@ import { treeRebuild } from "../../../logic/tree/build";
 export const ResponsiveToggle = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const mode = p.mode;
-  const activeModeClassName = "border-b-2 border-blue-500";
+  let activeModeClassName = "border-b-2 border-blue-500";
 
   const render = () => {
     const code = p.code["site"]?.doc;
@@ -27,6 +27,10 @@ export const ResponsiveToggle = () => {
     w.isMobile = responsive === "mobile";
     w.isDesktop = responsive === "desktop";
     localStorage.setItem("prasi-editor-mode", responsive);
+  }
+
+  if (responsive) {
+    activeModeClassName = "border-b-2 border-green-500 bg-green-100";
   }
 
   const box = {
