@@ -6,8 +6,10 @@ import { FSWatcher, statSync, watch } from "fs";
 import { readdir } from "node:fs/promises";
 import { code } from "../code";
 import { join } from "path";
+import { Subprocess } from "bun";
+
 export class Watcher {
-  watchers = {} as Record<string, FSWatcher>;
+  proc: undefined | Subprocess;
 
   constructor(path: string, id_site: string) {
     this.init(path, id_site);
@@ -33,16 +35,13 @@ export class Watcher {
         });
       };
 
-      const createWatcher = (p: string, recursive: boolean) => {
-        return watch(p, { recursive }, (e, filename) => {
-          const fe = code.internal.frontend[id_site];
-
-          if (
-            filename?.endsWith(".tsx") ||
-            filename?.endsWith(".ts") ||
-            filename?.endsWith(".css") ||
-            filename?.endsWith(".html")
-          ) {
+      this.proc = Bun.spawn(
+        ["bun", join(import.meta.dir, "init/watcher.ts"), path],
+        {
+          stdout: "inherit",
+          stderr: "inherit",
+          ipc(message, childProc) {
+            const fe = code.internal.frontend[id_site];
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);
@@ -58,28 +57,15 @@ export class Watcher {
                 }
               }, 500);
             }
-          }
-        });
-      };
-
-      this.watchers["."] = createWatcher(path, false);
-      const files = await readdir(path);
-      for (const file of files) {
-        if (file.startsWith(".") || file === "node_modules") continue;
-        const fullpath = join(path, file);
-        const stats = statSync(fullpath);
-        if (stats.isDirectory()) {
-          this.watchers[file] = createWatcher(fullpath, true);
+          },
         }
-      }
+      );
     } catch (e) {
       console.error(e);
     }
   }
 
   async close() {
-    for (const v of Object.values(this.watchers)) {
-      v.close();
-    }
+    this.proc?.kill();
   }
 }
