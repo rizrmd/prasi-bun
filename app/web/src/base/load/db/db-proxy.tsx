@@ -11,6 +11,7 @@ const schema_promise = {
 
 export const dbProxy = (dburl: string) => {
   const name = "";
+
   return new Proxy(
     {},
     {
@@ -165,7 +166,9 @@ export const fetchSendDb = async (
     typeof location !== "undefined" &&
     base.hostname !== location.hostname &&
     (window as any).isEditor &&
-    ["prasi.avolut.com", "localhost:4550"].includes(location.host)
+    ["prasi.avolut.com", "localhost:4550", "127.0.0.1:4550"].includes(
+      location.host
+    )
   )
     isEditor = true;
 
