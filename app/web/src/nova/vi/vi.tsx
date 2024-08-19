@@ -68,7 +68,7 @@ export const Vi: FC<{
     try {
       if (
         ["prasi.avolut.com"].includes(location.hostname) ||
-        location.host === "localhost:4550"
+        location.port === "4550"
       ) {
         if (vi.site.api_url) {
           if (!vi.site_url) {

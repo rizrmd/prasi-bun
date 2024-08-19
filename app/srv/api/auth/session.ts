@@ -19,7 +19,7 @@ export const _ = {
       const origin = req.headers.get("origin");
       if (origin) {
         const url = new URL(origin);
-        if (url.hostname === "localhost") {
+        if (url.port === "4550") {
           setDefaultCookie = false;
           res.setHeader("set-cookie", `${session.cookieKey}=${sdata.id};`);
         }

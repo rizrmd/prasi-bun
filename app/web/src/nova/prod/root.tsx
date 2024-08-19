@@ -176,6 +176,12 @@ export const Root = () => {
   // #endregion
 
   let mobileCSS = "";
+  console.log(
+    base.mode,
+    !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    )
+  );
   if (base.mode === "mobile") {
     if (
       !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

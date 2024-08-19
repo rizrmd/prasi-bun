@@ -27,6 +27,7 @@ const getRoute = () => {
       fetch(base.url`_prasi/compress/only-gz`);
     }
     cached.route = await res.json();
+
     done(cached.route);
   });
 };
@@ -49,6 +50,7 @@ export const initBaseRoute = async () => {
       }
 
       base.site = res.site;
+
       base.site.code = { mode: "vsc" };
       await injectSiteScript();
 
@@ -78,6 +80,7 @@ const injectSiteScript = () => {
       done();
     };
     let base_url = base.site.api_url;
+
     if (base_url === "*") {
       base_url = `${location.protocol}//${location.host}`;
       base.site.api_url = base_url;
@@ -92,8 +95,7 @@ const injectSiteScript = () => {
     cur.pathname = "";
     if (
       !base_url ||
-      (!["prasi.avolut.com"].includes(cur.hostname) &&
-        cur.host !== "localhost:4550")
+      (!["prasi.avolut.com"].includes(cur.hostname) && cur.port !== "4550")
     ) {
       cur.hash = "";
       let cur_url = trim(cur.toString(), "/");
@@ -125,7 +127,7 @@ export const rebuildMeta = (meta: Record<string, IMeta>, root: IRoot) => {
         meta,
         mode: "page",
       },
-      { item },
+      { item }
     );
   }
 };
