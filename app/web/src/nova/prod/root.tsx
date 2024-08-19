@@ -178,6 +178,8 @@ export const Root = () => {
   let mobileCSS = "";
 
   if (base.page.root.responsive === "mobile") {
+    base.mode = "mobile";
+
     if (
       !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
