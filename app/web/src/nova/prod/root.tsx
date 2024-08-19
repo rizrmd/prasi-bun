@@ -206,6 +206,8 @@ export const Root = () => {
         }
       `;
     }
+  } else {
+    base.mode = "desktop";
   }
 
   return (
