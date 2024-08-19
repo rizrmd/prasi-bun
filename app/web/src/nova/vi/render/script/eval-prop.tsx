@@ -139,7 +139,15 @@ export const viEvalProps = (
             }
           }
 
-          const js = prop.valueBuilt || "";
+          let js = prop.valueBuilt || "";
+
+          if (js.startsWith(`const _jsxFileName = "";`)) {
+            js = `(() => { ${js.replace(
+              `const _jsxFileName = "";`,
+              `const _jsxFileName = ""; return `
+            )} })()`;
+          }
+
           const src = replaceWithObject(js, replacement) || "";
 
           const fn = new Function(
