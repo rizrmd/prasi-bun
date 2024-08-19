@@ -5,6 +5,7 @@ export type IRoot = {
   id: "root";
   type: "root";
   id_page?: string;
+  responsive?: "mobile" | "desktop";
   childs: ISection[];
   component_ids?: string[];
 };
