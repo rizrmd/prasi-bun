@@ -177,6 +177,7 @@ export const Root = () => {
 
   let mobileCSS = "";
 
+  console.log(base.page.root.responsive, base.mode);
   if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
 

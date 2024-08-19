@@ -17,7 +17,7 @@ export const useLocal = <T extends object>(
     },
     deps: (deps || []) as any[],
     ready: false,
-    _loading: {} as any, 
+    _loading: {} as any,
     lastRender: 0,
     lastRenderCount: 0,
     delayedRender: false,
@@ -59,6 +59,10 @@ export const useLocal = <T extends object>(
         }
 
         if (local.lastRenderCount > 300) {
+          setTimeout(() => {
+            local.lastRender = Date.now();
+            _render({});
+          }, 500);
           throw new Error(
             "local.render more than 300 times in less than 300ms"
           );
