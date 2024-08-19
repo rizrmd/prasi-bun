@@ -177,7 +177,13 @@ export const Root = () => {
 
   let mobileCSS = "";
   if (base.mode === "mobile") {
-    if (["prasi.avolut.com", "localhost:4550"].includes(location.host)) {
+    if (
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+    ) {
+      // if page is mobile but device is not, frame the screen
+
       mobileCSS = css`
         @media (min-width: 768px) {
           border-left: 1px solid #ccc;
@@ -194,18 +200,6 @@ export const Root = () => {
           top: 0px;
           bottom: 0px;
           overflow-y: auto;
-        }
-      `;
-    } else {
-      mobileCSS = css`
-        @media (min-width: 1600px) {
-          border-left: 1px solid #ccc;
-          border-right: 1px solid #ccc;
-          width: 375px;
-          top: 0px;
-          overflow-x: hidden;
-          overflow-y: auto;
-          bottom: 0px;
         }
       `;
     }
