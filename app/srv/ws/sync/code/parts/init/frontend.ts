@@ -214,6 +214,7 @@ import React from "react";
                   });
                 } else {
                   await codeError(id_site, "");
+                  await $`rm -rf ${out_dir_old}`.quiet();
                   await $`mv ${out_dir} ${out_dir_old}`.quiet();
                   await $`mv ${out_dir_temp} ${out_dir}`.quiet();
 
