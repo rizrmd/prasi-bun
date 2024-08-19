@@ -103,7 +103,7 @@ export const _ = {
                 },
               }
             );
-          } catch () {
+          } catch (e) {
             try {
               let file = Bun.file(build_old);
 
