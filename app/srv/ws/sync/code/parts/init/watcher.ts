@@ -8,6 +8,7 @@ const watchers = {} as Record<string, FSWatcher>;
 
 const createWatcher = (p: string, recursive: boolean) => {
   return watch(p, { recursive }, (e, filename) => {
+    if (filename === "global.d.ts") return;
     if (
       filename?.endsWith(".tsx") ||
       filename?.endsWith(".ts") ||

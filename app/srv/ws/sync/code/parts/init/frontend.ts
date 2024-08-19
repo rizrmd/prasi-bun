@@ -21,6 +21,8 @@ export const initFrontEnd = async (
 ) => {
   let existing = code.internal.frontend[id_site];
 
+  await isInstalling(id_site);
+
   if (existing) {
     if (existing.npm) {
       if (pending[id_site]) return;
@@ -48,8 +50,6 @@ export const initFrontEnd = async (
   }
 
   try {
-    await isInstalling(id_site);
-
     if (code.internal.frontend[id_site]?.watch) {
       await code.internal.frontend[id_site].watch.close();
     }
@@ -108,6 +108,17 @@ const isInstalling = async (id_site: string) => {
           for (const [k, v] of Object.entries(module_json.devDependencies)) {
             if (!pkg_json.devDependencies[k]) should_install = true;
             pkg_json.devDependencies[k] = v;
+          }
+        }
+
+        for (const k of Object.keys(pkg_json.dependencies)) {
+          if (
+            !(await Bun.file(
+              code.path(id_site, "site", "src", `node_modules/${k}`)
+            ).exists())
+          ) {
+            should_install = true;
+            break;
           }
         }
 

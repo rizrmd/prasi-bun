@@ -41,6 +41,7 @@ export class Watcher {
           stdout: "inherit",
           stderr: "inherit",
           ipc(message, childProc) {
+            console.log(id_site, message);
             const fe = code.internal.frontend[id_site];
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
