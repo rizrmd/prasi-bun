@@ -89,7 +89,9 @@ export const _ = {
           const arr = pathname.split("/").slice(2);
           const codepath = arr.join("/");
           const build_path = code.path(site_id, "site", "build", codepath);
-          const build_old = code.path(site_id, "site", "build_old", codepath);
+          const build_old = dir.data(
+            `code/${site_id}/site/build-old/${codepath}`
+          );
 
           try {
             let file = Bun.file(build_path);
