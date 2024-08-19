@@ -96,7 +96,9 @@ export const EdPropInstanceOptions: FC<{
           for (const [k, v] of Object.entries(meta.item.component.props)) {
             if (v.valueBuilt && v.valueBuilt.length > 3) {
               if (v.valueBuilt.startsWith(`const _jsxFileName = "";`)) {
-                v.valueBuilt = `(() => { ${v.valueBuilt} })()`;
+                v.valueBuilt = `(() => { ${v.valueBuilt.replace(
+                  `const _jsxFileName = ""; return `
+                )} })()`;
               }
 
               try {
