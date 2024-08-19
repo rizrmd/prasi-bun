@@ -175,6 +175,41 @@ export const Root = () => {
   }
   // #endregion
 
+  let mobileCSS = "";
+  if (base.mode === "mobile") {
+    if (["prasi.avolut.com", "localhost:4550"].includes(location.host)) {
+      mobileCSS = css`
+        @media (min-width: 768px) {
+          border-left: 1px solid #ccc;
+          border-right: 1px solid #ccc;
+          width: 375px;
+          top: 0px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          bottom: 0px;
+        }
+        @media (max-width: 767px) {
+          left: 0px;
+          right: 0px;
+          top: 0px;
+          bottom: 0px;
+          overflow-y: auto;
+        }
+      `;
+    } else {
+      mobileCSS = css`
+        @media (min-width: 1600px) {
+          border-left: 1px solid #ccc;
+          border-right: 1px solid #ccc;
+          width: 375px;
+          top: 0px;
+          overflow-x: hidden;
+          overflow-y: auto;
+          bottom: 0px;
+        }
+      `;
+    }
+  }
 
   return (
     <Provider value={w.prasiContext}>
@@ -190,28 +225,7 @@ export const Root = () => {
         <div
           className={cx(
             "absolute flex flex-col items-stretch flex-1 bg-white main-content-preview",
-            base.mode === "mobile" &&
-              ["prasi.avolut.com", "localhost:4550"].includes(location.host)
-              ? css`
-                  @media (min-width: 768px) {
-                    border-left: 1px solid #ccc;
-                    border-right: 1px solid #ccc;
-                    width: 375px;
-                    top: 0px;
-                    overflow-x: hidden;
-                    overflow-y: auto;
-                    bottom: 0px;
-                  }
-                  @media (max-width: 767px) {
-                    left: 0px;
-                    right: 0px;
-                    top: 0px;
-                    bottom: 0px;
-                    overflow-y: auto;
-                  }
-                `
-              : "inset-0 overflow-auto",
-
+            base.mode === "mobile" ? mobileCSS : "inset-0 overflow-auto",
             css`
               contain: content;
             `
