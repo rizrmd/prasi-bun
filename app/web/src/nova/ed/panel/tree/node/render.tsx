@@ -254,7 +254,7 @@ function bytesToHumanFileSize(bytes: number): string {
 }
 
 const hydrateItem = (p: PG, item: IItem) => {
-  const result = deepClone(item);
+  const result = { ...item };
 
   if (result.childs) {
     for (const [k, child] of Object.entries(result.childs)) {
