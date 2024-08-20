@@ -1,5 +1,6 @@
 export const files = [
   "favicon.ico",
+  "img/empty.png",
   "monaco/min/vs/basic-languages/postiats/postiats.js",
   "monaco/min/vs/basic-languages/scheme/scheme.js",
   "monaco/min/vs/basic-languages/sb/sb.js",
@@ -114,4 +115,5 @@ export const files = [
   "monaco/min/vs/editor/editor.main.nls.js",
   "monaco/min/vs/editor/editor.main.nls.fr.js",
   "monaco/min/vs/loader.js",
-];
+  "img/empty.png"
+]
