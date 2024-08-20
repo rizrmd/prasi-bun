@@ -180,11 +180,22 @@ export const Root = () => {
   if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
     mobileCSS = css`
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px;
-      overflow-y: auto;
+      @media (min-width: 1280px) {
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        width: 375px;
+        top: 0px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        bottom: 0px;
+      }
+      @media (max-width: 1279px) {
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        overflow-y: auto;
+      }
     `;
   } else if (base.page.root.responsive === "desktop") {
     base.mode = "desktop";
