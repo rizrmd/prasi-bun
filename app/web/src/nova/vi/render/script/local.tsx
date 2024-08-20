@@ -2,8 +2,12 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { modifyChild } from "./passprop";
+import { deepClone } from "web-utils";
 
-export const local_cached_value = {} as Record<string, any>;
+export const local_cached_value = {} as Record<
+  string,
+  { mounted: boolean; value: any }
+>;
 
 export const createViLocal = (
   vi: {
@@ -39,10 +43,18 @@ export const createViLocal = (
 
     const curid = vi.page.cur.id + "~" + id;
     if (!local_cached_value[curid]) {
-      local_cached_value[curid] = arg.value;
+      local_cached_value[curid] = { mounted: true, value: arg.value };
+    } else if (!local_cached_value[curid].mounted) {
+      for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
+        delete local_cached_value[curid].value[k];
+      }
+      for (const [k, v] of Object.entries(deepClone(arg.value))) {
+        local_cached_value[curid].value[k] = v;
+      }
+      local_cached_value[curid].mounted = true;
     }
 
-    const ref = useRef<any>(local_cached_value[curid]);
+    const ref = useRef<any>(local_cached_value[curid].value);
 
     const [_, set] = useState({});
     const local = ref.current;
@@ -89,7 +101,9 @@ export const createViLocal = (
         fn();
       }
 
-      return () => {};
+      return () => {
+        local_cached_value[curid].mounted = false;
+      };
     }, [...(arg.deps || []), location.pathname]);
 
     useEffect(() => {
