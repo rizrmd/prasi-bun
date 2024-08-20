@@ -14,7 +14,7 @@ import { declareScope } from "./scope/scope";
 
 // @ts-ignore
 import { FNCompDef } from "../../../../../utils/types/meta-fn";
-import { editorLocalValue } from "../../../../vi/render/script/local";
+import { local_cached_value } from "../../../../vi/render/script/local";
 import { propInstanceOnChange } from "../../side/prop-instance/on-change";
 import { codeEditAdvJs } from "./code-edit/adv-js";
 import { codeEditPropInstance } from "./code-edit/prop-instance";
@@ -346,7 +346,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 scope = await code_result;
               }
             } else {
-              editorLocalValue[active.item_id] = null;
+              local_cached_value[active.item_id] = null;
               if (mode === "js") {
                 const code_result = codeEditAdvJs(p, value);
 
