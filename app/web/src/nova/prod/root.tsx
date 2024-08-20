@@ -177,7 +177,7 @@ export const Root = () => {
 
   let mobileCSS = "";
 
-  if (base.page.root.responsive === "mobile") {
+  if (base.page.root.responsive === "mobile" || base.mode === "mobile") {
     base.mode = "mobile";
     mobileCSS = css`
       @media (min-width: 1280px) {

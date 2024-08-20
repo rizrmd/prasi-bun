@@ -164,3 +164,11 @@ model page_history {
   ts           String
   page         page   @relation(fields: [id_page], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+model deploy_target {
+  id      String @id(map: "deploy_target_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_site Int
+  name    String
+  api_url String
+  domain  String
+}
