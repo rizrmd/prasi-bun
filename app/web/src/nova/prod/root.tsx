@@ -180,7 +180,7 @@ export const Root = () => {
   if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
     mobileCSS = css`
-      @media (min-width: 768px) {
+      @media (min-width: 1280px) and (min-height: 1024px) {
         border-left: 1px solid #ccc;
         border-right: 1px solid #ccc;
         width: 375px;
@@ -189,7 +189,7 @@ export const Root = () => {
         overflow-y: auto;
         bottom: 0px;
       }
-      @media (max-width: 767px) {
+      @media (max-width: 1279px) and (max-height: 1023px) {
         left: 0px;
         right: 0px;
         top: 0px;
