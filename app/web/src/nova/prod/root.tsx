@@ -179,34 +179,25 @@ export const Root = () => {
 
   if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
-
-    if (
-      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      )
-    ) {
-      // if page is mobile but device is not, frame the screen
-
-      mobileCSS = css`
-        @media (min-width: 768px) {
-          border-left: 1px solid #ccc;
-          border-right: 1px solid #ccc;
-          width: 375px;
-          top: 0px;
-          overflow-x: hidden;
-          overflow-y: auto;
-          bottom: 0px;
-        }
-        @media (max-width: 767px) {
-          left: 0px;
-          right: 0px;
-          top: 0px;
-          bottom: 0px;
-          overflow-y: auto;
-        }
-      `;
-    }
-  } else {
+    mobileCSS = css`
+      @media (min-width: 768px) {
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        width: 375px;
+        top: 0px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        bottom: 0px;
+      }
+      @media (max-width: 767px) {
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        overflow-y: auto;
+      }
+    `;
+  } else if (base.page.root.responsive === "desktop") {
     base.mode = "desktop";
   }
 
