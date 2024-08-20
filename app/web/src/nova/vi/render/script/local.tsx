@@ -1,13 +1,13 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { IMeta } from "../../../ed/logic/ed-global";
-import { updatePropScope } from "./eval-prop";
-import { modifyChild } from "./passprop";
 import { VG } from "../global";
+import { modifyChild } from "./passprop";
 
-export const editorLocalValue = {} as Record<string, any>;
+export const local_cached_value = {} as Record<string, any>;
 
 export const createViLocal = (
   vi: {
+    page: { cur: { id: string } };
     layout: VG["layout"];
     site: { db: any; api: any };
     meta: Record<string, IMeta>;
@@ -36,9 +36,14 @@ export const createViLocal = (
     const { children, parent_key } = arg;
     const init_local_effect = vi.script?.init_local_effect;
     const metas = is_layout ? vi.layout?.meta : vi.meta;
-    const ref = useRef<any>(
-      editorLocalValue[id] ? editorLocalValue[id] : arg.value
-    );
+
+    const curid = vi.page.cur.id + "~" + id;
+    if (!local_cached_value[curid]) {
+      local_cached_value[curid] = arg.value;
+    }
+
+    const ref = useRef<any>(local_cached_value[curid]);
+
     const [_, set] = useState({});
     const local = ref.current;
     local.render = () => {
@@ -49,8 +54,6 @@ export const createViLocal = (
         set({});
       }
     };
-
-    updatePropScope(vi, meta, meta.script?.scope, parent_key);
 
     if (arg.hook) {
       arg.hook(local);
@@ -76,12 +79,10 @@ export const createViLocal = (
         if (typeof init_local_effect === "object") {
           init_local_effect[id] = true;
         }
+
         const fn = async () => {
           if (arg.effect) {
             await arg.effect(local);
-            if (isEditor) {
-              editorLocalValue[id] = local;
-            }
           }
         };
 
@@ -93,19 +94,19 @@ export const createViLocal = (
 
     useEffect(() => {
       if (isEditor) {
-        if (editorLocalValue[id] === null) {
+        if (local_cached_value[id] === null) {
           const fn = async () => {
             if (arg.effect) {
               await arg.effect(local);
               if (isEditor) {
-                editorLocalValue[id] = local;
+                local_cached_value[id] = local;
               }
             }
           };
           fn();
         }
       }
-    }, [editorLocalValue[id]]);
+    }, [local_cached_value[id]]);
 
     const result = modifyChild(children, {
       ...meta.script?.scope,
