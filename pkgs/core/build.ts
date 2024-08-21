@@ -122,10 +122,6 @@ if (build_all) {
   if (public_files) {
     await Promise.all(
       public_files.map(async (file) => {
-        if (file !== "favicon.ico" && !file.startsWith("monaco")) {
-          public_files.push(file);
-        }
-
         const brfile = Bun.file(dir.path(`app/web/public-br/${file}`));
         if (!(await brfile.exists())) {
           const bfile = Bun.file(dir.path(`app/web/public/${file}`));
