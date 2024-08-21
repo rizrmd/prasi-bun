@@ -121,8 +121,11 @@ export const _ = {
             } catch (e: any) {
               return new Response(
                 `
-              console.error("Failed to load index.js")
-              console.error("${e.message}")
+console.error("Failed to load index.js")
+console.error("${e.message}");
+setTimeout(() =>{
+  location.reload();
+}, 1500);
 `,
                 {
                   headers: { "content-type": "application/javascript" },
