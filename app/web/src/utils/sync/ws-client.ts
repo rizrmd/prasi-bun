@@ -59,7 +59,11 @@ const runtime = {
     done: [] as string[],
     pending: {} as Record<
       string,
-      { ts: number; resolve: (value: any) => void; timeout: any }
+      {
+        ts: number;
+        timeout: any;
+        resolves: ((value: any) => void)[];
+      }
     >,
   },
 };
@@ -208,7 +212,7 @@ const connect = (
             } else if (msg.type === SyncType.ActionResult) {
               const pending = runtime.action.pending[msg.argid];
               if (pending) {
-                pending.resolve(msg.val);
+                pending.resolves.map((e) => e(msg.val));
                 clearTimeout(pending.timeout);
                 delete runtime.action.pending[msg.argid];
                 const idb = conf.idb;
@@ -255,6 +259,10 @@ const doAction = async <T>(arg: {
     const path = (SyncActionPaths as any)[code];
     const argid = await xxhash32(`op-${path}-${sargs}`);
 
+    if (runtime.action.pending[argid]) {
+      runtime.action.pending[argid].resolves.push(resolve);
+      return;
+    }
     if (runtime.action.done.includes(argid)) {
       resolve(undefined);
       return;
@@ -267,7 +275,7 @@ const doAction = async <T>(arg: {
       // online
       runtime.action.pending[argid] = {
         ts: Date.now(),
-        resolve,
+        resolves: [resolve],
         timeout: path.startsWith("yjs.")
           ? setTimeout(() => {
               console.error(`Sync too long: `, {
