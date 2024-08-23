@@ -22,7 +22,13 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
   if (!node || !node.data) {
     return <></>;
   }
-  const item = node.data?.item;
+  let item = node.data?.item;
+
+  if (!item.id && node.data?.mitem) {
+    node.data.item = node.data.mitem.toJSON() as any;
+    item = node.data.item;
+  }
+
   const isComponent = item.type === "item" && item.component?.id;
 
   if (p.ui.tree.item_loading.includes(item.id)) {
@@ -71,7 +77,7 @@ export const nodeRender: NodeRender<IMeta> = (node, prm) => {
     }
 
     if (hide) {
-      return <></>;
+      return <>HIDE</>;
     }
   }
 

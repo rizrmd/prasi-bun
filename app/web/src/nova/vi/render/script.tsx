@@ -38,6 +38,7 @@ export const ViScript: FC<{
 
   if (meta.item.adv?.js) {
     viEvalScript(vi, meta, is_layout, _pass, depth, parent_key);
+
     if (meta.script) return meta.script.result;
   }
 
