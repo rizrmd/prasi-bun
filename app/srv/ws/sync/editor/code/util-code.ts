@@ -73,7 +73,7 @@ declare global {
   const db: prisma.PrismaClient & ${prismaExtendType};
 
 
-  type PrasiServer = {
+  export interface PrasiServer extends Record<string, any> {
     ws?: WebSocketHandler<{ url: string }>;
     http: (arg: {
       url: { raw: URL; pathname: string };
@@ -81,10 +81,12 @@ declare global {
       server: Server;
       mode: "dev" | "prod";
       handle: (req: Request) => Promise<Response>;
+      serveStatic?: any;
+      serveAPI?: any;
       index: { head: string[]; body: string[]; render: () => string };
       prasi: { page_id?: string; params?: Record<string, any> };
     }) => Promise<Response>;
-    init: (arg: { port?: number }) => Promise<void>;
-  };
+    init?: (arg: { port?: number }) => Promise<void>;
+  }
 }
 `;
