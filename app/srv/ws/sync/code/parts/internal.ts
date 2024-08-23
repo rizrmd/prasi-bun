@@ -29,8 +29,8 @@ export const codeInternal = {
       SITE_ID,
       {
         ctx: BuildContext;
-        timeout: any;
         watch?: Watcher;
+        inputs: Set<string>;
         rebuilding: boolean;
         npm?: Promise<void>;
       }

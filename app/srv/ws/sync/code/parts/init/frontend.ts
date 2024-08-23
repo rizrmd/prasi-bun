@@ -55,13 +55,12 @@ export const initFrontEnd = async (
     }
 
     code.internal.frontend[id_site] = {
+      inputs: new Set(),
       ctx: await initBuildCtx({ id_site, root }),
-      timeout: null,
-      rebuilding: false,
+      rebuilding: true,
       watch: new Watcher(dir.data(root), id_site),
     };
     const fe = code.internal.frontend[id_site];
-    fe.rebuilding = true;
     try {
       await fe.ctx.rebuild();
     } catch (e) {
@@ -201,6 +200,13 @@ import React from "react";
         async setup(setup) {
           try {
             setup.onEnd((res) => {
+              code.internal.frontend[id_site].rebuilding = false;
+              if (res.errors.length === 0) {
+                code.internal.frontend[id_site].inputs = new Set(
+                  Object.keys(res.metafile?.inputs || {})
+                );
+              }
+
               setTimeout(async () => {
                 const client_ids = user.active
                   .findAll({ site_id: id_site })

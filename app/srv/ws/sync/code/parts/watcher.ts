@@ -52,23 +52,24 @@ export class Watcher {
               ) {
                 sv.rebuilding = true;
                 sv.ctx.rebuild();
-                return;
               }
             }
             if (typeof fe !== "undefined" && !fe.rebuilding) {
-              fe.rebuilding = true;
-              clearTimeout(fe.timeout);
-              fe.timeout = setTimeout(async () => {
+              if (
+                Array.isArray(message) &&
+                typeof message[1] === "string" &&
+                sv.inputs.has(message[1])
+              ) {
+                fe.rebuilding = true;
                 try {
                   broadcastLoading();
-                  await fe.ctx.rebuild();
-                  fe.rebuilding = false;
+                  fe.ctx.rebuild();
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
                   console.error(e.message);
                   fe.rebuilding = false;
                 }
-              }, 500);
+              }
             }
           },
         }
