@@ -43,6 +43,7 @@ export const initServer = async (
       treeShaking: true,
       format: "cjs",
       logLevel: "silent",
+      external: ["bun:sqlite"],
       plugins: [
         {
           name: "prasi",
