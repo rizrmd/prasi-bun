@@ -40,7 +40,7 @@ export class Watcher {
         {
           stdout: "inherit",
           stderr: "inherit",
-          ipc(message, childProc) {
+          async ipc(message, childProc) {
             console.log(id_site, message);
             const fe = code.internal.frontend[id_site];
             const sv = code.internal.server[id_site];
@@ -50,8 +50,14 @@ export class Watcher {
                 typeof message[1] === "string" &&
                 sv.inputs.has(message[1])
               ) {
-                sv.rebuilding = true;
-                sv.ctx.rebuild();
+                try {
+                  sv.rebuilding = true;
+                  await sv.ctx.rebuild();
+                } catch (e: any) {
+                  console.error(`Srv failed rebuild (site: ${id_site})`);
+                  console.error(e.message);
+                  fe.rebuilding = false;
+                }
               }
             }
             if (typeof fe !== "undefined" && !fe.rebuilding) {
@@ -63,7 +69,7 @@ export class Watcher {
                 fe.rebuilding = true;
                 try {
                   broadcastLoading();
-                  fe.ctx.rebuild();
+                  await fe.ctx.rebuild();
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
                   console.error(e.message);
