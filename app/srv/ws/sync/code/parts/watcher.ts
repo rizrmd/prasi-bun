@@ -52,6 +52,7 @@ export class Watcher {
               ) {
                 try {
                   sv.rebuilding = true;
+                  console.log("rebuilding srv", id_site);
                   await sv.ctx.rebuild();
                 } catch (e: any) {
                   console.error(`Srv failed rebuild (site: ${id_site})`);
@@ -69,6 +70,8 @@ export class Watcher {
                 fe.rebuilding = true;
                 try {
                   broadcastLoading();
+                  console.log("rebuilding fe", id_site);
+
                   await fe.ctx.rebuild();
                 } catch (e: any) {
                   console.error(`Frontend failed rebuild (site: ${id_site})`);
