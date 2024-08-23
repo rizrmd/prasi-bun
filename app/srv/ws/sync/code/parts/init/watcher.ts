@@ -1,12 +1,13 @@
 import { FSWatcher, statSync, watch } from "fs";
 import { readdir } from "node:fs/promises";
 import { join } from "path";
+import { code } from "../../code";
 
 const path = process.argv.splice(2).join(" ");
 
 const watchers = {} as Record<string, FSWatcher>;
 
-const createWatcher = (p: string, recursive: boolean) => {
+const createWatcher = (p: string, recursive: boolean, prefix?: string) => {
   return watch(p, { recursive }, (e, filename) => {
     if (filename === "global.d.ts") return;
     if (
@@ -15,7 +16,7 @@ const createWatcher = (p: string, recursive: boolean) => {
       filename?.endsWith(".css") ||
       filename?.endsWith(".html")
     ) {
-      process.send?.([e, filename]);
+      process.send?.([e, (prefix || "") + filename]);
     }
   });
 };
@@ -27,7 +28,7 @@ for (const file of files) {
   const fullpath = join(path, file);
   const stats = statSync(fullpath);
   if (stats.isDirectory()) {
-    watchers[file] = createWatcher(fullpath, true);
+    watchers[file] = createWatcher(fullpath, true, `${file}/`);
   }
 }
 setInterval(() => {}, 1e9);
