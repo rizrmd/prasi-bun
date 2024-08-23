@@ -43,6 +43,18 @@ export class Watcher {
           ipc(message, childProc) {
             console.log(id_site, message);
             const fe = code.internal.frontend[id_site];
+            const sv = code.internal.server[id_site];
+            if (sv && !sv.rebuilding) {
+              if (
+                Array.isArray(message) &&
+                typeof message[1] === "string" &&
+                sv.inputs.has(message[1])
+              ) {
+                sv.rebuilding = true;
+                sv.ctx.rebuild();
+                return;
+              }
+            }
             if (typeof fe !== "undefined" && !fe.rebuilding) {
               fe.rebuilding = true;
               clearTimeout(fe.timeout);

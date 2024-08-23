@@ -13,6 +13,7 @@ export const initServer = async (
   if (existing) {
     if (force) {
       existing.rebuilding = false;
+      await existing.ctx.cancel();
       await existing.ctx.dispose();
     } else {
       return;
@@ -29,7 +30,8 @@ export const initServer = async (
   }
 
   code.internal.server[id_site] = {
-    rebuilding: false,
+    inputs: new Set(),
+    rebuilding: true,
     ts: 0,
     ctx: await context({
       absWorkingDir: dir.data(root),
@@ -37,6 +39,7 @@ export const initServer = async (
       bundle: true,
       outfile: build_file,
       platform: "node",
+      metafile: true,
       treeShaking: true,
       format: "cjs",
       logLevel: "silent",
@@ -45,9 +48,22 @@ export const initServer = async (
           name: "prasi",
           setup(build) {
             build.onEnd((e) => {
+              code.internal.server[id_site].rebuilding = false;
               if (e.errors.length === 0) {
+                code.internal.server[id_site].inputs = new Set(
+                  Object.keys(e.metafile?.inputs || {})
+                );
                 server.init(id_site);
               }
+              console.log(
+                `\
+site server rebuild ${id_site} ${
+                  e.errors.length > 0
+                    ? `
+ - e.errors.map((e) => e.text).join("\n - ")`
+                    : ""
+                }`
+              );
             });
           },
         },
@@ -111,6 +127,5 @@ if (typeof global.server_hook === "function") {
       },
     }),
   };
-
-  code.internal.server[id_site].ctx.watch();
+  await code.internal.server[id_site].ctx.rebuild();
 };

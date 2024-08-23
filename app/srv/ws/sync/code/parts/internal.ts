@@ -14,7 +14,12 @@ export const codeInternal = {
     if (!g.prasi_code.server) g.prasi_code.server = {};
     return g.prasi_code.server as Record<
       SITE_ID,
-      { rebuilding: boolean; ts: number; ctx: BuildContext }
+      {
+        rebuilding: boolean;
+        ts: number;
+        ctx: BuildContext;
+        inputs: Set<string>;
+      }
     >;
   },
   get frontend() {
