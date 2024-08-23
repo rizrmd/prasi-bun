@@ -85,7 +85,6 @@ export const ViRender: FC<{
       </ErrorBox>
     );
   }
-
   return (
     <ErrorBox meta={meta}>
       <ViChild

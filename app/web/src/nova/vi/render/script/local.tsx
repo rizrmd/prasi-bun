@@ -3,6 +3,7 @@ import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
 import { modifyChild } from "./passprop";
 import { deepClone } from "web-utils";
+import { w } from "./eval-prop";
 
 export const local_cached_value = {} as Record<
   string,
@@ -45,11 +46,13 @@ export const createViLocal = (
     if (!local_cached_value[curid]) {
       local_cached_value[curid] = { mounted: true, value: arg.value };
     } else if (!local_cached_value[curid].mounted) {
-      for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
-        delete local_cached_value[curid].value[k];
-      }
-      for (const [k, v] of Object.entries(deepClone(arg.value))) {
-        local_cached_value[curid].value[k] = v;
+      if (!w.isEditor) {
+        for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
+          delete local_cached_value[curid].value[k];
+        }
+        for (const [k, v] of Object.entries(deepClone(arg.value))) {
+          local_cached_value[curid].value[k] = v;
+        }
       }
       local_cached_value[curid].mounted = true;
     }

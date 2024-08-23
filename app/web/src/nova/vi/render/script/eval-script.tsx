@@ -53,6 +53,7 @@ export const viEvalScript = (
 
   const script = meta.script;
   const exports = (window as any).exports;
+
   const arg = {
     useEffect,
     children: parts.props.children,
@@ -78,7 +79,7 @@ export const viEvalScript = (
           el: ReactElement;
         } => {
           let should_replace = false;
-          const new_childs = [];
+          let new_childs = [];
 
           if (isValidElement(el)) {
             if (el.type === meta.script?.PassProp) {
@@ -90,36 +91,45 @@ export const viEvalScript = (
                 },
               };
             }
-            if (Array.isArray(el.props?.children)) {
-              for (const child of el.props?.children) {
-                if (Array.isArray(child)) {
-                  const sub_child = [];
-                  let sub_replace = false;
-                  for (const c of child) {
-                    let nc = override_children(c);
-                    if (nc.should_replace) {
-                      sub_child.push(nc.el);
-                      sub_replace = true;
-                    } else {
-                      sub_child.push(c);
+
+            if (el.props?.children) {
+              if (!Array.isArray(el.props.children)) {
+                el.props.children = [el.props.children];
+              }
+              if (Array.isArray(el.props.children)) {
+                for (const child of el.props.children) {
+                  if (Array.isArray(child)) {
+                    const sub_child = [];
+                    let sub_replace = false;
+                    for (const c of child) {
+                      let nc = override_children(c);
+                      if (nc.should_replace) {
+                        sub_child.push(nc.el);
+                        sub_replace = true;
+                      } else {
+                        sub_child.push(c);
+                      }
                     }
-                  }
-                  if (sub_replace) {
-                    should_replace = true;
-                    new_childs.push(sub_child);
+                    if (sub_replace) {
+                      should_replace = true;
+                      new_childs.push(sub_child);
+                    } else {
+                      new_childs.push(child);
+                    }
+                  } else if (typeof child === "object" && child) {
+                    if (child.type === meta.script?.PassProp) {
+                      should_replace = true;
+                      new_childs.push({
+                        ...child,
+                        props: {
+                          ...child.props,
+                          internal_key: child.props.key,
+                        },
+                      });
+                    }
                   } else {
                     new_childs.push(child);
                   }
-                } else if (typeof child === "object" && child) {
-                  if (child.type === meta.script?.PassProp) {
-                    should_replace = true;
-                    new_childs.push({
-                      ...child,
-                      props: { ...child.props, internal_key: child.props.key },
-                    });
-                  }
-                } else {
-                  new_childs.push(child);
                 }
               }
             }
@@ -136,6 +146,7 @@ export const viEvalScript = (
           result = res.el;
         }
       }
+
       if (script) script.result = <Suspense>{result}</Suspense>;
     },
     params,
