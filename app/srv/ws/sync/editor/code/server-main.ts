@@ -53,6 +53,7 @@ const serverMain = () => ({
       try {
         delete require.cache[server_src_path];
         const svr = require(server_src_path);
+
         if (svr && typeof svr.server === "object") {
           this.handler[site_id] = svr.server;
           svr.server.site_id = site_id;
@@ -160,20 +161,21 @@ const serverMain = () => ({
   },
 });
 
-type PrasiServer = {
-  site_id?: string;
+export interface PrasiServer extends Record<string, any> {
   ws?: WebSocketHandler<{ url: string }>;
   http: (arg: {
     url: { raw: URL; pathname: string };
     req: Request;
     server: Server;
-    handle: (req: Request) => Promise<undefined | Response>;
     mode: "dev" | "prod";
+    handle: (req: Request) => Promise<Response>;
+    serveStatic?: any;
+    serveAPI?: any;
     index: { head: string[]; body: string[]; render: () => string };
     prasi: { page_id?: string; params?: Record<string, any> };
   }) => Promise<Response>;
   init?: (arg: { port?: number }) => Promise<void>;
-};
+}
 
 const glb = global as unknown as {
   _server: ReturnType<typeof serverMain>;

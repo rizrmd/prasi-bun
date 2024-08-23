@@ -50,7 +50,7 @@ declare global {
       }
     | undefined;
 
-  type PrasiServer = {
+  export interface PrasiServer extends Record<string, any> {
     ws?: WebSocketHandler<{ url: string }>;
     http: (arg: {
       url: { raw: URL; pathname: string };
@@ -64,7 +64,7 @@ declare global {
       prasi: { page_id?: string; params?: Record<string, any> };
     }) => Promise<Response>;
     init?: (arg: { port?: number }) => Promise<void>;
-  };
+  }
 
   type IItem = {
     id: string;
