@@ -164,7 +164,6 @@ const connect = (
   } else {
     return new Promise<void>((resolve, reject) => {
       if (!conf.ws) {
-        let reconnect = 0;
         const retry = () => {
           const url = new URL(w.basehost || location.href);
           url.pathname = "/sync";
