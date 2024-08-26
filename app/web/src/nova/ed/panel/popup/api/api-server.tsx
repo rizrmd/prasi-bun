@@ -1,12 +1,12 @@
+import trim from "lodash.trim";
 import { forwardRef } from "react";
 import { useGlobal, useLocal } from "web-utils";
+import { deploy_target } from "../../../../../../../db/db";
 import { Modal } from "../../../../../utils/ui/modal";
+import { Popover } from "../../../../../utils/ui/popover";
 import { EDGlobal } from "../../../logic/ed-global";
 import { EdApiTab } from "./api-tab";
-import trim from "lodash.trim";
-import { Popover } from "../../../../../utils/ui/popover";
-import { deploy_target } from "../../../../../../../db/db";
-import { apiRef, apiUrl } from "./api-utils";
+import { server } from "./api-utils";
 
 export const EdPopApi = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
@@ -234,8 +234,9 @@ export const EdApiServer = forwardRef<
         id_site={p.site.id}
         api_url={p.site.config.api_url}
         onUpdate={async ({ api_url }) => {
+          p.render();
+
           if (local.active === 0) {
-            p.render();
             p.site.config.api_url = trim(api_url, "/");
             await p.sync?.site.update(p.site.id, {
               config: { api_url: api_url },
@@ -247,6 +248,8 @@ export const EdApiServer = forwardRef<
               data: { api_url },
             });
           }
+          server.status = "ready";
+          p.render();
         }}
       />
     </div>
