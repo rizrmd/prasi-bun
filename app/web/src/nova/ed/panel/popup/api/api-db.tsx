@@ -8,14 +8,21 @@ export const EdApiDB = ({
   db,
   render,
   update,
+  api_url,
 }: {
   db: { url: string };
+  api_url: string;
   render: () => void;
   update: () => void;
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
   const local = useLocal({ url: db.url, has_prisma: false });
-  const api = apiRef[apiUrl(p)];
+  const api = apiRef[api_url];
+
+  let is_main = true;
+  if (apiUrl(p) !== api_url) {
+    is_main = false;
+  }
 
   useEffect(() => {
     _api.local_prisma("check", p.site.id).then((res: any) => {
@@ -69,19 +76,6 @@ export const EdApiDB = ({
                         url: `${location.protocol}//${location.host}/local-prisma/src/${p.site.id}`,
                       });
 
-                      server.status = "ready";
-                      render();
-                      alert("Prisma Schema Synchronized");
-                    }}
-                  >
-                    Sync prisma.schema
-                  </div>
-                  <div
-                    className="border rounded-sm px-2 text-[12px] hover:bg-blue-100 cursor-pointer"
-                    onClick={async () => {
-                      server.status = "restarting";
-                      render();
-
                       await api._deploy({
                         type: "db-gen",
                         id_site: p.site.id,
@@ -90,14 +84,16 @@ export const EdApiDB = ({
                       render();
                       alert("DB GENERATE: OK\nRESTART: OK");
 
-                      localStorage.removeItem(`schema-md-${p.site.id}`);
-                      _api.clear_route_cache(p.site.id);
-                      _api.type_rebuild(p.site.id);
+                      if (is_main) {
+                        localStorage.removeItem(`schema-md-${p.site.id}`);
+                        _api.clear_route_cache(p.site.id);
+                        _api.type_rebuild(p.site.id);
 
-                      location.reload();
+                        location.reload();
+                      }
                     }}
                   >
-                    Generate
+                    Sync & Generate prisma.schema
                   </div>
                 </>
               ) : (
@@ -114,10 +110,12 @@ export const EdApiDB = ({
                     render();
                     alert("DB PULL & GENERATE: OK\nRESTART: OK");
 
-                    localStorage.removeItem(`schema-md-${p.site.id}`);
-                    _api.clear_route_cache(p.site.id);
-                    _api.type_rebuild(p.site.id);
-                    location.reload();
+                    if (is_main) {
+                      localStorage.removeItem(`schema-md-${p.site.id}`);
+                      _api.clear_route_cache(p.site.id);
+                      _api.type_rebuild(p.site.id);
+                      location.reload();
+                    }
                   }}
                 >
                   DB Pull
@@ -137,10 +135,11 @@ export const EdApiDB = ({
                 server.status = "ready";
                 render();
                 alert("RESTART: OK");
-                _api.clear_route_cache(p.site.id);
-                console.warn("reload 8");
 
-                location.reload();
+                if (is_main) {
+                  _api.clear_route_cache(p.site.id);
+                  location.reload();
+                }
               }}
             >
               Restart Server

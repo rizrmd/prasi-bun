@@ -16,6 +16,7 @@ export const EmptySite = {
   name: "",
   domain: "",
   config: { api_url: "" },
+  deploy_name:"",
   js: "",
   js_compiled: "",
   responsive: "" as "desktop-only" | "mobile-only" | "responsive",
@@ -324,7 +325,7 @@ export const EDGlobal = {
         on_pick?: (group_id: string) => void | Promise<void>;
         on_close?: () => void | Promise<void>;
       },
-      api: { open: false },
+      api: { open: true },
     },
   },
 };

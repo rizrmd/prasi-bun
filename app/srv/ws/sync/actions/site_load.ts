@@ -50,6 +50,7 @@ export const site_load: SAction["site"]["load"] = async function (
         name: site.name,
         config: config as ESite["config"],
         domain: site.domain,
+        deploy_name: site.deploy_name,
         js: site.js || "",
         responsive: site.responsive as ESite["responsive"],
         js_compiled: site.js_compiled || "",
