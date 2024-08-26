@@ -29,6 +29,8 @@ export const EdApiTab: FC<{
   });
 
   useEffect(() => {
+    local.status = "init";
+    local.render();
     check();
   }, [target]);
 
