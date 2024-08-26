@@ -5,7 +5,9 @@ import { apiRef, apiUrl, server } from "./api-utils";
 
 export const EdApiDeploy = ({
   deploy,
+  api_url,
 }: {
+  api_url: string;
   deploy: {
     current: number;
     now: number;
@@ -13,12 +15,12 @@ export const EdApiDeploy = ({
   };
 }) => {
   const p = useGlobal(EDGlobal, "EDITOR");
-  const api = apiRef[apiUrl(p)];
+  const api = apiRef[api_url];
   const local = deploy;
   const deploys = local.deploys;
 
   return (
-    <div className="flex border-slate-200 boxed  flex flex-col items-stretch">
+    <div className="flex border-slate-200 boxed  flex-col items-stretch">
       <div className="flex justify-between py-2 px-2 ">
         <div>History:</div>
         <div

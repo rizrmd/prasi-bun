@@ -126,7 +126,9 @@ model site {
   responsive     String           @default("all")
   npm_cache      String           @default(" ") @db.VarChar
   code_mode      String           @default("old") @db.VarChar(5)
+  deploy_name    String           @default("DEV")
   component_site component_site[]
+  deploy_target  deploy_target[]
   npm_site       npm_site[]
   page           page[]
   page_folder    page_folder[]
@@ -167,8 +169,9 @@ model page_history {
 
 model deploy_target {
   id      String @id(map: "deploy_target_id") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_site Int
   name    String
   api_url String
   domain  String
+  id_site String @db.Uuid
+  site    site   @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
