@@ -325,7 +325,7 @@ export const EDGlobal = {
         on_pick?: (group_id: string) => void | Promise<void>;
         on_close?: () => void | Promise<void>;
       },
-      api: { open: true },
+      api: { open: false },
     },
   },
 };
