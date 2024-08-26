@@ -38,9 +38,15 @@ export const EdApiDB = ({
       <AutoHeightTextarea
         value={local.url}
         className="text-[13px] border p-2 mb-2 "
-        onChange={(e) => {
+        onChange={async (e) => {
           local.url = e.currentTarget.value.replace(/\s/, "");
           db.url = local.url;
+
+          await api._deploy({
+            type: "db-update",
+            id_site: p.site.id,
+            url: db.url,
+          });
           local.render();
         }}
         onBlur={async () => {

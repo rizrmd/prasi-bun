@@ -41,15 +41,11 @@ export const EdApiTab: FC<{
     let url = target ? target.api_url : api_url;
     const res = await checkAPI(url, id_site);
 
+    
     local.api_url = url;
     local.status = "online";
 
     if (typeof res === "object") {
-      // await apiRef[apiUrl(p)]._deploy({
-      //   type: "db-update",
-      //   id_site: p.site.id,
-      //   url: local.db.url,
-      // });
 
       local.db = res.db;
       local.domains = res.domains;
