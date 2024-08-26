@@ -20,36 +20,11 @@ export const server = {
     | "restarting",
 };
 
-export const apiUrl = function (p: PG): string {
-  if (dev.enabled) {
-    return dev.url;
-  }
-
-  if (!dev.lastURL) {
-    dev.lastURL = { valid: false, url: "" };
-  }
-
-  if (!dev.lastURL.valid || dev.lastURL.url !== p.site.config.api_url) {
-    try {
-      const url = new URL(p.site.config.api_url);
-      if (url && url.hostname && url.protocol.startsWith("http")) {
-        dev.lastURL.valid = true;
-        return p.site.config.api_url;
-      }
-      dev.lastURL.valid = false;
-    } catch (e) {
-      dev.lastURL.valid = false;
-    }
-  }
-
-  if (dev.lastURL.valid) return p.site.config.api_url;
-
-  return "";
+export const apiUrl = (p: PG) => {
+  return p.site?.config?.api_url || "";
 };
 
-export const checkAPI = async (p: PG) => {
-  const url = apiUrl(p);
-
+export const checkAPI = async (url: string, id_site: string) => {
   if (!url) return "offline";
 
   try {
@@ -62,7 +37,7 @@ export const checkAPI = async (p: PG) => {
     } else {
       let res = await capi._deploy({
         type: "check",
-        id_site: p.site.id,
+        id_site,
       });
 
       if (!res) {

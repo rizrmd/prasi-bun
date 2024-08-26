@@ -1,16 +1,15 @@
-import { waitUntil } from "web-utils";
+import { apiProxy } from "../../../base/load/api/api-proxy";
 import { viLoadLegacy } from "../../vi/load/load-legacy";
 import { viLoadSnapshot } from "../../vi/load/load-snapshot";
 import { apiRef, apiUrl } from "../panel/popup/api/api-utils";
 import { ESite, PG } from "./ed-global";
-import { apiProxy } from "../../../base/load/api/api-proxy";
 
 export const loadSite = async (p: PG, site: ESite, note: string) => {
   p.site = site;
   const url = apiUrl(p);
   if (!apiRef[url]) apiRef[url] = apiProxy(url) as any;
 
-  const api = apiRef[apiUrl(p)];
+  const api = apiRef[url];
   try {
     const res = await api._deploy({
       type: "db-ver",
