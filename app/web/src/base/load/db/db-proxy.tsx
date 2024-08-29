@@ -1,7 +1,8 @@
 import hash_sum from "hash-sum";
-import pako from "pako";
-import { fetchViaProxy } from "../proxy";
+import pako, { gzip } from "pako";
+import { fetchViaProxy, getProxyUrl } from "../proxy";
 import { del, get, set } from "idb-keyval";
+import { pack } from "msgpackr";
 
 const schema_promise = {
   tables: {} as Record<string, any>,
@@ -9,8 +10,26 @@ const schema_promise = {
   rels: {} as Record<string, any>,
 };
 
+const db_mode = {} as Record<string, "msgpack" | "json">;
+
 export const dbProxy = (dburl: string) => {
   const name = "";
+
+  if (!db_mode[dburl]) {
+    fetchSendDb(
+      {
+        table: "check",
+        action: "check",
+      },
+      dburl
+    ).then((res) => {
+      if (res && res.mode === "encrypted") {
+        db_mode[dburl] = "msgpack";
+      } else {
+        db_mode[dburl] = "json";
+      }
+    });
+  }
 
   return new Proxy(
     {},
@@ -173,14 +192,22 @@ export const fetchSendDb = async (
     isEditor = true;
 
   const load = async () => {
-    const result = await fetchViaProxy(
-      url,
-      params,
-      {
-        "content-type": "application/json",
-      },
-      false
-    );
+    let body: any = params;
+    let result = null;
+    if (db_mode[dburl] === "msgpack") {
+      body = gzip(pack(params), {});
+      const res = await fetch(getProxyUrl(url), { method: "POST", body });
+      result = await res.json();
+    } else {
+      result = await fetchViaProxy(
+        url,
+        body,
+        {
+          "content-type": "application/json",
+        },
+        false
+      );
+    }
 
     try {
       if (typeof result === "string") return JSON.parse(result);
