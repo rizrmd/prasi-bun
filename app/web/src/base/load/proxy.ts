@@ -122,3 +122,26 @@ const replacer = (key: string, value: string) => {
   }
   return value;
 };
+
+export const getProxyUrl = (target_url: string) => {
+  const to_url = new URL(target_url);
+
+  if (w !== null) {
+    const cur_url = new URL(location.href);
+    let final_url = "";
+
+    if (
+      // to_url.hostname === 'localhost' ||
+      to_url.host === cur_url.host ||
+      (!!g && typeof g.server_hook === "function")
+    ) {
+      final_url = to_url.toString();
+    } else {
+      final_url = `${cur_url.protocol}//${
+        cur_url.host
+      }/_proxy/${encodeURIComponent(to_url.toString())}`;
+    }
+    return final_url;
+  }
+  return to_url;
+};
