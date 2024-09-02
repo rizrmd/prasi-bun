@@ -9,7 +9,9 @@ import { statSync } from "fs";
 import { listAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { platform } from "os";
 import { $ } from "bun";
+import { g } from "utils/global";
 
+g.mode = "prod";
 const brotli = await brotliPromise;
 
 await build({
