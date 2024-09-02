@@ -107,7 +107,7 @@ if (build_all) {
     // "--no-optimize",
     "--no-scope-hoist",
     "--dist-dir",
-    dir.data(`static`),
+    dir.data(`static-temp`),
   ];
 
   let build_static =
