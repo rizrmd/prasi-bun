@@ -19,7 +19,7 @@ export const parcelBuild = async () => {
     "./src/index.html",
     g.mode === "dev" ? "--no-hmr" : "",
     "--dist-dir",
-    dir.path(`app/static`),
+    dir.data(`static`),
   ];
 
   if (g.mode === "dev") {

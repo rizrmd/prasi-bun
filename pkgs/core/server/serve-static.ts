@@ -27,7 +27,7 @@ export const serveStatic = {
       }
 
       ["app/static", "app/web/public"].forEach((base_path) => {
-        watch(dir.path(`app/static`), async (event, filename) => {
+        watch(dir.data(`static`), async (event, filename) => {
           if (filename) {
             cache.dev = {};
           }
