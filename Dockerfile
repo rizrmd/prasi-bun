@@ -22,4 +22,4 @@ RUN bun run build
 
 EXPOSE 4550/tcp
 
-CMD [ "bun", "run", "prod" ]
+CMD [ "bun", "run", "./pkgs/core/index.ts", "prod" ]
