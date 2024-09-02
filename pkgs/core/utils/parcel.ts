@@ -6,7 +6,7 @@ import { platform } from "os";
 
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
-  await dirAsync("app/static");
+  await dirAsync(dir.data("static"));
 
   const args = [
     "node",
