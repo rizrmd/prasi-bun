@@ -26,24 +26,31 @@ export const serveStatic = {
         delete cache.static[k];
       }
 
-      ["app/static", "app/web/public"].forEach((base_path) => {
-        watch(dir.data(`static`), async (event, filename) => {
-          if (filename) {
-            cache.dev = {};
-          }
-        });
+      watch(dir.data(`static`), async (event, filename) => {
+        if (filename) {
+          cache.dev = {};
+        }
+      });
+
+      watch(dir.path("app/web/public"), async (event, filename) => {
+        if (filename) {
+          cache.dev = {};
+        }
       });
     } else {
-      await Promise.all([this.load("app/static"), this.load("app/web/public")]);
+      await Promise.all([
+        this.load(dir.data("static")),
+        this.load(dir.path("app/web/public")),
+      ]);
     }
   },
   async load(base_path: string) {
     try {
       const glob = new Bun.Glob("**");
 
-      for await (const file_path of glob.scan(dir.path(base_path))) {
-        const r_path = dir.path(`${base_path}/${file_path}`);
-        const br_path = dir.path(`${base_path}-br/${file_path}`);
+      for await (const file_path of glob.scan(base_path)) {
+        const r_path = `${base_path}/${file_path}`;
+        const br_path = `${base_path}-br/${file_path}`;
 
         let final_path = r_path;
         let br = false;
@@ -140,7 +147,7 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         return new Response(cache.dev[url.pathname]);
       }
 
-      let file = Bun.file(dir.path(`/app/static${url.pathname}`));
+      let file = Bun.file(dir.data(`static${url.pathname}`));
       if (await file.exists()) {
         cache.dev[url.pathname] = file;
         return new Response(file);
@@ -150,7 +157,7 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         cache.dev[url.pathname] = file;
         return new Response(file);
       }
-      file = Bun.file(dir.path(`/app/static/index.html`));
+      file = Bun.file(dir.data(`static/index.html`));
       if (await file.exists()) {
         cache.dev[`/index.html`] = file;
         return new Response(file);
