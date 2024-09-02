@@ -90,7 +90,7 @@ const build_all =
   process.argv[process.argv.length - 1] === "main" ? false : true;
 if (build_all) {
   await removeAsync(dir.path("app/web/.parcel-cache"));
-  await removeAsync(dir.data("static-temp"));
+  await removeAsync(dir.path(`static-temp`));
 
   await writeAsync(
     dir.path("app/web/timestamp.ts"),
@@ -109,7 +109,7 @@ if (build_all) {
     // "--no-optimize",
     "--no-scope-hoist",
     "--dist-dir",
-    dir.data(`static-temp`),
+    dir.path(`static-temp`),
   ];
 
   console.log(args);
@@ -160,27 +160,27 @@ if (build_all) {
     });
     await parcel.exited;
 
-    const static_br = dir.data("static-br-temp");
+    const static_br = dir.path(`static-br-temp`);
     await removeAsync(static_br);
-    const static_files = await listAsync(dir.data("static-temp"));
+    const static_files = await listAsync(dir.path(`static-temp`));
     if (static_files) {
       await Promise.all(
         static_files
-          .filter((file) => statSync(dir.data(`static-temp/${file}`)).isFile())
+          .filter((file) => statSync(dir.path(`static-temp/${file}`)).isFile())
           .map(async (file) => {
             if (
-              !(await Bun.file(dir.data(`static-br-temp/${file}`)).exists())
+              !(await Bun.file(dir.path(`static-br-temp/${file}`)).exists())
             ) {
               const br = brotli.compress(
                 new Uint8Array(
-                  await Bun.file(dir.data(`static-temp/${file}`)).arrayBuffer()
+                  await Bun.file(dir.path(`static-temp/${file}`)).arrayBuffer()
                 ),
                 { quality: 11 }
               );
               if (br) {
                 console.log(`Compressing [static] ${file}`);
                 await writeAsync(
-                  dir.data(`static-br-temp/${file}`),
+                  dir.path(`static-br-temp/${file}`),
                   Buffer.from(br)
                 );
               }
@@ -189,9 +189,9 @@ if (build_all) {
       );
     }
 
-    $`rm -rf ${dir.data(`static-br`)}`.nothrow();
-    $`rm -rf ${dir.data(`static`)}`.nothrow();
-    $`mv ${dir.data(`static-br-temp`)} ${dir.data(`static-br`)}`.nothrow();
-    $`mv ${dir.data(`static-temp`)} ${dir.data(`static`)}`.nothrow();
+    $`rm -rf ${dir.path(`static-br`)}`.nothrow();
+    $`rm -rf ${dir.path(`static`)}`.nothrow();
+    $`mv ${dir.path(`static-br-temp`)} ${dir.path(`static-br`)}`.nothrow();
+    $`mv ${dir.path(`static-temp`)} ${dir.path(`static`)}`.nothrow();
   }
 }

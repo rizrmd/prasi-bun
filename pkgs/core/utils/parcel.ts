@@ -6,7 +6,7 @@ import { platform } from "os";
 
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
-  await dirAsync(dir.data("static"));
+  await dirAsync(dir.path(`static`));
 
   const args = [
     "node",
@@ -19,7 +19,7 @@ export const parcelBuild = async () => {
     "./src/index.html",
     g.mode === "dev" ? "--no-hmr" : "",
     "--dist-dir",
-    dir.data(`static`),
+    dir.path(`static`),
   ];
 
   if (g.mode === "dev") {

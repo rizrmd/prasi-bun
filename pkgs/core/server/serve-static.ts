@@ -26,7 +26,7 @@ export const serveStatic = {
         delete cache.static[k];
       }
 
-      watch(dir.data(`static`), async (event, filename) => {
+      watch(dir.path(`static`), async (event, filename) => {
         if (filename) {
           cache.dev = {};
         }
@@ -39,7 +39,7 @@ export const serveStatic = {
       });
     } else {
       await Promise.all([
-        this.load(dir.data("static")),
+        this.load(dir.path(`static`)),
         this.load(dir.path("app/web/public")),
       ]);
     }
@@ -147,7 +147,7 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         return new Response(cache.dev[url.pathname]);
       }
 
-      let file = Bun.file(dir.data(`static${url.pathname}`));
+      let file = Bun.file(dir.path(`static${url.pathname}`));
       if (await file.exists()) {
         cache.dev[url.pathname] = file;
         return new Response(file);
@@ -157,7 +157,7 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         cache.dev[url.pathname] = file;
         return new Response(file);
       }
-      file = Bun.file(dir.data(`static/index.html`));
+      file = Bun.file(dir.path(`static/index.html`));
       if (await file.exists()) {
         cache.dev[`/index.html`] = file;
         return new Response(file);
