@@ -21,7 +21,7 @@ export const code = {
       await initServer(root, id_site);
       await initTypings(root, id_site);
       if (exists(dir.data(`${root}`))) {
-        await $`chmod -R 777 ${dir.data(`${root}`)}`;
+        await $`chmod -R 777 ${dir.data(`${root}`)}`.nothrow();
       }
     } catch (e) {
       console.error(`Failed to init site: ${id_site}`);
