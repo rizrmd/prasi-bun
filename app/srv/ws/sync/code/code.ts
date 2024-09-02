@@ -11,16 +11,20 @@ import { exists } from "fs-jetpack";
 export const code = {
   internal: codeInternal,
   async init(id_site: string, note: string) {
-    const root = `/code/${id_site}/site/src`;
+    try {
+      const root = `/code/${id_site}/site/src`;
 
-    await ensureLib(root, id_site);
-    await ensureFiles(root, id_site);
+      await ensureLib(root, id_site);
+      await ensureFiles(root, id_site);
 
-    await initFrontEnd(root, id_site);
-    await initServer(root, id_site);
-    await initTypings(root, id_site);
-    if (exists(dir.data(`${root}`))) {
-      await $`chmod -R 777 ${dir.data(`${root}`)}`;
+      await initFrontEnd(root, id_site);
+      await initServer(root, id_site);
+      await initTypings(root, id_site);
+      if (exists(dir.data(`${root}`))) {
+        await $`chmod -R 777 ${dir.data(`${root}`)}`;
+      }
+    } catch (e) {
+      console.error(`Failed to init site: ${id_site}`);
     }
   },
   path(
