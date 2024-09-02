@@ -7,7 +7,8 @@ import { polyfillNode } from "esbuild-plugin-polyfill-node";
 await removeAsync(dir.path("/app/srv/core"));
 await $`bun tailwindcss -i  src/nova/prod/tailwind.css -o ../srv/core/index.css`
   .cwd(dir.path(`/app/web`))
-  .quiet();
+  .quiet()
+  .nothrow();
 
 const ctx = await context({
   bundle: true,

@@ -123,7 +123,7 @@ const isInstalling = async (id_site: string) => {
 
         if (should_install) {
           await Bun.write(pkg, JSON.stringify(pkg_json, null, 2));
-          await $`npm i`.cwd(code.path(id_site, "site", "src")).quiet();
+          await $`npm i`.cwd(code.path(id_site, "site", "src")).quiet().nothrow();
         }
       }
     } catch (e) {}
@@ -231,9 +231,9 @@ import React from "react";
                   });
                 } else {
                   await codeError(id_site, "");
-                  await $`rm -rf ${out_dir_old}`.quiet();
-                  await $`mv ${out_dir} ${out_dir_old}`.quiet();
-                  await $`mv ${out_dir_temp} ${out_dir}`.quiet();
+                  await $`rm -rf ${out_dir_old}`.quiet().nothrow();
+                  await $`mv ${out_dir} ${out_dir_old}`.quiet().nothrow();
+                  await $`mv ${out_dir_temp} ${out_dir}`.quiet().nothrow();
 
                   const now = Date.now();
                   client_ids.forEach((client_id) => {
