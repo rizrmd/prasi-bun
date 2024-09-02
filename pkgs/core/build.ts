@@ -8,6 +8,7 @@ import { fdir } from "fdir";
 import { statSync } from "fs";
 import { listAsync, removeAsync, writeAsync } from "fs-jetpack";
 import { platform } from "os";
+import { $ } from "bun";
 
 const brotli = await brotliPromise;
 
@@ -87,7 +88,7 @@ const build_all =
   process.argv[process.argv.length - 1] === "main" ? false : true;
 if (build_all) {
   await removeAsync(dir.path("app/web/.parcel-cache"));
-  await removeAsync(dir.path("app/static"));
+  await removeAsync(dir.data("static-temp"));
 
   await writeAsync(
     dir.path("app/web/timestamp.ts"),
@@ -106,7 +107,7 @@ if (build_all) {
     // "--no-optimize",
     "--no-scope-hoist",
     "--dist-dir",
-    dir.path(`app/static`),
+    dir.data(`static`),
   ];
 
   let build_static =
@@ -116,7 +117,7 @@ if (build_all) {
     const public_br = dir.path("app/web/public-br");
     await removeAsync(public_br);
   }
-  
+
   const api = new fdir().withRelativePaths().crawl(dir.path("app/web/public"));
   const public_files = api.sync();
   if (public_files) {
@@ -155,25 +156,27 @@ if (build_all) {
     });
     await parcel.exited;
 
-    const static_br = dir.path("app/static-br");
+    const static_br = dir.data("static-br-temp");
     await removeAsync(static_br);
-    const static_files = await listAsync(dir.path("app/static"));
+    const static_files = await listAsync(dir.data("static-temp"));
     if (static_files) {
       await Promise.all(
         static_files
-          .filter((file) => statSync(dir.path(`app/static/${file}`)).isFile())
+          .filter((file) => statSync(dir.data(`static-temp/${file}`)).isFile())
           .map(async (file) => {
-            if (!(await Bun.file(dir.path(`app/static-br/${file}`)).exists())) {
+            if (
+              !(await Bun.file(dir.data(`static-br-temp/${file}`)).exists())
+            ) {
               const br = brotli.compress(
                 new Uint8Array(
-                  await Bun.file(dir.path(`app/static/${file}`)).arrayBuffer()
+                  await Bun.file(dir.data(`static-temp/${file}`)).arrayBuffer()
                 ),
                 { quality: 11 }
               );
               if (br) {
                 console.log(`Compressing [static] ${file}`);
                 await writeAsync(
-                  dir.path(`app/static-br/${file}`),
+                  dir.data(`static-br-temp/${file}`),
                   Buffer.from(br)
                 );
               }
@@ -181,5 +184,10 @@ if (build_all) {
           })
       );
     }
+
+    $`rm -rf ${dir.data(`static-br`)}`.nothrow();
+    $`rm -rf ${dir.data(`static`)}`.nothrow();
+    $`mv ${dir.data(`static-br-temp`)} ${dir.data(`static-br`)}`.nothrow();
+    $`mv ${dir.data(`static-temp`)} ${dir.data(`static`)}`.nothrow();
   }
 }
