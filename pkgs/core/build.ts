@@ -112,6 +112,8 @@ if (build_all) {
     dir.data(`static-temp`),
   ];
 
+  console.log(args);
+
   let build_static =
     process.argv[process.argv.length - 1] === "public" ? false : true;
 
