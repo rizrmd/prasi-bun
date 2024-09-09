@@ -20,8 +20,8 @@
   ],
   "dependencies": {
     "brotli-wasm": "^3.0.1",
-    "fdir": "^6.2.0",
+    "fdir": "^6.3.0",
     "react-select": "^5.8.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   }
 }

@@ -3,7 +3,6 @@ import style from "@hyrious/esbuild-plugin-style";
 import { $ } from "bun";
 import { dir } from "dir";
 import { context, formatMessages } from "esbuild";
-import { cleanPlugin } from "esbuild-clean-plugin";
 import { existsAsync } from "fs-jetpack";
 import { appendFile } from "node:fs/promises";
 import { conns } from "../../../entity/conn";
@@ -12,6 +11,7 @@ import { sendWS } from "../../../sync-handler";
 import { SyncType } from "../../../type";
 import { code } from "../../code";
 import { Watcher } from "../watcher";
+import { cleanPlugin } from "../../utlis/esbuild-clean-plugin";
 const pending = {} as any;
 
 export const initFrontEnd = async (
