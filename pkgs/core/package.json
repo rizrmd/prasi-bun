@@ -10,7 +10,7 @@
     "@types/unzipper": "^0.10.8",
     "acorn-walk": "^8.3.3",
     "brotli-wasm": "^3.0.1",
-    "esbuild": "^0.21.5",
+    "esbuild": "^0.23.1",
     "esbuild-plugin-polyfill-node": "^0.3.0",
     "execa": "^8.0.1",
     "fs-jetpack": "^5.1.0",
