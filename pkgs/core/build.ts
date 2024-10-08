@@ -138,10 +138,7 @@ if (build_all) {
           );
           if (br) {
             console.log(`Compressing [public] ${file}`);
-            await Bun.write(
-              dir.path(`app/web/public-br/${file}`),
-              Buffer.from(br)
-            );
+            await Bun.write(dir.path(`app/web/public-br/${file}`), br);
           }
         }
       })
