@@ -186,7 +186,6 @@ export const Vi: FC<{
   return (
     <ErrorBox>
       <Suspense>
-        asdas
         <ViRoot />
       </Suspense>
     </ErrorBox>
