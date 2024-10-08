@@ -1,6 +1,5 @@
 import { TreeMethods } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
-import { IContent } from "../../../../../../utils/types/general";
 import { getMetaById } from "../../../../logic/active/get-meta";
 import { IMeta, PG, active } from "../../../../logic/ed-global";
 import { scrollTreeActiveItem } from "../../scroll-tree";

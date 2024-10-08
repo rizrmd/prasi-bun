@@ -1,9 +1,8 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { useEffect } from "react";
 import { useGlobal, useLocal } from "web-utils";
-import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 import { fuzzy } from "../../../../utils/ui/fuzzy";
-import { IItem } from "../../../../utils/types/item";
+import { EDGlobal, IMeta, PG, active } from "../../logic/ed-global";
 
 export const EdTreeSearch = () => {
   const p = useGlobal(EDGlobal, "EDITOR");

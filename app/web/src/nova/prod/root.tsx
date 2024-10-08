@@ -177,7 +177,7 @@ export const Root = () => {
 
   let mobileCSS = "";
 
-  if (base.page.root.responsive === "mobile" || base.mode === "mobile") {
+  if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
     mobileCSS = css`
       @media (min-width: 1280px) {
@@ -201,6 +201,10 @@ export const Root = () => {
     base.mode = "desktop";
   }
 
+  if (!base.mode) {
+    base.mode = "mobile";
+  }
+
   return (
     <Provider value={w.prasiContext}>
       <div
@@ -214,7 +218,7 @@ export const Root = () => {
       >
         <div
           className={cx(
-            "absolute flex flex-col items-stretch flex-1 bg-white main-content-preview",
+            "absolute flex flex-col items-stretch flex-1 bg-white main-content",
             base.mode === "mobile" ? mobileCSS : "inset-0 overflow-auto",
             css`
               contain: content;

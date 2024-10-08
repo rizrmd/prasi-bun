@@ -74,12 +74,12 @@ export const EdTreeBody = () => {
         tree={tree}
         rootId={"root"}
         insertDroppableFirst={false}
+        dropTargetOffset={10}
         classes={treeClasses}
         ref={(el) => {
           local.tree = el;
         }}
         sort={false}
-        dropTargetOffset={10}
         render={nodeRender}
         onDrop={(tree, options) => nodeOnDrop(p, tree, options)}
         canDrop={(_, args) => {
