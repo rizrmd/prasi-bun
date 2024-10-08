@@ -53,7 +53,7 @@ export const dbProxy = (dburl: string) => {
                 {
                   name,
                   action: "batch_upsert",
-                  table: "",
+                  table: arg.table,
                   params: { arg },
                 },
                 dburl
@@ -202,8 +202,8 @@ export const fetchSendDb = async (
         text = await res.text();
         result = JSON.parse(text);
         if (["localhost", "prasi.avolut.com"].includes(location.hostname)) {
-          console.error(`%c⬆`, "color:green", "SENT", params);
-          console.error(`%c⬇`, `color:purple`, "RECV", result);
+          console.log(`%c⬆`, "color:green", "SENT", params);
+          console.log(`%c⬇`, `color:purple`, "RECV", result);
           console.log("");
         }
       } catch (e) {
