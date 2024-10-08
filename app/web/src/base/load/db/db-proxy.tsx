@@ -195,9 +195,21 @@ export const fetchSendDb = async (
     let body: any = params;
     let result = null;
     if (db_mode[dburl] === "msgpack") {
-      body = gzip(pack(params), {});
-      const res = await fetch(getProxyUrl(url), { method: "POST", body });
-      result = await res.json();
+      let text = "";
+      try {
+        body = gzip(new Uint8Array(pack(params)), {});
+        const res = await fetch(getProxyUrl(url), { method: "POST", body });
+        text = await res.text();
+        result = JSON.parse(text);
+      } catch (e) {
+        if (["localhost", "prasi.avolut.com"].includes(location.hostname)) {
+          console.error("Error while fetching from db:");
+          console.error(`%c⬆`, "color:green", "SENT", params);
+          console.error(`%c⬇`, `color:red`, "RECV", text);
+        } else {
+          throw e;
+        }
+      }
     } else {
       result = await fetchViaProxy(
         url,

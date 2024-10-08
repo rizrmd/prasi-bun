@@ -175,7 +175,7 @@ const manifest = [
     "/source-sans-3-latin-ext-400-normal.0483ba2f.woff",
     "/source-sans-3-latin-400-normal.43f5aafe.woff2",
     "/source-sans-3-latin-400-normal.6f62a854.woff",
-    "/index.7a219bdd.js",
+    "/index.772a8ea5.js",
     "/login.dff13ed3.js",
     "/logout.920e94f5.js",
     "/register.5db9c712.js",
@@ -190,7 +190,7 @@ const manifest = [
     "/index.module.7282dc17.js",
     "/ed.400f6bfd.css"
 ];
-const version = "9d9a12c6";
+const version = "3d657c6c";
 (0, _serviceWorker._register)(manifest, version);
 
 },{"@parcel/service-worker":"et5Hi"}],"et5Hi":[function(require,module,exports) {
@@ -564,7 +564,7 @@ function _routerNodeToTable(initialPath, initialNode) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "version", ()=>version);
-const version = "s4x06ae";
+const version = "rq1p8as";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"lXNsG":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
