@@ -203,7 +203,8 @@ export const fetchSendDb = async (
         result = JSON.parse(text);
         if (
           typeof location === "object" &&
-          ["localhost", "prasi.avolut.com"].includes(location.hostname)
+          (["localhost", "prasi.avolut.com"].includes(location.hostname) ||
+            location.hostname.endsWith(".avolut.com"))
         ) {
           console.log(`%c⬆`, "color:green", "SENT", params);
           console.log(`%c⬇`, `color:purple`, "RECV", result);
@@ -212,7 +213,8 @@ export const fetchSendDb = async (
       } catch (e) {
         if (
           typeof location === "object" &&
-          ["localhost", "prasi.avolut.com"].includes(location.hostname)
+          (["localhost", "prasi.avolut.com"].includes(location.hostname) ||
+            location.hostname.endsWith(".avolut.com"))
         ) {
           console.error("Error while fetching from db:");
           console.error(`%c⬆`, "color:green", "SENT", params);
