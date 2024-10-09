@@ -59,11 +59,15 @@ export const defineWindow = async (awaitServerUrl = true) => {
       .forEach((e) => {
         if (Array.isArray(e)) {
           for (const f of e) {
-            if (typeof f === "string" && f.trim()) {
-              result.push(f.trim());
+            if (typeof f === "string") {
+              const trimmed = f.trim();
+              if (trimmed) result.push(f.trim());
             }
           }
-        } else result.push(e.trim());
+        } else if (typeof e === "string") {
+          const trimmed = e.trim();
+          if (trimmed) result.push(e.trim());
+        }
       });
     return result.join(" ");
   };
