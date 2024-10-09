@@ -201,13 +201,19 @@ export const fetchSendDb = async (
         const res = await fetch(getProxyUrl(url), { method: "POST", body });
         text = await res.text();
         result = JSON.parse(text);
-        if (["localhost", "prasi.avolut.com"].includes(location.hostname)) {
+        if (
+          typeof location === "object" &&
+          ["localhost", "prasi.avolut.com"].includes(location.hostname)
+        ) {
           console.log(`%c⬆`, "color:green", "SENT", params);
           console.log(`%c⬇`, `color:purple`, "RECV", result);
           console.log("");
         }
       } catch (e) {
-        if (["localhost", "prasi.avolut.com"].includes(location.hostname)) {
+        if (
+          typeof location === "object" &&
+          ["localhost", "prasi.avolut.com"].includes(location.hostname)
+        ) {
           console.error("Error while fetching from db:");
           console.error(`%c⬆`, "color:green", "SENT", params);
           console.error(`%c⬇`, `color:red`, "RECV", text);
