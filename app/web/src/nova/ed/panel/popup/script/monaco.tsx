@@ -346,7 +346,7 @@ export const EdScriptMonaco: FC<{}> = () => {
                 scope = await code_result;
               }
             } else {
-              local_cached_value[active.item_id] = null;
+              delete local_cached_value[active.item_id];
               if (mode === "js") {
                 const code_result = codeEditAdvJs(p, value);
 
@@ -415,6 +415,7 @@ return typings;
 }
 `
     );
+
     try {
       const typings = typings_fn(active, meta);
       if (typeof typings === "object") {
@@ -429,7 +430,7 @@ return typings;
         }
       }
     } catch (e) {
-      console.log("WARNING: typings prasi error, bilang mas rizky plis...");
+      console.log("WARNING: typings prasi error, bilang mas rizky plis...", e);
     }
   }
 };
