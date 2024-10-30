@@ -7,6 +7,7 @@ export const serveWS: (
 ) => Promise<WebSocketHandler<WSData>> = async (wsHandler) => {
   return {
     maxPayloadLength: 9999999,
+    idleTimeout: 960,
     closeOnBackpressureLimit: true,
     drain(ws) {
       if (g.ws_hook && g.ws_hook.drain) {

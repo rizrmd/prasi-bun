@@ -9,6 +9,7 @@ import { prodIndex } from "../util/prod-index";
 import { code } from "../ws/sync/code/code";
 import { initFrontEnd } from "../ws/sync/code/parts/init/frontend";
 import { gzipAsync } from "../ws/sync/entity/zlib";
+import { Readable } from "stream";
 
 const encoder = new TextEncoder();
 export const _ = {
@@ -96,36 +97,31 @@ export const _ = {
           try {
             let file = Bun.file(build_path);
 
-            return new Response(
-              await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-              {
-                headers: {
-                  "content-encoding": "gzip",
-                  "content-type": mime.getType(build_path) || "",
-                },
-              }
-            );
+            const bin = new Uint8Array(await file.arrayBuffer());
+            const stream = Readable.from([await gzipAsync(bin)]);
+            return new Response(stream, {
+              headers: {
+                "content-encoding": "gzip",
+                "content-type": mime.getType(build_path) || "",
+              },
+            });
           } catch (e) {
             try {
               let file = Bun.file(build_old);
 
-              return new Response(
-                await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-                {
-                  headers: {
-                    "content-encoding": "gzip",
-                    "content-type": mime.getType(build_path) || "",
-                  },
-                }
-              );
+              const bin = new Uint8Array(await file.arrayBuffer());
+              const stream = Readable.from([await gzipAsync(bin)]);
+              return new Response(stream, {
+                headers: {
+                  "content-encoding": "gzip",
+                  "content-type": mime.getType(build_path) || "",
+                },
+              });
             } catch (e: any) {
               return new Response(
                 `
 console.error("Failed to load index.js")
 console.error("${e.message}");
-setTimeout(() =>{
-  location.reload();
-}, 1500);
 `,
                 {
                   headers: { "content-type": "application/javascript" },
@@ -336,15 +332,14 @@ setTimeout(() =>{
         const file = Bun.file(src_path);
 
         if (await file.exists()) {
-          return new Response(
-            await gzipAsync(new Uint8Array(await file.arrayBuffer())),
-            {
-              headers: {
-                "content-encoding": "gzip",
-                "content-type": mime.getType(src_path) || "",
-              },
-            }
-          );
+          const bin = new Uint8Array(await file.arrayBuffer());
+          const stream = Readable.from([await gzipAsync(bin)]);
+          return new Response(stream, {
+            headers: {
+              "content-encoding": "gzip",
+              "content-type": mime.getType(src_path) || "",
+            },
+          });
         }
       }
 
@@ -355,7 +350,8 @@ setTimeout(() =>{
 
 const responseCompressed = async (req: Request, body: string | Uint8Array) => {
   if (req.headers.get("accept-encoding")?.includes("gz")) {
-    return new Response(await gzipAsync(body), {
+    const stream = Readable.from([await gzipAsync(body)]);
+    return new Response(stream, {
       headers: { "content-encoding": "gzip" },
     });
   }
