@@ -289,7 +289,7 @@ export const EdPopComp = () => {
                             classes={{
                               root: "tree-root flex-1",
                               listItem: "listitem",
-                              container: "container",
+                              container: "",
                               dropTarget: "dropping",
                             }}
                             render={edPageTreeRender}
