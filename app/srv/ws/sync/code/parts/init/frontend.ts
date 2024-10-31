@@ -182,6 +182,7 @@ import React from "react";
     logLevel: "silent",
     sourcemap: true,
     metafile: true,
+    external: ['crypto', 'fs'],
     plugins: [
       cleanPlugin(),
       style(),
