@@ -1,5 +1,3 @@
-import { dir } from "dir";
-
 type EmptySnapshot = {
   type: "";
   id: string;
@@ -52,15 +50,6 @@ export type DocSnapshot =
   | CompSnapshot
   | CodeSnapshot
   | EmptySnapshot;
-
-const emptySnapshot: DocSnapshot = {
-  type: "",
-  id: "",
-  bin: new Uint8Array(),
-  id_doc: 0,
-  name: "",
-  ts: Date.now(),
-};
 
 export const snapshot = {
   _db: {} as any,
