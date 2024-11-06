@@ -194,6 +194,7 @@ ERROR: $\{e.message}
 \`)
 }
   `;
+
   try {
     const fn = new Function(...Object.keys(arg), "__js", final_src);
     fn(...Object.values(arg), meta.item.adv?.js);

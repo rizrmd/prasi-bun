@@ -8,28 +8,30 @@ export const extractNavigate = (
   vi: { page: VG["page"]; on_nav_loaded?: VG["on_preload"] },
   str: string
 ) => {
-  const found_nav = [
-    ...findBetween(str, `navigate(`, `)`),
-    ...findBetween(str, `href = `, `;`),
-  ];
+  if (str.length < 5000) {
+    const found_nav = [
+      ...findBetween(str, `navigate(`, `)`),
+      ...findBetween(str, `href = `, `;`),
+    ];
 
-  const page_id = vi.page.cur.id;
-  if (!vi.page.navs[page_id]) {
-    vi.page.navs[page_id] = new Set();
-  }
-
-  for (const url of found_nav) {
-    vi.page.navs[page_id].add(url);
-  }
-
-  clearTimeout(nav.timeout);
-  nav.timeout = setTimeout(() => {
-    if (vi.on_nav_loaded) {
-      vi.on_nav_loaded({
-        urls: Array.from(vi.page.navs[page_id]),
-      });
+    const page_id = vi.page.cur.id;
+    if (!vi.page.navs[page_id]) {
+      vi.page.navs[page_id] = new Set();
     }
-  }, 100);
+
+    for (const url of found_nav) {
+      vi.page.navs[page_id].add(url);
+    }
+
+    clearTimeout(nav.timeout);
+    nav.timeout = setTimeout(() => {
+      if (vi.on_nav_loaded) {
+        vi.on_nav_loaded({
+          urls: Array.from(vi.page.navs[page_id]),
+        });
+      }
+    }, 100);
+  }
 };
 
 const findBetween = (text: string, opener: string, closer: string) => {
@@ -46,15 +48,28 @@ const findBetween = (text: string, opener: string, closer: string) => {
           `${char}${closer}`,
           startIndex + opener.length + 1
         );
-        const found = text.substring(startIndex + opener.length + 1, end);
-        i = end + 2 + closer.length;
-        founds.push(found);
+        if (end !== -1) {
+          // Ensure closer is found
+          const found = text.substring(startIndex + opener.length + 1, end);
+          i = end + 2 + closer.length;
+          founds.push(found);
+        } else {
+          // Handle case where closer is not found
+          i = startIndex + opener.length + 1; // Move past the opener
+        }
+      } else {
+        // Handle case where char is not a quote
+        i = startIndex + opener.length + 1; // Move past the opener
       }
+    } else {
+      // Handle case where opener is not found
+      break;
     }
 
     if (last === i) {
       break;
     }
   }
+
   return founds;
 };

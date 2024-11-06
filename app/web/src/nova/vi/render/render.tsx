@@ -113,6 +113,7 @@ export const ViChild: FC<{
     for (const item_id of vi.entry) {
       const meta = vi.meta[item_id];
 
+      if (meta.item.hidden) continue; 
       if (meta.item.adv?.js || meta.item.component?.id) {
         childs.push(
           <ErrorBox meta={meta}>
