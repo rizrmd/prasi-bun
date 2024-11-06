@@ -16,7 +16,7 @@ import { initIDB } from "./idb";
 const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
-const WS_CONFIG = {
+export const WS_CONFIG = {
   debug: !!localStorage.getItem("prasi-ws-debug"),
   reconnectTimeout: 1000,
 };
