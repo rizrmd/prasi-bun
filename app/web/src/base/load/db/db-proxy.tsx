@@ -3,6 +3,7 @@ import pako, { gzip } from "pako";
 import { fetchViaProxy, getProxyUrl } from "../proxy";
 import { del, get, set } from "idb-keyval";
 import { pack } from "msgpackr";
+import { WS_CONFIG } from "../../../utils/sync/ws-client";
 
 const schema_promise = {
   tables: {} as Record<string, any>,
@@ -202,6 +203,7 @@ export const fetchSendDb = async (
         text = await res.text();
         result = JSON.parse(text);
         if (
+          WS_CONFIG.debug &&
           typeof location === "object" &&
           (["localhost", "prasi.avolut.com"].includes(location.hostname) ||
             location.hostname.endsWith(".avolut.com"))
