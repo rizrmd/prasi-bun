@@ -37,6 +37,7 @@ if (!g.Y) {
 
   /** init lmdb */
   user.conf.init();
+
   snapshot.init();
 }
 
@@ -45,6 +46,7 @@ if (!db) {
   await preparePrisma();
   await ensureNotRunning();
   const db = g._db;
+
   if (db) {
     db.$connect()
       .catch((e: any) => {
@@ -55,12 +57,17 @@ if (!db) {
       });
   }
 }
+
 await import("../../app/srv/init");
+
 await prepareApiRoutes();
 
+
 if (!g.apiPrepared) {
+
   await syncActionDefinition();
   g.log.info("WS Action defined");
+
   await prepareAPITypes();
   g.log.info("API prepared");
   g.apiPrepared = true;
@@ -73,7 +80,6 @@ if (!g.apiPrepared) {
 if (g.mode === "dev") {
   await import("./build-core");
   g.log.info("Core built");
-
 }
 
 if (!g.parcel && g.mode === "dev") {

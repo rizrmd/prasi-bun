@@ -17,7 +17,10 @@ const packr = new Packr({ structuredClone: true });
 
 /** CONSTANT */
 export const WS_CONFIG = {
-  debug: !!localStorage.getItem("prasi-ws-debug"),
+  debug:
+    typeof localStorage === "undefined"
+      ? false
+      : !!localStorage.getItem("prasi-ws-debug"),
   reconnectTimeout: 1000,
 };
 

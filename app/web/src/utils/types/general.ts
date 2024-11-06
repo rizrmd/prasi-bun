@@ -20,7 +20,7 @@ export type PrasiAPI = {
   apiTypes?: string;
 };
 
-export const w = window as unknown as {
+export const w = (typeof window === "undefined" ? {} : window) as unknown as {
   isEditor: boolean;
   isMobile: boolean;
   basehost?: string;
@@ -50,7 +50,7 @@ export const w = window as unknown as {
     on: any;
     off: any;
   };
-  pointer_active: boolean
+  pointer_active: boolean;
 };
 
 export type Page = {
