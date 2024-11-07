@@ -32,7 +32,11 @@ export const EdTreeName = ({
   if (item.component?.id && p.comp.loaded[item.component.id]) {
     name = p.comp.loaded[item.component.id].name;
 
-    if (item.component.props && item.component.props.child) {
+    if (
+      item.component.props &&
+      item.component.props.child &&
+      node.data?.parent?.comp_id
+    ) {
       is_jsx_prop = true;
     }
   }
