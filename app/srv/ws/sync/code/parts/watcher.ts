@@ -41,7 +41,6 @@ export class Watcher {
           stdout: "inherit",
           stderr: "inherit",
           async ipc(message, childProc) {
-            console.log(id_site, message);
             const fe = code.internal.frontend[id_site];
             const sv = code.internal.server[id_site];
             if (sv && !sv.rebuilding) {
