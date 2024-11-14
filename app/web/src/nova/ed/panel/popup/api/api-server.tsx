@@ -52,9 +52,12 @@ export const EdApiServer = forwardRef<
       for (const t of targets) {
         local.tabs.push(t);
       }
-      local.render();
+      p.ui.deploy.target = local.tabs;
+
+      p.render();
     }
   );
+  p.ui.deploy.active = local.active;
 
   return (
     <div

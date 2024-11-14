@@ -16,7 +16,7 @@ export const EmptySite = {
   name: "",
   domain: "",
   config: { api_url: "" },
-  deploy_name:"",
+  deploy_name: "",
   js: "",
   js_compiled: "",
   responsive: "" as "desktop-only" | "mobile-only" | "responsive",
@@ -209,6 +209,7 @@ export const EDGlobal = {
   code: {} as Record<string, { doc: null | DCode }>,
   global_prop: [] as string[],
   ui: {
+    deploy: { target: [] as { name: string; id: string, api_url:string }[], active: 0 },
     build: { status: "ready" as "ready" | "loading" | "error" },
     monaco: null as any,
     comp_editable: localStorage.getItem("prasi-comp-editable") === "yes",

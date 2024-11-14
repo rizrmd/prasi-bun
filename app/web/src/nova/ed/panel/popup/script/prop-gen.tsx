@@ -96,7 +96,7 @@ export const EdPropGen = () => {
                 {local.suggest_status !== "ready" ? (
                   <div className="flex items-center border-l px-2">⌛</div>
                 ) : (
-                  <label className="flex items-center border-l px-2 cursor-pointer cursor-pointer">
+                  <label className="flex items-center border-l px-2 cursor-pointer">
                     {local.suggest_label && (
                       <div className="flex pr-2">{local.suggest_label}</div>
                     )}
