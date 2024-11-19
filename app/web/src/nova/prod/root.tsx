@@ -188,6 +188,7 @@ export const Root = () => {
         overflow-x: hidden;
         overflow-y: auto;
         bottom: 0px;
+        contain: content;
       }
       @media (max-width: 1279px) {
         left: 0px;
@@ -219,10 +220,7 @@ export const Root = () => {
         <div
           className={cx(
             "absolute flex flex-col items-stretch flex-1 bg-white main-content",
-            base.mode === "mobile" ? mobileCSS : "inset-0 overflow-auto",
-            css`
-              contain: content;
-            `
+            base.mode === "mobile" ? mobileCSS : "inset-0 overflow-auto"
           )}
         >
           <Vi
