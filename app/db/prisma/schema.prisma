@@ -16,7 +16,9 @@ model component {
   type               String           @default("item")
   id_component_group String?          @db.Uuid
   props              Json             @default("[]")
+  deleted_at         DateTime?        @db.Timestamp(6)
   component_group    component_group? @relation(fields: [id_component_group], references: [id], onDelete: Cascade)
+  component_ext      component_ext[]
 }
 
 model component_group {
@@ -174,4 +176,13 @@ model deploy_target {
   domain  String
   id_site String @db.Uuid
   site    site   @relation(fields: [id_site], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model component_ext {
+  id           Int       @id @default(autoincrement())
+  created_at   DateTime  @default(now()) @db.Timestamp(6)
+  id_component String    @db.Uuid
+  img          Bytes?
+  desc         String?
+  component    component @relation(fields: [id_component], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "component_ext_relation_1")
 }
