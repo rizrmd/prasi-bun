@@ -179,6 +179,19 @@ export const Root = () => {
 
   if (base.page.root.responsive === "mobile") {
     base.mode = "mobile";
+  } else if (base.page.root.responsive === "desktop") {
+    base.mode = "desktop";
+  }
+
+  if (!base.mode) {
+    if (window.matchMedia("screen and (max-width: 768px)").matches) {
+      base.mode = "mobile";
+    } else {
+      base.mode = "desktop";
+    }
+  }
+
+  if (base.mode === "mobile") {
     mobileCSS = css`
       @media (min-width: 1280px) {
         border-left: 1px solid #ccc;
@@ -198,16 +211,6 @@ export const Root = () => {
         overflow-y: auto;
       }
     `;
-  } else if (base.page.root.responsive === "desktop") {
-    base.mode = "desktop";
-  }
-
-  if (!base.mode) {
-    if (window.matchMedia("screen and (max-width: 768px)").matches) {
-      base.mode = "mobile";
-    } else {
-      base.mode = "desktop";
-    }
   }
 
   return (
