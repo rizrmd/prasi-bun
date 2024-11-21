@@ -203,7 +203,11 @@ export const Root = () => {
   }
 
   if (!base.mode) {
-    base.mode = "mobile";
+    if (window.matchMedia("screen and (max-width: 768px)").matches) {
+      base.mode = "mobile";
+    } else {
+      base.mode = "desktop";
+    }
   }
 
   return (
