@@ -4,7 +4,7 @@
 
 html,
 body,
-#root {
+#root, #root-cached {
   width: 100%;
   height: 100%;
   padding: 0px;

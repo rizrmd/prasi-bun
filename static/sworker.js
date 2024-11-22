@@ -146,7 +146,7 @@
 var _serviceWorker = require("@parcel/service-worker");
 const manifest = [
     "/index.html",
-    "/index.88450a68.css",
+    "/index.38d43b6d.css",
     "/index.50269ee5.css",
     "/jetbrains-mono-cyrillic-ext-400-normal.01f99d06.woff2",
     "/jetbrains-mono-cyrillic-ext-400-normal.b19dae56.woff",
@@ -175,12 +175,12 @@ const manifest = [
     "/source-sans-3-latin-ext-400-normal.0483ba2f.woff",
     "/source-sans-3-latin-400-normal.43f5aafe.woff2",
     "/source-sans-3-latin-400-normal.6f62a854.woff",
-    "/index.c94eb0f9.js",
+    "/index.9824a3f5.js",
     "/login.dff13ed3.js",
     "/logout.920e94f5.js",
     "/register.5db9c712.js",
     "/all.8cf772a3.js",
-    "/ed.517e6ee1.js",
+    "/ed.8e155bde.js",
     "/wasm_gzip.922c2de1.wasm",
     "/standalone.0aea92ae.js",
     "/estree.4a6560c1.js",
@@ -190,7 +190,7 @@ const manifest = [
     "/index.module.7282dc17.js",
     "/ed.400f6bfd.css"
 ];
-const version = "120ede00";
+const version = "69af3271";
 (0, _serviceWorker._register)(manifest, version);
 
 },{"@parcel/service-worker":"et5Hi"}],"et5Hi":[function(require,module,exports) {
@@ -564,7 +564,7 @@ function _routerNodeToTable(initialPath, initialNode) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "version", ()=>version);
-const version = "k8ckn7a";
+const version = "lh61fij";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"lXNsG":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");

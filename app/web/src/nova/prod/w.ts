@@ -14,5 +14,6 @@ export const w = window as unknown as {
       page_id?: string;
       params?: any;
     };
+    on_preload?: () => void
   };
 };
