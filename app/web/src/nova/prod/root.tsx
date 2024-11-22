@@ -285,6 +285,14 @@ export const Root = () => {
             }
             script={{ init_local_effect: base.init_local_effect }}
             on_preload={async ({ urls, opt }) => {
+              document.querySelector("#root-cached")?.remove();
+              document.querySelector("#root")?.removeAttribute("style");
+              setTimeout(() => {
+                if (w._prasi.on_preload) {
+                  w._prasi.on_preload();
+                }
+              }, 500);
+
               const load_urls: string[] = [];
               if (base.cache.urls) {
                 for (const url of urls) {
