@@ -64,7 +64,7 @@ export const createViLocal = (
     };
 
     if (!local_cached_value[curid]) {
-      local_cached_value[curid] = {value: {}, mounted: false} as any;
+      local_cached_value[curid] = { value: {}, mounted: false } as any;
       resetLocal();
     } else if (!local_cached_value[curid].mounted) {
       if (!w.isEditor) {
@@ -118,13 +118,15 @@ export const createViLocal = (
     }, [location.pathname]);
 
     useEffect(() => {
-      if (!deps_ref.init) {
-        deps_ref.init = true;
-        return;
-      }
-      resetLocal();
-      if (arg.effect) {
-        arg.effect(local);
+      if ((arg.deps || []).length > 0) {
+        if (!deps_ref.init) {
+          deps_ref.init = true;
+          return;
+        }
+        resetLocal();
+        if (arg.effect) {
+          arg.effect(local);
+        }
       }
     }, [...(arg.deps || [])]);
 
