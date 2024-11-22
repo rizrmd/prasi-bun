@@ -84,6 +84,10 @@ const injectSiteScript = () => {
     if (base_url === "*") {
       base_url = `${location.protocol}//${location.host}`;
       base.site.api_url = base_url;
+    } else {
+      const url = new URL(base_url);
+      url.search = "";
+      base_url = url.toString();
     }
     base_url = trim(base_url, "/");
 
