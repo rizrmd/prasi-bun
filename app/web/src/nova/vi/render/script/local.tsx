@@ -41,34 +41,41 @@ export const createViLocal = (
     const { children, parent_key } = arg;
     const init_local_effect = vi.script?.init_local_effect;
     const metas = is_layout ? vi.layout?.meta : vi.meta;
-
     const curid = vi.page.cur.id + "~" + id;
+
+    const deps_ref = useRef({ init: false }).current;
+
+    const resetLocal = () => {
+      for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
+        delete local_cached_value[curid].value[k];
+      }
+      for (const [k, v] of Object.entries(deepClone(arg.value))) {
+        local_cached_value[curid].value[k] = v;
+      }
+      local_cached_value[curid].value.render = () => {
+        const w = window as any;
+        if (!w.isEditor && w.prasiContext.render) {
+          w.prasiContext.render();
+        } else {
+          set({});
+        }
+      };
+      local_cached_value[curid].mounted = true;
+    };
+
     if (!local_cached_value[curid]) {
-      local_cached_value[curid] = { mounted: true, value: arg.value };
+      local_cached_value[curid] = {value: {}, mounted: false} as any;
+      resetLocal();
     } else if (!local_cached_value[curid].mounted) {
       if (!w.isEditor) {
-        for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
-          delete local_cached_value[curid].value[k];
-        }
-        for (const [k, v] of Object.entries(deepClone(arg.value))) {
-          local_cached_value[curid].value[k] = v;
-        }
+        resetLocal();
       }
-      local_cached_value[curid].mounted = true;
     }
 
     const ref = useRef<any>(local_cached_value[curid].value);
 
     const [_, set] = useState({});
     const local = ref.current;
-    local.render = () => {
-      const w = window as any;
-      if (!w.isEditor && w.prasiContext.render) {
-        w.prasiContext.render();
-      } else {
-        set({});
-      }
-    };
 
     if (arg.hook) {
       arg.hook(local);
@@ -89,7 +96,7 @@ export const createViLocal = (
         }
       }
 
-      let should_run = !init_local_effect[id];
+      let should_run = !init_local_effect[id] && !deps_ref.init;
       if (should_run) {
         if (typeof init_local_effect === "object") {
           init_local_effect[id] = true;
@@ -105,9 +112,21 @@ export const createViLocal = (
       }
 
       return () => {
+        deps_ref.init = false;
         local_cached_value[curid].mounted = false;
       };
-    }, [...(arg.deps || []), location.pathname]);
+    }, [location.pathname]);
+
+    useEffect(() => {
+      if (!deps_ref.init) {
+        deps_ref.init = true;
+        return;
+      }
+      resetLocal();
+      if (arg.effect) {
+        arg.effect(local);
+      }
+    }, [...(arg.deps || [])]);
 
     useEffect(() => {
       if (isEditor) {
