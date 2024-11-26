@@ -74,10 +74,9 @@ export const createViLocal = (
     const ref = useRef<any>(local_cached_value[curid].value);
 
     const [_, set] = useState({});
-    const local = ref.current;
 
     if (arg.hook) {
-      arg.hook(local);
+      arg.hook(local_cached_value[curid].value);
     }
 
     useEffect(() => {
@@ -95,7 +94,7 @@ export const createViLocal = (
         }
       }
 
-      let should_run = !init_local_effect[id] && !mounted;
+      let should_run = !init_local_effect[id];
       if (should_run) {
         if (typeof init_local_effect === "object") {
           init_local_effect[id] = true;
@@ -103,7 +102,7 @@ export const createViLocal = (
 
         const fn = async () => {
           if (arg.effect) {
-            await arg.effect(local);
+            await arg.effect(local_cached_value[curid].value);
           }
         };
 
@@ -120,10 +119,10 @@ export const createViLocal = (
         if (!mounted) {
           return;
         }
-        
+
         resetLocal();
         if (arg.effect) {
-          arg.effect(local);
+          arg.effect(local_cached_value[curid].value);
         }
       }
     }, [...(arg.deps || [])]);
@@ -133,9 +132,9 @@ export const createViLocal = (
         if (local_cached_value[id] === null) {
           const fn = async () => {
             if (arg.effect) {
-              await arg.effect(local);
+              await arg.effect(local_cached_value[curid].value);
               if (isEditor) {
-                local_cached_value[id] = local;
+                local_cached_value[id] = local_cached_value[curid].value;
               }
             }
           };
@@ -146,7 +145,7 @@ export const createViLocal = (
 
     const result = modifyChild(children, {
       ...meta.script?.scope,
-      [arg.name]: local,
+      [arg.name]: local_cached_value[curid].value,
     });
     return result;
   };
