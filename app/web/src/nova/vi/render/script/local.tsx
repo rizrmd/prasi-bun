@@ -43,8 +43,6 @@ export const createViLocal = (
     const metas = is_layout ? vi.layout?.meta : vi.meta;
     const curid = vi.page.cur.id + "~" + id;
 
-    const deps_ref = useRef({ init: false }).current;
-
     const resetLocal = () => {
       for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
         delete local_cached_value[curid].value[k];
@@ -72,6 +70,7 @@ export const createViLocal = (
       }
     }
 
+    const mounted = local_cached_value[curid].mounted;
     const ref = useRef<any>(local_cached_value[curid].value);
 
     const [_, set] = useState({});
@@ -96,7 +95,7 @@ export const createViLocal = (
         }
       }
 
-      let should_run = !init_local_effect[id] && !deps_ref.init;
+      let should_run = !init_local_effect[id] && !mounted;
       if (should_run) {
         if (typeof init_local_effect === "object") {
           init_local_effect[id] = true;
@@ -112,17 +111,16 @@ export const createViLocal = (
       }
 
       return () => {
-        deps_ref.init = false;
         local_cached_value[curid].mounted = false;
       };
     }, [location.pathname]);
 
     useEffect(() => {
       if ((arg.deps || []).length > 0) {
-        if (!deps_ref.init) {
-          deps_ref.init = true;
+        if (!mounted) {
           return;
         }
+        
         resetLocal();
         if (arg.effect) {
           arg.effect(local);
