@@ -123,7 +123,10 @@ const isInstalling = async (id_site: string) => {
 
         if (should_install) {
           await Bun.write(pkg, JSON.stringify(pkg_json, null, 2));
-          await $`npm i`.cwd(code.path(id_site, "site", "src")).quiet().nothrow();
+          await $`npm i`
+            .cwd(code.path(id_site, "site", "src"))
+            .quiet()
+            .nothrow();
         }
       }
     } catch (e) {}
@@ -182,7 +185,7 @@ import React from "react";
     logLevel: "silent",
     sourcemap: true,
     metafile: true,
-    external: ['crypto', 'fs'],
+    external: ["crypto", "fs"],
     plugins: [
       cleanPlugin(),
       style(),
@@ -200,7 +203,16 @@ import React from "react";
         name: "prasi",
         async setup(setup) {
           try {
+            setup.onStart(() => {
+              code.internal.frontend[id_site].build_timer = Date.now();
+            });
             setup.onEnd((res) => {
+              if (code.internal.frontend[id_site].build_timer) {
+                const ms =
+                  Date.now() - code.internal.frontend[id_site].build_timer;
+                console.log(`Built front-end ${id_site} in ${ms}ms`);
+              }
+
               code.internal.frontend[id_site].rebuilding = false;
               if (res.errors.length === 0) {
                 code.internal.frontend[id_site].inputs = new Set(

@@ -56,15 +56,6 @@ export const initServer = async (
                 );
                 server.init(id_site);
               }
-              console.log(
-                `\
-site server rebuild ${id_site} ${
-                  e.errors.length > 0
-                    ? `
- - e.errors.map((e) => e.text).join("\n - ")`
-                    : ""
-                }`
-              );
             });
           },
         },
