@@ -175,12 +175,12 @@ const manifest = [
     "/source-sans-3-latin-ext-400-normal.0483ba2f.woff",
     "/source-sans-3-latin-400-normal.43f5aafe.woff2",
     "/source-sans-3-latin-400-normal.6f62a854.woff",
-    "/index.c0990a7d.js",
+    "/index.dafe26fa.js",
     "/login.3daaefac.js",
     "/logout.920e94f5.js",
     "/register.5db9c712.js",
     "/all.8cf772a3.js",
-    "/ed.bfc619b4.js",
+    "/ed.9eb26e86.js",
     "/wasm_gzip.922c2de1.wasm",
     "/standalone.0aea92ae.js",
     "/estree.4a6560c1.js",
@@ -190,7 +190,7 @@ const manifest = [
     "/index.module.7282dc17.js",
     "/ed.400f6bfd.css"
 ];
-const version = "df185e5d";
+const version = "603af579";
 (0, _serviceWorker._register)(manifest, version);
 
 },{"@parcel/service-worker":"et5Hi"}],"et5Hi":[function(require,module,exports) {
