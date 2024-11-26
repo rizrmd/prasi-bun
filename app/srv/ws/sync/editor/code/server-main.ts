@@ -48,7 +48,7 @@ const serverMain = () => ({
 
     const c = code.internal.server[site_id];
 
-    if ((await file.exists()) && file.size && c.ts !== file.lastModified) {
+    if ((await file.exists()) && file.size) {
       c.ts = file.lastModified;
       try {
         delete require.cache[server_src_path];

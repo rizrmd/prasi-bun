@@ -33,6 +33,7 @@ export const codeInternal = {
         inputs: Set<string>;
         rebuilding: boolean;
         npm?: Promise<void>;
+        build_timer?: number;
       }
     >;
   },

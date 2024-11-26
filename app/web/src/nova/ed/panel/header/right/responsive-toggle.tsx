@@ -37,10 +37,12 @@ export const ResponsiveToggle = () => {
     mobile: {
       onClick() {
         if (p.mode === "mobile") {
-          mroot?.set("responsive", undefined);
-          localStorage.setItem("prasi-editor-mode", "");
-          render();
-          return;
+          if (mroot?.get("responsive")) {
+            mroot?.set("responsive", undefined);
+            localStorage.setItem("prasi-editor-mode", "");
+            render();
+            return;
+          }
         }
 
         p.mode = "mobile";
@@ -73,10 +75,12 @@ export const ResponsiveToggle = () => {
     desktop: {
       onClick() {
         if (p.mode === "desktop") {
-          mroot?.set("responsive", undefined);
-          localStorage.setItem("prasi-editor-mode", "");
-          render();
-          return;
+          if (mroot?.get("responsive")) {
+            mroot?.set("responsive", undefined);
+            localStorage.setItem("prasi-editor-mode", "");
+            render();
+            return;
+          }
         }
 
         p.mode = "desktop";

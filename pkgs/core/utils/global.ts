@@ -29,7 +29,7 @@ export const g = global as unknown as {
     url: URL;
     req: Request;
     server: Server;
-    handle: (req: Request) => Promise<Response | undefined>;
+    handle: (req: Request) => Promise<Response>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
     serveStatic?: any;
     serveAPI?: any;

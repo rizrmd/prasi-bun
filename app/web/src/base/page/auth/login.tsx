@@ -45,7 +45,6 @@ export default page({
             if (s.status === "failed") {
               form.submitting = false;
               form.render();
-              alert(s.reason);
             } else {
               let rto = (window as any).redirectTo;
               if (rto) {
