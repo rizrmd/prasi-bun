@@ -60,7 +60,7 @@ export const createViLocal = (
     };
 
     if (!local_cached_value[curid]) {
-      local_cached_value[curid] = { value: {}, mounted: "" };
+      local_cached_value[curid] = { value: {}, mounted: location.pathname };
       resetLocal("init");
     } else if (local_cached_value[curid].mounted !== location.pathname) {
       if (!w.isEditor) {
