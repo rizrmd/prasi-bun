@@ -222,7 +222,7 @@ export const reloadPage = async (
           await p.sync.yjs.diff_local(
             "page",
             p.page.cur.id,
-            Buffer.from(compress(diff_local))
+            compress(diff_local)
           );
           p.ui.syncing = false;
 
@@ -232,7 +232,9 @@ export const reloadPage = async (
             ?.get("childs")
             ?.map((e: any) => e.get("id")) as string[];
 
-          if (active.should_render_main) p.render();
+          if (active.should_render_main && !p.ui.popup.script.open) {
+            p.render();
+          }
         }
       }, UPDATE_TIMEOUT);
     };

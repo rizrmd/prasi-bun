@@ -12,7 +12,7 @@ services:
       - DEFAULT_WORKSPACE=/config/workspace #optional
     volumes:
       - /Users/riz/Documents/code-config:/config
-      - /Users/riz/Developer/prasi-bun/data/code:/site
+      - /Users/riz/Developer/data/code:/site
     ports:
       - 8443:8443
     restart: unless-stopped

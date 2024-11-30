@@ -1,9 +1,9 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { deepClone } from "web-utils";
 import { IMeta } from "../../../ed/logic/ed-global";
 import { VG } from "../global";
-import { modifyChild } from "./passprop";
-import { deepClone } from "web-utils";
 import { w } from "./eval-prop";
+import { modifyChild } from "./passprop";
 
 export const local_cached_value = {} as Record<
   string,

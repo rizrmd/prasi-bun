@@ -75,6 +75,7 @@ const target = {
 
 export const active = {
   should_render_main: true,
+  defer_render_main: false,
   hover: { id: "", tree: false },
   scope: {} as any,
   script_nav: {

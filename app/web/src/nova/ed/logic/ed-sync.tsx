@@ -193,8 +193,8 @@ export const edInitSync = (p: PG) => {
             const res = await p.sync.yjs.sv_remote(
               data.type,
               data.id,
-              sv,
-              diff
+              new Uint8Array(sv),
+              new Uint8Array(diff)
             );
 
             if (res) {
