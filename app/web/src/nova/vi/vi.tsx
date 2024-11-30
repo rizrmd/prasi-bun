@@ -1,13 +1,12 @@
 import { FC, Suspense, useEffect } from "react";
 import { useGlobal } from "web-utils";
+import { IItem } from "../../utils/types/item";
 import { IMeta } from "../ed/logic/ed-global";
 import { viLoad } from "./load/load";
 import { VG, ViGlobal } from "./render/global";
 import { render_stat } from "./render/render";
-import { nav } from "./render/script/extract-nav";
 import { ViRoot } from "./root";
 import { ErrorBox } from "./utils/error-box";
-import { IItem } from "../../utils/types/item";
 
 type PRELOAD = Exclude<VG["on_preload"], undefined>;
 type PRELOAD_ARGS = Parameters<PRELOAD>[0];
