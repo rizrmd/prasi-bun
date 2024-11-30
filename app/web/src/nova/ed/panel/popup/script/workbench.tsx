@@ -30,7 +30,10 @@ export const EdScriptWorkbench = () => {
     canBack: active.script_nav.list.length > 0,
   };
 
-  if (p.ui.popup.script.type === "item") {
+  if (
+    p.ui.popup.script.type === "item" &&
+    p.ui.popup.script.mode !== p.ui.popup.script.lastMode
+  ) {
     setTimeout(() => {
       p.ui.popup.script.mode = p.ui.popup.script.lastMode;
       p.render();

@@ -1,5 +1,7 @@
 import { useGlobal } from "web-utils";
 import { jscript } from "../../utils/script/jscript";
+import { w } from "../../utils/types/general";
+import { isLocalhost } from "../../utils/ui/is-localhost";
 import { Loading } from "../../utils/ui/loading";
 import { EdLeft } from "./ed-left";
 import { EdMid } from "./ed-mid";
@@ -13,15 +15,12 @@ import { EdPageHistoryMain } from "./panel/main/main-history";
 import { EdPane } from "./panel/main/pane-resize";
 import { EdPopApi } from "./panel/popup/api/api-server";
 import { EdPopCode } from "./panel/popup/code/code";
+import { iconVSCode } from "./panel/popup/code/icons";
 import { EdPopCompGroup } from "./panel/popup/comp/comp-group";
 import { EdPopComp } from "./panel/popup/comp/comp-popup";
 import { EdPopPage } from "./panel/popup/page/page-popup";
 import { EdPopScript } from "./panel/popup/script/pop-script";
 import { EdPopSite } from "./panel/popup/site/site-popup";
-import { iconVSCode } from "./panel/popup/code/icons";
-import { isLocalhost } from "../../utils/ui/is-localhost";
-import { w } from "../../utils/types/general";
-import { edInitSync } from "./logic/ed-sync";
 
 export const EdBase = () => {
   const p = useGlobal(EDGlobal, "EDITOR");
