@@ -7,7 +7,7 @@ import { modifyChild } from "./passprop";
 
 export const local_cached_value = {} as Record<
   string,
-  { mounted: boolean; value: any }
+  { mounted: string; value: any }
 >;
 
 export const createViLocal = (
@@ -39,11 +39,10 @@ export const createViLocal = (
     let id = meta.item.id;
 
     const { children, parent_key } = arg;
-    const init_local_effect = vi.script?.init_local_effect;
     const metas = is_layout ? vi.layout?.meta : vi.meta;
     const curid = vi.page.cur.id + "~" + id;
 
-    const resetLocal = () => {
+    const resetLocal = (from: string) => {
       for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
         delete local_cached_value[curid].value[k];
       }
@@ -58,20 +57,16 @@ export const createViLocal = (
           set({});
         }
       };
-      local_cached_value[curid].mounted = true;
     };
 
     if (!local_cached_value[curid]) {
-      local_cached_value[curid] = { value: {}, mounted: false } as any;
-      resetLocal();
-    } else if (!local_cached_value[curid].mounted) {
+      local_cached_value[curid] = { value: {}, mounted: "" };
+      resetLocal("init");
+    } else if (local_cached_value[curid].mounted !== location.pathname) {
       if (!w.isEditor) {
-        resetLocal();
+        resetLocal("init-not-mounted");
       }
     }
-
-    const mounted = local_cached_value[curid].mounted;
-    const ref = useRef<any>(local_cached_value[curid].value);
 
     const [_, set] = useState({});
 
@@ -94,33 +89,24 @@ export const createViLocal = (
         }
       }
 
-      let should_run = !init_local_effect[id];
-      if (should_run) {
-        if (typeof init_local_effect === "object") {
-          init_local_effect[id] = true;
+      local_cached_value[curid].mounted = location.pathname;
+      const fn = async () => {
+        if (arg.effect) {
+          await arg.effect(local_cached_value[curid].value);
         }
-
-        const fn = async () => {
-          if (arg.effect) {
-            await arg.effect(local_cached_value[curid].value);
-          }
-        };
-
-        fn();
-      }
-
-      return () => {
-        local_cached_value[curid].mounted = false;
       };
+      fn();
+
+      return () => {};
     }, [location.pathname]);
 
     useEffect(() => {
       if ((arg.deps || []).length > 0) {
-        if (!mounted) {
+        if (!local_cached_value[curid].mounted) {
           return;
         }
 
-        resetLocal();
+        resetLocal("deps");
         if (arg.effect) {
           arg.effect(local_cached_value[curid].value);
         }
