@@ -216,7 +216,8 @@ export const fetchSendDb = async (
         if (
           typeof location === "object" &&
           (["localhost", "prasi.avolut.com"].includes(location.hostname) ||
-            location.hostname.endsWith(".avolut.com"))
+            location.hostname.endsWith(".avolut.com")) &&
+          (text || "").trim()
         ) {
           console.error("Error while fetching from db:");
           console.error(`%c⬆`, "color:green", "SENT", params);
