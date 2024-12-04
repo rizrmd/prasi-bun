@@ -142,22 +142,22 @@ export const initExtNotif = async (vi: VG, prasi_ext: PrasiExt) => {
     });
 
     window.parent.postMessage({ mobile: true, type: "ready" }, "*");
-  }
 
-  w.notif = {
-    async send(data: NOTIF_ARG) {
-      if (vi && vi.site.api) {
-        return await vi.site.api._notif("send", {
-          type: "send",
-          id:
-            typeof data.user_id === "string"
-              ? data.user_id
-              : data.user_id.toString(),
-          body: data.body,
-          title: data.title,
-          data: data.data,
-        });
-      }
-    },
-  } as any;
+    w.notif = {
+      async send(data: NOTIF_ARG) {
+        if (vi && vi.site.api) {
+          return await vi.site.api._notif("send", {
+            type: "send",
+            id:
+              typeof data.user_id === "string"
+                ? data.user_id
+                : data.user_id.toString(),
+            body: data.body,
+            title: data.title,
+            data: data.data,
+          });
+        }
+      },
+    } as any;
+  }
 };
