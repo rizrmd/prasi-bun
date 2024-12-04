@@ -19,14 +19,9 @@ export const initExts = async (vi: VG) => {
       const send = (msg: { type: "ready" }) => {
         window.parent.postMessage({ mobile: true, ...msg }, "*");
       };
-      window.addEventListener("message", async ({ data: raw }) => {
-        console.log(raw);
-        if (typeof raw === "object" && raw.mobile) {
-        }
-      });
       send({ type: "ready" });
+      await initExtNotif(vi, pe);
     }
-    await initExtNotif(vi, pe);
     pe.status = "ready";
   }
 };
