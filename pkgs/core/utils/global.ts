@@ -29,7 +29,15 @@ export const g = global as unknown as {
     url: URL;
     req: Request;
     server: Server;
-    handle: (req: Request) => Promise<Response>;
+    handle: (
+      req: Request,
+      opt?: {
+        rewrite?: (arg: {
+          body: Response["body"];
+          headers: Response["headers"];
+        }) => Response["body"];
+      }
+    ) => Promise<Response>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
     serveStatic?: any;
     serveAPI?: any;
