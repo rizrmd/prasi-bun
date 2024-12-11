@@ -33,9 +33,9 @@ export const createServer = async () => {
         req: Request,
         opt?: {
           rewrite?: (arg: {
-            body: Response["body"];
+            body: Bun.BodyInit;
             headers: Response["headers"];
-          }) => Response["body"];
+          }) => Bun.BodyInit;
         }
       ) => {
         if (wsHandler[url.pathname]) {
@@ -52,10 +52,10 @@ export const createServer = async () => {
         }
 
         if (serveStatic.exists(url)) {
-          return serveStatic.serve(url);
+          return serveStatic.serve(url, opt);
         } else {
           try {
-            const response = serveStatic.serveSitePublic(url);
+            const response = serveStatic.serveSitePublic(url, opt);
             if (response) return response;
           } catch (e) {}
         }
@@ -65,7 +65,7 @@ export const createServer = async () => {
           return api_response;
         }
 
-        return serveStatic.serve(url);
+        return serveStatic.serve(url, opt);
       };
 
       if (g.server_hook) {

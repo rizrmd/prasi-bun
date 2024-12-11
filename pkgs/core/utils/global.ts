@@ -33,9 +33,9 @@ export const g = global as unknown as {
       req: Request,
       opt?: {
         rewrite?: (arg: {
-          body: Response["body"];
+          body: Bun.BodyInit;
           headers: Response["headers"];
-        }) => Response["body"];
+        }) => Bun.BodyInit;
       }
     ) => Promise<Response>;
     wsHandler: Record<string, WebSocketHandler<WSData>>;
