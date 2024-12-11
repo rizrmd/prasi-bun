@@ -34,7 +34,7 @@ export const g = global as unknown as {
       opt?: {
         rewrite?: (arg: {
           body: Bun.BodyInit;
-          headers: Response["headers"];
+          headers: Headers | any;
         }) => Bun.BodyInit;
       }
     ) => Promise<Response>;

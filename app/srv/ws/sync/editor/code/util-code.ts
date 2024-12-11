@@ -83,7 +83,7 @@ declare global {
       handle: (req: Request, opt?: {
           rewrite?: (arg: {
             body: Bun.BodyInit;
-            headers: Response["headers"];
+            headers: Headers | any;
           }) => Bun.BodyInit;
         }) => Promise<Response>;
       serveStatic?: any;
