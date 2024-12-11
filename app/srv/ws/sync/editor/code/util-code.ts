@@ -80,7 +80,12 @@ declare global {
       req: Request;
       server: Server;
       mode: "dev" | "prod";
-      handle: (req: Request) => Promise<Response>;
+      handle: (req: Request, opt?: {
+          rewrite?: (arg: {
+            body: Response["body"];
+            headers: Response["headers"];
+          }) => Response["body"];
+        }) => Promise<Response>;
       serveStatic?: any;
       serveAPI?: any;
       index: { head: string[]; body: string[]; render: () => string };

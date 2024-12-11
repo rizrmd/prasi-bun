@@ -29,7 +29,15 @@ export const createServer = async () => {
       const url = new URL(req.url) as URL;
       const prasi = {};
 
-      const handle = async (req: Request) => {
+      const handle = async (
+        req: Request,
+        opt?: {
+          rewrite?: (arg: {
+            body: Response["body"];
+            headers: Response["headers"];
+          }) => Response["body"];
+        }
+      ) => {
         if (wsHandler[url.pathname]) {
           if (
             server.upgrade(req, {
@@ -38,7 +46,7 @@ export const createServer = async () => {
               },
             })
           ) {
-            return;
+            return new Response("");
           }
           return new Response("Upgrade failed :(", { status: 500 });
         }
