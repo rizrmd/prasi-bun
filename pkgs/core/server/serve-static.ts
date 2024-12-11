@@ -84,7 +84,7 @@ export const serveStatic = {
     opt?: {
       rewrite?: (arg: {
         body: Bun.BodyInit;
-        headers: Response["headers"];
+        headers: Headers | any;
       }) => Bun.BodyInit;
     }
   ) => {
@@ -109,7 +109,7 @@ export const serveStatic = {
     opt?: {
       rewrite?: (arg: {
         body: Bun.BodyInit;
-        headers: Response["headers"];
+        headers: Headers | any;
       }) => Bun.BodyInit;
     }
   ) {
@@ -193,7 +193,7 @@ const rewriteResponse = (
     opt?: {
       rewrite?: (arg: {
         body: Bun.BodyInit;
-        headers: Response["headers"];
+        headers: Headers | any;
       }) => Bun.BodyInit;
     };
   }
@@ -202,11 +202,11 @@ const rewriteResponse = (
     arg.headers instanceof Headers ? arg.headers : new Headers(arg.headers);
 
   if (arg.opt?.rewrite) {
-    return new Response(arg.opt.rewrite({ body: body, headers }), {
+    return new Response(arg.opt.rewrite({ body: body, headers }) as any, {
       headers,
       status: arg.status,
     });
   }
 
-  return new Response(body, { headers, status: arg.status });
+  return new Response(body as any, { headers, status: arg.status });
 };

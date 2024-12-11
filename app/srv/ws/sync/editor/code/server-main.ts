@@ -175,7 +175,7 @@ export interface PrasiServer extends Record<string, any> {
       opt?: {
         rewrite?: (arg: {
           body: Bun.BodyInit;
-          headers: Response["headers"];
+          headers: Headers | any;
         }) => Bun.BodyInit;
       }
     ) => Promise<Response>;
@@ -190,5 +190,6 @@ export interface PrasiServer extends Record<string, any> {
 const glb = global as unknown as {
   _server: ReturnType<typeof serverMain>;
 };
+
 glb._server = serverMain();
 export const server = glb._server;

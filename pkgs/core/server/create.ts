@@ -34,7 +34,7 @@ export const createServer = async () => {
         opt?: {
           rewrite?: (arg: {
             body: Bun.BodyInit;
-            headers: Response["headers"];
+            headers: Headers | any;
           }) => Bun.BodyInit;
         }
       ) => {

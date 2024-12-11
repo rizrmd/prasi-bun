@@ -62,7 +62,7 @@ declare global {
         opt?: {
           rewrite?: (arg: {
             body: Bun.BodyInit;
-            headers: Response["headers"];
+            headers: Headers | any;
           }) => Bun.BodyInit;
         }
       ) => Promise<Response>;
