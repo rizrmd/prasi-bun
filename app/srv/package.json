@@ -22,6 +22,6 @@
     "yjs-types": "^0.0.1"
   },
   "devDependencies": {
-    "bun-types": "^1.0.30"
+    "bun-types": "^1.1.38"
   }
 }

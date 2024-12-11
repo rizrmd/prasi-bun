@@ -1,3 +1,5 @@
+/// <reference types="bun-types" />
+
 import type { Server, WebSocketHandler } from "bun";
 import { existsAsync } from "fs-jetpack";
 import _fs from "node:fs/promises";
@@ -172,9 +174,9 @@ export interface PrasiServer extends Record<string, any> {
       req: Request,
       opt?: {
         rewrite?: (arg: {
-          body: Response["body"];
+          body: Bun.BodyInit;
           headers: Response["headers"];
-        }) => Response["body"];
+        }) => Bun.BodyInit;
       }
     ) => Promise<Response>;
     serveStatic?: any;

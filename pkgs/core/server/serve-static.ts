@@ -1,7 +1,8 @@
+/// <reference types="bun-types" />
+
 import { dir } from "dir";
 import { watch } from "fs";
 import mime from "mime";
-import { join } from "path";
 import { g } from "utils/global";
 import { CORS_HEADERS } from "./serve-api";
 import { existsAsync } from "fs-jetpack";
@@ -78,7 +79,15 @@ export const serveStatic = {
   exists: (url: URL) => {
     return !!cache.static[url.pathname];
   },
-  serveSitePublic: (url: URL) => {
+  serveSitePublic: (
+    url: URL,
+    opt?: {
+      rewrite?: (arg: {
+        body: Bun.BodyInit;
+        headers: Response["headers"];
+      }) => Bun.BodyInit;
+    }
+  ) => {
     if (!cache.static[url.pathname] && url.pathname.startsWith("/prod")) {
       const parts = url.pathname.split("/");
       const id_site = parts[2];
@@ -95,18 +104,27 @@ export const serveStatic = {
       }
     }
   },
-  async serve(url: URL) {
+  async serve(
+    url: URL,
+    opt?: {
+      rewrite?: (arg: {
+        body: Bun.BodyInit;
+        headers: Response["headers"];
+      }) => Bun.BodyInit;
+    }
+  ) {
     if (g.mode === "prod") {
       let file = cache.static[url.pathname];
       if (file) {
-        return new Response(file.content, {
-          headers: {
-            ...CORS_HEADERS,
-            ...{ "content-type": file.type },
-            ...(file.compression
-              ? { "content-encoding": file.compression }
-              : {}),
-          },
+        const headers = new Headers({
+          ...CORS_HEADERS,
+          ...{ "content-type": file.type },
+          ...(file.compression ? { "content-encoding": file.compression } : {}),
+        });
+
+        return rewriteResponse(file.content, {
+          headers,
+          opt,
         });
       }
 
@@ -163,6 +181,32 @@ navigator.serviceWorker.getRegistration().then(function(reg) {
         return new Response(file);
       }
     }
-    return new Response(`Not Found: ${url.pathname}`, { status: 404 });
+    return rewriteResponse(`Not Found: ${url.pathname}`, { opt, status: 404 });
   },
+};
+
+const rewriteResponse = (
+  body: Bun.BodyInit,
+  arg: {
+    headers?: any;
+    status?: number;
+    opt?: {
+      rewrite?: (arg: {
+        body: Bun.BodyInit;
+        headers: Response["headers"];
+      }) => Bun.BodyInit;
+    };
+  }
+) => {
+  const headers =
+    arg.headers instanceof Headers ? arg.headers : new Headers(arg.headers);
+
+  if (arg.opt?.rewrite) {
+    return new Response(arg.opt.rewrite({ body: body, headers }), {
+      headers,
+      status: arg.status,
+    });
+  }
+
+  return new Response(body, { headers, status: arg.status });
 };
