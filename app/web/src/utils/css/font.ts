@@ -15,7 +15,7 @@ export const cssFont = (
 
   if (font.family) {
     if (!glbFont.loadedFonts) glbFont.loadedFonts = [];
-    const weight = `:wght@${[300, 400, 500, 600].join(";")}`;
+    const weight = `:wght@${[300, 400, 500, 600, 700, 800].join(";")}`;
     const fontName = font.family.replace(/ /g, "+");
 
     if (glbFont.loadedFonts.indexOf(font.family) < 0) {

@@ -17,7 +17,7 @@ import { w } from "./w";
     defineReact();
 
     let internal_url = "/_prasi/code/internal.js";
-    if (location.pathname.startsWith("/prod")) {
+    if (location.pathname.startsWith("/prod/")) {
       const patharr = location.pathname.split("/");
       internal_url = `/prod/${patharr[2]}${internal_url}`;
     }
@@ -33,8 +33,8 @@ import { w } from "./w";
       if (_href && _href.startsWith("/")) {
         if (isPreview()) {
           if (
-            location.pathname.startsWith("/prod") &&
-            !_href.startsWith("/prod")
+            location.pathname.startsWith("/prod/") &&
+            !_href.startsWith("/prod/")
           ) {
             const patharr = location.pathname.split("/");
             _href = `/prod/${patharr[2]}${_href}`;
