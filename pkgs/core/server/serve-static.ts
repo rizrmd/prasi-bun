@@ -88,7 +88,10 @@ export const serveStatic = {
       }) => Bun.BodyInit;
     }
   ) => {
-    if (!cache.static[url.pathname] && url.pathname.startsWith("/prod")) {
+    if (
+      !cache.static[url.pathname] &&
+      (url.pathname === "/prod" || url.pathname.startsWith("/prod"))
+    ) {
       const parts = url.pathname.split("/");
       const id_site = parts[2];
       if (id_site && id_site.length > 5) {
