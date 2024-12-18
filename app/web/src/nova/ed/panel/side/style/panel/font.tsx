@@ -238,7 +238,9 @@ export const PanelFont: FC<{
               ) {
                 ft.loadedFonts.push(item.value);
                 const doc = document;
-                let weight = `:wght@${[300, 400, 500, 600].join(";")}`;
+                let weight = `:wght@${[300, 400, 500, 600, 700, 800].join(
+                  ";"
+                )}`;
                 let fontName = item.value.replace(/ /g, "+");
                 const _href = `https://fonts.googleapis.com/css2?family=${fontName}${weight}&display=swap`;
                 if (!doc.querySelector(`link[href="${_href}]`)) {

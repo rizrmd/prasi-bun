@@ -39,7 +39,7 @@ export const Root = () => {
   // #endregion
 
   // #region init
-  const isPreviewProd = isPreview() && location.pathname.startsWith("/prod");
+  const isPreviewProd = isPreview() && location.pathname.startsWith("/prod/");
 
   if (
     base.route.status !== "ready" ||
