@@ -90,7 +90,7 @@ export const serveStatic = {
   ) => {
     if (
       !cache.static[url.pathname] &&
-      (url.pathname === "/prod" || url.pathname.startsWith("/prod"))
+      (url.pathname === "/prod" || url.pathname.startsWith("/prod/"))
     ) {
       const parts = url.pathname.split("/");
       const id_site = parts[2];
