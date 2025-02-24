@@ -195,7 +195,7 @@ export const fetchSendDb = async (
   const load = async () => {
     let body: any = params;
     let result = null;
-    if (db_mode[dburl] === "msgpack") {
+    if (db_mode[dburl] === "msgpack" || typeof window === 'undefined') {
       let text = "";
       try {
         body = gzip(new Uint8Array(pack(params)), {});
