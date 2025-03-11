@@ -173,6 +173,14 @@ import React from "react";
     );
   }
 
+  let prasi_json = {} as { exclude?: string[] };
+  const prasi_json_file = Bun.file(
+    dir.data(`code/${id_site}/site/src/prasi.json`)
+  );
+  if (await prasi_json_file.exists()) {
+    prasi_json = await prasi_json_file.json();
+  }
+
   return await context({
     absWorkingDir: dir.data(root),
     entryPoints: ["index.tsx", site_filename],
@@ -185,7 +193,7 @@ import React from "react";
     logLevel: "silent",
     sourcemap: true,
     metafile: true,
-    external: ["crypto", "fs"],
+    external: ["crypto", "fs", ...(prasi_json?.exclude || [])],
     plugins: [
       cleanPlugin(),
       style(),
