@@ -17,19 +17,39 @@ export const dbProxy = (dburl: string) => {
   const name = "";
 
   if (!db_mode[dburl]) {
-    fetchSendDb(
-      {
+    fetch(dburl + "/_dbs/check", {
+      method: "POST",
+      body: JSON.stringify({
         table: "check",
         action: "check",
-      },
-      dburl
-    ).then((res) => {
-      if (res && res.mode === "encrypted") {
-        db_mode[dburl] = "msgpack";
-      } else {
-        db_mode[dburl] = "json";
-      }
-    });
+      }),
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          res.json().then((res) => {
+            if (res && res.mode === "encrypted") {
+              db_mode[dburl] = "msgpack";
+            } else {
+              db_mode[dburl] = "json";
+            }
+          });
+        }
+      })
+      .catch(() => {
+        fetchSendDb(
+          {
+            table: "check",
+            action: "check",
+          },
+          dburl
+        ).then((res) => {
+          if (res && res.mode === "encrypted") {
+            db_mode[dburl] = "msgpack";
+          } else {
+            db_mode[dburl] = "json";
+          }
+        });
+      });
   }
 
   return new Proxy(
@@ -195,7 +215,7 @@ export const fetchSendDb = async (
   const load = async () => {
     let body: any = params;
     let result = null;
-    if (db_mode[dburl] === "msgpack" || typeof window === 'undefined') {
+    if (db_mode[dburl] === "msgpack" || typeof window === "undefined") {
       let text = "";
       try {
         body = gzip(new Uint8Array(pack(params)), {});
