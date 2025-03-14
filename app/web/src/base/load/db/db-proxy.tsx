@@ -16,7 +16,7 @@ const db_mode = {} as Record<string, "msgpack" | "json">;
 export const dbProxy = (dburl: string) => {
   const name = "";
 
-  if (!db_mode[dburl]) {
+  if (!db_mode[dburl] && typeof window !== 'undefined') {
     fetch(dburl + "/_dbs/check", {
       method: "POST",
       body: JSON.stringify({
