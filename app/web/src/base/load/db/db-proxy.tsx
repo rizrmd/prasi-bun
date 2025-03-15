@@ -17,38 +17,40 @@ export const dbProxy = (dburl: string) => {
   const name = "";
 
   if (!db_mode[dburl] && typeof window !== "undefined") {
-    fetch(dburl + "/_dbs/check", {
-      method: "POST",
-      body: JSON.stringify({
+    fetchSendDb(
+      {
         table: "check",
         action: "check",
-      }),
-    })
+      },
+      dburl
+    )
       .then((res) => {
-        if (res.status === 200) {
-          res.json().then((res) => {
-            if (res && res.mode === "encrypted") {
-              db_mode[dburl] = "msgpack";
-            } else {
-              db_mode[dburl] = "json";
-            }
-          });
+        if (res && res.mode === "encrypted") {
+          db_mode[dburl] = "msgpack";
+        } else {
+          db_mode[dburl] = "json";
         }
       })
       .catch(() => {
-        fetchSendDb(
-          {
+        fetch(dburl + "/_dbs/check", {
+          method: "POST",
+          body: JSON.stringify({
             table: "check",
             action: "check",
-          },
-          dburl
-        ).then((res) => {
-          if (res && res.mode === "encrypted") {
-            db_mode[dburl] = "msgpack";
-          } else {
-            db_mode[dburl] = "json";
-          }
-        });
+          }),
+        })
+          .then((res) => {
+            if (res.status === 200) {
+              res.json().then((res) => {
+                if (res && res.mode === "encrypted") {
+                  db_mode[dburl] = "msgpack";
+                } else {
+                  db_mode[dburl] = "json";
+                }
+              });
+            }
+          })
+          .catch(() => {});
       });
   }
 
@@ -218,6 +220,7 @@ export const fetchSendDb = async (
 
     if (typeof window === "undefined") {
       try {
+        db_mode[dburl] = "msgpack";
         const response = await fetch(getProxyUrl(url), {
           method: "POST",
           body: JSON.stringify({
@@ -231,25 +234,7 @@ export const fetchSendDb = async (
         } else {
           db_mode[dburl] = "json";
         }
-      } catch (e) {
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
-              table: "check",
-              action: "check",
-            }),
-          });
-          const res = await response.json();
-          if (res && res.mode === "encrypted") {
-            db_mode[dburl] = "msgpack";
-          } else {
-            db_mode[dburl] = "json";
-          }
-        } catch (e) {
-          db_mode[dburl] = "json";
-        }
-      }
+      } catch (e) {}
     }
 
     if (db_mode[dburl] === "msgpack") {
