@@ -217,18 +217,34 @@ export const fetchSendDb = async (
     let result = null;
 
     if (typeof window === "undefined") {
-      const response = await fetch(getProxyUrl(url), {
-        method: "POST",
-        body: JSON.stringify({
-          table: "check",
-          action: "check",
-        }),
-      });
-      const res = await response.json();
-      if (res && res.mode === "encrypted") {
-        db_mode[dburl] = "msgpack";
-      } else {
-        db_mode[dburl] = "json";
+      try {
+        const response = await fetch(getProxyUrl(url), {
+          method: "POST",
+          body: JSON.stringify({
+            table: "check",
+            action: "check",
+          }),
+        });
+        const res = await response.json();
+        if (res && res.mode === "encrypted") {
+          db_mode[dburl] = "msgpack";
+        } else {
+          db_mode[dburl] = "json";
+        }
+      } catch (e) {
+        const response = await fetch(url, {
+          method: "POST",
+          body: JSON.stringify({
+            table: "check",
+            action: "check",
+          }),
+        });
+        const res = await response.json();
+        if (res && res.mode === "encrypted") {
+          db_mode[dburl] = "msgpack";
+        } else {
+          db_mode[dburl] = "json";
+        }
       }
     }
 
