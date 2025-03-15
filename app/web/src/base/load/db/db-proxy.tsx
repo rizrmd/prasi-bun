@@ -232,17 +232,21 @@ export const fetchSendDb = async (
           db_mode[dburl] = "json";
         }
       } catch (e) {
-        const response = await fetch(url, {
-          method: "POST",
-          body: JSON.stringify({
-            table: "check",
-            action: "check",
-          }),
-        });
-        const res = await response.json();
-        if (res && res.mode === "encrypted") {
-          db_mode[dburl] = "msgpack";
-        } else {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+              table: "check",
+              action: "check",
+            }),
+          });
+          const res = await response.json();
+          if (res && res.mode === "encrypted") {
+            db_mode[dburl] = "msgpack";
+          } else {
+            db_mode[dburl] = "json";
+          }
+        } catch (e) {
           db_mode[dburl] = "json";
         }
       }
