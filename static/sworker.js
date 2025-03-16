@@ -190,7 +190,7 @@ const manifest = [
     "/index.module.7282dc17.js",
     "/ed.400f6bfd.css"
 ];
-const version = "5c74ed0c";
+const version = "ac42c40d";
 (0, _serviceWorker._register)(manifest, version);
 
 },{"@parcel/service-worker":"et5Hi"}],"et5Hi":[function(require,module,exports) {
@@ -564,7 +564,7 @@ function _routerNodeToTable(initialPath, initialNode) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "version", ()=>version);
-const version = "u8acymc";
+const version = "c4787o8";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"lXNsG":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
