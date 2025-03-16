@@ -16,6 +16,7 @@ type CompilerOptions = Parameters<
 export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
   const m = monaco as any;
 
+  console.log('mantap jiwa')
   if (editor.getModel()) {
     const jsxHgController = new MonacoJsxSyntaxHighlight(getWorker(), monaco);
     const { highlighter } = jsxHgController.highlighterBuilder({
@@ -27,7 +28,7 @@ export const jsMount = async (editor: MonacoEditor, monaco: Monaco, p?: PG) => {
     }
     editor.onDidChangeModelContent(() => {
       if (typeof editor.getModel === "function") {
-        try {
+        try { 
           highlighter();
         } catch (e) {}
       }
