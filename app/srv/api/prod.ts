@@ -68,7 +68,6 @@ export const _ = {
           const build_path = dir.data(`/code/${site_id}/site/typings.d.ts`);
           let file = Bun.file(build_path);
 
-          console.log(build_path)
           if (!(await file.exists())) {
             const root = `/code/${site_id}/site/src`;
             await initFrontEnd(root, site_id);
