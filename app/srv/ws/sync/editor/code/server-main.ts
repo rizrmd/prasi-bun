@@ -88,6 +88,7 @@ const serverMain = () => ({
         } else {
           await Bun.write(Bun.file(log_path), e.message);
           console.log(`Failed to init server ${site_id}\n`, log_path);
+          console.error(e);
         }
       }
     }
