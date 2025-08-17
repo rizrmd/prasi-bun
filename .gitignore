@@ -185,3 +185,11 @@ app/srv/site/*
 app/srv/site.zip
 app/static
 app/static-br
+
+# Source map files
+*.map
+**/*.map
+
+# Large image files from templates
+app/web/public/images/template/
+app/web/static/images/template/
