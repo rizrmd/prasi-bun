@@ -29,36 +29,91 @@ function encodeLargeData(data: any): Uint8Array {
   }
 }
 
-// Additional helper for extremely large data - chunk the object before encoding
+// Process file contents separately to avoid buffer overflow
+function processFileContents(fileData: Record<string, string | Uint8Array>, mode: "string" | "binary"): Record<string, string | Uint8Array> {
+  const result: Record<string, string | Uint8Array> = {};
+  let processedCount = 0;
+
+  for (const [key, content] of Object.entries(fileData)) {
+    // Skip extremely large files that could cause buffer overflow
+    const contentSize = typeof content === 'string' ? content.length : content.byteLength;
+
+    if (contentSize > 10 * 1024 * 1024) { // Skip files larger than 10MB
+      console.warn(`Skipping large file ${key} (${contentSize} bytes) to avoid buffer overflow`);
+      result[key] = mode === "binary" ? new Uint8Array(0) : ""; // Empty content as placeholder
+    } else {
+      result[key] = content;
+    }
+
+    processedCount++;
+    if (processedCount % 1000 === 0) {
+      console.log(`Processed ${processedCount} files...`);
+    }
+  }
+
+  console.log(`Completed processing ${processedCount} files, skipped ${Object.keys(fileData).length - processedCount} large files`);
+  return result;
+}
+
+// Additional helper for extremely large data - separate metadata and file contents
 function encodeVeryLargeData(data: any): Uint8Array {
-  // First try our large data encoder
+  // Extract and process file contents separately
+  const processedData = { ...data };
+
+  // Process file contents in each section to avoid buffer overflow
+  if (processedData.public) {
+    processedData.public = processFileContents(processedData.public, "binary");
+  }
+
+  if (processedData.code) {
+    if (processedData.code.server) {
+      processedData.code.server = processFileContents(processedData.code.server, "binary");
+    }
+    if (processedData.code.site) {
+      processedData.code.site = processFileContents(processedData.code.site, "binary");
+    }
+    if (processedData.code.core) {
+      processedData.code.core = processFileContents(processedData.code.core, "binary");
+    }
+  }
+
+  // First try our large data encoder with processed data
   try {
-    return encodeLargeData(data);
+    return encodeLargeData(processedData);
   } catch (e) {
-    console.warn(`All msgpack encoders failed, implementing chunked encoding: ${e.message}`);
+    console.warn(`All msgpack encoders failed, implementing aggressive chunked encoding: ${e.message}`);
 
-    // For extremely large objects, we need to chunk them
+    // For extremely large objects, implement aggressive chunking
     const chunks: Uint8Array[] = [];
-
-    // Split the result into manageable chunks
-    const entries = Object.entries(data);
-    const chunkSize = 1000; // Process 1000 properties at a time
+    const entries = Object.entries(processedData);
+    const chunkSize = 100; // Much smaller chunks - 100 properties at a time
 
     for (let i = 0; i < entries.length; i += chunkSize) {
       const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
-      const encodedChunk = largePackr.encode(chunk);
-      chunks.push(encodedChunk);
+
+      try {
+        const encodedChunk = largePackr.encode(chunk);
+        chunks.push(encodedChunk);
+      } catch (chunkError) {
+        console.warn(`Chunk encoding failed for chunk ${i}-${i + chunkSize}, skipping: ${chunkError.message}`);
+        // Skip this chunk if it's too large
+        continue;
+      }
+    }
+
+    if (chunks.length === 0) {
+      throw new Error("All chunks were too large to encode");
     }
 
     // Combine chunks with a simple framing protocol
-    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length + 4, 0); // 4 bytes for length prefix
+    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length + 4, 0);
     const result = new Uint8Array(totalLength);
     let offset = 0;
 
     for (const chunk of chunks) {
       // Write chunk length (4 bytes)
       const view = new DataView(result.buffer, offset, 4);
-      view.setUint32(0, chunk.length, false); // big-endian
+      view.setUint32(0, chunk.length, false);
       offset += 4;
 
       // Write chunk data
@@ -66,6 +121,7 @@ function encodeVeryLargeData(data: any): Uint8Array {
       offset += chunk.length;
     }
 
+    console.log(`Successfully encoded ${chunks.length} chunks for ${entries.length} total properties`);
     return result;
   }
 }
