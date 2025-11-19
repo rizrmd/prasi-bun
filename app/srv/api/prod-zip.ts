@@ -1,77 +1,115 @@
 import { apiContext } from "service-srv";
 import fs from "fs";
 import path from "path";
-import { gzipAsync } from "../ws/sync/entity/zlib";
 import { validate } from "uuid";
 import { dir } from "dir";
 import { existsAsync, readAsync, exists } from "fs-jetpack";
 import { code } from "../ws/sync/code/code";
-import { encode, Packr } from "msgpackr";
 import { binaryExtensions } from "../util/binary-ext";
 
-// Create a custom Packr instance with larger buffer limits
-const largePackr = new Packr({
-  // Configure for large data handling
-  useRecords: false,
-  // Set reasonable chunk size for encoding
-  maxStructureDepth: 64,
-  // Additional options for large data
-});
+// Import archiver for zip creation
+const archiver = require('archiver');
 
-function encodeLargeData(data: any): Uint8Array {
-  try {
-    // Try standard encoding first
-    return encode(data);
-  } catch (e) {
-    // If that fails, try with our custom packr
-    console.warn(`Standard msgpack failed for large data, using custom packr: ${e.message}`);
-    return largePackr.encode(data);
-  }
-}
+// Create a zip archive containing site files and metadata
+async function createSiteZip(site_id: string, siteData: any): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Maximum compression
+    });
 
-// Process file contents separately to avoid buffer overflow - very restrictive
-function processFileContents(fileData: Record<string, string | Uint8Array>, mode: "string" | "binary"): Record<string, string | Uint8Array> {
-  const result: Record<string, string | Uint8Array> = {};
-  let processedCount = 0;
-  let totalSize = 0;
-  const maxSizeLimit = 50 * 1024 * 1024; // 50MB total limit per section
-  const maxFileCount = 1000; // Strict limit on number of files
-  const maxFileSize = 1 * 1024 * 1024; // 1MB per file limit
+    const chunks: Buffer[] = [];
+    archive.on('data', (chunk: Buffer) => chunks.push(chunk));
+    archive.on('end', () => resolve(Buffer.concat(chunks)));
+    archive.on('error', reject);
 
-  console.log(`Processing file contents with strict limits: max ${maxFileCount} files, ${maxFileSize} per file, ${maxSizeLimit} total`);
+    // Create a temporary directory structure in memory
+    console.log(`Creating zip archive for site: ${site_id}`);
 
-  for (const [key, content] of Object.entries(fileData)) {
-    if (processedCount >= maxFileCount) {
-      console.warn(`Reached maximum file count ${maxFileCount}, stopping processing`);
-      break;
+    try {
+      // Add metadata as JSON file
+      const metadata = {
+        site: siteData.site,
+        layouts: siteData.layouts,
+        pages: siteData.pages,
+        components: siteData.comps,
+        created_at: new Date().toISOString(),
+        site_id: site_id
+      };
+
+      archive.append(JSON.stringify(metadata, null, 2), { name: 'metadata.json' });
+
+      // Add public files
+      if (siteData.public) {
+        console.log(`Adding ${Object.keys(siteData.public).length} public files...`);
+        for (const [filePath, content] of Object.entries(siteData.public)) {
+          if (typeof content === 'string') {
+            archive.append(content, { name: `public/${filePath}` });
+          } else {
+            archive.append(Buffer.from(content), { name: `public/${filePath}` });
+          }
+        }
+      }
+
+      // Add server build files
+      if (siteData.code?.server) {
+        console.log(`Adding ${Object.keys(siteData.code.server).length} server files...`);
+        for (const [filePath, content] of Object.entries(siteData.code.server)) {
+          if (typeof content === 'string') {
+            archive.append(content, { name: `server/${filePath}` });
+          } else {
+            archive.append(Buffer.from(content), { name: `server/${filePath}` });
+          }
+        }
+      }
+
+      // Add site build files (limiting to prevent zip from becoming too large)
+      if (siteData.code?.site) {
+        const siteFiles = Object.entries(siteData.code.site);
+        const maxFiles = 500; // Limit site files to prevent zip from being enormous
+        let fileCount = 0;
+
+        console.log(`Adding up to ${maxFiles} site files...`);
+        for (const [filePath, content] of siteFiles) {
+          if (fileCount >= maxFiles) {
+            console.log(`Reached site file limit (${maxFiles}), stopping...`);
+            break;
+          }
+
+          if (typeof content === 'string') {
+            archive.append(content, { name: `site/${filePath}` });
+          } else {
+            archive.append(Buffer.from(content), { name: `site/${filePath}` });
+          }
+          fileCount++;
+        }
+
+        // Add a file listing what was included and what was skipped
+        const fileListing = {
+          included: fileCount,
+          total: siteFiles.length,
+          skipped: siteFiles.length - fileCount,
+          files: siteFiles.slice(0, maxFiles).map(([path]) => path)
+        };
+        archive.append(JSON.stringify(fileListing, null, 2), { name: 'site-files.json' });
+      }
+
+      // Add core files
+      if (siteData.code?.core) {
+        console.log(`Adding ${Object.keys(siteData.code.core).length} core files...`);
+        for (const [filePath, content] of Object.entries(siteData.code.core)) {
+          if (typeof content === 'string') {
+            archive.append(content, { name: `core/${filePath}` });
+          } else {
+            archive.append(Buffer.from(content), { name: `core/${filePath}` });
+          }
+        }
+      }
+
+      archive.finalize();
+    } catch (error) {
+      reject(error);
     }
-
-    const contentSize = typeof content === 'string' ? content.length : content.byteLength;
-
-    // Check if adding this file would exceed total size limit
-    if (totalSize + contentSize > maxSizeLimit) {
-      console.warn(`Would exceed size limit, skipping file ${key} (${contentSize} bytes)`);
-      break;
-    }
-
-    // Skip extremely large files
-    if (contentSize > maxFileSize) {
-      console.warn(`Skipping large file ${key} (${contentSize} bytes) - exceeds ${maxFileSize} limit`);
-      result[key] = mode === "binary" ? new Uint8Array(0) : ""; // Empty content as placeholder
-    } else {
-      result[key] = content;
-      totalSize += contentSize;
-    }
-
-    processedCount++;
-
-    if (processedCount % 100 === 0) {
-      console.log(`Processed ${processedCount} files, total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
-    }
-  }
-
-  console.log(`Completed processing ${processedCount} files (${(totalSize / 1024 / 1024).toFixed(2)}MB total), skipped ${Object.keys(fileData).length - processedCount} files`);
-  return result;
+  });
 }
 
 // Manual minimal msgpack encoder as ultimate fallback
@@ -294,28 +332,16 @@ export const _ = {
   async api(site_id: string) {
     const { req, res } = apiContext(this);
 
-    let is_msgpack = req.query_parameters["msgpack"];
-
-    // Add timeout handling for large file operations
+    // Add timeout handling for zip creation
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout')), 230000); // 230 seconds (less than server timeout of 240)
+      setTimeout(() => reject(new Error('Request timeout')), 230000); // 230 seconds
     });
 
     const zipPromise = (async () => {
       if (validate(site_id)) {
-        const mode = is_msgpack ? "binary" : "string";
+        console.log(`Starting zip creation for site: ${site_id}`);
 
-        // Check public directory size first to estimate total size
-        const public_data = readDirectoryRecursively(
-          mode,
-          code.path(site_id, "site", "src", "public")
-        );
-
-        // Estimate if this will be too large for msgpack
-        const estimatedSize = Object.keys(public_data).length * 1000; // rough estimate
-        if (estimatedSize > 100 * 1024 * 1024) { // 100MB estimate
-          console.warn(`Large site detected for ${site_id}, estimated size: ${estimatedSize} bytes`);
-        }
+        // Fetch all the site data
         const result = {
           layouts: await _db.page.findMany({
             where: {
@@ -355,7 +381,10 @@ export const _ = {
             },
             select: { id: true, content_tree: true },
           }),
-          public: public_data,
+          public: readDirectoryRecursively(
+            "binary",
+            code.path(site_id, "site", "src", "public")
+          ),
           site: await _db.site.findFirst({
             where: { id: site_id },
             select: {
@@ -368,28 +397,32 @@ export const _ = {
           }),
           code: {
             server: readDirectoryRecursively(
-              mode,
+              "binary",
               code.path(site_id, "server", "build")
             ),
             site: readDirectoryRecursively(
-              mode,
+              "binary",
               code.path(site_id, "site", "build")
             ),
-            core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
+            core: readDirectoryRecursively("binary", dir.path(`/app/srv/core`)),
           },
         };
 
-        let dataToCompress: Uint8Array;
+        // Create the zip file
+        console.log(`Creating zip archive with ${Object.keys(result.public || {}).length} public files`);
+        const zipBuffer = await createSiteZip(site_id, result);
 
-        // Use optimized msgpack encoding for large data
-        if (mode === "binary") {
-          dataToCompress = encodeVeryLargeData(result);
-        } else {
-          // For string mode, still use JSON as it's more appropriate for text
-          dataToCompress = new TextEncoder().encode(JSON.stringify(result));
-        }
+        console.log(`Zip created successfully: ${zipBuffer.length} bytes`);
 
-        return await gzipAsync(Buffer.from(dataToCompress));
+        // Return the zip file with appropriate headers
+        return new Response(zipBuffer, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/zip',
+            'Content-Disposition': `attachment; filename="site-${site_id}-${Date.now()}.zip"`,
+            'Cache-Control': 'no-cache',
+          },
+        });
       }
       return new Response("NOT FOUND", { status: 403 });
     })();
