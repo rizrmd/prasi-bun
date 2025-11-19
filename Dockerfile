@@ -1,7 +1,7 @@
-FROM oven/bun:latest as base
+FROM oven/bun:latest AS base
 WORKDIR /app/prasi/repo
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install wget build-essential gcc git curl gnupg zip unzip -yq
 RUN git config --global --add safe.directory /app/prasi/repo
@@ -16,7 +16,7 @@ RUN PATH="/usr/lib/node_modules/npm/bin:$PATH"
 COPY dockerzip .
 RUN unzip -o dockerzip
 RUN bun install
-RUN bun pm trust --all
+RUN bun pm trust --all || true
 RUN bun install
 
 COPY . .
