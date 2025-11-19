@@ -20,10 +20,13 @@ RUN unzip -o dockerzip
 COPY package.json bun.lockb ./
 COPY app/srv/package.json ./app/srv/
 COPY app/web/package.json ./app/web/
-COPY pkgs/*/package.json ./pkgs/*/
+COPY app/db/package.json ./app/db/
+COPY pkgs/core/package.json ./pkgs/core/
+COPY pkgs/web-utils/package.json ./pkgs/web-utils/
+COPY pkgs/dbgen/package.json ./pkgs/dbgen/
 
-# Install dependencies with explicit workspace handling
-RUN bun install --frozen-lockfile
+# Install dependencies
+RUN bun install
 RUN bun pm trust --all || true
 
 # Copy the rest of the source code
