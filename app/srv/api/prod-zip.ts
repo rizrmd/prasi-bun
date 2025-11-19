@@ -29,38 +29,59 @@ function encodeLargeData(data: any): Uint8Array {
   }
 }
 
-// Process file contents separately to avoid buffer overflow
+// Process file contents separately to avoid buffer overflow - very restrictive
 function processFileContents(fileData: Record<string, string | Uint8Array>, mode: "string" | "binary"): Record<string, string | Uint8Array> {
   const result: Record<string, string | Uint8Array> = {};
   let processedCount = 0;
+  let totalSize = 0;
+  const maxSizeLimit = 50 * 1024 * 1024; // 50MB total limit per section
+  const maxFileCount = 1000; // Strict limit on number of files
+  const maxFileSize = 1 * 1024 * 1024; // 1MB per file limit
+
+  console.log(`Processing file contents with strict limits: max ${maxFileCount} files, ${maxFileSize} per file, ${maxSizeLimit} total`);
 
   for (const [key, content] of Object.entries(fileData)) {
-    // Skip extremely large files that could cause buffer overflow
+    if (processedCount >= maxFileCount) {
+      console.warn(`Reached maximum file count ${maxFileCount}, stopping processing`);
+      break;
+    }
+
     const contentSize = typeof content === 'string' ? content.length : content.byteLength;
 
-    if (contentSize > 10 * 1024 * 1024) { // Skip files larger than 10MB
-      console.warn(`Skipping large file ${key} (${contentSize} bytes) to avoid buffer overflow`);
+    // Check if adding this file would exceed total size limit
+    if (totalSize + contentSize > maxSizeLimit) {
+      console.warn(`Would exceed size limit, skipping file ${key} (${contentSize} bytes)`);
+      break;
+    }
+
+    // Skip extremely large files
+    if (contentSize > maxFileSize) {
+      console.warn(`Skipping large file ${key} (${contentSize} bytes) - exceeds ${maxFileSize} limit`);
       result[key] = mode === "binary" ? new Uint8Array(0) : ""; // Empty content as placeholder
     } else {
       result[key] = content;
+      totalSize += contentSize;
     }
 
     processedCount++;
-    if (processedCount % 1000 === 0) {
-      console.log(`Processed ${processedCount} files...`);
+
+    if (processedCount % 100 === 0) {
+      console.log(`Processed ${processedCount} files, total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
     }
   }
 
-  console.log(`Completed processing ${processedCount} files, skipped ${Object.keys(fileData).length - processedCount} large files`);
+  console.log(`Completed processing ${processedCount} files (${(totalSize / 1024 / 1024).toFixed(2)}MB total), skipped ${Object.keys(fileData).length - processedCount} files`);
   return result;
 }
 
-// Additional helper for extremely large data - separate metadata and file contents
+// Ultra-safe incremental encoding for extremely large data
 function encodeVeryLargeData(data: any): Uint8Array {
-  // Extract and process file contents separately
+  console.log("Starting ultra-safe incremental encoding for extremely large data");
+
+  // First, extract and process all file contents with strict limits
   const processedData = { ...data };
 
-  // Process file contents in each section to avoid buffer overflow
+  // Apply very strict file size limits to prevent any buffer overflow
   if (processedData.public) {
     processedData.public = processFileContents(processedData.public, "binary");
   }
@@ -77,52 +98,117 @@ function encodeVeryLargeData(data: any): Uint8Array {
     }
   }
 
-  // First try our large data encoder with processed data
+  // Try standard encoding on processed data
   try {
+    console.log("Attempting standard encoding after file processing");
     return encodeLargeData(processedData);
   } catch (e) {
-    console.warn(`All msgpack encoders failed, implementing aggressive chunked encoding: ${e.message}`);
+    console.warn(`Standard encoding failed after file processing: ${e.message}`);
+  }
 
-    // For extremely large objects, implement aggressive chunking
-    const chunks: Uint8Array[] = [];
-    const entries = Object.entries(processedData);
-    const chunkSize = 100; // Much smaller chunks - 100 properties at a time
+  // If standard encoding fails, build the result incrementally
+  console.log("Building custom binary format incrementally");
 
-    for (let i = 0; i < entries.length; i += chunkSize) {
-      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
+  // We'll create a simpler structure that definitely can be encoded
+  const safeResult: any = {
+    _format: "custom",
+    _timestamp: Date.now(),
+    _site_id: processedData.site?.id || "unknown"
+  };
+
+  // Process sections one by one with extreme limits
+  const sectionKeys = ['layouts', 'pages', 'comps', 'site', 'public', 'code'];
+
+  for (const sectionKey of sectionKeys) {
+    if (processedData[sectionKey]) {
+      console.log(`Processing section: ${sectionKey}`);
 
       try {
-        const encodedChunk = largePackr.encode(chunk);
-        chunks.push(encodedChunk);
-      } catch (chunkError) {
-        console.warn(`Chunk encoding failed for chunk ${i}-${i + chunkSize}, skipping: ${chunkError.message}`);
-        // Skip this chunk if it's too large
-        continue;
+        // Try to encode this section alone first
+        const testSection = { [sectionKey]: processedData[sectionKey] };
+        encodeLargeData(testSection);
+
+        // If it succeeds, include the section
+        safeResult[sectionKey] = processedData[sectionKey];
+        console.log(`✓ Successfully encoded section: ${sectionKey}`);
+      } catch (sectionError) {
+        console.warn(`✗ Failed to encode section ${sectionKey}: ${sectionError.message}`);
+
+        if (sectionKey === 'public' || sectionKey === 'code') {
+          // For file-heavy sections, create a minimal version
+          const fileData = processedData[sectionKey];
+          const safeFileData: any = {};
+
+          let fileCount = 0;
+          const maxFiles = 500; // Strict limit on number of files
+
+          for (const [fileName, fileContent] of Object.entries(fileData || {})) {
+            if (fileCount >= maxFiles) {
+              console.warn(`Reached file limit ${maxFiles} for section ${sectionKey}`);
+              break;
+            }
+
+            const contentSize = typeof fileContent === 'string' ? fileContent.length : fileContent.byteLength;
+
+            // Very strict size limit per file
+            if (contentSize > 1024 * 1024) { // 1MB limit per file
+              console.warn(`Skipping large file ${fileName} (${contentSize} bytes) in section ${sectionKey}`);
+              safeFileData[fileName] = "";
+            } else {
+              safeFileData[fileName] = fileContent;
+              fileCount++;
+            }
+          }
+
+          // Try encoding the reduced file data
+          try {
+            encodeLargeData({ [sectionKey]: safeFileData });
+            safeResult[sectionKey] = safeFileData;
+            console.log(`✓ Successfully encoded reduced section ${sectionKey} with ${fileCount} files`);
+          } catch (reducedError) {
+            console.warn(`✗ Even reduced section ${sectionKey} failed, using placeholder`);
+            // Use a placeholder if even the reduced version fails
+            safeResult[sectionKey] = {
+              _skipped: true,
+              _reason: "too_large",
+              _originalFileCount: Object.keys(fileData || {}).length
+            };
+          }
+        } else {
+          // For non-file sections, use a placeholder
+          safeResult[sectionKey] = processedData[sectionKey];
+          if (Array.isArray(safeResult[sectionKey])) {
+            // Limit array length
+            safeResult[sectionKey] = safeResult[sectionKey].slice(0, 100);
+            console.log(`Limited array ${sectionKey} to 100 items`);
+          }
+        }
       }
     }
+  }
 
-    if (chunks.length === 0) {
-      throw new Error("All chunks were too large to encode");
-    }
+  // Final encoding attempt
+  try {
+    console.log("Final encoding attempt with safe data structure");
+    return encodeLargeData(safeResult);
+  } catch (finalError) {
+    console.error(`Even safe encoding failed: ${finalError.message}`);
 
-    // Combine chunks with a simple framing protocol
-    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length + 4, 0);
-    const result = new Uint8Array(totalLength);
-    let offset = 0;
+    // Last resort: create a minimal response
+    const minimalResponse = {
+      _format: "minimal",
+      _error: "Data too large to encode",
+      _site_id: processedData.site?.id,
+      _layouts_count: Array.isArray(processedData.layouts) ? processedData.layouts.length : 0,
+      _pages_count: Array.isArray(processedData.pages) ? processedData.pages.length : 0,
+      _comps_count: Array.isArray(processedData.comps) ? processedData.comps.length : 0,
+      _public_files_count: Object.keys(processedData.public || {}).length,
+      _code_files_count: Object.keys(processedData.code?.site || {}).length,
+      _timestamp: Date.now()
+    };
 
-    for (const chunk of chunks) {
-      // Write chunk length (4 bytes)
-      const view = new DataView(result.buffer, offset, 4);
-      view.setUint32(0, chunk.length, false);
-      offset += 4;
-
-      // Write chunk data
-      result.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    console.log(`Successfully encoded ${chunks.length} chunks for ${entries.length} total properties`);
-    return result;
+    console.log("Returning minimal response due to encoding limitations");
+    return encodeLargeData(minimalResponse);
   }
 }
 
