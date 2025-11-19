@@ -23,10 +23,18 @@ export const _ = {
     const zipPromise = (async () => {
       if (validate(site_id)) {
         const mode = is_msgpack ? "binary" : "string";
+
+        // Check public directory size first to estimate total size
         const public_data = readDirectoryRecursively(
           mode,
           code.path(site_id, "site", "src", "public")
         );
+
+        // Estimate if this will be too large for msgpack
+        const estimatedSize = Object.keys(public_data).length * 1000; // rough estimate
+        if (estimatedSize > 100 * 1024 * 1024) { // 100MB estimate
+          console.warn(`Large site detected for ${site_id}, estimated size: ${estimatedSize} bytes`);
+        }
         const result = {
           layouts: await _db.page.findMany({
             where: {
@@ -90,9 +98,22 @@ export const _ = {
           },
         };
 
-        return await gzipAsync(
-          mode === "binary" ? encode(result) : JSON.stringify(result)
-        );
+        let dataToCompress: string | Buffer;
+        try {
+          // Try msgpack encoding first (more efficient for binary data)
+          if (mode === "binary") {
+            dataToCompress = encode(result);
+          } else {
+            dataToCompress = JSON.stringify(result);
+          }
+        } catch (e) {
+          // Fallback to JSON if msgpack buffer overflow occurs
+          console.warn(`Msgpack encoding failed for site ${site_id}, falling back to JSON:`, e.message);
+          console.warn("This is normal for very large sites. JSON fallback will be used.");
+          dataToCompress = JSON.stringify(result);
+        }
+
+        return await gzipAsync(dataToCompress);
       }
       return new Response("NOT FOUND", { status: 403 });
     })();
