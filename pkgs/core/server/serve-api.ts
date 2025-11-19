@@ -55,7 +55,12 @@ export const serveAPI = {
         ) {
           try {
             const text = await req.text();
-            const json = JSON.parse(text, replacer);
+
+            // Skip JSON parsing for empty request bodies (HEAD requests, GET requests, etc.)
+            if (!text || text.trim() === '') {
+              // Empty body, proceed with default args
+            } else {
+              const json = JSON.parse(text, replacer);
 
             if (typeof json === "object" && !!json) {
               if (Array.isArray(json)) {
@@ -77,6 +82,7 @@ export const serveAPI = {
                   }
                 }
               }
+            }
             }
           } catch (e) {
             throw e;

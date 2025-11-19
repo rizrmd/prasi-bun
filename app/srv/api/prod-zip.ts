@@ -17,7 +17,7 @@ export const _ = {
 
     // Add timeout handling for large file operations
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout')), 110000); // 110 seconds
+      setTimeout(() => reject(new Error('Request timeout')), 230000); // 230 seconds (less than server timeout of 240)
     });
 
     const zipPromise = (async () => {
