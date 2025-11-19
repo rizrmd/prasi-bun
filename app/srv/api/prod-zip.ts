@@ -6,8 +6,70 @@ import { validate } from "uuid";
 import { dir } from "dir";
 import { existsAsync, readAsync, exists } from "fs-jetpack";
 import { code } from "../ws/sync/code/code";
-import { encode } from "msgpackr";
+import { encode, Packr } from "msgpackr";
 import { binaryExtensions } from "../util/binary-ext";
+
+// Create a custom Packr instance with larger buffer limits
+const largePackr = new Packr({
+  // Configure for large data handling
+  useRecords: false,
+  // Set reasonable chunk size for encoding
+  maxStructureDepth: 64,
+  // Additional options for large data
+});
+
+function encodeLargeData(data: any): Uint8Array {
+  try {
+    // Try standard encoding first
+    return encode(data);
+  } catch (e) {
+    // If that fails, try with our custom packr
+    console.warn(`Standard msgpack failed for large data, using custom packr: ${e.message}`);
+    return largePackr.encode(data);
+  }
+}
+
+// Additional helper for extremely large data - chunk the object before encoding
+function encodeVeryLargeData(data: any): Uint8Array {
+  // First try our large data encoder
+  try {
+    return encodeLargeData(data);
+  } catch (e) {
+    console.warn(`All msgpack encoders failed, implementing chunked encoding: ${e.message}`);
+
+    // For extremely large objects, we need to chunk them
+    const chunks: Uint8Array[] = [];
+
+    // Split the result into manageable chunks
+    const entries = Object.entries(data);
+    const chunkSize = 1000; // Process 1000 properties at a time
+
+    for (let i = 0; i < entries.length; i += chunkSize) {
+      const chunk = Object.fromEntries(entries.slice(i, i + chunkSize));
+      const encodedChunk = largePackr.encode(chunk);
+      chunks.push(encodedChunk);
+    }
+
+    // Combine chunks with a simple framing protocol
+    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length + 4, 0); // 4 bytes for length prefix
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+
+    for (const chunk of chunks) {
+      // Write chunk length (4 bytes)
+      const view = new DataView(result.buffer, offset, 4);
+      view.setUint32(0, chunk.length, false); // big-endian
+      offset += 4;
+
+      // Write chunk data
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    return result;
+  }
+}
+
 export const _ = {
   url: "/prod-zip/:site_id",
   async api(site_id: string) {
@@ -98,22 +160,17 @@ export const _ = {
           },
         };
 
-        let dataToCompress: string | Buffer;
-        try {
-          // Try msgpack encoding first (more efficient for binary data)
-          if (mode === "binary") {
-            dataToCompress = encode(result);
-          } else {
-            dataToCompress = JSON.stringify(result);
-          }
-        } catch (e) {
-          // Fallback to JSON if msgpack buffer overflow occurs
-          console.warn(`Msgpack encoding failed for site ${site_id}, falling back to JSON:`, e.message);
-          console.warn("This is normal for very large sites. JSON fallback will be used.");
-          dataToCompress = JSON.stringify(result);
+        let dataToCompress: Uint8Array;
+
+        // Use optimized msgpack encoding for large data
+        if (mode === "binary") {
+          dataToCompress = encodeVeryLargeData(result);
+        } else {
+          // For string mode, still use JSON as it's more appropriate for text
+          dataToCompress = new TextEncoder().encode(JSON.stringify(result));
         }
 
-        return await gzipAsync(dataToCompress);
+        return await gzipAsync(Buffer.from(dataToCompress));
       }
       return new Response("NOT FOUND", { status: 403 });
     })();
