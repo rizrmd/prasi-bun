@@ -24,6 +24,7 @@ export const createServer = async () => {
   g.server = Bun.serve({
     port: g.port,
     maxRequestBodySize: 1024 * 1024 * 128,
+    idleTimeout: 120 * 1000, // Increase timeout to 120 seconds for large file operations
     websocket: await serveWS(wsHandler),
     async fetch(req, server) {
       const url = new URL(req.url) as URL;

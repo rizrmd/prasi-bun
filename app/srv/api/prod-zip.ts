@@ -15,80 +15,106 @@ export const _ = {
 
     let is_msgpack = req.query_parameters["msgpack"];
 
-    if (validate(site_id)) {
-      const mode = is_msgpack ? "binary" : "string";
-      const public_data = readDirectoryRecursively(
-        mode,
-        code.path(site_id, "site", "src", "public")
-      );
-      const result = {
-        layouts: await _db.page.findMany({
-          where: {
-            id_site: site_id,
-            is_deleted: false,
-            name: { startsWith: "layout:" },
-          },
-          select: {
-            id: true,
-            name: true,
-            url: true,
-            content_tree: true,
-            is_default_layout: true,
-          },
-        }),
-        pages: await _db.page.findMany({
-          where: {
-            id_site: site_id,
-            is_deleted: false,
-            name: { not: { startsWith: "layout:" } },
-          },
-          select: { id: true, name: true, url: true, content_tree: true },
-        }),
-        comps: await _db.component.findMany({
-          where: {
-            component_group: {
-              OR: [
-                {
-                  id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
-                },
-                { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
-                {
-                  component_site: { every: { id_site: site_id } },
-                },
-              ],
-            },
-          },
-          select: { id: true, content_tree: true },
-        }),
-        public: public_data,
-        site: await _db.site.findFirst({
-          where: { id: site_id },
-          select: {
-            id: true,
-            name: true,
-            config: true,
-            responsive: true,
-            domain: true,
-          },
-        }),
-        code: {
-          server: readDirectoryRecursively(
-            mode,
-            code.path(site_id, "server", "build")
-          ),
-          site: readDirectoryRecursively(
-            mode,
-            code.path(site_id, "site", "build")
-          ),
-          core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
-        },
-      };
+    // Add timeout handling for large file operations
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout')), 110000); // 110 seconds
+    });
 
-      return await gzipAsync(
-        mode === "binary" ? encode(result) : JSON.stringify(result)
-      );
+    const zipPromise = (async () => {
+      if (validate(site_id)) {
+        const mode = is_msgpack ? "binary" : "string";
+        const public_data = readDirectoryRecursively(
+          mode,
+          code.path(site_id, "site", "src", "public")
+        );
+        const result = {
+          layouts: await _db.page.findMany({
+            where: {
+              id_site: site_id,
+              is_deleted: false,
+              name: { startsWith: "layout:" },
+            },
+            select: {
+              id: true,
+              name: true,
+              url: true,
+              content_tree: true,
+              is_default_layout: true,
+            },
+          }),
+          pages: await _db.page.findMany({
+            where: {
+              id_site: site_id,
+              is_deleted: false,
+              name: { not: { startsWith: "layout:" } },
+            },
+            select: { id: true, name: true, url: true, content_tree: true },
+          }),
+          comps: await _db.component.findMany({
+            where: {
+              component_group: {
+                OR: [
+                  {
+                    id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
+                  },
+                  { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
+                  {
+                    component_site: { every: { id_site: site_id } },
+                  },
+                ],
+              },
+            },
+            select: { id: true, content_tree: true },
+          }),
+          public: public_data,
+          site: await _db.site.findFirst({
+            where: { id: site_id },
+            select: {
+              id: true,
+              name: true,
+              config: true,
+              responsive: true,
+              domain: true,
+            },
+          }),
+          code: {
+            server: readDirectoryRecursively(
+              mode,
+              code.path(site_id, "server", "build")
+            ),
+            site: readDirectoryRecursively(
+              mode,
+              code.path(site_id, "site", "build")
+            ),
+            core: readDirectoryRecursively(mode, dir.path(`/app/srv/core`)),
+          },
+        };
+
+        return await gzipAsync(
+          mode === "binary" ? encode(result) : JSON.stringify(result)
+        );
+      }
+      return new Response("NOT FOUND", { status: 403 });
+    })();
+
+    try {
+      const result = await Promise.race([zipPromise, timeoutPromise]);
+      return result;
+    } catch (e: any) {
+      if (e.message === 'Request timeout') {
+        return new Response(
+          JSON.stringify({
+            error: 'Request timeout - the site is too large to zip within the time limit',
+            timeout: true
+          }),
+          {
+            status: 408,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      throw e;
     }
-    return new Response("NOT FOUND", { status: 403 });
   },
 };
 
