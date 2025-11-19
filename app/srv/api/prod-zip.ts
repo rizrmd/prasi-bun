@@ -74,6 +74,75 @@ function processFileContents(fileData: Record<string, string | Uint8Array>, mode
   return result;
 }
 
+// Manual minimal msgpack encoder as ultimate fallback
+function createMinimalMsgpack(data: any): Uint8Array {
+  // Manual msgpack encoding for a very simple object
+  // Format: { format: string, status: string, timestamp: number, counts: object }
+  const minimalData = {
+    format: "minimal",
+    status: "too_large",
+    timestamp: Date.now(),
+    site_id: data.site?.id || "unknown",
+    counts: {
+      layouts: Array.isArray(data.layouts) ? data.layouts.length : 0,
+      pages: Array.isArray(data.pages) ? data.pages.length : 0,
+      comps: Array.isArray(data.comps) ? data.comps.length : 0,
+      public_files: Object.keys(data.public || {}).length,
+      code_files: Object.keys(data.code?.site || {}).length,
+    }
+  };
+
+  // Create a very simple msgpack-encoded response manually
+  // msgpack map format: 0x80 + (number of key-value pairs)
+  const numPairs = Object.keys(minimalData).length;
+  const result = new Uint8Array(1024); // Pre-allocate small buffer
+  let offset = 0;
+
+  // Write map header
+  result[offset++] = 0x80 + numPairs;
+
+  // Encode each key-value pair
+  for (const [key, value] of Object.entries(minimalData)) {
+    // Encode key as string
+    const keyBytes = new TextEncoder().encode(key);
+    result[offset++] = 0xa0 + keyBytes.length; // str8 format header
+    result.set(keyBytes, offset);
+    offset += keyBytes.length;
+
+    // Encode value
+    if (typeof value === 'string') {
+      const strBytes = new TextEncoder().encode(value);
+      result[offset++] = 0xa0 + strBytes.length; // str8 format header
+      result.set(strBytes, offset);
+      offset += strBytes.length;
+    } else if (typeof value === 'number') {
+      result[offset++] = 0xd3; // int64
+      // Write 8 bytes for the number (big-endian)
+      const view = new DataView(result.buffer, offset, 8);
+      view.setBigInt64(0, BigInt(value), false);
+      offset += 8;
+    } else if (typeof value === 'object' && value !== null) {
+      // Encode counts object as another map
+      const countKeys = Object.keys(value);
+      result[offset++] = 0x80 + countKeys.length; // map header
+      for (const [countKey, countValue] of Object.entries(value)) {
+        const countKeyBytes = new TextEncoder().encode(countKey);
+        result[offset++] = 0xa0 + countKeyBytes.length;
+        result.set(countKeyBytes, offset);
+        offset += countKeyBytes.length;
+
+        result[offset++] = 0xd3;
+        const countView = new DataView(result.buffer, offset, 8);
+        countView.setBigInt64(0, BigInt(Number(countValue)), false);
+        offset += 8;
+      }
+    }
+  }
+
+  // Return the actual used portion
+  return result.slice(0, offset);
+}
+
 // Ultra-safe incremental encoding for extremely large data
 function encodeVeryLargeData(data: any): Uint8Array {
   console.log("Starting ultra-safe incremental encoding for extremely large data");
@@ -140,7 +209,7 @@ function encodeVeryLargeData(data: any): Uint8Array {
           const safeFileData: any = {};
 
           let fileCount = 0;
-          const maxFiles = 500; // Strict limit on number of files
+          const maxFiles = 100; // Even stricter limit
 
           for (const [fileName, fileContent] of Object.entries(fileData || {})) {
             if (fileCount >= maxFiles) {
@@ -151,7 +220,7 @@ function encodeVeryLargeData(data: any): Uint8Array {
             const contentSize = typeof fileContent === 'string' ? fileContent.length : fileContent.byteLength;
 
             // Very strict size limit per file
-            if (contentSize > 1024 * 1024) { // 1MB limit per file
+            if (contentSize > 100 * 1024) { // 100KB limit per file
               console.warn(`Skipping large file ${fileName} (${contentSize} bytes) in section ${sectionKey}`);
               safeFileData[fileName] = "";
             } else {
@@ -178,9 +247,9 @@ function encodeVeryLargeData(data: any): Uint8Array {
           // For non-file sections, use a placeholder
           safeResult[sectionKey] = processedData[sectionKey];
           if (Array.isArray(safeResult[sectionKey])) {
-            // Limit array length
-            safeResult[sectionKey] = safeResult[sectionKey].slice(0, 100);
-            console.log(`Limited array ${sectionKey} to 100 items`);
+            // Limit array length even more
+            safeResult[sectionKey] = safeResult[sectionKey].slice(0, 10); // Only 10 items
+            console.log(`Limited array ${sectionKey} to 10 items`);
           }
         }
       }
@@ -194,21 +263,29 @@ function encodeVeryLargeData(data: any): Uint8Array {
   } catch (finalError) {
     console.error(`Even safe encoding failed: ${finalError.message}`);
 
-    // Last resort: create a minimal response
-    const minimalResponse = {
-      _format: "minimal",
-      _error: "Data too large to encode",
-      _site_id: processedData.site?.id,
-      _layouts_count: Array.isArray(processedData.layouts) ? processedData.layouts.length : 0,
-      _pages_count: Array.isArray(processedData.pages) ? processedData.pages.length : 0,
-      _comps_count: Array.isArray(processedData.comps) ? processedData.comps.length : 0,
-      _public_files_count: Object.keys(processedData.public || {}).length,
-      _code_files_count: Object.keys(processedData.code?.site || {}).length,
-      _timestamp: Date.now()
-    };
+    // ULTIMATE FALLBACK: manual msgpack encoding
+    try {
+      console.log("Using ultimate fallback: manual minimal msgpack encoding");
+      return createMinimalMsgpack(processedData);
+    } catch (manualError) {
+      console.error(`Even manual encoding failed: ${manualError.message}`);
 
-    console.log("Returning minimal response due to encoding limitations");
-    return encodeLargeData(minimalResponse);
+      // Absolute last resort - return a hardcoded minimal response
+      const hardcodedResponse = new Uint8Array([
+        0x82, // Map with 2 elements
+        0xa6, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, // "status"
+        0xa9, 0x74, 0x6f, 0x6f, 0x5f, 0x6c, 0x61, 0x72, 0x67, 0x65, // "too_large"
+        0xa8, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, // "timestamp"
+        0xd3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // Current timestamp as int64
+      ]);
+
+      // Set actual timestamp
+      const view = new DataView(hardcodedResponse.buffer, hardcodedResponse.length - 8, 8);
+      view.setBigInt64(0, BigInt(Date.now()), false);
+
+      console.log("Returning hardcoded minimal response as absolute last resort");
+      return hardcodedResponse;
+    }
   }
 }
 
