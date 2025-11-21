@@ -26,17 +26,74 @@ async function createSiteZip(site_id: string, siteData: any): Promise<Buffer> {
     console.log(`Creating zip archive for site: ${site_id}`);
 
     try {
-      // Add metadata as JSON file
+      // Create optimized metadata without content_tree to reduce size
       const metadata = {
         site: siteData.site,
-        layouts: siteData.layouts,
-        pages: siteData.pages,
-        components: siteData.comps,
+        layouts: siteData.layouts.map(layout => ({
+          id: layout.id,
+          name: layout.name,
+          url: layout.url,
+          is_default_layout: layout.is_default_layout,
+          // Exclude content_tree to reduce metadata size
+        })),
+        pages: siteData.pages.map(page => ({
+          id: page.id,
+          name: page.name,
+          url: page.url,
+          // Exclude content_tree to reduce metadata size
+        })),
+        components: siteData.comps.map(comp => ({
+          id: comp.id,
+          // Exclude content_tree to reduce metadata size
+        })),
         created_at: new Date().toISOString(),
-        site_id: site_id
+        site_id: site_id,
+        optimization: {
+          content_tree_removed: true,
+          reason: "Reduce metadata file size from 635MB to manageable size",
+          original_pages: siteData.pages.length,
+          original_components: siteData.comps.length,
+          original_layouts: siteData.layouts.length
+        }
       };
 
       archive.append(JSON.stringify(metadata, null, 2), { name: 'metadata.json' });
+
+      // Add separate content tree files to keep metadata small
+      console.log(`Adding content tree files...`);
+
+      // Add layout content trees
+      if (siteData.layouts && siteData.layouts.length > 0) {
+        const layoutContents = {};
+        for (const layout of siteData.layouts) {
+          if (layout.content_tree) {
+            layoutContents[layout.id] = layout.content_tree;
+          }
+        }
+        archive.append(JSON.stringify(layoutContents), { name: 'content/layout-content-trees.json' });
+      }
+
+      // Add page content trees
+      if (siteData.pages && siteData.pages.length > 0) {
+        const pageContents = {};
+        for (const page of siteData.pages) {
+          if (page.content_tree) {
+            pageContents[page.id] = page.content_tree;
+          }
+        }
+        archive.append(JSON.stringify(pageContents), { name: 'content/page-content-trees.json' });
+      }
+
+      // Add component content trees
+      if (siteData.comps && siteData.comps.length > 0) {
+        const componentContents = {};
+        for (const comp of siteData.comps) {
+          if (comp.content_tree) {
+            componentContents[comp.id] = comp.content_tree;
+          }
+        }
+        archive.append(JSON.stringify(componentContents), { name: 'content/component-content-trees.json' });
+      }
 
       // Add public files
       if (siteData.public) {
