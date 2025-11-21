@@ -35,6 +35,6 @@ COPY . .
 
 EXPOSE 4550/tcp
 
-# Override entrypoint to avoid shell script issues
-ENTRYPOINT [/usr/local/bin/bun, run]
-CMD [./pkgs/core/index.ts, prod]
+# Use exec form with proper JSON array format
+ENTRYPOINT [/usr/local/bin/bun]
+CMD [run, ./pkgs/core/index.ts, prod]
