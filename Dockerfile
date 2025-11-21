@@ -35,4 +35,6 @@ COPY . .
 
 EXPOSE 4550/tcp
 
-CMD [ bun, run, ./pkgs/core/index.ts, prod ]
+# Override entrypoint to avoid shell script issues
+ENTRYPOINT [/usr/local/bin/bun, run]
+CMD [./pkgs/core/index.ts, prod]
