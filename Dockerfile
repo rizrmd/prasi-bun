@@ -35,6 +35,5 @@ COPY . .
 
 EXPOSE 4550/tcp
 
-# Use exec form with proper JSON array format
-ENTRYPOINT [/usr/local/bin/bun]
-CMD [run, ./pkgs/core/index.ts, prod]
+# Use shell form to bypass entrypoint script issues
+CMD [/bin/sh, -c, exec /usr/local/bin/bun run ./pkgs/core/index.ts prod]
