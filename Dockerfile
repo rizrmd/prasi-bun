@@ -27,7 +27,7 @@ COPY pkgs/dbgen/package.json ./pkgs/dbgen/
 
 # Install dependencies
 RUN bun install
-RUN bun pm trust --all || true
+RUN echo "Package dependencies installed successfully"
 
 # Copy the rest of the source code
 COPY . .
