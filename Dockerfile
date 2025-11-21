@@ -35,5 +35,6 @@ COPY . .
 
 EXPOSE 4550/tcp
 
-# Use shell form to bypass entrypoint script issues
-CMD [/bin/sh, -c, exec /usr/local/bin/bun run ./pkgs/core/index.ts prod]
+# Use empty entrypoint to bypass problematic docker-entrypoint.sh
+ENTRYPOINT []
+CMD [/usr/local/bin/bun, run, ./pkgs/core/index.ts, prod]
