@@ -10,6 +10,52 @@ import { binaryExtensions } from "../util/binary-ext";
 // Import archiver for zip creation
 const archiver = require('archiver');
 
+// Helper function to process file contents with size limits (now unlimited)
+function processFileContents(fileData: Record<string, any>, mode: "string" | "binary"): Record<string, any> {
+  const processed: Record<string, any> = {};
+
+  for (const [fileName, content] of Object.entries(fileData)) {
+    processed[fileName] = content; // No size restrictions - include all files
+  }
+
+  return processed;
+}
+
+// Helper function to encode large data structures
+function encodeLargeData(data: any): Uint8Array {
+  try {
+    // Try to use TextEncoder to create JSON string, then convert to Uint8Array
+    const jsonString = JSON.stringify(data);
+    return new TextEncoder().encode(jsonString);
+  } catch (error) {
+    console.warn(`JSON encoding failed, trying fallback: ${error.message}`);
+
+    // Fallback: create a simple structure that can always be encoded
+    const fallbackData = {
+      _encoding_error: true,
+      _message: error.message,
+      _data_type: typeof data,
+      _keys: Array.isArray(data) ? 'array' : typeof data === 'object' && data !== null ? Object.keys(data) : 'primitive'
+    };
+
+    try {
+      const jsonString = JSON.stringify(fallbackData);
+      return new TextEncoder().encode(jsonString);
+    } catch (fallbackError) {
+      console.error(`Even fallback encoding failed: ${fallbackError.message}`);
+
+      // Ultimate fallback: return a minimal error response
+      const minimalResponse = JSON.stringify({
+        _status: "encoding_failed",
+        _error: "Could not encode data",
+        _original_error: error.message
+      });
+
+      return new TextEncoder().encode(minimalResponse);
+    }
+  }
+}
+
 // Create a zip archive containing site files and metadata
 async function createSiteZip(site_id: string, siteData: any): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -119,33 +165,24 @@ async function createSiteZip(site_id: string, siteData: any): Promise<Buffer> {
         }
       }
 
-      // Add site build files (limiting to prevent zip from becoming too large)
+      // Add site build files (now unlimited)
       if (siteData.code?.site) {
         const siteFiles = Object.entries(siteData.code.site);
-        const maxFiles = 500; // Limit site files to prevent zip from being enormous
-        let fileCount = 0;
-
-        console.log(`Adding up to ${maxFiles} site files...`);
+        console.log(`Adding ${siteFiles.length} site files...`);
         for (const [filePath, content] of siteFiles) {
-          if (fileCount >= maxFiles) {
-            console.log(`Reached site file limit (${maxFiles}), stopping...`);
-            break;
-          }
-
           if (typeof content === 'string') {
             archive.append(content, { name: `site/${filePath}` });
           } else {
             archive.append(Buffer.from(content), { name: `site/${filePath}` });
           }
-          fileCount++;
         }
 
-        // Add a file listing what was included and what was skipped
+        // Add a file listing all included files
         const fileListing = {
-          included: fileCount,
+          included: siteFiles.length,
           total: siteFiles.length,
-          skipped: siteFiles.length - fileCount,
-          files: siteFiles.slice(0, maxFiles).map(([path]) => path)
+          skipped: 0,
+          files: siteFiles.map(([path]) => path)
         };
         archive.append(JSON.stringify(fileListing, null, 2), { name: 'site-files.json' });
       }
@@ -304,25 +341,14 @@ function encodeVeryLargeData(data: any): Uint8Array {
           const safeFileData: any = {};
 
           let fileCount = 0;
-          const maxFiles = 100; // Even stricter limit
 
-          for (const [fileName, fileContent] of Object.entries(fileData || {})) {
-            if (fileCount >= maxFiles) {
-              console.warn(`Reached file limit ${maxFiles} for section ${sectionKey}`);
-              break;
-            }
+        for (const [fileName, fileContent] of Object.entries(fileData || {})) {
+          const contentSize = typeof fileContent === 'string' ? fileContent.length : fileContent.byteLength;
 
-            const contentSize = typeof fileContent === 'string' ? fileContent.length : fileContent.byteLength;
-
-            // Very strict size limit per file
-            if (contentSize > 100 * 1024) { // 100KB limit per file
-              console.warn(`Skipping large file ${fileName} (${contentSize} bytes) in section ${sectionKey}`);
-              safeFileData[fileName] = "";
-            } else {
-              safeFileData[fileName] = fileContent;
-              fileCount++;
-            }
-          }
+          // No size limit per file - include all files regardless of size
+          safeFileData[fileName] = fileContent;
+          fileCount++;
+        }
 
           // Try encoding the reduced file data
           try {
@@ -388,11 +414,6 @@ export const _ = {
   url: "/prod-zip/:site_id",
   async api(site_id: string) {
     const { req, res } = apiContext(this);
-
-    // Add timeout handling for zip creation
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout')), 230000); // 230 seconds
-    });
 
     const zipPromise = (async () => {
       if (validate(site_id)) {
@@ -485,21 +506,9 @@ export const _ = {
     })();
 
     try {
-      const result = await Promise.race([zipPromise, timeoutPromise]);
+      const result = await zipPromise;
       return result;
     } catch (e: any) {
-      if (e.message === 'Request timeout') {
-        return new Response(
-          JSON.stringify({
-            error: 'Request timeout - the site is too large to zip within the time limit',
-            timeout: true
-          }),
-          {
-            status: 408,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-      }
       throw e;
     }
   },
