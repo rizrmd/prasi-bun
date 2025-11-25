@@ -10,14 +10,35 @@ import { binaryExtensions } from "../util/binary-ext";
 // Import archiver for zip creation
 const archiver = require('archiver');
 
-// Helper function to process file contents with size limits (now unlimited)
+// Helper function to process file contents with reasonable size limits
 function processFileContents(fileData: Record<string, any>, mode: "string" | "binary"): Record<string, any> {
   const processed: Record<string, any> = {};
+  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file limit
+  const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB total limit
+  let totalSize = 0;
 
   for (const [fileName, content] of Object.entries(fileData)) {
-    processed[fileName] = content; // No size restrictions - include all files
+    const contentSize = typeof content === 'string' ? content.length :
+                       (content instanceof Uint8Array ? content.byteLength :
+                       (content instanceof Buffer ? content.length : 0));
+
+    // Skip files that are too large
+    if (contentSize > MAX_FILE_SIZE) {
+      console.warn(`Skipping large file: ${fileName} (${(contentSize / 1024 / 1024).toFixed(2)}MB > ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
+      continue;
+    }
+
+    // Check total size limit
+    if (totalSize + contentSize > MAX_TOTAL_SIZE) {
+      console.warn(`Skipping file due to total size limit: ${fileName}`);
+      break;
+    }
+
+    processed[fileName] = content;
+    totalSize += contentSize;
   }
 
+  console.log(`Processed ${Object.keys(processed).length} files, total size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
   return processed;
 }
 
@@ -342,10 +363,19 @@ function encodeVeryLargeData(data: any): Uint8Array {
 
           let fileCount = 0;
 
-        for (const [fileName, fileContent] of Object.entries(fileData || {})) {
-          const contentSize = typeof fileContent === 'string' ? fileContent.length : fileContent.byteLength;
+        const MAX_FILES = 1000; // Limit number of files
+        const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
 
-          // No size limit per file - include all files regardless of size
+        for (const [fileName, fileContent] of Object.entries(fileData || {})) {
+          const contentSize = typeof fileContent === 'string' ? fileContent.length :
+                             (fileContent && fileContent.byteLength ? fileContent.byteLength : 0);
+
+          // Skip files that are too large or if we've hit the file count limit
+          if (contentSize > MAX_FILE_SIZE || fileCount >= MAX_FILES) {
+            console.warn(`Skipping file: ${fileName} (${fileCount >= MAX_FILES ? 'file count limit' : 'too large'})`);
+            continue;
+          }
+
           safeFileData[fileName] = fileContent;
           fileCount++;
         }
@@ -419,75 +449,97 @@ export const _ = {
       if (validate(site_id)) {
         console.log(`Starting zip creation for site: ${site_id}`);
 
-        // Fetch all the site data
-        const result = {
-          layouts: await _db.page.findMany({
-            where: {
-              id_site: site_id,
-              is_deleted: false,
-              name: { startsWith: "layout:" },
-            },
-            select: {
-              id: true,
-              name: true,
-              url: true,
-              content_tree: true,
-              is_default_layout: true,
-            },
-          }),
-          pages: await _db.page.findMany({
-            where: {
-              id_site: site_id,
-              is_deleted: false,
-              name: { not: { startsWith: "layout:" } },
-            },
-            select: { id: true, name: true, url: true, content_tree: true },
-          }),
-          comps: await _db.component.findMany({
-            where: {
-              component_group: {
-                OR: [
-                  {
-                    id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
-                  },
-                  { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
-                  {
-                    component_site: { every: { id_site: site_id } },
-                  },
-                ],
-              },
-            },
-            select: { id: true, content_tree: true },
-          }),
-          public: readDirectoryRecursively(
-            "binary",
-            code.path(site_id, "site", "src", "public")
-          ),
-          site: await _db.site.findFirst({
-            where: { id: site_id },
-            select: {
-              id: true,
-              name: true,
-              config: true,
-              responsive: true,
-              domain: true,
-            },
-          }),
-          code: {
-            server: readDirectoryRecursively(
-              "binary",
-              code.path(site_id, "server", "build")
-            ),
-            site: readDirectoryRecursively(
-              "binary",
-              code.path(site_id, "site", "build")
-            ),
-            core: readDirectoryRecursively("binary", dir.path(`/app/srv/core`)),
-          },
+        // Add timeout and memory protection
+        const MAX_EXECUTION_TIME = 120000; // 2 minutes timeout
+        const startTime = Date.now();
+
+        const checkTimeout = () => {
+          if (Date.now() - startTime > MAX_EXECUTION_TIME) {
+            throw new Error(`Zip creation timeout after ${MAX_EXECUTION_TIME / 1000} seconds`);
+          }
         };
 
-        // Create the zip file
+        // Fetch all the site data with timeout checks
+        checkTimeout();
+        const result: any = {};
+
+        result.layouts = await _db.page.findMany({
+          where: {
+            id_site: site_id,
+            is_deleted: false,
+            name: { startsWith: "layout:" },
+          },
+          select: {
+            id: true,
+            name: true,
+            url: true,
+            content_tree: true,
+            is_default_layout: true,
+          },
+        });
+
+        checkTimeout();
+        result.pages = await _db.page.findMany({
+          where: {
+            id_site: site_id,
+            is_deleted: false,
+            name: { not: { startsWith: "layout:" } },
+          },
+          select: { id: true, name: true, url: true, content_tree: true },
+        });
+
+        checkTimeout();
+        result.comps = await _db.component.findMany({
+          where: {
+            component_group: {
+              OR: [
+                {
+                  id: "13143272-d4e3-4301-b790-2b3fd3e524e6",
+                },
+                { id: "cf81ff60-efe5-41d2-aa41-6f47549082b2" },
+                {
+                  component_site: { every: { id_site: site_id } },
+                },
+              ],
+            },
+          },
+          select: { id: true, content_tree: true },
+        });
+
+        checkTimeout();
+        result.public = readDirectoryRecursively(
+          "binary",
+          code.path(site_id, "site", "src", "public")
+        );
+
+        checkTimeout();
+        result.site = await _db.site.findFirst({
+          where: { id: site_id },
+          select: {
+            id: true,
+            name: true,
+            config: true,
+            responsive: true,
+            domain: true,
+          },
+        });
+
+        checkTimeout();
+        result.code = {
+          server: readDirectoryRecursively(
+            "binary",
+            code.path(site_id, "server", "build")
+          ),
+          site: readDirectoryRecursively(
+            "binary",
+            code.path(site_id, "site", "build")
+          ),
+          core: readDirectoryRecursively("binary", dir.path(`/app/srv/core`)),
+        };
+
+        // Create the zip file with timeout protection
         console.log(`Creating zip archive with ${Object.keys(result.public || {}).length} public files`);
+        checkTimeout();
         const zipBuffer = await createSiteZip(site_id, result);
 
         console.log(`Zip created successfully: ${zipBuffer.length} bytes`);

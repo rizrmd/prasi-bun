@@ -61,10 +61,28 @@ export const serveStatic = {
         }
 
         try {
+          const fileContent = await Bun.file(final_path).arrayBuffer();
+
+          // Validate the file content before caching
+          if (!fileContent || fileContent.byteLength === 0) {
+            console.warn(`Skipping empty file: ${final_path}`);
+            continue;
+          }
+
+          // Add file size limit for caching to prevent memory issues
+          const MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB per file
+          if (fileContent.byteLength > MAX_CACHE_SIZE) {
+            console.warn(`Skipping large file for caching: ${final_path} (${fileContent.byteLength} bytes)`);
+            continue;
+          }
+
+          // Create a copy of the ArrayBuffer to prevent modification
+          const arrayBufferCopy = fileContent.slice(0);
+
           cache.static[`/${file_path}`] = {
             type: mime.getType(file_path) || "application/octet-stream",
             compression: br ? "br" : "",
-            content: await Bun.file(final_path).arrayBuffer(),
+            content: arrayBufferCopy,
           };
         } catch (e: any) {
           console.error(`Failed to load static file: ${final_path}`);
@@ -125,7 +143,15 @@ export const serveStatic = {
           ...(file.compression ? { "content-encoding": file.compression } : {}),
         });
 
-        return rewriteResponse(file.content, {
+        // Create a copy of the ArrayBuffer to prevent modification of cached data
+        let content: ArrayBuffer;
+        if (file.content instanceof ArrayBuffer) {
+          content = file.content.slice(0);
+        } else {
+          content = file.content;
+        }
+
+        return rewriteResponse(content, {
           headers,
           opt,
         });
