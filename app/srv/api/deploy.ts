@@ -1,13 +1,12 @@
 import { apiContext } from "service-srv";
 import { validate } from "uuid";
 import { exists } from "fs-jetpack";
+import { dir } from "dir";
 import { code } from "../ws/sync/code/code";
 
 interface DeployRequest {
   type: "check" | "deploy" | "redeploy" | "deploy-del";
   id_site: string;
-  dlurl?: string;
-  load_from?: string;
   ts?: number;
 }
 
@@ -30,7 +29,7 @@ export const _ = {
 
     try {
       const body = await req.json() as DeployRequest;
-      const { type, id_site, dlurl, load_from, ts } = body;
+      const { type, id_site, ts } = body;
 
       // Validate site ID
       if (!validate(id_site)) {
@@ -87,8 +86,8 @@ export const _ = {
 
             // Check if production files exist in core directory
             const corePath = dir.path("/app/srv/core");
-            const prodMainExists = await exists(`${corePath}/main.js`);
-            const prodIndexExists = await exists(`${corePath}/index.html`);
+            const prodMainExists = exists(`${corePath}/main.js`);
+            const prodIndexExists = exists(`${corePath}/index.html`);
 
             if (!prodMainExists || !prodIndexExists) {
               console.log(`[DEPLOY] Production files missing in ${corePath}`);
