@@ -3,6 +3,7 @@ import { validate } from "uuid";
 import { exists } from "fs-jetpack";
 import { dir } from "dir";
 import { code } from "../ws/sync/code/code";
+import { readDirectoryRecursively } from "./prod-zip";
 
 interface DeployRequest {
   type: "check" | "deploy" | "redeploy" | "deploy-del";
@@ -28,8 +29,90 @@ export const _ = {
     const { req } = apiContext(this);
 
     try {
-      const body = await req.json() as DeployRequest;
-      const { type, id_site, ts } = body;
+      // Handle deployment download for deployed sites (GET requests)
+      if (req.method === "GET") {
+        const url = new URL(req.url);
+        const site_id = url.searchParams.get("site_id");
+        const ts = url.searchParams.get("ts");
+
+        if (!site_id || !validate(site_id)) {
+          return new Response("Invalid site ID", { status: 400 });
+        }
+
+        console.log(`[DEPLOY DOWNLOAD] Request for site: ${site_id}, ts: ${ts}`);
+
+        try {
+          // Check if site exists
+          const site = await _db.site.findFirst({
+            where: { id: site_id },
+            select: { id: true, name: true }
+          });
+
+          if (!site) {
+            return new Response("Site not found", { status: 404 });
+          }
+
+          // Create deployment data payload
+          const deployData = {
+            site: {
+              id: site.id,
+              name: site.name
+            },
+            timestamp: Date.now(),
+            pages: [],
+            components: [],
+            public: {},
+            code: {
+              server: {},
+              site: {},
+              core: {}
+            },
+            status: "success"
+          };
+
+          // Try to read site build data
+          try {
+            const siteBuildPath = code.path(site_id, "site", "build");
+            const serverBuildPath = code.path(site_id, "server", "build");
+
+            if (await import("fs-jetpack").then(({ exists }) => exists(siteBuildPath))) {
+              deployData.code.site = readDirectoryRecursively("string", siteBuildPath);
+            }
+
+            if (await import("fs-jetpack").then(({ exists }) => exists(serverBuildPath))) {
+              deployData.code.server = readDirectoryRecursively("string", serverBuildPath);
+            }
+          } catch (e: any) {
+            console.log(`[DEPLOY DOWNLOAD] Could not read build data: ${e.message}`);
+          }
+
+          // Convert to JSON and compress with proper gzip headers
+          const jsonString = JSON.stringify(deployData);
+          const gzippedData = await import("zlib").then(zlib =>
+            new Uint8Array(zlib.gzipSync(Buffer.from(jsonString, 'utf8'), { level: 9 }))
+          );
+
+          console.log(`[DEPLOY DOWNLOAD] Sending ${gzippedData.length} bytes for site: ${site_id}`);
+
+          return new Response(gzippedData, {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'Content-Encoding': 'gzip',
+              'Cache-Control': 'no-cache',
+              'Content-Disposition': `attachment; filename="deploy-${site_id}-${Date.now()}.gz"`
+            }
+          });
+
+        } catch (error: any) {
+          console.error(`[DEPLOY DOWNLOAD] Error for site ${site_id}:`, error);
+          return new Response(`Download failed: ${error.message}`, { status: 500 });
+        }
+      }
+
+      // Handle POST requests (existing deployment management)
+      const body = req.method === "POST" ? await req.json() as DeployRequest : null;
+      const { type, id_site, ts } = body || {};
 
       // Validate site ID
       if (!validate(id_site)) {
