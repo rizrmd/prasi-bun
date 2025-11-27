@@ -298,6 +298,27 @@ console.error("${e.message}");
     } else if (pathname === "index.html" || pathname === "_") {
       return index_html;
     } else {
+      // Handle main.js and index.css for all sites from core directory
+      if (pathname === "main.js") {
+        const src_path = dir.path(`/app/srv/core/main.js`);
+        const file = Bun.file(src_path);
+        if (await file.exists()) {
+          return new Response(file, {
+            headers: { "content-type": "application/javascript" }
+          });
+        }
+      }
+
+      if (pathname === "index.css") {
+        const src_path = dir.path(`/app/srv/core/index.css`);
+        const file = Bun.file(src_path);
+        if (await file.exists()) {
+          return new Response(file, {
+            headers: { "content-type": "text/css" }
+          });
+        }
+      }
+
       const src_path = dir.path(`/app/srv/core/${pathname}`);
 
       if (!g.main_cache) g.main_cache = {};

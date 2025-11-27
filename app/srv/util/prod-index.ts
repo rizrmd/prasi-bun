@@ -34,7 +34,7 @@ export const prodIndex = (
       }
     }
   </script>
-  <script src="/prod/${site_id}/main.js" type="module"></script>
+  <script src="/prod/_/main.js" type="module"></script>
 </body>
 
 </html>`;

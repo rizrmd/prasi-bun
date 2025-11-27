@@ -74,7 +74,7 @@ export const _ = {
 
 // Helper function to create site export zip
 async function createSiteExportZip(site_id: string, site_name: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const archive = archiver('zip', {
       zlib: { level: 9 } // Maximum compression
     });
