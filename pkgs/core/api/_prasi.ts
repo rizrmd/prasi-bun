@@ -28,7 +28,6 @@ export const _ = {
 
         const is_remote = req.query_parameters["remote"];
         if (is_remote) {
-          const cur_url = new URL(req.url);
           const remote_url = new URL(req.query_parameters["url"]);
 
           // Build the remote URL properly
