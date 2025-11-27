@@ -1,5 +1,6 @@
 import { format, formatDistance } from "date-fns";
 import { useGlobal, useLocal } from "web-utils";
+import { w } from "../../../../../utils/types/general";
 import { EDGlobal } from "../../../logic/ed-global";
 import { apiRef, apiUrl, server } from "./api-utils";
 import { ChevronDown } from "../../tree/node/item/indent";
@@ -47,7 +48,7 @@ export const EdApiDeploy = ({
                 const res = await api._deploy({
                   type: "deploy",
                   id_site: p.site.id,
-                  dlurl: `${serverurl}/site-export/${p.site.id}`,
+                  dlurl: `${w.serverurl}/site-export/${p.site.id}`,
                 });
 
                 server.status = "ready";
