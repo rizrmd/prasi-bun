@@ -30,14 +30,26 @@ export const _ = {
         if (is_remote) {
           const cur_url = new URL(req.url);
           const remote_url = new URL(req.query_parameters["url"]);
-          cur_url.hostname = remote_url.hostname;
-          cur_url.port = remote_url.port;
-          cur_url.protocol = remote_url.protocol;
-          const res = await (await fetch(cur_url.toString())).text();
 
-          return new Response(res, {
-            headers: { "content-type": "text/javascript; charset=UTF-8" },
-          });
+          // Build the remote URL properly
+          const remote_fetch_url = `${remote_url.protocol}//${remote_url.hostname}${remote_url.port ? ':' + remote_url.port : ''}/_prasi/load.js?url=${encodeURIComponent(req.query_parameters["url"])}&v3&dev=${req.query_parameters["dev"] || ''}`;
+
+          try {
+            const res = await fetch(remote_fetch_url);
+            if (!res.ok) {
+              throw new Error(`Remote fetch failed: ${res.status} ${res.statusText}`);
+            }
+            const text = await res.text();
+            return new Response(text, {
+              headers: { "content-type": "text/javascript; charset=UTF-8" },
+            });
+          } catch (e: any) {
+            console.error('Remote fetch error:', e.message);
+            return new Response(`// Remote fetch failed: ${e.message}`, {
+              status: 502,
+              headers: { "content-type": "text/javascript; charset=UTF-8" },
+            });
+          }
         }
 
         const mode = req.query_parameters["dev"] ? "dev" : "prod";
