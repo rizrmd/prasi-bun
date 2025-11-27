@@ -71,14 +71,7 @@ export const _ = {
 
         case "deploy": {
           // Handle new deployment
-          if (!dlurl) {
-            return Response.json({
-              status: "error",
-              message: "Download URL (dlurl) is required for deployment"
-            } as DeployResponse, { status: 400 });
-          }
-
-          console.log(`[DEPLOY] Starting deployment for site ${id_site} from ${dlurl}`);
+          console.log(`[DEPLOY] Starting deployment for site ${id_site}`);
 
           try {
             // Validate that the site build exists
@@ -92,15 +85,42 @@ export const _ = {
 
             const deployTimestamp = Date.now();
 
-            // TODO: Implement actual deployment logic here
-            // This could involve:
-            // 1. Downloading from dlurl if external
-            // 2. Copying files to deployment directory
-            // 3. Setting up domain/routing
-            // 4. Notifying external services
+            // Check if production files exist in core directory
+            const corePath = dir.path("/app/srv/core");
+            const prodMainExists = await exists(`${corePath}/main.js`);
+            const prodIndexExists = await exists(`${corePath}/index.html`);
 
-            // For now, simulate successful deployment
+            if (!prodMainExists || !prodIndexExists) {
+              console.log(`[DEPLOY] Production files missing in ${corePath}`);
+              console.log(`[DEPLOY] Available files:`, await import("fs").then(fs => fs.readdirSync(corePath)));
+
+              return Response.json({
+                status: "error",
+                message: "Production build files not found. Please run 'bun run build' first."
+              } as DeployResponse, { status: 400 });
+            }
+
+            // Mark deployment as active by creating a deployment record
+            const deployRecord = {
+              site_id: id_site,
+              timestamp: deployTimestamp,
+              build_path: buildPath,
+              core_path: corePath,
+              status: "active"
+            };
+
+            // Store deployment info for tracking
+            const deployInfoPath = dir.data(`/deploy/${id_site}/${deployTimestamp}.json`);
+            await import("fs-jetpack").then(({ dirAsync, writeAsync }) =>
+              dirAsync(dir.data(`/deploy/${id_site}`)).then(() =>
+                writeAsync(deployInfoPath, JSON.stringify(deployRecord, null, 2))
+              )
+            );
+
             console.log(`[DEPLOY] Deployment completed for site ${id_site}`);
+            console.log(`[DEPLOY] Site accessible at: /prod/${id_site}`);
+            console.log(`[DEPLOY] Build files at: ${buildPath}`);
+            console.log(`[DEPLOY] Core files at: ${corePath}`);
 
             return Response.json({
               current: deployTimestamp,
