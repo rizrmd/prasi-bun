@@ -16,7 +16,7 @@
     "fs-jetpack": "^5.1.0",
     "lmdb": "^2.8.5",
     "mime": "^3.0.0",
-    "msgpackr": "^1.10.1",
+    "msgpackr": "^1.11.9",
     "pino": "^8.16.1",
     "pino-pretty": "^10.2.3",
     "radash": "^11.0.0",

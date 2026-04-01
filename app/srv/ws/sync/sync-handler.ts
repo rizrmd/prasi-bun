@@ -14,7 +14,13 @@ import { previewLiveReload } from "./preview/live-reload";
 const packr = new Packr({ structuredClone: true });
 
 export const sendWS = (ws: ServerWebSocket<WSData>, msg: any) => {
-  ws.sendBinary(packr.pack(msg));
+  try {
+    ws.sendBinary(packr.pack(msg));
+  } catch (e) {
+    // Shared packr buffer can overflow on large payloads — retry with a fresh instance
+    const fresh = new Packr({ structuredClone: true });
+    ws.sendBinary(fresh.pack(msg));
+  }
 };
 
 export const syncHandler: WebSocketHandler<WSData> = {

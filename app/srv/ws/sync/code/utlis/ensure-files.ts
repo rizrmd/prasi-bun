@@ -102,7 +102,7 @@ export const ensureFiles = async (path: string, id_site: string) => {
               zod: "^3.22.4",
             },
           }),
-          { mode: 777 }
+          { mode: 0o777 }
         );
         let proc = Bun.spawn([`npm`, `install`], {
           stdio: ["inherit", "inherit", "inherit"],
