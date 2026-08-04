@@ -118,10 +118,14 @@ export const _ = {
                 },
               });
             } catch (e: any) {
+              const msg = String(e?.message || e)
+                .replace(/\\/g, "\\\\")
+                .replace(/"/g, '\\"')
+                .replace(/\r?\n/g, "\\n");
               return new Response(
                 `
 console.error("Failed to load index.js")
-console.error("${e.message}");
+console.error("${msg}");
 `,
                 {
                   headers: { "content-type": "application/javascript" },

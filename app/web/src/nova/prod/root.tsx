@@ -66,6 +66,9 @@ export const Root = () => {
         const fn = new Function("callback", `import("${url}").then(callback)`);
         await new Promise<void>((resolve) => {
           fn((exports: any) => {
+            // Keep module exports both as window.exports and individual globals
+            // (login scripts call bcrypt.compareSync from global/export scope).
+            (w as any).exports = { ...((w as any).exports || {}), ...exports };
             for (const [k, v] of Object.entries(exports)) {
               (w as any)[k] = v;
             }
@@ -138,7 +141,7 @@ export const Root = () => {
 
   if (page.id !== local.page_id) {
     base.init_local_effect = {};
-
+    local.page_id = page.id;
     listenChanges({ type: "page", id: page.id });
   }
 
@@ -168,10 +171,20 @@ export const Root = () => {
         render();
       });
 
-    return <Loading note="Loading page" />;
+    // Soft transition: keep previous page visible while loading next
+    // (avoids full white flash / "Loading page" blink on every navigation)
+    if (base.page.root && base.page.meta) {
+      // fall through and render previous root; cache will swap in when ready
+    } else {
+      return <Loading note="Loading page" />;
+    }
   } else {
     base.page.root = cache.root;
     base.page.meta = cache.meta;
+  }
+
+  if (!base.page.root) {
+    return <Loading note="Loading page" />;
   }
   // #endregion
 

@@ -120,6 +120,7 @@ export const initDevLiveReload = () => {
                     try {
                       fn((exports: any) => {
                         const w = window as any;
+                        w.exports = { ...(w.exports || {}), ...exports };
                         for (const [k, v] of Object.entries(exports)) {
                           w[k] = v;
                         }

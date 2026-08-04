@@ -252,9 +252,23 @@ import React from "react";
                   });
                 } else {
                   await codeError(id_site, "");
-                  await $`rm -rf ${out_dir_old}`.quiet().nothrow();
-                  await $`mv ${out_dir} ${out_dir_old}`.quiet().nothrow();
-                  await $`mv ${out_dir_temp} ${out_dir}`.quiet().nothrow();
+                  // Prefer Node fs renames — shell `mv` is unreliable on Windows
+                  // and can leave build stuck as build-temp only.
+                  try {
+                    const { rm, rename } = await import("node:fs/promises");
+                    await rm(out_dir_old, { recursive: true, force: true });
+                    try {
+                      await rename(out_dir, out_dir_old);
+                    } catch {
+                      // out_dir may not exist on first build
+                    }
+                    await rename(out_dir_temp, out_dir);
+                  } catch (e) {
+                    console.error("Failed to promote frontend build dirs", e);
+                    await $`rm -rf ${out_dir_old}`.quiet().nothrow();
+                    await $`mv ${out_dir} ${out_dir_old}`.quiet().nothrow();
+                    await $`mv ${out_dir_temp} ${out_dir}`.quiet().nothrow();
+                  }
 
                   const now = Date.now();
                   client_ids.forEach((client_id) => {

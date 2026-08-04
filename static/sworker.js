@@ -6,7 +6,16 @@
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
 
-(function (modules, entry, mainEntry, parcelRequireName, globalName) {
+(function (
+  modules,
+  entry,
+  mainEntry,
+  parcelRequireName,
+  externals,
+  distDir,
+  publicUrl,
+  devServer
+) {
   /* eslint-disable no-undef */
   var globalObject =
     typeof globalThis !== 'undefined'
@@ -25,6 +34,7 @@
     typeof globalObject[parcelRequireName] === 'function' &&
     globalObject[parcelRequireName];
 
+  var importMap = previousRequire.i || {};
   var cache = previousRequire.cache || {};
   // Do not use `require` to prevent Webpack from trying to bundle this call
   var nodeRequire =
@@ -35,6 +45,9 @@
   function newRequire(name, jumped) {
     if (!cache[name]) {
       if (!modules[name]) {
+        if (externals[name]) {
+          return externals[name];
+        }
         // if we cannot find the module within our internal map or
         // cache jump to the current global require ie. the last bundle
         // that was added to the page.
@@ -73,7 +86,7 @@
         localRequire,
         module,
         module.exports,
-        this
+        globalObject
       );
     }
 
@@ -81,7 +94,54 @@
 
     function localRequire(x) {
       var res = localRequire.resolve(x);
-      return res === false ? {} : newRequire(res);
+      if (res === false) {
+        return {};
+      }
+      // Synthesize a module to follow re-exports.
+      if (Array.isArray(res)) {
+        var m = {__esModule: true};
+        res.forEach(function (v) {
+          var key = v[0];
+          var id = v[1];
+          var exp = v[2] || v[0];
+          var x = newRequire(id);
+          if (key === '*') {
+            Object.keys(x).forEach(function (key) {
+              if (
+                key === 'default' ||
+                key === '__esModule' ||
+                Object.prototype.hasOwnProperty.call(m, key)
+              ) {
+                return;
+              }
+
+              Object.defineProperty(m, key, {
+                enumerable: true,
+                get: function () {
+                  return x[key];
+                },
+              });
+            });
+          } else if (exp === '*') {
+            Object.defineProperty(m, key, {
+              enumerable: true,
+              value: x,
+            });
+          } else {
+            Object.defineProperty(m, key, {
+              enumerable: true,
+              get: function () {
+                if (exp === 'default') {
+                  return x.__esModule ? x.default : x;
+                }
+                return x[exp];
+              },
+            });
+          }
+        });
+        return m;
+      }
+      return newRequire(res);
     }
 
     function resolve(x) {
@@ -93,6 +153,7 @@
   function Module(moduleName) {
     this.id = moduleName;
     this.bundle = newRequire;
+    this.require = nodeRequire;
     this.exports = {};
   }
 
@@ -101,6 +162,10 @@
   newRequire.modules = modules;
   newRequire.cache = cache;
   newRequire.parent = previousRequire;
+  newRequire.distDir = distDir;
+  newRequire.publicUrl = publicUrl;
+  newRequire.devServer = devServer;
+  newRequire.i = importMap;
   newRequire.register = function (id, exports) {
     modules[id] = [
       function (require, module) {
@@ -109,6 +174,10 @@
       {},
     ];
   };
+
+  // Only insert newRequire.load when it is actually used.
+  // The code in this file is linted against ES5, so dynamic import is not allowed.
+  // INSERT_LOAD_HERE
 
   Object.defineProperty(newRequire, 'root', {
     get: function () {
@@ -136,64 +205,60 @@
       define(function () {
         return mainExports;
       });
-
-      // <script>
-    } else if (globalName) {
-      this[globalName] = mainExports;
     }
   }
-})({"jj91m":[function(require,module,exports) {
+})({"cMN5a":[function(require,module,exports,__globalThis) {
 var _serviceWorker = require("@parcel/service-worker");
 const manifest = [
     "/index.html",
-    "/index.38d43b6d.css",
-    "/index.50269ee5.css",
-    "/jetbrains-mono-cyrillic-ext-400-normal.01f99d06.woff2",
-    "/jetbrains-mono-cyrillic-ext-400-normal.b19dae56.woff",
-    "/jetbrains-mono-cyrillic-400-normal.c27eb9dd.woff2",
-    "/jetbrains-mono-cyrillic-400-normal.12e183dd.woff",
-    "/jetbrains-mono-greek-400-normal.fab63212.woff2",
-    "/jetbrains-mono-greek-400-normal.69c2db8b.woff",
-    "/jetbrains-mono-vietnamese-400-normal.72fde104.woff2",
-    "/jetbrains-mono-vietnamese-400-normal.cde33dd0.woff",
-    "/jetbrains-mono-latin-ext-400-normal.510ef9e7.woff2",
-    "/jetbrains-mono-latin-ext-400-normal.8522e56b.woff",
-    "/jetbrains-mono-latin-400-normal.785c446b.woff2",
-    "/jetbrains-mono-latin-400-normal.f1e9154a.woff",
-    "/index.0ef5fe45.css",
-    "/source-sans-3-cyrillic-ext-400-normal.092a473c.woff2",
-    "/source-sans-3-cyrillic-ext-400-normal.ff53f249.woff",
-    "/source-sans-3-cyrillic-400-normal.f971b9ad.woff2",
-    "/source-sans-3-cyrillic-400-normal.d31f6c55.woff",
-    "/source-sans-3-greek-ext-400-normal.2f1e4560.woff2",
-    "/source-sans-3-greek-ext-400-normal.e253957a.woff",
-    "/source-sans-3-greek-400-normal.30e09ac6.woff2",
-    "/source-sans-3-greek-400-normal.a9365509.woff",
-    "/source-sans-3-vietnamese-400-normal.8175b15f.woff2",
-    "/source-sans-3-vietnamese-400-normal.a0f67db9.woff",
-    "/source-sans-3-latin-ext-400-normal.8180fdee.woff2",
-    "/source-sans-3-latin-ext-400-normal.0483ba2f.woff",
-    "/source-sans-3-latin-400-normal.43f5aafe.woff2",
-    "/source-sans-3-latin-400-normal.6f62a854.woff",
-    "/index.60241935.js",
-    "/login.3daaefac.js",
-    "/logout.920e94f5.js",
-    "/register.5db9c712.js",
-    "/all.5b92210c.js",
-    "/ed.9bc33a21.js",
+    "/web.5ce799cf.css",
+    "/web.42c3c6c6.css",
+    "/jetbrains-mono-cyrillic-ext-400-normal.efbbb8bf.woff2",
+    "/jetbrains-mono-cyrillic-ext-400-normal.c31ed161.woff",
+    "/jetbrains-mono-cyrillic-400-normal.f5622044.woff2",
+    "/jetbrains-mono-cyrillic-400-normal.f213832e.woff",
+    "/jetbrains-mono-greek-400-normal.8b41f7b5.woff2",
+    "/jetbrains-mono-greek-400-normal.3967a17d.woff",
+    "/jetbrains-mono-vietnamese-400-normal.083ba072.woff2",
+    "/jetbrains-mono-vietnamese-400-normal.c75734aa.woff",
+    "/jetbrains-mono-latin-ext-400-normal.665bf05c.woff2",
+    "/jetbrains-mono-latin-ext-400-normal.ba315d1f.woff",
+    "/jetbrains-mono-latin-400-normal.4394ea15.woff2",
+    "/jetbrains-mono-latin-400-normal.11a7fa3a.woff",
+    "/web.805fc849.css",
+    "/source-sans-3-cyrillic-ext-400-normal.6cdc2570.woff2",
+    "/source-sans-3-cyrillic-ext-400-normal.ca71eb9d.woff",
+    "/source-sans-3-cyrillic-400-normal.beb585e3.woff2",
+    "/source-sans-3-cyrillic-400-normal.0007913b.woff",
+    "/source-sans-3-greek-ext-400-normal.c70423a9.woff2",
+    "/source-sans-3-greek-ext-400-normal.3045d648.woff",
+    "/source-sans-3-greek-400-normal.c9e545d9.woff2",
+    "/source-sans-3-greek-400-normal.1dd59bc9.woff",
+    "/source-sans-3-vietnamese-400-normal.03a2b5b0.woff2",
+    "/source-sans-3-vietnamese-400-normal.429f621d.woff",
+    "/source-sans-3-latin-ext-400-normal.85c23614.woff2",
+    "/source-sans-3-latin-ext-400-normal.e7773c46.woff",
+    "/source-sans-3-latin-400-normal.d1938bd0.woff2",
+    "/source-sans-3-latin-400-normal.82c81400.woff",
+    "/web.74e46de4.js",
+    "/login.c60e5c22.js",
+    "/logout.fde209c8.js",
+    "/register.965997e0.js",
+    "/all.c833d69b.js",
+    "/ed.2526c45f.js",
     "/wasm_gzip.922c2de1.wasm",
-    "/standalone.0aea92ae.js",
-    "/estree.4a6560c1.js",
-    "/typescript.9d343126.js",
-    "/dist.1f9430ff.js",
-    "/esm.87f94ee9.js",
-    "/index.module.7282dc17.js",
-    "/ed.400f6bfd.css"
+    "/standalone.e8128d96.js",
+    "/estree.e1ceecb0.js",
+    "/typescript.0041ce49.js",
+    "/dist.3449f913.js",
+    "/esm.5dd695ca.js",
+    "/index.module.1eaa218b.js",
+    "/ed.d99b2079.css"
 ];
-const version = "3f66762a";
+const version = "621c7202";
 (0, _serviceWorker._register)(manifest, version);
 
-},{"@parcel/service-worker":"et5Hi"}],"et5Hi":[function(require,module,exports) {
+},{"@parcel/service-worker":"dpQWa"}],"dpQWa":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "manifest", ()=>manifest);
@@ -201,26 +266,26 @@ parcelHelpers.export(exports, "version", ()=>version);
 // Called by the runtime.
 parcelHelpers.export(exports, "_register", ()=>_register);
 let manifest = [];
-let version = "";
+let version = '';
 function _register(m, v) {
     manifest = m;
     version = v;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"jpDjm":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"ac9ov"}],"ac9ov":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
     };
 };
 exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, "__esModule", {
+    Object.defineProperty(a, '__esModule', {
         value: true
     });
 };
 exports.exportAll = function(source, dest) {
     Object.keys(source).forEach(function(key) {
-        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        if (key === 'default' || key === '__esModule' || Object.prototype.hasOwnProperty.call(dest, key)) return;
         Object.defineProperty(dest, key, {
             enumerable: true,
             get: function() {
@@ -237,7 +302,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"aLfyY":[function(require,module,exports) {
+},{}],"aLfyY":[function(require,module,exports,__globalThis) {
 var _serviceWorker = require("@parcel/service-worker");
 var _radix3 = require("radix3");
 var _timestamp = require("../timestamp");
@@ -341,7 +406,7 @@ addEventListener("message", async (e)=>{
     }
 });
 
-},{"@parcel/service-worker":"et5Hi","radix3":"80B3m","../timestamp":"1koxN","../public_files":"lXNsG"}],"80B3m":[function(require,module,exports) {
+},{"@parcel/service-worker":"dpQWa","radix3":"hNA4t","../timestamp":"1koxN","../public_files":"lXNsG"}],"hNA4t":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "NODE_TYPES", ()=>NODE_TYPES);
@@ -560,13 +625,13 @@ function _routerNodeToTable(initialPath, initialNode) {
     return table;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"1koxN":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"ac9ov"}],"1koxN":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "version", ()=>version);
-const version = "jumi3sv";
+const version = "jirh300";
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}],"lXNsG":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"ac9ov"}],"lXNsG":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "files", ()=>files);
@@ -689,6 +754,6 @@ const files = [
     "monaco/min/vs/loader.js"
 ];
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jpDjm"}]},["jj91m","aLfyY"], "aLfyY", "parcelRequire2d1f")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"ac9ov"}]},["cMN5a","aLfyY"], "aLfyY", "parcelRequire2d1f", {})
 
 //# sourceMappingURL=sworker.js.map

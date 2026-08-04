@@ -2,19 +2,15 @@ import { spawn } from "bun";
 import { dirAsync } from "fs-jetpack";
 import { dir } from "./dir";
 import { g } from "./global";
-import { platform } from "os";
 
 const decoder = new TextDecoder();
 export const parcelBuild = async () => {
   await dirAsync(dir.path(`static`));
 
+  // Always invoke parcel via node + package entry (Windows .bin/*.exe shims break under node)
   const args = [
     "node",
-    dir.path(
-      platform() === "win32"
-        ? "node_modules/.bin/parcel.exe"
-        : "node_modules/.bin/parcel"
-    ),
+    dir.path("node_modules/parcel/lib/bin.js"),
     g.mode === "dev" ? "watch" : "build",
     "./src/index.html",
     g.mode === "dev" ? "--no-hmr" : "",
@@ -36,13 +32,24 @@ export const parcelBuild = async () => {
 
       let output = true;
       let decoded = false;
+      const markReady = (text: string) => {
+        // Parcel prints ✨ on Unix; on Windows often "Built" / "√ Built"
+        if (
+          !decoded &&
+          (text.includes("✨") ||
+            text.includes("Built in") ||
+            text.includes("√ Built") ||
+            text.includes("√"))
+        ) {
+          resolve();
+          decoded = true;
+        }
+      };
       (async () => {
         if (parcel.stdout) {
           for await (const chunk of parcel.stdout as any) {
-            if (!decoded && decoder.decode(chunk).includes("✨")) {
-              resolve();
-              decoded = true;
-            }
+            const text = decoder.decode(chunk);
+            markReady(text);
             if (output) process.stdout.write(chunk);
           }
         }
@@ -51,6 +58,8 @@ export const parcelBuild = async () => {
       (async () => {
         if (parcel.stderr) {
           for await (const chunk of parcel.stderr as any) {
+            const text = decoder.decode(chunk);
+            markReady(text);
             if (output) process.stderr.write(chunk);
           }
         }
