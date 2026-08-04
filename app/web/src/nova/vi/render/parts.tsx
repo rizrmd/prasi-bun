@@ -96,6 +96,55 @@ export const viParts = (
     delete props.dangerouslySetInnerHTML;
   }
 
+  // Apply page linktag (e.g. home "Kelola" → /staff-pengajar/home/kelola)
+  // mobile.linktag takes priority in mobile mode; fall back to root linktag.
+  const mobileLink =
+    item.mobile && typeof item.mobile === "object"
+      ? (item.mobile as any).linktag?.link
+      : undefined;
+  const rootLink = item.linktag?.link;
+  const link =
+    vi.mode === "mobile"
+      ? mobileLink || rootLink
+      : rootLink || mobileLink;
+
+  if (typeof link === "string" && link.trim()) {
+    const href = link.trim();
+    props.style = {
+      ...(typeof props.style === "object" && props.style
+        ? (props.style as object)
+        : {}),
+      cursor: "pointer",
+    } as any;
+    const prevClick = props.onClick;
+    props.onClick = (e) => {
+      if (typeof prevClick === "function") prevClick(e);
+      if (e.defaultPrevented) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const nav = (window as any).navigate as
+        | ((url: string) => void)
+        | undefined;
+      if (typeof nav === "function") {
+        nav(href);
+      } else if (href.startsWith("http")) {
+        location.href = href;
+      } else {
+        // fallback: respect /prod/<siteId> prefix
+        if (
+          location.pathname.startsWith("/prod/") &&
+          href.startsWith("/") &&
+          !href.startsWith("/prod/")
+        ) {
+          const siteId = location.pathname.split("/")[2];
+          location.href = `/prod/${siteId}${href}`;
+        } else {
+          location.href = href;
+        }
+      }
+    };
+  }
+
   return {
     props,
     text_props,

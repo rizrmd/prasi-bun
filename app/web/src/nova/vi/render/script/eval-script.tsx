@@ -93,43 +93,52 @@ export const viEvalScript = (
             }
 
             if (el.props?.children) {
-              if (!Array.isArray(el.props.children)) {
-                el.props.children = [el.props.children];
-              }
-              if (Array.isArray(el.props.children)) {
-                for (const child of el.props.children) {
-                  if (Array.isArray(child)) {
-                    const sub_child = [];
-                    let sub_replace = false;
-                    for (const c of child) {
-                      let nc = override_children(c);
-                      if (nc.should_replace) {
-                        sub_child.push(nc.el);
-                        sub_replace = true;
-                      } else {
-                        sub_child.push(c);
-                      }
-                    }
-                    if (sub_replace) {
-                      should_replace = true;
-                      new_childs.push(sub_child);
+              // React 18+ freezes element.props — never mutate el.props.children
+              const rawChildren = el.props.children;
+              const childList = Array.isArray(rawChildren)
+                ? rawChildren
+                : [rawChildren];
+              for (const child of childList) {
+                if (Array.isArray(child)) {
+                  const sub_child = [];
+                  let sub_replace = false;
+                  for (const c of child) {
+                    let nc = override_children(c);
+                    if (nc.should_replace) {
+                      sub_child.push(nc.el);
+                      sub_replace = true;
                     } else {
-                      new_childs.push(child);
+                      sub_child.push(c);
                     }
-                  } else if (typeof child === "object" && child) {
-                    if (child.type === meta.script?.PassProp) {
-                      should_replace = true;
-                      new_childs.push({
-                        ...child,
-                        props: {
-                          ...child.props,
-                          internal_key: child.props.key,
-                        },
-                      });
-                    }
+                  }
+                  if (sub_replace) {
+                    should_replace = true;
+                    new_childs.push(sub_child);
                   } else {
                     new_childs.push(child);
                   }
+                } else if (typeof child === "object" && child) {
+                  if (child.type === meta.script?.PassProp) {
+                    should_replace = true;
+                    new_childs.push({
+                      ...child,
+                      props: {
+                        ...child.props,
+                        internal_key: child.props.key,
+                      },
+                    });
+                  } else {
+                    // keep non-PassProp elements (Local, etc.)
+                    const nc = override_children(child);
+                    if (nc.should_replace) {
+                      should_replace = true;
+                      new_childs.push(nc.el);
+                    } else {
+                      new_childs.push(child);
+                    }
+                  }
+                } else {
+                  new_childs.push(child);
                 }
               }
             }

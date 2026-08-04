@@ -31,6 +31,7 @@ export const createViLocal = (
     effect?: (local: T) => void | Promise<void>;
     parent_key?: any;
     deps?: any[];
+    cache?: boolean;
   }) => {
     const isEditor =
       (["prasi.avolut.com"].includes(location.hostname) ||
@@ -43,6 +44,9 @@ export const createViLocal = (
     const curid = vi.page.cur.id + "~" + id;
 
     const resetLocal = (from: string) => {
+      if (!local_cached_value[curid]) {
+        local_cached_value[curid] = { value: {}, mounted: location.pathname };
+      }
       for (const [k, v] of Object.entries(local_cached_value[curid].value)) {
         delete local_cached_value[curid].value[k];
       }
@@ -57,6 +61,7 @@ export const createViLocal = (
           set({});
         }
       };
+      local_cached_value[curid].mounted = location.pathname;
     };
 
     if (!local_cached_value[curid]) {
