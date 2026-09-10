@@ -240,12 +240,12 @@ const manifest = [
     "/source-sans-3-latin-ext-400-normal.e7773c46.woff",
     "/source-sans-3-latin-400-normal.d1938bd0.woff2",
     "/source-sans-3-latin-400-normal.82c81400.woff",
-    "/web.58895c15.js",
+    "/web.c61a071a.js",
     "/login.c60e5c22.js",
     "/logout.fde209c8.js",
     "/register.965997e0.js",
     "/all.c833d69b.js",
-    "/ed.9e92d403.js",
+    "/ed.f4d0a63e.js",
     "/wasm_gzip.922c2de1.wasm",
     "/standalone.e8128d96.js",
     "/estree.e1ceecb0.js",
@@ -255,7 +255,7 @@ const manifest = [
     "/index.module.1eaa218b.js",
     "/ed.d99b2079.css"
 ];
-const version = "48364c4d";
+const version = "8545a236";
 (0, _serviceWorker._register)(manifest, version);
 
 },{"@parcel/service-worker":"dpQWa"}],"dpQWa":[function(require,module,exports,__globalThis) {
@@ -629,7 +629,7 @@ function _routerNodeToTable(initialPath, initialNode) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "version", ()=>version);
-const version = "fl1dz7g";
+const version = "l9yna7c";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"ac9ov"}],"lXNsG":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");

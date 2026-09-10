@@ -54,11 +54,36 @@ export const createViLocal = (
         local_cached_value[curid].value[k] = v;
       }
       local_cached_value[curid].value.render = () => {
-        const w = window as any;
-        if (!w.isEditor && w.prasiContext.render) {
-          w.prasiContext.render();
-        } else {
+        // Always update this Local subtree first.
+        try {
           set({});
+        } catch {
+          /* ignore */
+        }
+        // Many menus/page scripts rely on full page re-render to clear loading
+        // flags and unlock clicks. Debounce full render lightly to avoid storms
+        // without dropping the final state (loading→ready).
+        const w = window as any;
+        if (!w.isEditor && w.prasiContext?.render) {
+          try {
+            if (w.__ml_local_full_render_timer) {
+              clearTimeout(w.__ml_local_full_render_timer);
+            }
+            w.__ml_local_full_render_timer = setTimeout(() => {
+              w.__ml_local_full_render_timer = null;
+              try {
+                w.prasiContext.render();
+              } catch {
+                /* ignore */
+              }
+            }, 40);
+          } catch {
+            try {
+              w.prasiContext.render();
+            } catch {
+              /* ignore */
+            }
+          }
         }
       };
       local_cached_value[curid].mounted = location.pathname;
